@@ -1,0 +1,52 @@
+.app-container{
+    background:#30303d;
+}
+
+.graphContainer{
+     background-color: #30303d; 
+     color: #fff;
+}
+
+.summaryPieContainer{
+    padding-right: 5px!important;
+    padding-left: 5px!important;
+}
+
+.timeSeriesContainer{
+    padding-left: 0px;
+}
+
+#graphdiv{
+    width:100%;
+    margin-bottom: 40px;
+}
+
+.news-feed-title{
+    color: #a3a3b3;
+    text-transform: uppercase;
+     padding-left: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.termBrowserContainer{
+    padding-right: 0px;
+    margin-right: 0px;
+    padding-left: 8px!important;
+}
+
+.heatmapContainer{
+    padding-left: 0px!important;
+}
+
+.dashboard-grid > div > div > div {
+  width: 100%;
+}
+
+.react-grid-item > .react-resizable-handle{
+    background: url('/images/handleIcon.svg')!important;
+    font-family: FontAwesome!important;
+    color: #757575!important;
+    padding-right: 25px;
+    padding-bottom: 25px;
+}
