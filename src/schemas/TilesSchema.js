@@ -40,6 +40,7 @@ module.exports = graphql.buildSchema(`
     name: String,
     name_ar: String,
     name_ur: String,
+    name_id: String,
     id: String,
     population: Float,
     kind: String,
