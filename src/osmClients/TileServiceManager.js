@@ -65,6 +65,7 @@ function InvokeServiceRequest(url, callback, featureCollection, bboxPolygon){
                                     const placeName = feature.properties["name:en"] || feature.properties.name;
                                     const placeNameAr = feature.properties["name:ar"] || placeName;
                                     const placeNameUr = feature.properties["name:ur"] || placeName;
+                                    const placeNameId = feature.properties["name:id"] || placeName;
                                     const id = feature.properties.id;
                                     const urlPart = url.split('/');
                                     const tileZ = urlPart[5];
@@ -74,7 +75,7 @@ function InvokeServiceRequest(url, callback, featureCollection, bboxPolygon){
                                     if(id && placeName && feature.geometry.type === "Point"){
                                         featureCollection.set(placeName, Object.assign({}, {
                                             coordinates: coordinates, id: id, source: feature.properties.source, 
-                                            name: placeName, name_ur: placeNameUr, name_ar: placeNameAr, kind: feature.properties.kind,
+                                            name: placeName, name_ur: placeNameUr, name_id: placeNameId, name_ar: placeNameAr, kind: feature.properties.kind,
                                             population: population, tileId: `${tileZ}_${tileY}_${tileX}`
                                         }));
                                     }
