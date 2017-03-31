@@ -223,6 +223,7 @@ export const AdminLocations = React.createClass({
                                                             name: geoJsonFeature.properties.name,
                                                             name_ar: geoJsonFeature.properties.name_ar,
                                                             name_ur: geoJsonFeature.properties.name_ur,
+                                                            name_id: geoJsonFeature.properties.name_id,
                                                             originalsource: geoJsonFeature.properties.originalsource,
                                                             population: geoJsonFeature.properties.population || 0,
                                                             coordinates: geoJsonFeature.geometry.coordinates.join(","),
@@ -260,6 +261,7 @@ export const AdminLocations = React.createClass({
                const selectedLocation = {
                    name: e.feature.properties.name,
                    name_ar: "",
+                   name_id: "",
                    name_ur: "",
                    population: e.feature.properties.population || 0,
                    originalsource: e.feature.properties.source,
