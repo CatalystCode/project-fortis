@@ -141,8 +141,9 @@ export const AdminStore = Fluxxor.createStore({
             const name = feature.name.toLowerCase();
             const name_ar = feature.name_ar.toLowerCase();
             const name_ur = feature.name_ur.toLowerCase();
+            const name_id = feature.name_id.toLowerCase();
             const RowKey = `${id}`;
-            const properties = {population, RowKey, kind, name, name_ar, name_ur, originalsource};
+            const properties = {population, RowKey, kind, name, name_ar, name_id, name_ur, originalsource};
             const geometry = { "type": "Point", "coordinates": coordinates};
 
             if(keyName === 'town' && population >= POPULATED_TOWN){
