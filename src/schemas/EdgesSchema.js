@@ -23,6 +23,7 @@ module.exports = graphql.buildSchema(`
     originalsource: String,
     coordinates: [Float]
     name_ar: String
+    name_de: String
     name_ur: String
     name_id: String
     alternatenames: String
@@ -38,6 +39,7 @@ module.exports = graphql.buildSchema(`
     type: EdgeType
     name_ar: String
     name_ur: String
+    name_de: String
     name_id: String
     demographic: String
     RowKey: String
@@ -48,6 +50,7 @@ module.exports = graphql.buildSchema(`
     type: EdgeType
     name_ar: String
     name_ur: String
+    name_de: String
     name_id: String
     demographic: String
     RowKey: String
@@ -63,6 +66,7 @@ module.exports = graphql.buildSchema(`
     region: String
     name_ar: String
     name_ur: String
+    name_de: String
     name_id: String
     aciiname: String
     population: Float

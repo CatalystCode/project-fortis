@@ -99,6 +99,7 @@ function QueryLocalities(languages, pgClient, callback){
                         "name_ar": location.ar_name ? location.ar_name.toLowerCase() : '',
                         "name_ur": location.ur_name ? location.ur_name.toLowerCase() : '',
                         "name_id": location.id_name ? location.id_name.toLowerCase() : '',
+                        "name_de": location.de_name ? location.de_name.toLowerCase() : '',
                         "coordinates": [location.longitude, location.latitude],
                         "population": location.population,
                         "alternatenames": location.alternatenames,
@@ -685,7 +686,7 @@ group by original_sources;`;
             const upsertStmts = modifiedLocations.map(location=>{
                 return `INSERT INTO localities (
                             geonameid, originalsource, feature_class, name, region, alternatenames, 
-                            aciiname, country_iso, geog, adminid, population, ar_name, ur_name, id_name
+                            aciiname, country_iso, geog, adminid, population, ar_name, ur_name, id_name, de_name
                         ) VALUES (
                             ${parseInt(location.RowKey)}, 
                             '${location.originalsource}', 
@@ -700,7 +701,8 @@ group by original_sources;`;
                             ${location.population},
                             '${location.name_ar ? location.name_ar.replace(/\'/g, "\''") : ""}',
                             '${location.name_ur ? location.name_ur.replace(/\'/g, "\''") : ""}',
-                            '${location.name_id ? location.name_id.replace(/\'/g, "\''") : ""}'
+                            '${location.name_id ? location.name_id.replace(/\'/g, "\''") : ""}',
+                            '${location.name_de ? location.name_de.replace(/\'/g, "\''") : ""}'
                         ) ON CONFLICT (geonameid, originalsource) DO UPDATE SET
                             name = '${location.name.replace(/\'/g, "\''")}',
                             adminid = 0,
@@ -713,6 +715,7 @@ group by original_sources;`;
                             ar_name = '${location.name_ar ? location.name_ar.replace(/\'/g, "\''") : ""}',
                             ur_name = '${location.name_ur ? location.name_ur.replace(/\'/g, "\''") : ""}',
                             id_name = '${location.name_id ? location.name_id.replace(/\'/g, "\''") : ""}',
+                            de_name = '${location.name_de ? location.name_de.replace(/\'/g, "\''") : ""}',
                             geog = ST_SetSRID(ST_MakePoint(${location.coordinates[0]}, ${location.coordinates[1]}), 4326)
                         ;`;
             });

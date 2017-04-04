@@ -10,7 +10,7 @@ let turfBbox = require('turf-bbox-polygon');
 let geotile = require('geotile');
 
 const PARALLELISM_LIMIT = 50;
-const TILE_SERVICE = "https://vector.mapzen.com/osm/places";
+const TILE_SERVICE = "http://tile.mapzen.com/mapzen/vector/v1/places";
 const VALID_PLACE_KINDS = ["neighbourhood", "hamlet", "suburb", "locality", "town", "village", "city", "county", "district", "Populated place"];
 
 const FetchSiteDefintion = (siteId, callback) => {
@@ -18,7 +18,6 @@ const FetchSiteDefintion = (siteId, callback) => {
     if(siteDefinition){
         return callback(undefined, siteDefinition);
     }else{
-        console.log(`Looking up site code for site [${siteId}]`);
         azureTableService.GetSiteDefinition(siteId, (error, siteList) => {
             if(!error && siteList && siteList.length > 0){
                 siteDefinition = siteList[0].properties;
@@ -58,7 +57,6 @@ function InvokeServiceRequest(url, callback, featureCollection, bboxPolygon){
                             body.features.forEach(feature => {
                                 const featureType = feature.properties.kind;
                                 const coordinates = feature.geometry.coordinates;
-
                                 if(featureType && PointFeatureInsideBBox(coordinates, bboxPolygon) 
                                                && VALID_PLACE_KINDS.indexOf(featureType) > -1){
                                     const population = feature.properties.population;
@@ -66,6 +64,7 @@ function InvokeServiceRequest(url, callback, featureCollection, bboxPolygon){
                                     const placeNameAr = feature.properties["name:ar"] || placeName;
                                     const placeNameUr = feature.properties["name:ur"] || placeName;
                                     const placeNameId = feature.properties["name:id"] || placeName;
+                                    const placeNameDe = feature.properties["name:de"] || placeName;
                                     const id = feature.properties.id;
                                     const urlPart = url.split('/');
                                     const tileZ = urlPart[5];
@@ -75,7 +74,7 @@ function InvokeServiceRequest(url, callback, featureCollection, bboxPolygon){
                                     if(id && placeName && feature.geometry.type === "Point"){
                                         featureCollection.set(placeName, Object.assign({}, {
                                             coordinates: coordinates, id: id, source: feature.properties.source, 
-                                            name: placeName, name_ur: placeNameUr, name_id: placeNameId, name_ar: placeNameAr, kind: feature.properties.kind,
+                                            name: placeName, name_ur: placeNameUr, name_id: placeNameId, name_ar: placeNameAr, name_de: placeNameDe, kind: feature.properties.kind,
                                             population: population, tileId: `${tileZ}_${tileY}_${tileX}`
                                         }));
                                     }
@@ -112,6 +111,7 @@ module.exports = {
                     let featureCollection = new Map();
 
                     async.eachLimit(serviceCalls, PARALLELISM_LIMIT, (serviceCall, cb) => InvokeServiceRequest(serviceCall, cb, featureCollection, bboxPolygon), err=> {
+                        
                         callback(err, Array.from(featureCollection.values()))
                     });
                 }else{
