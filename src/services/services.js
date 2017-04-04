@@ -10,6 +10,7 @@ const locationEdgeFragment = `fragment FortisDashboardLocationEdges on LocationC
                                             name_ar
                                             name_ur
                                             name_id
+                                            name_de
                                             type
                                             coordinates
                                             population
@@ -28,6 +29,7 @@ const termsEdgeFragment = ` fragment FortisDashboardTermEdges on TermCollection 
                                         name
                                         type
                                         name_ar
+                                        name_de
                                         name_ur
                                         name_id
                                         RowKey
@@ -104,6 +106,7 @@ const placeCollectiontFragment = `fragment FortisDashboardLocations on PlaceColl
                                             id
                                             name_ar
                                             name_ur
+                                            name_de
                                             name_id
                                             population
                                         }
@@ -606,6 +609,7 @@ export const SERVICES = {
                                         name, 
                                         name_ar,
                                         name_id,
+                                        name_de,
                                         name_ur
                                     }
                                 }`;
