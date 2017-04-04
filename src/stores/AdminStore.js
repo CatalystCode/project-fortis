@@ -140,6 +140,7 @@ export const AdminStore = Fluxxor.createStore({
             const originalsource = PLACE_SOURCE_KEYS[source];
             const name = feature.name.toLowerCase();
             const name_ar = feature.name_ar.toLowerCase();
+            const name_de = feature.name_de.toLowerCase();
             const name_ur = feature.name_ur.toLowerCase();
             const name_id = feature.name_id.toLowerCase();
             const RowKey = `${id}`;
@@ -175,7 +176,6 @@ export const AdminStore = Fluxxor.createStore({
         columns.push(Object.assign({}, defaultColDef, {filterable: false, compositeKey: true, editable: false, key: "RowKey", name: "Id"}));
         languages.forEach(lang => {
             columns.push(Object.assign({}, defaultColDef, {
-                                                           compositeKey: true, 
                                                            key: lang !== "en" ? `name_${lang}` : 'name', 
                                                            name: lang !== "en" ? `name_${lang}` : 'name'
                                                           }))            
