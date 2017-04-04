@@ -4,9 +4,9 @@ import React from 'react';
 import Fluxxor from 'fluxxor';
 import moment from 'moment';
 // eslint-disable-next-line
-import ReactDataGridPlugins from 'react-data-grid-addons';
 import {guid} from '../../utils/Utils.js';
 
+const { Toolbar, Data: { Selectors } } = require('react-data-grid-addons');
 const STATE_ACTIONS = {
     SAVED: "saved",
     SAVING: "saving",
@@ -15,7 +15,6 @@ const STATE_ACTIONS = {
     TRANSLATING: "translating"
 };
 
-const Toolbar             = window.ReactDataGridPlugins.Toolbar;
 const FluxMixin = Fluxxor.FluxMixin(React), StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 const RowRenderer = React.createClass({
     getRowStyle: function() {
@@ -146,7 +145,7 @@ export const DataGrid = React.createClass({
       this.props.handleRemove(selectedRows);
   },
   getSize() {
-      return this.state.rows.length;
+      return Selectors.getRows(this.state).length;
   },
   handleAddRow(e){
       let newRow = {}, rows = this.state.rows;
@@ -199,11 +198,7 @@ handleGridRowsUpdated(updatedRowData) {
       this.setState({modifiedRows, localAction, rows});
   },
   rowGetter(rowIdx){
-    if (rowIdx < 0 || rowIdx > this.getSize()) {
-      return undefined;
-    }
-
-    return this.state.rows[rowIdx];
+    return Selectors.getRows(this.state)[rowIdx];
   },
   onClearFilters(){
     this.setState({filters: {} });
@@ -459,7 +454,7 @@ handleGridRowsUpdated(updatedRowData) {
                                             modifiedRows={this.state.modifiedRows}/>}
                   onAddFilter={this.handleFilterChange}
                   onGridRowsUpdated={this.handleGridRowsUpdated}
-                  toolbar={<Toolbar enableFilter={true}
+                  toolbar={<Toolbar enableFilter={true} 
                                     {...toolBarProps}/>}
                   getValidFilterValues={this.getValidFilterValues}
                   rowsCount={this.getSize()}
