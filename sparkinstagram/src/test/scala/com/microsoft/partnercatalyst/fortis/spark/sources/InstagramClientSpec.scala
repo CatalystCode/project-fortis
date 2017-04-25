@@ -1,6 +1,7 @@
-package com.microsoft.partnercatalyst.fortis.spark.instagram.client
+package com.microsoft.partnercatalyst.fortis.spark.sources
 
-import com.microsoft.partnercatalyst.fortis.spark.instagram.dto.{Image, Instagram}
+import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client.{Auth, InstagramClient}
+import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.dto.{Image, Instagram}
 import org.scalatest.FlatSpec
 
 class InstagramTestClient(response: String) extends InstagramClient(Auth("token")) {

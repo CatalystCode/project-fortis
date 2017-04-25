@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.instagram.client
+package com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client
 
 import scala.io.Source
 

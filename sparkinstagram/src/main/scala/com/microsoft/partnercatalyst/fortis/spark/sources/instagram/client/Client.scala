@@ -1,6 +1,6 @@
-package com.microsoft.partnercatalyst.fortis.spark.instagram.client
+package com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client
 
-import com.microsoft.partnercatalyst.fortis.spark.instagram.dto.{Image, Instagram, JsonInstagramResponse}
+import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.dto.{Image, Instagram, JsonInstagramResponse}
 import net.liftweb.json
 import net.liftweb.json.DefaultFormats
 

@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.instagram.dto
+package com.microsoft.partnercatalyst.fortis.spark.sources.instagram.dto
 
 case class JsonInstagramResponse(data: List[JsonInstagramItem])
 case class JsonInstagramItem(created_time: String, `type`: String, images: JsonInstagramImages, id: String, link: String)
