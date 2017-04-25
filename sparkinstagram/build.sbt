@@ -1,12 +1,11 @@
-import Dependencies._
+name := "Simple Project"
 
-lazy val root = (project in file(".")).
-  settings(
-    inThisBuild(List(
-      organization := "com.example",
-      scalaVersion := "2.12.1",
-      version      := "0.1.0-SNAPSHOT"
-    )),
-    name := "Hello",
-    libraryDependencies += scalaTest % Test
-  )
+version := "1.0"
+
+scalaVersion := "2.11.7"
+
+libraryDependencies ++= Seq(
+  "org.apache.spark" %% "spark-core" % "2.1.0" % "provided",
+  "org.apache.spark" % "spark-streaming_2.11" % "2.1.0",
+  "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+)
