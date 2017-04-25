@@ -2,7 +2,7 @@ import java.util.concurrent.TimeUnit
 
 import com.microsoft.partnercatalyst.fortis.spark.Schedule
 import com.microsoft.partnercatalyst.fortis.spark.instagram.InstagramReceiver
-import com.microsoft.partnercatalyst.fortis.spark.instagram.client.{InstagramContext, InstagramLocationClient, Location}
+import com.microsoft.partnercatalyst.fortis.spark.instagram.client.{Auth, InstagramLocationClient, Location}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
@@ -16,7 +16,7 @@ object Main {
       schedule = Schedule(10, TimeUnit.SECONDS),
       client = new InstagramLocationClient(
         location = Location(lat = 123.1, lng = 21.2),
-        auth = InstagramContext("INSERT_INSTAGRAM_ACCESS_CODE_HERE"))))
+        auth = Auth("INSERT_INSTAGRAM_ACCESS_CODE_HERE"))))
 
     instagramStream.map(x => x.link).print()
 

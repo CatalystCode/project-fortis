@@ -4,9 +4,9 @@ import com.microsoft.partnercatalyst.fortis.spark.instagram.dto.{Image, Instagra
 import net.liftweb.json
 import net.liftweb.json.DefaultFormats
 
-case class InstagramContext(accessToken: String, apiHost: String = "api.instagram.com")
+case class Auth(accessToken: String, apiHost: String = "api.instagram.com")
 
-abstract class InstagramClient(auth: InstagramContext) {
+abstract class InstagramClient(auth: Auth) {
   implicit val formats = DefaultFormats
 
   def loadNewInstagrams(): Seq[Instagram] = {
