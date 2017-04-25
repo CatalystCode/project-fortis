@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.instagram
 
+import com.microsoft.partnercatalyst.fortis.spark.instagram.client.InstagramClient
 import com.microsoft.partnercatalyst.fortis.spark.instagram.dto.Instagram
 import com.microsoft.partnercatalyst.fortis.spark.{PollingReceiver, Schedule}
 import org.apache.spark.storage.StorageLevel

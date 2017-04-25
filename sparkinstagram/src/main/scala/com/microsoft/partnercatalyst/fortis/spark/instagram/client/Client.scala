@@ -1,10 +1,8 @@
-package com.microsoft.partnercatalyst.fortis.spark.instagram
+package com.microsoft.partnercatalyst.fortis.spark.instagram.client
 
 import com.microsoft.partnercatalyst.fortis.spark.instagram.dto.{Image, Instagram, JsonInstagramResponse}
 import net.liftweb.json
 import net.liftweb.json.DefaultFormats
-
-import scala.io.Source
 
 case class InstagramContext(accessToken: String, apiHost: String = "api.instagram.com")
 
@@ -32,22 +30,4 @@ abstract class InstagramClient(auth: InstagramContext) {
   }
 
   protected def fetchInstagramResponse(): String
-}
-
-case class Location(lat: Double, lng: Double, radiusMeters: Int = 1000)
-
-class InstagramLocationClient(location: Location, auth: InstagramContext) extends InstagramClient(auth) {
-  override protected def fetchInstagramResponse(): String = {
-    val url = s"https://${auth.apiHost}/v1/media/search?lat=${location.lat}&lng=${location.lng}&access_token=${auth.accessToken}"
-    Source.fromURL(url).mkString
-  }
-}
-
-case class Tag(name: String)
-
-class InstagramTagClient(tag: Tag, auth: InstagramContext) extends InstagramClient(auth) {
-  override protected def fetchInstagramResponse(): String = {
-    val url = s"https://${auth.apiHost}/v1/tags/${tag.name}/media/recent?access_token=${auth.accessToken}"
-    Source.fromURL(url).mkString
-  }
 }

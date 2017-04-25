@@ -1,7 +1,8 @@
 import java.util.concurrent.TimeUnit
 
 import com.microsoft.partnercatalyst.fortis.spark.Schedule
-import com.microsoft.partnercatalyst.fortis.spark.instagram._
+import com.microsoft.partnercatalyst.fortis.spark.instagram.InstagramReceiver
+import com.microsoft.partnercatalyst.fortis.spark.instagram.client.{InstagramContext, InstagramLocationClient, Location}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
