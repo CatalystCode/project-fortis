@@ -19,7 +19,7 @@ class InstagramReceiver(
       .filter(x => x.createdAtEpoch > lastIngestedEpoch)
       .foreach(x => {
         store(x)
-        lastIngestedEpoch = Math.max(x.createdAtEpoch, lastIngestedEpoch)
+        if (x.createdAtEpoch > lastIngestedEpoch) lastIngestedEpoch = x.createdAtEpoch
       })
   }
 }
