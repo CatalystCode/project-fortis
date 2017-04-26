@@ -16,17 +16,17 @@ abstract class InstagramClient(auth: Auth) extends Serializable {
       .filter(x => "image".equals(x.`type`))
       .map(x => Instagram(
         thumbnail = Image(
-          url=x.images.thumbnail.url,
-          height=x.images.thumbnail.height,
-          width=x.images.thumbnail.width),
+          url = x.images.thumbnail.url,
+          height = x.images.thumbnail.height,
+          width = x.images.thumbnail.width),
         image = Image(
-          url=x.images.standard_resolution.url,
-          height=x.images.standard_resolution.height,
-          width=x.images.standard_resolution.width),
-        id=x.id,
-        link=x.link,
-        createdAtEpoch=x.created_time.toLong,
-        imageUrl=x.images.standard_resolution.url)
+          url = x.images.standard_resolution.url,
+          height = x.images.standard_resolution.height,
+          width = x.images.standard_resolution.width),
+        id = x.id,
+        link = x.link,
+        createdAtEpoch = x.created_time.toLong,
+        imageUrl = x.images.standard_resolution.url)
       )
   }
 

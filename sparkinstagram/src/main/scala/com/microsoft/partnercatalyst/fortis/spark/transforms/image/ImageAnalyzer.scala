@@ -30,8 +30,8 @@ class ImageAnalyzer(auth: Auth) extends Serializable {
     val response = json.parse(apiResponse).extract[JsonImageAnalysisResponse]
 
     AnalyzedImage(
-      original=original,
-      analysis=ImageAnalysis(
-        tags=response.tags.map(x => x.name)))
+      original = original,
+      analysis = ImageAnalysis(
+        tags = response.tags.map(x => x.name)))
   }
 }
