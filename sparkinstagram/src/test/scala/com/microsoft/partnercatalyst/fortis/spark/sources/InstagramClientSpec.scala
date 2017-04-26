@@ -71,7 +71,8 @@ class InstagramClientSpec extends FlatSpec {
       image=Image(url="http://distillery.s3.amazonaws.com/media/2011/02/02/f9443f3443484c40b4792fa7c76214d5_7.jpg", width=612, height=612),
       id="22699663",
       link="http://instagr.am/p/BWl6P/",
-      createdAtEpoch=1296703536
+      createdAtEpoch=1296703536,
+      imageUrl="http://distillery.s3.amazonaws.com/media/2011/02/02/f9443f3443484c40b4792fa7c76214d5_7.jpg"
     ))
   }
 

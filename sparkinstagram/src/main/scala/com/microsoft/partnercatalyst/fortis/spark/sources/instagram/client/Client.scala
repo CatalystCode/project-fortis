@@ -25,7 +25,8 @@ abstract class InstagramClient(auth: Auth) extends Serializable {
           width=x.images.standard_resolution.width),
         id=x.id,
         link=x.link,
-        createdAtEpoch=x.created_time.toLong)
+        createdAtEpoch=x.created_time.toLong,
+        imageUrl=x.images.standard_resolution.url)
       )
   }
 

@@ -1,8 +1,9 @@
 import java.util.concurrent.TimeUnit
 
 import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.InstagramReceiver
-import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client.{Auth, InstagramLocationClient, Location}
+import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client.{InstagramLocationClient, Location, Auth => InstagramAuth}
 import com.microsoft.partnercatalyst.fortis.spark.sources.Schedule
+import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalyzer, Auth => VisionAuth}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
@@ -15,10 +16,16 @@ object Main {
     val instagramStream = ssc.receiverStream(new InstagramReceiver(
       schedule = Schedule(10, TimeUnit.SECONDS),
       client = new InstagramLocationClient(
-        location = Location(lat = 123.1, lng = 21.2),
-        auth = Auth("INSERT_INSTAGRAM_ACCESS_CODE_HERE"))))
+        location = Location(lat = 49.25, lng = -123.1, radiusMeters = 5000),
+        auth = InstagramAuth("INSERT_INSTAGRAM_TOKEN_HERE"))))
 
-    instagramStream.map(x => x.link).print()
+    val imageAnalysis = new ImageAnalyzer(
+      auth = VisionAuth("INSERT_COGNITIVE_SERVICES_TOKEN_HERE"))
+
+    instagramStream
+      .map(x => imageAnalysis.analyze(x))
+      .map(x => s"${x.original.link} ===> ${x.analysis.tags.mkString(",")}")
+      .print()
 
     ssc.start()
     ssc.awaitTermination()
