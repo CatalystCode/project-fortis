@@ -2,14 +2,14 @@ package com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client
 
 import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.dto.{Image, Instagram, JsonInstagramResponse}
 import net.liftweb.json
-import net.liftweb.json.DefaultFormats
 
 case class Auth(accessToken: String, apiHost: String = "api.instagram.com")
 
-abstract class InstagramClient(auth: Auth) {
-  implicit val formats = DefaultFormats
-
+@SerialVersionUID(100L)
+abstract class InstagramClient(auth: Auth) extends Serializable {
   def loadNewInstagrams(): Seq[Instagram] = {
+    implicit val formats = json.DefaultFormats
+
     json.parse(fetchInstagramResponse())
       .extract[JsonInstagramResponse]
       .data
