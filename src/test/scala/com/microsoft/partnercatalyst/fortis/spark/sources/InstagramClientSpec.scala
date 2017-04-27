@@ -4,13 +4,13 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client.{Auth
 import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.dto.{Image, Instagram}
 import org.scalatest.FlatSpec
 
-class InstagramTestClient(response: String) extends InstagramClient(Auth("token")) {
+class TestInstagramClient(response: String) extends InstagramClient(Auth("token")) {
   override protected def fetchInstagramResponse(): String = response
 }
 
 class InstagramClientSpec extends FlatSpec {
   "The instagram client" should "produce domain objects from the json api response" in {
-    val response = new InstagramTestClient("""
+    val response = new TestInstagramClient("""
         |{
         |    "data": [{
         |        "type": "image",
@@ -77,7 +77,7 @@ class InstagramClientSpec extends FlatSpec {
   }
 
   it should "ignore non-image responses" in {
-    val response = new InstagramTestClient("""
+    val response = new TestInstagramClient("""
         |{
         |    "data": [{
         |        "type": "video",
