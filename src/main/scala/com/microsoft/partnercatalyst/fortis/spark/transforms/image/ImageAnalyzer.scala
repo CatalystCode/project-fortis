@@ -22,16 +22,18 @@ class ImageAnalyzer(auth: Auth) extends Serializable {
       .postData("{\"url\":\"" + image.imageUrl + "\"}")
       .asString
 
-    parseResponse(image, response.body)
+    val analysis = parseResponse(response.body)
+    AnalyzedImage(image, analysis)
   }
 
-  protected def parseResponse[T](original: T, apiResponse: String): AnalyzedImage[T] = {
+  protected def parseResponse(apiResponse: String): ImageAnalysis = {
     implicit val formats = json.DefaultFormats
     val response = json.parse(apiResponse).extract[JsonImageAnalysisResponse]
 
-    AnalyzedImage(
-      original = original,
-      analysis = ImageAnalysis(
-        tags = response.tags.map(x => x.name)))
+    ImageAnalysis(
+      description = response.description.captions.map(x => x.text).headOption,
+      celebrities = response.categories.flatMap(_.detail.flatMap(_.celebrities)).flatten(x => x).map(_.name),
+      landmarks = response.categories.flatMap(_.detail.flatMap(_.landmarks)).flatten(x => x).map(_.name),
+      tags = response.tags.map(x => x.name))
   }
 }
