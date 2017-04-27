@@ -9,7 +9,7 @@ Run it via:
 sbt assembly
 
 # run on spark
-spark-submit --class Main --master local[4] sparkinstagram/target/scala-2.11/simple-project-assembly-1.0.jar
+spark-submit --class Main --master local[4] target/scala-2.11/simple-project-assembly-1.0.jar
 ```
 
 Remember to update the Instagram and Cognitive Services access tokens in `Main.scala`!
