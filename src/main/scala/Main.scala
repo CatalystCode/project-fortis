@@ -25,7 +25,6 @@ object Main {
 
     instagramStream
       .map(x => imageAnalysis.analyze(x))
-      .map(x => s"${x.original.link} ===> ${x.analysis.tags.mkString(",")}")
       .print()
 
     ssc.start()
