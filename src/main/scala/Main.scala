@@ -1,5 +1,5 @@
 import com.microsoft.partnercatalyst.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.AnalyzedItem
+import com.microsoft.partnercatalyst.fortis.spark.transforms.{AnalyzedItem, Location}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -20,8 +20,22 @@ object Main {
     locationStream
       .union(tagStream)
       .map(instagram => {
+        // general-purpose image analysis
         val analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
-        AnalyzedItem(instagram, analysis)
+
+        // instagram-specific post-processing
+        if (instagram.location.isDefined) {
+          analysis.locations :+ Location(
+            confidence = Some(1.0),
+            latitude = Some(instagram.location.get.latitude),
+            longitude = Some(instagram.location.get.longitude))
+        }
+
+        // produce object in common data model
+        AnalyzedItem(
+          originalItem = instagram,
+          analysis = analysis,
+          source = instagram.link)
       })
       .print()
 

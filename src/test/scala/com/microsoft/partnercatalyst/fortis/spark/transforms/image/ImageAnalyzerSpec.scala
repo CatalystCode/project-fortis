@@ -1,10 +1,10 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.{ImageAnalysis, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location, Tag}
 import org.scalatest.FlatSpec
 
 class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key")) {
-  def parse(): ImageAnalysis = parseResponse(response)
+  def parse(): Analysis = parseResponse(response)
 }
 
 class ImageAnalyzerSpec extends FlatSpec {
@@ -116,11 +116,11 @@ class ImageAnalyzerSpec extends FlatSpec {
         |}
       """.stripMargin).parse()
 
-    assert(response === ImageAnalysis(
-      tags = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
-      description = Some("Satya Nadella sitting on a bench"),
-      celebrities = List(Tag("Satya Nadella", 0.999028444)),
-      landmarks = List(Tag("Forbidden City", 0.9978346))
+    assert(response === Analysis(
+      keywords = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
+      summary = Some("Satya Nadella sitting on a bench"),
+      entities = List(Tag("Satya Nadella", 0.999028444)),
+      locations = List(Location(name = Some("Forbidden City"), confidence = Some(0.9978346)))
     ))
   }
 
@@ -206,11 +206,11 @@ class ImageAnalyzerSpec extends FlatSpec {
         |}
       """.stripMargin).parse()
 
-    assert(response === ImageAnalysis(
-      tags = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
-      description = None,
-      celebrities = List(),
-      landmarks = List()
+    assert(response === Analysis(
+      keywords = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
+      summary = None,
+      entities = List(),
+      locations = List()
     ))
   }
 }

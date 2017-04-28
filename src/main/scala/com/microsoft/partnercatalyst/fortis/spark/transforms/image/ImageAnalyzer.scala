@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.{ImageAnalysis, JsonImageAnalysisResponse, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.JsonImageAnalysisResponse
 import net.liftweb.json
 
 import scalaj.http.Http
@@ -9,7 +10,7 @@ case class ImageAnalysisAuth(key: String, apiHost: String = "westus.api.cognitiv
 
 @SerialVersionUID(100L)
 class ImageAnalyzer(auth: ImageAnalysisAuth) extends Serializable {
-  def analyze(imageUrl: String): ImageAnalysis = {
+  def analyze(imageUrl: String): Analysis = {
     val response =
       Http(s"https://${auth.apiHost}/vision/v1.0/analyze")
       .params(
@@ -24,14 +25,14 @@ class ImageAnalyzer(auth: ImageAnalysisAuth) extends Serializable {
     parseResponse(response.body)
   }
 
-  protected def parseResponse(apiResponse: String): ImageAnalysis = {
+  protected def parseResponse(apiResponse: String): Analysis = {
     implicit val formats = json.DefaultFormats
     val response = json.parse(apiResponse).extract[JsonImageAnalysisResponse]
 
-    ImageAnalysis(
-      description = response.description.captions.map(x => x.text).headOption,
-      celebrities = response.categories.flatMap(_.detail.flatMap(_.celebrities)).flatten(x => x).map(x => Tag(x.name, x.confidence)),
-      landmarks = response.categories.flatMap(_.detail.flatMap(_.landmarks)).flatten(x => x).map(x => Tag(x.name, x.confidence)),
-      tags = response.tags.map(x => Tag(x.name, x.confidence)))
+    Analysis(
+      summary = response.description.captions.map(x => x.text).headOption,
+      entities = response.categories.flatMap(_.detail.flatMap(_.celebrities)).flatten(x => x).map(x => Tag(x.name, x.confidence)),
+      locations = response.categories.flatMap(_.detail.flatMap(_.landmarks)).flatten(x => x).map(x => Location(name = Some(x.name), confidence = Some(x.confidence))),
+      keywords = response.tags.map(x => Tag(x.name, x.confidence)))
   }
 }
