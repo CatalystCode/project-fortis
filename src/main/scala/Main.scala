@@ -1,11 +1,8 @@
-import java.util.concurrent.TimeUnit
-
-import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.InstagramDStream
-import com.microsoft.partnercatalyst.fortis.spark.sources.instagram.client.{InstagramLocationClient, Location, Auth => InstagramAuth}
-import com.microsoft.partnercatalyst.fortis.spark.sources.Schedule
-import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalyzer, Auth => VisionAuth}
-import org.apache.spark.{SparkConf, SparkContext}
+import com.microsoft.partnercatalyst.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.AnalyzedItem
+import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{Auth, ImageAnalyzer}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 object Main {
   def main(args: Array[String]) {
@@ -13,18 +10,19 @@ object Main {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-    val instagramStream = new InstagramDStream(
-      _ssc = ssc,
-      schedule = Schedule(10, TimeUnit.SECONDS),
-      client = new InstagramLocationClient(
-        location = Location(lat = 49.25, lng = -123.1, radiusMeters = 5000),
-        auth = InstagramAuth("INSERT_INSTAGRAM_TOKEN_HERE")))
+    val instagramAuth = InstagramAuth("INSERT_INSTAGRAM_TOKEN_HERE")
 
-    val imageAnalysis = new ImageAnalyzer(
-      auth = VisionAuth("INSERT_COGNITIVE_SERVICES_TOKEN_HERE"))
+    val locationStream = InstagramUtils.createLocationStream(ssc, instagramAuth, latitude = 49.25, longitude = -123.1)
+    val tagStream = InstagramUtils.createTagStream(ssc, instagramAuth, tag = "rose")
 
-    instagramStream
-      .map(x => imageAnalysis.analyze(x))
+    val imageAnalysis = new ImageAnalyzer(Auth("INSERT_COGNITIVE_SERVICES_TOKEN_HERE"))
+
+    locationStream
+      .union(tagStream)
+      .map(instagram => {
+        val analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
+        AnalyzedItem(instagram, analysis)
+      })
       .print()
 
     ssc.start()

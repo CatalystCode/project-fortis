@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.ImageAnalysis
+import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.{ImageAnalysis, Tag}
 import org.scalatest.FlatSpec
 
 class TestImageAnalyzer(response: String) extends ImageAnalyzer(Auth("key")) {
@@ -117,10 +117,10 @@ class ImageAnalyzerSpec extends FlatSpec {
       """.stripMargin).parse()
 
     assert(response === ImageAnalysis(
-      tags = List("person", "man", "outdoor", "window"),
+      tags = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
       description = Some("Satya Nadella sitting on a bench"),
-      celebrities = List("Satya Nadella"),
-      landmarks = List("Forbidden City")
+      celebrities = List(Tag("Satya Nadella", 0.999028444)),
+      landmarks = List(Tag("Forbidden City", 0.9978346))
     ))
   }
 
@@ -207,7 +207,7 @@ class ImageAnalyzerSpec extends FlatSpec {
       """.stripMargin).parse()
 
     assert(response === ImageAnalysis(
-      tags = List("person", "man", "outdoor", "window"),
+      tags = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
       description = None,
       celebrities = List(),
       landmarks = List()
