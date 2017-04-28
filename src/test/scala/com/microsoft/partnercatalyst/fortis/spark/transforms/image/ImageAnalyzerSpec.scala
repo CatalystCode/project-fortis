@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.{ImageAnalysis, Tag}
 import org.scalatest.FlatSpec
 
-class TestImageAnalyzer(response: String) extends ImageAnalyzer(Auth("key")) {
+class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key")) {
   def parse(): ImageAnalysis = parseResponse(response)
 }
 

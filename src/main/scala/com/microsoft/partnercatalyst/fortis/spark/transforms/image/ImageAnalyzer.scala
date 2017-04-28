@@ -6,10 +6,10 @@ import net.liftweb.json
 import scala.language.reflectiveCalls
 import scalaj.http.Http
 
-case class Auth(key: String, apiHost: String = "westus.api.cognitive.microsoft.com")
+case class ImageAnalysisAuth(key: String, apiHost: String = "westus.api.cognitive.microsoft.com")
 
 @SerialVersionUID(100L)
-class ImageAnalyzer(auth: Auth) extends Serializable {
+class ImageAnalyzer(auth: ImageAnalysisAuth) extends Serializable {
   def analyze(imageUrl: String): ImageAnalysis = {
     val response =
       Http(s"https://${auth.apiHost}/vision/v1.0/analyze")
