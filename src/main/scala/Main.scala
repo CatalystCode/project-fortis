@@ -10,25 +10,23 @@ object Main {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-    val instagramAuth = InstagramAuth("INSERT_INSTAGRAM_TOKEN_HERE")
+    val instagramAuth = InstagramAuth("INSERT_INSTAGRAM_KEY_HERE")
 
     val locationStream = InstagramUtils.createLocationStream(ssc, instagramAuth, latitude = 49.25, longitude = -123.1)
     val tagStream = InstagramUtils.createTagStream(ssc, instagramAuth, tag = "rose")
 
-    val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth("INSERT_COGNITIVE_SERVICES_TOKEN_HERE"))
+    val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth("INSERT_COGNITIVE_SERVICES_KEY_HERE"))
 
     locationStream
       .union(tagStream)
       .map(instagram => {
         // general-purpose image analysis
-        val analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
+        var analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
 
         // instagram-specific post-processing
         if (instagram.location.isDefined) {
-          analysis.locations :+ Location(
-            confidence = Some(1.0),
-            latitude = Some(instagram.location.get.latitude),
-            longitude = Some(instagram.location.get.longitude))
+          val taggedLocation = Location(confidence = Some(1.0), latitude = Some(instagram.location.get.latitude), longitude = Some(instagram.location.get.longitude))
+          analysis = analysis.copy(locations = taggedLocation :: analysis.locations)
         }
 
         // produce object in common data model
