@@ -3,7 +3,6 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.{ImageAnalysis, JsonImageAnalysisResponse, Tag}
 import net.liftweb.json
 
-import scala.language.reflectiveCalls
 import scalaj.http.Http
 
 case class ImageAnalysisAuth(key: String, apiHost: String = "westus.api.cognitive.microsoft.com")
