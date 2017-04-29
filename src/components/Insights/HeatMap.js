@@ -160,6 +160,8 @@ export const HeatMap = React.createClass({
   },
 
   componentWillReceiveProps(nextProps){
+      console.log('componentWillReceiveProps');
+      
       if(((this.hasChanged(this.getStateFromFlux(), this, "bbox") && this.props.bbox.length > 0) || this.hasChanged(nextProps, this.props, "datetimeSelection") || this.props.height !== nextProps.height
        ||  this.hasChanged(nextProps, this.props, "timespanType") || this.hasChanged(nextProps, this.props, "edges") || (!this.status && nextProps.categoryValue) || this.hasChanged(nextProps, this.props, "language")
       ||  this.hasChanged(nextProps.categoryValue, this.props.categoryValue, `name_${this.state.language}`) || this.hasChanged(nextProps, this.props, "dataSource")) && this.status !== 'loading'){
@@ -435,7 +437,7 @@ export const HeatMap = React.createClass({
   },
    
   render() {
-    let progressPercentage = this.status === "loaded" ? 100 : 0;
+    let progressPercentage = !this.status || this.status === "loaded" ? 100 : 0;
     const state = this.getStateFromFlux();
 
     return (
