@@ -40,7 +40,7 @@ export const PopularTermsChart = React.createClass({
         let dataProvider = summaryTerms.map((term, index) => {
             const edge = edgeMap.get(term.name.toLowerCase());
             let name = edge['name_'+state.language];
-            if(name.toLowerCase() === selectedTopic.toLowerCase()){
+            if(selectedTopic && name.toLowerCase() === selectedTopic.toLowerCase()){
                 activeIndex = index;
             }
             let value = term.mentions;

@@ -435,7 +435,7 @@ export const HeatMap = React.createClass({
   },
    
   render() {
-    let progressPercentage = this.status === "loaded" ? 100 : 0;
+    let progressPercentage = !this.status || this.status === "loaded" ? 100 : 0;
     const state = this.getStateFromFlux();
 
     return (

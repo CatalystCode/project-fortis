@@ -41,7 +41,7 @@ export const PopularLocationsChart = React.createClass({
               const name = edge['name_'+lang];
               let value = location.mentions;
               let color = COLORS[index];
-              if(name.toLowerCase() === selectedLocation.toLowerCase()){
+              if(selectedLocation && name.toLowerCase() === selectedLocation.toLowerCase()){
                 activeIndex = index;
               }
               colorCells.push(<Cell key={0} fill={color}/>);

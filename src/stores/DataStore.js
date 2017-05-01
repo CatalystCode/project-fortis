@@ -1,5 +1,6 @@
 import Fluxxor from 'fluxxor';
 import {Actions} from '../actions/Actions';
+import moment from 'moment';
 
 const LANGUAGE_CODE_ENG='en';
 
@@ -8,8 +9,8 @@ export const DataStore = Fluxxor.createStore({
       
       this.dataStore = {
           userProfile: profile,
-          timespanType: 'customMonth',
-          datetimeSelection: 'December 2016',//moment().format(Actions.constants.TIMESPAN_TYPES.days.format),
+          timespanType: 'months',
+          datetimeSelection: moment().format("YYYY-MM"),
           categoryType: '',
           dataSource: 'all',
           fromDateRange: false,
@@ -124,9 +125,11 @@ export const DataStore = Fluxxor.createStore({
             this.dataStore.termFilters.clear();
         }
 
-        this.dataStore.categoryValue = edgeMap.get(selectedEntity[`name_${language}`]);
-        this.dataStore.selectedLocationCoordinates = selectedEntity.coordinates || [];
-        this.dataStore.categoryType = selectedEntity.type;
+        if(selectedEntity){
+            this.dataStore.categoryValue = edgeMap.get(selectedEntity[`name_${language}`]);
+            this.dataStore.selectedLocationCoordinates = selectedEntity.coordinates || [];
+            this.dataStore.categoryType = selectedEntity.type;
+        }
     },
 
     syncDatetimeState(datetimeSelection, timespanType){
