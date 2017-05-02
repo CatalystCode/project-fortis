@@ -3,6 +3,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.collection.mutable
+
 object Main2 {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("Simple Application")
@@ -14,9 +16,14 @@ object Main2 {
 
     val locationsExtractor = new LocationsExtractor(geofence).buildLookup()
 
-    val textStream = sc.parallelize(Seq(
+    val lines1 = sc.parallelize(Seq(
       "Went to New York last week. It was wonderful.",
-      "Manhatten is my favorite place in NYC."))
+      "Manhattan is my favorite place in NYC."))
+    val lines2 = sc.parallelize(Seq(
+      "#NYC is awesome! Loving it!",
+      "Having green juice in the big apple :O"))
+
+    val textStream = ssc.queueStream[String](mutable.Queue(lines1, lines2))
 
     textStream
       .map(text => {
@@ -29,7 +36,7 @@ object Main2 {
           analysis = analysis,
           source = null)
       })
-      .foreach(println)
+      .print()
 
     ssc.start()
     ssc.awaitTermination()
