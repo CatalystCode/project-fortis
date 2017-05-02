@@ -13,7 +13,7 @@ object StringUtils {
 }
 
 class LocationsExtractor(geofence: Geofence, ngrams: Int = 3) extends Serializable {
-  protected var lookup: Map[String, String] = _
+  protected var lookup: Map[String, Set[String]] = _
 
   def buildLookup(): this.type = {
     // todo: fetch locations for geofence from postgres
@@ -23,7 +23,7 @@ class LocationsExtractor(geofence: Geofence, ngrams: Int = 3) extends Serializab
 
   def analyze(text: String): Analysis = {
     val words = StringUtils.ngrams(text, ngrams).toSet
-    val geometries = words.flatMap(word => lookup.get(word))
+    val geometries = words.flatMap(word => lookup.get(word)).flatten
     Analysis(locations = geometries.map(geo => Location(geometry = Some(geo))).toList)
   }
 }

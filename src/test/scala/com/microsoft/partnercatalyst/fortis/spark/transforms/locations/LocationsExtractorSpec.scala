@@ -26,12 +26,12 @@ class TestLocationsExtractor extends LocationsExtractor(Geofence(1, 2, 3, 4)) {
 
   override def buildLookup(): this.type = {
     lookup = Map(
-      "NYC" -> geometryNyc,
-      "nyc" -> geometryNyc,
-      "ny" -> geometryNyc,
-      "New York" -> geometryNyc,
-      "big apple" -> geometryManhattan,
-      "Manhattan" -> geometryManhattan
+      "NYC" -> Set(geometryNyc),
+      "nyc" -> Set(geometryNyc),
+      "ny" -> Set(geometryNyc),
+      "New York" -> Set(geometryNyc),
+      "big apple" -> Set(geometryManhattan),
+      "Manhattan" -> Set(geometryManhattan)
     )
     this
   }
