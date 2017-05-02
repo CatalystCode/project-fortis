@@ -4,7 +4,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysi
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 
-object Main {
+object DemoInstagram {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("Simple Application")
     val sc = new SparkContext(conf)
