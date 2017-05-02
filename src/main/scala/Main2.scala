@@ -12,8 +12,7 @@ object Main2 {
     val geofence = Geofence(north = 16.829126675000003, west = -23.017646899999998,
                             south = 16.629126675000003, east = -22.817646899999998)
 
-    val locationsExtractor = new LocationsExtractor(geofence)
-    locationsExtractor.buildLookup()
+    val locationsExtractor = new LocationsExtractor(geofence).buildLookup()
 
     val textStream = sc.parallelize(Seq(
       "Went to New York last week. It was wonderful.",

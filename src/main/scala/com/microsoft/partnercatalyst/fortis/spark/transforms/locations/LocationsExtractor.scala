@@ -15,9 +15,10 @@ object StringUtils {
 class LocationsExtractor(geofence: Geofence, ngrams: Int = 3) extends Serializable {
   protected var lookup: Map[String, String] = _
 
-  def buildLookup(): Unit = {
+  def buildLookup(): this.type = {
     // todo: fetch locations for geofence from postgres
     lookup = Map()
+    this
   }
 
   def analyze(text: String): Analysis = {
