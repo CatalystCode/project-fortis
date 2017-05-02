@@ -16,7 +16,8 @@ case class Location(
   latitude: Option[Double] = None,
   longitude: Option[Double] = None,
   name: Option[String] = None,
-  id: Option[String] = None
+  id: Option[String] = None,
+  geometry: Option[String] = None
 )
 
 case class Tag(
