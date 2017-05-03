@@ -1,4 +1,4 @@
-import com.microsoft.partnercatalyst.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
+import com.microsoft.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{AnalyzedItem, Location}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
