@@ -28,12 +28,11 @@ class TestLocationsExtractor() extends LocationsExtractor(null, null) {
 
   override def buildLookup(): this.type = {
     lookup = Map(
-      "NYC" -> Set(geometryNyc),
       "nyc" -> Set(geometryNyc),
       "ny" -> Set(geometryNyc),
-      "New York" -> Set(geometryNyc),
+      "new york" -> Set(geometryNyc),
       "big apple" -> Set(geometryManhattan),
-      "Manhattan" -> Set(geometryManhattan)
+      "manhattan" -> Set(geometryManhattan)
     )
     this
   }
@@ -73,8 +72,8 @@ class LocationsExtractorSpec extends FlatSpec {
     val lookup = extractor.buildLookup().getLookup
 
     assert(lookup == Map(
-      "New York" -> Set("id1", "id2"),
-      "Gowanus Heights" -> Set("id3")
+      "new york" -> Set("id1-New York", "id2-New York"),
+      "gowanus heights" -> Set("id3-Gowanus Heights")
     ))
   }
 }

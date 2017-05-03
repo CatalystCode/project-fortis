@@ -36,7 +36,7 @@ class LocationsExtractor(
   }
 
   def analyze(text: String): Analysis = {
-    val words = StringUtils.ngrams(text, ngrams).toSet
+    val words = StringUtils.ngrams(text.toLowerCase, ngrams).toSet
     val geometries = words.flatMap(word => lookup.get(word)).flatten
     Analysis(locations = geometries.map(geo => Location(geometry = Some(geo))).toList)
   }
