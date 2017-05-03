@@ -1,6 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location}
+
+import scala.collection.mutable
 
 case class Geofence(north: Double, west: Double, south: Double, east: Double)
 
@@ -12,12 +15,23 @@ object StringUtils {
   }
 }
 
-class LocationsExtractor(geofence: Geofence, ngrams: Int = 3) extends Serializable {
+@SerialVersionUID(100L)
+class LocationsExtractor(
+  featureServiceClient: FeatureServiceClient,
+  geofence: Geofence,
+  ngrams: Int = 3
+) extends Serializable {
+
   protected var lookup: Map[String, Set[String]] = _
 
   def buildLookup(): this.type = {
-    // todo: fetch locations for geofence from postgres
-    lookup = Map()
+    val map = mutable.Map[String, mutable.Set[String]]()
+    featureServiceClient.bbox(geofence).foreach(location => {
+      // TODO: determine which fields should be put into map
+      map.getOrElseUpdate(location.name, mutable.Set()).add(location.id)
+    })
+
+    lookup = map.map(kv => (kv._1, kv._2.toSet)).toMap
     this
   }
 

@@ -1,4 +1,5 @@
 import com.microsoft.partnercatalyst.fortis.spark.transforms.AnalyzedItem
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -11,17 +12,18 @@ object DemoLocations {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-    val geofence = Geofence(north = 16.829126675000003, west = -23.017646899999998,
-                            south = 16.629126675000003, east = -22.817646899999998)
+    val geofence = Geofence(north = 40.5561, west = -74.105,
+                            south = 40.8589, east = -73.8314)
 
-    val locationsExtractor = new LocationsExtractor(geofence).buildLookup()
+    val featureServiceClient = new FeatureServiceClient("localhost:8080")
+
+    val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence).buildLookup()
 
     val lines1 = sc.parallelize(Seq(
       "Went to New York last week. It was wonderful.",
       "Manhattan is my favorite place in NYC."))
     val lines2 = sc.parallelize(Seq(
-      "#NYC is awesome! Loving it!",
-      "Having green juice in the big apple :O"))
+      "Appartment viewing in East Village :O"))
 
     val textStream = ssc.queueStream[String](mutable.Queue(lines1, lines2))
 
