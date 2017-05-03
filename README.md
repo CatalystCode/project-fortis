@@ -1,6 +1,9 @@
 ## What's this? ##
 
-Demo of ingesting Instagram data into Spark Streaming and analyzing the pictures using Cognitive Services.
+This project contains demos of the various Spark Streaming data processing methods for Project Fortis:
+
+- Ingesting Instagram pictures and analyzing them using Cognitive Services.
+- Ingesting Twitter tweets and extracting locations using Open Street Map.
 
 Run it via:
 
@@ -13,4 +16,4 @@ spark-submit --class DemoInstagram --master local[4] target/scala-2.11/simple-pr
 spark-submit --class DemoLocations --master local[4] target/scala-2.11/simple-project-assembly-1.0.jar
 ```
 
-Remember to update the Instagram and Cognitive Services access tokens in The demo files!
+Remember to update the access tokens in the demo files for Instagram, Twitter, Cognitive Services, etc!
