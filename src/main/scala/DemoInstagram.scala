@@ -10,12 +10,12 @@ object DemoInstagram {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-    val instagramAuth = InstagramAuth("INSERT_INSTAGRAM_KEY_HERE")
+    val instagramAuth = InstagramAuth(System.getenv("INSTAGRAM_AUTH_TOKEN"))
 
     val locationStream = InstagramUtils.createLocationStream(ssc, instagramAuth, latitude = 49.25, longitude = -123.1)
     val tagStream = InstagramUtils.createTagStream(ssc, instagramAuth, tag = "rose")
 
-    val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth("INSERT_COGNITIVE_SERVICES_KEY_HERE"))
+    val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")))
 
     locationStream
       .union(tagStream)
