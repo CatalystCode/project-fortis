@@ -12,7 +12,7 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % "2.1.0" % "provided",
-  "com.github.catalystcode" % "streaming-instagram_2.11" % "0.0.1-alpha",
+  "com.github.catalystcode" % "streaming-instagram_2.11" % "0.0.3",
   "org.apache.spark" % "spark-streaming_2.11" % "2.1.0",
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
