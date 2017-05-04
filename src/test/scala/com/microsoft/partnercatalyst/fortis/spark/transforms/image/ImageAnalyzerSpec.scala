@@ -6,7 +6,7 @@ import org.scalatest.FlatSpec
 
 class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
   def parse(): Analysis = parseResponse(response)
-  override def landmarkToLocations(landmark: JsonImageLandmark) = Seq(Location(landmark.name, Some(landmark.confidence)))
+  override def landmarksToLocations(landmarks: Iterable[JsonImageLandmark]): Iterable[Location] = landmarks.map(x => Location(x.name, Some(x.confidence)))
 }
 
 class ImageAnalyzerSpec extends FlatSpec {

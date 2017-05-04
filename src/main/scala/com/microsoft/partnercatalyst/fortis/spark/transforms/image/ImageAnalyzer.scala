@@ -33,11 +33,13 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
     Analysis(
       summary = response.description.captions.map(x => x.text).headOption,
       entities = response.categories.flatMap(_.detail.flatMap(_.celebrities)).flatten(x => x).map(x => Tag(x.name, x.confidence)),
-      locations = response.categories.flatMap(_.detail.flatMap(_.landmarks)).flatten(x => x).flatMap(landmarkToLocations),
+      locations = landmarksToLocations(response.categories.flatMap(_.detail.flatMap(_.landmarks)).flatten(x => x)).toList,
       keywords = response.tags.map(x => Tag(x.name, x.confidence)))
   }
 
-  protected def landmarkToLocations(landmark: JsonImageLandmark): Iterable[Location] = {
-    featureServiceClient.name(landmark.name).map(loc => Location(loc.id, confidence = Some(landmark.confidence)))
+  protected def landmarksToLocations(marks: Iterable[JsonImageLandmark]): Iterable[Location] = {
+    val landmarks = marks.map(landmark => landmark.name -> landmark.confidence).toMap
+    val features = featureServiceClient.name(landmarks.keys)
+    features.map(loc => Location(loc.id, landmarks.get(loc.name)))
   }
 }
