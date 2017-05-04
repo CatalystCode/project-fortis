@@ -71,9 +71,19 @@ object DemoInstagramAndLocations {
           AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
         })
         .map(analyzedTweet => {
+          // map tagged locations to location features
+          var analyzed = analyzedTweet
+          val location = analyzed.originalItem.getGeoLocation
+          if (location != null) {
+            val taggedLocations = locationsExtractor.fetch(latitude = location.getLatitude, longitude = location.getLongitude).toList
+            analyzed = analyzed.copy(analysis = analyzed.analysis.copy(
+              locations = taggedLocations ++ analyzed.analysis.locations))
+          }
+          analyzed
+        })
+        .map(analyzedTweet => {
           // infer locations from text
-          val text = analyzedTweet.originalItem.getText
-          val inferredLocations = locationsExtractor.analyze(text).toList
+          val inferredLocations = locationsExtractor.analyze(analyzedTweet.originalItem.getText).toList
 
           analyzedTweet.copy(analysis = analyzedTweet.analysis.copy(
             locations = inferredLocations ++ analyzedTweet.analysis.locations))
