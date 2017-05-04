@@ -85,9 +85,7 @@ object DemoInstagramAndLocations {
         .map(analyzedTweet => {
           // infer locations from text
           val inferredLocations = locationsExtractor.analyze(analyzedTweet.originalItem.getText).toList
-
-          analyzedTweet.copy(analysis = analyzedTweet.analysis.copy(
-            locations = inferredLocations ++ analyzedTweet.analysis.locations))
+          analyzedTweet.copy(analysis = analyzedTweet.analysis.copy(locations = inferredLocations ++ analyzedTweet.analysis.locations))
         })
         .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
     }
