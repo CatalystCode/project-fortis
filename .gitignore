@@ -1,4 +1,7 @@
-### SBT ###
+# IntelliJ
+#
+.idea/
+
 # Simple Build Tool
 # http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
 
@@ -11,14 +14,3 @@ project/plugins/project/
 .history
 .cache
 .lib/
-
-### Scala ###
-*.class
-*.log
-
-
-### IDEs ###
-.idea/
-
-### macOS ###
-.DS_Store
