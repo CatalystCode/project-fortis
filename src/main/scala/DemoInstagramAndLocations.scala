@@ -75,9 +75,10 @@ object DemoInstagramAndLocations {
           var analyzed = analyzedTweet
           val location = analyzed.originalItem.getGeoLocation
           if (location != null) {
-            val taggedLocations = locationsExtractor.fetch(latitude = location.getLatitude, longitude = location.getLongitude).toList
-            analyzed = analyzed.copy(analysis = analyzed.analysis.copy(
-              locations = taggedLocations ++ analyzed.analysis.locations))
+            val lat = location.getLatitude
+            val lng = location.getLongitude
+            val taggedLocations = locationsExtractor.fetch(latitude = lat, longitude = lng).toList
+            analyzed = analyzed.copy(analysis = analyzed.analysis.copy(locations = taggedLocations ++ analyzed.analysis.locations))
           }
           analyzed
         })
