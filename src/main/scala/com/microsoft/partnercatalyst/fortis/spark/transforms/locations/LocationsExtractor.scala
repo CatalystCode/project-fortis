@@ -31,12 +31,12 @@ class LocationsExtractor(
   def analyze(text: String): Iterable[Location] = {
     val words = StringUtils.ngrams(text.toLowerCase, ngrams).toSet
     val locationsInGeofence = words.flatMap(word => lookup.get(word)).flatten
-    locationsInGeofence.map(location => Location(geometry = Some(location)))
+    locationsInGeofence.map(wofId => Location(wofId, confidence = Some(0.5)))
   }
 
   def fetch(latitude: Double, longitude: Double): Iterable[Location] = {
     val locationsForPoint = featureServiceClient.point(latitude = latitude, longitude = longitude)
     val locationsInGeofence = locationsForPoint.flatMap(location => lookup.get(location.name.toLowerCase)).flatten
-    locationsInGeofence.map(location => Location(geometry = Some(location)))
+    locationsInGeofence.map(wofId => Location(wofId, confidence = Some(1.0)))
   }
 }

@@ -1,10 +1,12 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
+import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.JsonImageLandmark
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location, Tag}
 import org.scalatest.FlatSpec
 
-class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key")) {
+class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
   def parse(): Analysis = parseResponse(response)
+  override def landmarkToLocations(landmark: JsonImageLandmark) = Seq(Location(landmark.name, Some(landmark.confidence)))
 }
 
 class ImageAnalyzerSpec extends FlatSpec {
@@ -120,7 +122,7 @@ class ImageAnalyzerSpec extends FlatSpec {
       keywords = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
       summary = Some("Satya Nadella sitting on a bench"),
       entities = List(Tag("Satya Nadella", 0.999028444)),
-      locations = List(Location(name = Some("Forbidden City"), confidence = Some(0.9978346)))
+      locations = List(Location(wofId = "Forbidden City", confidence = Some(0.9978346)))
     ))
   }
 

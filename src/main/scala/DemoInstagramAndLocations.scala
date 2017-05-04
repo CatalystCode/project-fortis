@@ -25,7 +25,7 @@ object DemoInstagramAndLocations {
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)  // useful tool to get fences for testing: http://boundingbox.klokantech.com
     val featureServiceClient = new FeatureServiceClient("localhost:8080")
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence).buildLookup()
-    val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")))
+    val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
 
     val instagramAuth = InstagramAuth(System.getenv("INSTAGRAM_AUTH_TOKEN"))
     System.setProperty("twitter4j.oauth.consumerKey", System.getenv("TWITTER_CONSUMER_KEY"))

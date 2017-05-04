@@ -16,6 +16,10 @@ class FeatureServiceClient(host: String) extends Serializable {
     parseResponse(fetchPointResponse(latitude = latitude, longitude = longitude))
   }
 
+  def name(name: String): Iterable[FeatureServiceFeature] = {
+    parseResponse(fetchNameResponse(name))
+  }
+
   private def parseResponse(response: String): Iterable[FeatureServiceFeature] = {
     implicit val formats = json.DefaultFormats
 
@@ -29,6 +33,11 @@ class FeatureServiceClient(host: String) extends Serializable {
 
   protected def fetchPointResponse(latitude: Double, longitude: Double): String = {
     val fetch = s"http://$host/features/point/$latitude/$longitude"
+    Source.fromURL(fetch)("UTF-8").mkString
+  }
+
+  protected def fetchNameResponse(name: String): String = {
+    val fetch = s"http://$host/features/name/$name"
     Source.fromURL(fetch)("UTF-8").mkString
   }
 }
