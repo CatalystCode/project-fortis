@@ -20,7 +20,7 @@ class LocationsExtractor(
     val map = mutable.Map[String, mutable.Set[String]]()
     featureServiceClient.bbox(geofence).foreach(location => {
       val key = location.name.toLowerCase
-      val value = s"${location.id}-${location.name}"  // TODO: determine which fields should be put into map
+      val value = location.id
       map.getOrElseUpdate(key, mutable.Set()).add(value)
     })
 
