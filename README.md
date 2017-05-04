@@ -20,6 +20,6 @@ export TWITTER_ACCESS_TOKEN_SECRET="..."
 sbt assembly
 
 # run on spark
-spark-submit --class DemoInstagram --master local[4] target/scala-2.11/simple-project-assembly-1.0.jar
-spark-submit --class DemoLocations --master local[4] target/scala-2.11/simple-project-assembly-1.0.jar
+spark-submit --class DemoInstagramAndLocations --master local[4] target/scala-2.11/simple-project-assembly-1.0.jar instagram
+spark-submit --class DemoInstagramAndLocations --master local[4] target/scala-2.11/simple-project-assembly-1.0.jar twitter
 ```
