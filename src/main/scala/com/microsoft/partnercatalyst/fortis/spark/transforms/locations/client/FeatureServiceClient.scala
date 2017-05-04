@@ -24,11 +24,11 @@ class FeatureServiceClient(host: String) extends Serializable {
 
   protected def fetchBboxResponse(geofence: Geofence): String = {
     val fetch = s"http://$host/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
-    Source.fromURL(fetch).mkString
+    Source.fromURL(fetch)("UTF-8").mkString
   }
 
   protected def fetchPointResponse(latitude: Double, longitude: Double): String = {
     val fetch = s"http://$host/features/point/$latitude/$longitude"
-    Source.fromURL(fetch).mkString
+    Source.fromURL(fetch)("UTF-8").mkString
   }
 }
