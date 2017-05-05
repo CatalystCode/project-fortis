@@ -30,7 +30,7 @@ class LocationsExtractor(
 
   def analyze(text: String): Iterable[Location] = {
     val words = StringUtils.ngrams(text.toLowerCase, ngrams).toSet
-    val locationsInGeofence = words.flatMap(word => lookup.get(word)).flatten.toSet
+    val locationsInGeofence = words.flatMap(word => lookup.get(word.toLowerCase)).flatten.toSet
     locationsInGeofence.map(wofId => Location(wofId, confidence = Some(0.5)))
   }
 
