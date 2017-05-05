@@ -70,6 +70,6 @@ class LocationsExtractorSpec extends FlatSpec {
     val extractor = new TestLocationsExtractorWithFakeClient(client).buildLookup()
     val points = extractor.fetch(12, 34).map(_.wofId)
 
-    assert(points == Seq("id1"))
+    assert(points == Set("id1"))
   }
 }
