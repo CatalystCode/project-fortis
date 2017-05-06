@@ -2,7 +2,7 @@ import com.github.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor, PlaceRecognizer}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -23,8 +23,9 @@ object DemoInstagramAndLocations {
     Logger.getLogger("akka").setLevel(Level.ERROR)
 
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)  // useful tool to get fences for testing: http://boundingbox.klokantech.com
+    val placeRecognizer = new PlaceRecognizer("C:\\Users\\clewolff\\Desktop\\opener-models")
     val featureServiceClient = new FeatureServiceClient("localhost:8080")
-    val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence).buildLookup()
+    val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
     val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
 
     val instagramAuth = InstagramAuth(System.getenv("INSTAGRAM_AUTH_TOKEN"))

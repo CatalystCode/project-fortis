@@ -11,6 +11,7 @@ case class Geofence(north: Double, west: Double, south: Double, east: Double)
 class LocationsExtractor(
   featureServiceClient: FeatureServiceClient,
   geofence: Geofence,
+  placeRecognizer: Option[PlaceRecognizer] = None,
   ngrams: Int = 3
 ) extends Serializable {
 
@@ -28,10 +29,21 @@ class LocationsExtractor(
     this
   }
 
-  def analyze(text: String): Iterable[Location] = {
-    val words = StringUtils.ngrams(text.toLowerCase, ngrams).toSet
-    val locationsInGeofence = words.flatMap(word => lookup.get(word.toLowerCase)).flatten.toSet
+  def analyze(text: String, language: Option[String] = None): Iterable[Location] = {
+    val candidatePlaces = extractCandidatePlaces(text, language)
+    val locationsInGeofence = candidatePlaces.flatMap(place => lookup.get(place.toLowerCase)).flatten.toSet
     locationsInGeofence.map(wofId => Location(wofId, confidence = Some(0.5)))
+  }
+
+  private def extractCandidatePlaces(text: String, language: Option[String]): Iterable[String] = {
+    var candidatePlaces = Iterable[String]()
+    if (placeRecognizer.isDefined) {
+      candidatePlaces = placeRecognizer.get.extractPlaces(text, language.getOrElse(""))
+    }
+    if (candidatePlaces.isEmpty) {
+      candidatePlaces = StringUtils.ngrams(text, ngrams)
+    }
+    candidatePlaces
   }
 
   def fetch(latitude: Double, longitude: Double): Iterable[Location] = {
