@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import org.scalatest.FlatSpec
 
-class StringUtilsTests extends FlatSpec {
+class StringUtilsSpec extends FlatSpec {
   "The ngrams method" should "extract correct ngrams" in {
     assert(StringUtils.ngrams("the koala eats", n = 1) == List("the", "koala", "eats"))
     assert(StringUtils.ngrams("the koala eats", n = 2) == List("the", "koala", "eats", "the koala", "koala eats"))
