@@ -15,7 +15,7 @@ class PlaceRecognizer(
   modelsDirectory: String
 ) extends Serializable {
 
-  private lazy val supportedLanguages = Set("de", "en", "es", "eu", "fr", "gl", "it", "nl")
+  private lazy val supportedLanguages = Set("de", "en", "es", "eu", "it", "nl")
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
     if (!supportedLanguages.contains(language)) {
