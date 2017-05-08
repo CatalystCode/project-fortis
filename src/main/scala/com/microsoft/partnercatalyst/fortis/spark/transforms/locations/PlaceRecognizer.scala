@@ -16,8 +16,6 @@ class PlaceRecognizer(
 ) extends Serializable {
 
   private lazy val supportedLanguages = Set("de", "en", "es", "eu", "fr", "gl", "it", "nl")
-  @transient private val posAnnotateCache = mutable.Map[String, PosAnnotate]()
-  @transient private val nerAnnotateCache = mutable.Map[String, NerAnnotate]()
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
     if (!supportedLanguages.contains(language)) {
@@ -53,13 +51,7 @@ class PlaceRecognizer(
     properties.setProperty("multiwords", "false")
     properties.setProperty("dictag", "false")
 
-    var annotator = posAnnotateCache.get(language)
-    if (annotator.isEmpty) {
-      annotator = Some(new PosAnnotate(properties))
-      posAnnotateCache.put(language, annotator.get)
-    }
-
-    annotator.get
+    new PosAnnotate(properties)
   }
 
   private def createNerAnnotate(language: String): NerAnnotate = {
@@ -71,12 +63,6 @@ class PlaceRecognizer(
     properties.setProperty("dictPath", "off")
     properties.setProperty("clearFeatures", "no")
 
-    var annotator = nerAnnotateCache.get(language)
-    if (annotator.isEmpty) {
-      annotator = Some(new NerAnnotate(properties))
-      nerAnnotateCache.put(language, annotator.get)
-    }
-
-    annotator.get
+    new NerAnnotate(properties)
   }
 }
