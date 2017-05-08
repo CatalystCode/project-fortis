@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import java.io.{BufferedReader, ByteArrayInputStream, File, InputStreamReader}
+import java.io._
 import java.util.Properties
 
 import eus.ixa.ixa.pipe.nerc.{Annotate => NerAnnotate}
@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 @SerialVersionUID(100L)
 class PlaceRecognizer(
   modelsDirectory: String
-) extends Serializable {
+) extends Serializable with Logger {
 
   private lazy val supportedLanguages = Set("de", "en", "es", "eu", "it", "nl")
 
@@ -22,12 +22,18 @@ class PlaceRecognizer(
       return Set()
     }
 
-    val kaf = new KAFDocument(language, "v1.naf")
-    tokAnnotate(text, language, kaf)
-    posAnnotate(language, kaf)
-    nerAnnotate(language, kaf)
+    try {
+      val kaf = new KAFDocument(language, "v1.naf")
+      tokAnnotate(text, language, kaf)
+      posAnnotate(language, kaf)
+      nerAnnotate(language, kaf)
 
-    kaf.getEntities.toList.filter(_.getType == "LOCATION").map(_.getStr).toSet
+      kaf.getEntities.toList.filter(_.getType == "LOCATION").map(_.getStr).toSet
+    } catch {
+      case ioex: IOError =>
+        logError(s"Unable to extract places for language $language", ioex)
+        Set()
+    }
   }
 
   private def nerAnnotate(language: String, kaf: KAFDocument) = {

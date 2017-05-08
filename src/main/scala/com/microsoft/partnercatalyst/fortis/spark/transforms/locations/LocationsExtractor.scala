@@ -2,7 +2,6 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.Location
-import org.apache.log4j.LogManager
 
 import scala.collection.mutable
 
@@ -14,7 +13,7 @@ class LocationsExtractor(
   geofence: Geofence,
   placeRecognizer: Option[PlaceRecognizer] = None,
   ngrams: Int = 3
-) extends Serializable {
+) extends Serializable with Logger {
 
   protected var lookup: Map[String, Set[String]] = _
 
@@ -56,9 +55,4 @@ class LocationsExtractor(
     val locationsInGeofence = locationsForPoint.flatMap(location => lookup.get(location.name.toLowerCase)).flatten.toSet
     locationsInGeofence.map(wofId => Location(wofId, confidence = Some(1.0)))
   }
-
-  @transient private lazy val log = LogManager.getLogger("liblocations")
-  def logDebug(message: String): Unit = log.debug(message)
-  def logInfo(message: String): Unit = log.info(message)
-  def logError(message: String, throwable: Throwable): Unit = log.error(message, throwable)
 }
