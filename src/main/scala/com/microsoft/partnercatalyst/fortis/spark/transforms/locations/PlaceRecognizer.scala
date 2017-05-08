@@ -23,11 +23,23 @@ class PlaceRecognizer(
     }
 
     val kaf = new KAFDocument(language, "v1.naf")
-    createTokAnnotate(language, text).tokenizeToKAF(kaf)
-    createPosAnnotate(language).annotatePOSToKAF(kaf)
-    createNerAnnotate(language).annotateNEs(kaf)
+    tokAnnotate(text, language, kaf)
+    posAnnotate(language, kaf)
+    nerAnnotate(language, kaf)
 
     kaf.getEntities.toList.filter(_.getType == "LOCATION").map(_.getStr).toSet
+  }
+
+  private def nerAnnotate(language: String, kaf: KAFDocument) = {
+    createNerAnnotate(language).annotateNEs(kaf)
+  }
+
+  private def posAnnotate(language: String, kaf: KAFDocument) = {
+    createPosAnnotate(language).annotatePOSToKAF(kaf)
+  }
+
+  private def tokAnnotate(text: String, language: String, kaf: KAFDocument) = {
+    createTokAnnotate(language, text).tokenizeToKAF(kaf)
   }
 
   private def createTokAnnotate(language: String, text: String): TokAnnotate = {
