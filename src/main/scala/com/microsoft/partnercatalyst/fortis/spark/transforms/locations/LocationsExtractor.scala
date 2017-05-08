@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.Location
+import org.apache.log4j.LogManager
 
 import scala.collection.mutable
 
@@ -26,6 +27,7 @@ class LocationsExtractor(
     })
 
     lookup = map.map(kv => (kv._1, kv._2.toSet)).toMap
+    logDebug(s"Built lookup for $geofence with ${lookup.size} locations")
     this
   }
 
@@ -38,9 +40,12 @@ class LocationsExtractor(
   private def extractCandidatePlaces(text: String, language: Option[String]): Iterable[String] = {
     var candidatePlaces = Iterable[String]()
     if (placeRecognizer.isDefined) {
-      candidatePlaces = placeRecognizer.get.extractPlaces(text, language.getOrElse(""))
+      val lang = language.getOrElse("")
+      logDebug(s"Attempting to extract places for language '$lang'")
+      candidatePlaces = placeRecognizer.get.extractPlaces(text, lang)
     }
     if (candidatePlaces.isEmpty) {
+      logDebug("Falling back to ngrams approach")
       candidatePlaces = StringUtils.ngrams(text, ngrams)
     }
     candidatePlaces
@@ -51,4 +56,9 @@ class LocationsExtractor(
     val locationsInGeofence = locationsForPoint.flatMap(location => lookup.get(location.name.toLowerCase)).flatten.toSet
     locationsInGeofence.map(wofId => Location(wofId, confidence = Some(1.0)))
   }
+
+  @transient private lazy val log = LogManager.getLogger("liblocations")
+  def logDebug(message: String): Unit = log.debug(message)
+  def logInfo(message: String): Unit = log.info(message)
+  def logError(message: String, throwable: Throwable): Unit = log.error(message, throwable)
 }
