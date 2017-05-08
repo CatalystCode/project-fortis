@@ -72,6 +72,7 @@ class PlaceRecognizer(
     properties.setProperty("resourcesDirectory", modelsDirectory)
     properties.setProperty("multiwords", "false")
     properties.setProperty("dictag", "false")
+    properties.setProperty("useModelCache", "true")
 
     new PosAnnotate(properties)
   }
@@ -84,6 +85,7 @@ class PlaceRecognizer(
     properties.setProperty("dictTag", "off")
     properties.setProperty("dictPath", "off")
     properties.setProperty("clearFeatures", "no")
+    properties.setProperty("useModelCache", "true")
 
     new NerAnnotate(properties)
   }
