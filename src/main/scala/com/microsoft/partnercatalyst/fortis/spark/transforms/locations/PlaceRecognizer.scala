@@ -12,13 +12,12 @@ import scala.collection.JavaConversions._
 
 @SerialVersionUID(100L)
 class PlaceRecognizer(
-  modelsDirectory: String
+  modelsDirectory: String,
+  enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
 ) extends Serializable with Logger {
 
-  private lazy val supportedLanguages = Set("de", "en", "es", "eu", "it", "nl")
-
   def extractPlaces(text: String, language: String): Iterable[String] = {
-    if (!supportedLanguages.contains(language)) {
+    if (!enabledLanguages.contains(language)) {
       return Set()
     }
 
