@@ -87,7 +87,7 @@ object DemoInstagramAndLocations {
         })
         .map(analyzedTweet => {
           // infer locations from text
-          val language = if (!analyzedTweet.originalItem.getLang.isEmpty) { Some(analyzedTweet.originalItem.getLang.toLowerCase) } else { None }
+          val language = if (analyzedTweet.originalItem.getLang != null) { Some(analyzedTweet.originalItem.getLang.toLowerCase) } else { None }
           val inferredLocations = locationsExtractor.analyze(analyzedTweet.originalItem.getText, language).toList
           analyzedTweet.copy(analysis = analyzedTweet.analysis.copy(locations = inferredLocations ++ analyzedTweet.analysis.locations))
         })
