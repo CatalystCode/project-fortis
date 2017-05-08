@@ -28,8 +28,13 @@ class PlaceRecognizer(
       posAnnotate(language, kaf)
       nerAnnotate(language, kaf)
 
+      logDebug(s"Analyzed text $text in language $language: $kaf")
+
       kaf.getEntities.toList.filter(_.getType == "LOCATION").map(_.getStr).toSet
     } catch {
+      case npex: NullPointerException =>
+        logError(s"Unable to extract places for language $language", npex)
+        Set()
       case ioex: IOError =>
         logError(s"Unable to extract places for language $language", ioex)
         Set()
