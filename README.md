@@ -21,6 +21,7 @@ export TWITTER_ACCESS_TOKEN="..."
 export TWITTER_ACCESS_TOKEN_SECRET="..."
 
 # compile scala, run tests, build fat jar
+export JAVA_OPTS="-Xmx2048M"
 sbt assembly
 
 # run on spark
