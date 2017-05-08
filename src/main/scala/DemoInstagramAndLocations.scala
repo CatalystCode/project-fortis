@@ -21,6 +21,8 @@ object DemoInstagramAndLocations {
     val ssc = new StreamingContext(sc, Seconds(1))
     Logger.getLogger("org").setLevel(Level.ERROR)
     Logger.getLogger("akka").setLevel(Level.ERROR)
+    Logger.getLogger("libinstagram").setLevel(Level.DEBUG)
+    Logger.getLogger("liblocations").setLevel(Level.DEBUG)
 
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)  // useful tool to get fences for testing: http://boundingbox.klokantech.com
     val placeRecognizer = new PlaceRecognizer("C:\\Users\\clewolff\\Desktop\\opener-models")
