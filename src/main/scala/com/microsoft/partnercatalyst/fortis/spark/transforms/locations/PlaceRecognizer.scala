@@ -9,19 +9,18 @@ import eus.ixa.ixa.pipe.tok.{Annotate => TokAnnotate}
 import ixa.kaflib.KAFDocument
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable
 
 @SerialVersionUID(100L)
 class PlaceRecognizer(
   modelsDirectory: String
 ) extends Serializable {
 
-  @transient private val supportedLanguages = Set("de", "en", "es", "eu", "fr", "gl", "it", "nl")
+  private lazy val supportedLanguages = Set("de", "en", "es", "eu", "fr", "gl", "it", "nl")
   @transient private val posAnnotateCache = mutable.Map[String, PosAnnotate]()
   @transient private val nerAnnotateCache = mutable.Map[String, NerAnnotate]()
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
-    if (!supportedLanguages.contains(language.toLowerCase)) {
+    if (!supportedLanguages.contains(language)) {
       return Set()
     }
 
