@@ -45,7 +45,6 @@ object DemoInstagramAndLocations {
         .map(instagram => {
           // do computer vision analysis: keyword extraction, etc.
           val source = instagram.link
-          println(source)
           val analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
           AnalyzedItem(originalItem = instagram, analysis = analysis, source = source)
         })
@@ -70,7 +69,6 @@ object DemoInstagramAndLocations {
       twitterStream
         .map(tweet => {
           val source = s"https://twitter.com/statuses/${tweet.getId}"
-          println(source)
           val analysis = Analysis()  // TODO: do nlp category extraction here
           AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
         })
