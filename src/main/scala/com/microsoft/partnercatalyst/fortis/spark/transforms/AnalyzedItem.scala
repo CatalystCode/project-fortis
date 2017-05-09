@@ -24,5 +24,6 @@ case class Tag(
 case class AnalyzedItem[T](
   originalItem: T,
   source: String,
+  sharedLocations: List[Location] = List(),
   analysis: Analysis
 )

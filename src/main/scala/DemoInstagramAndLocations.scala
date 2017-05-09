@@ -54,9 +54,8 @@ object DemoInstagramAndLocations {
           val instagram = analyzed.originalItem
           if (instagram.location.isDefined) {
             val location = instagram.location.get
-            val taggedLocations = locationsExtractor.fetch(latitude = location.latitude, longitude = location.longitude).toList
-            analyzed = analyzed.copy(analysis = analyzed.analysis.copy(
-              locations = taggedLocations ++ analyzed.analysis.locations))
+            val sharedLocations = locationsExtractor.fetch(latitude = location.latitude, longitude = location.longitude).toList
+            analyzed = analyzed.copy(sharedLocations = sharedLocations ++ analyzed.sharedLocations)
           }
           analyzed
         })
@@ -79,8 +78,8 @@ object DemoInstagramAndLocations {
           if (location != null) {
             val lat = location.getLatitude
             val lng = location.getLongitude
-            val taggedLocations = locationsExtractor.fetch(latitude = lat, longitude = lng).toList
-            analyzed = analyzed.copy(analysis = analyzed.analysis.copy(locations = taggedLocations ++ analyzed.analysis.locations))
+            val sharedLocations = locationsExtractor.fetch(latitude = lat, longitude = lng).toList
+            analyzed = analyzed.copy(sharedLocations = sharedLocations ++ analyzed.sharedLocations)
           }
           analyzed
         })
