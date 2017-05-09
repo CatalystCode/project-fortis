@@ -1,11 +1,11 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
+package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
 
 import java.io._
 import java.net.URL
 import java.nio.file.Files
 import java.util.Properties
 
-import sys.process._
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
 import eus.ixa.ixa.pipe.nerc.{Annotate => NerAnnotate}
 import eus.ixa.ixa.pipe.pos.{Annotate => PosAnnotate}
 import eus.ixa.ixa.pipe.tok.{Annotate => TokAnnotate}
@@ -13,6 +13,7 @@ import ixa.kaflib.KAFDocument
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
+import scala.sys.process._
 
 @SerialVersionUID(100L)
 class PlaceRecognizer(

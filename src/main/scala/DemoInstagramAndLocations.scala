@@ -2,7 +2,8 @@ import com.github.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor, PlaceRecognizer}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}

@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.Location
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
 
 import scala.collection.mutable
 

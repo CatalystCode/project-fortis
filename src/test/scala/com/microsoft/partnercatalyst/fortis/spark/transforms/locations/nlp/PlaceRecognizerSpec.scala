@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
+package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
 
 import org.scalatest.FlatSpec
 
