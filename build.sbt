@@ -26,6 +26,9 @@ libraryDependencies ++= Seq(
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
   "net.lingala.zip4j" % "zip4j" % "1.3.2",
+  "eus.ixa" % "ixa-pipe-pos" % "1.5.2",
+  "eus.ixa" % "ixa-pipe-tok" % "1.8.6",
+  "eus.ixa" % "ixa-pipe-nerc" % "1.6.1",
   "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 )
 
