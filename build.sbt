@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
   "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.0",
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
+  "net.lingala.zip4j" % "zip4j" % "1.3.2",
   "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 )
 

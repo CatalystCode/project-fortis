@@ -25,7 +25,7 @@ object DemoInstagramAndLocations {
     Logger.getLogger("liblocations").setLevel(Level.DEBUG)
 
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)  // useful tool to get fences for testing: http://boundingbox.klokantech.com
-    val placeRecognizer = new PlaceRecognizer("C:\\Users\\clewolff\\Desktop\\opener-models")
+    val placeRecognizer = new PlaceRecognizer()
     val featureServiceClient = new FeatureServiceClient("localhost:8080")
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
     val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
