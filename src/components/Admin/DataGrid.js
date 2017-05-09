@@ -6,7 +6,7 @@ import moment from 'moment';
 // eslint-disable-next-line
 import {guid} from '../../utils/Utils.js';
 
-const { Toolbar, Data: { Selectors } } = require('react-data-grid-addons');
+const { Toolbar } = require('react-data-grid-addons');
 const STATE_ACTIONS = {
     SAVED: "saved",
     SAVING: "saving",
@@ -145,7 +145,7 @@ export const DataGrid = React.createClass({
       this.props.handleRemove(selectedRows);
   },
   getSize() {
-      return Selectors.getRows(this.state).length;
+      return this.state.rows.length;
   },
   handleAddRow(e){
       let newRow = {}, rows = this.state.rows;
@@ -198,7 +198,7 @@ handleGridRowsUpdated(updatedRowData) {
       this.setState({modifiedRows, localAction, rows});
   },
   rowGetter(rowIdx){
-    return Selectors.getRows(this.state)[rowIdx];
+    return this.state.rows[rowIdx] || {};
   },
   onClearFilters(){
     this.setState({filters: {} });
@@ -452,7 +452,6 @@ handleGridRowsUpdated(updatedRowData) {
                   rowGetter={this.rowGetter}
                   rowRenderer={<RowRenderer rowKey={this.props.rowKey} 
                                             modifiedRows={this.state.modifiedRows}/>}
-                  onAddFilter={this.handleFilterChange}
                   onGridRowsUpdated={this.handleGridRowsUpdated}
                   toolbar={<Toolbar enableFilter={true} 
                                     {...toolBarProps}/>}
