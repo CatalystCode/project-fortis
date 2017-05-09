@@ -38,11 +38,8 @@ class PlaceRecognizer(
 
       kaf.getEntities.toList.filter(_.getType == "LOCATION").map(_.getStr).toSet
     } catch {
-      case npex: NullPointerException =>
-        logError(s"Unable to extract places for language $language", npex)
-        Set()
-      case ioex: IOError =>
-        logError(s"Unable to extract places for language $language", ioex)
+      case ex @ (_ : NullPointerException | _ : IOError) =>
+        logError(s"Unable to extract places for language $language", ex)
         Set()
     }
   }
