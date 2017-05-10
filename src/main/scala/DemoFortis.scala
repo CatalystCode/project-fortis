@@ -9,7 +9,7 @@ import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 
-object DemoInstagramAndLocations {
+object DemoFortis {
   def main(args: Array[String]) {
     val mode = args.headOption.getOrElse("")
     if (mode.isEmpty) {

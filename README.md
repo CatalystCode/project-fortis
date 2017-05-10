@@ -25,6 +25,6 @@ export JAVA_OPTS="-Xmx2048M"
 sbt assembly
 
 # run on spark
-spark-submit --class DemoInstagramAndLocations --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar instagram
-spark-submit --class DemoInstagramAndLocations --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar twitter
+spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar instagram
+spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar twitter
 ```
