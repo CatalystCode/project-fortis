@@ -106,6 +106,19 @@ object DemoFortis {
           AnalyzedItem(originalItem = post, analysis = analysis, source = source)
         })
         .map(analyzedPost => {
+          // map tagged locations to location features
+          var analyzed = analyzedPost
+          val place = Option(analyzed.originalItem.post.getPlace)
+          val location = if (place.isDefined) { Some(place.get.getLocation) } else { None }
+          if (location.isDefined) {
+            val lat = location.get.getLatitude
+            val lng = location.get.getLongitude
+            val sharedLocations = locationsExtractor.fetch(latitude = lat, longitude = lng).toList
+            analyzed = analyzed.copy(sharedLocations = sharedLocations ++ analyzed.sharedLocations)
+          }
+          analyzed
+        })
+        .map(analyzedPost => {
           // infer locations from text
           val language = Some("en") // TODO: do better than this...
           val inferredLocations = locationsExtractor.analyze(analyzedPost.originalItem.post.getMessage, language).toList
