@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
 // Bundled dependencies
 libraryDependencies ++= Seq(
   "com.github.catalystcode" % "streaming-instagram_2.11" % "0.0.5",
+  "com.github.catalystcode" % "streaming-facebook_2.11" % "0.0.1",
   "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.0",
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
@@ -47,6 +48,7 @@ assemblyMergeStrategy in assembly := {
   case PathList("javax", "inject", xs @ _*) => MergeStrategy.last
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
   case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
+  case PathList("com", "github", "catalystcode", xs @ _*) => MergeStrategy.last
   case PathList("eus", "ixa", xs @ _*) => MergeStrategy.last
   case PathList("org", "aopalliance", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", xs @ _*) => MergeStrategy.last

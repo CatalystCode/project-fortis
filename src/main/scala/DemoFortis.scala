@@ -1,3 +1,4 @@
+import com.github.catalystcode.fortis.spark.streaming.facebook.{FacebookAuth, FacebookUtils}
 import com.github.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
@@ -37,6 +38,8 @@ object DemoFortis {
     System.setProperty("twitter4j.oauth.consumerSecret", System.getenv("TWITTER_CONSUMER_SECRET"))
     System.setProperty("twitter4j.oauth.accessToken", System.getenv("TWITTER_ACCESS_TOKEN"))
     System.setProperty("twitter4j.oauth.accessTokenSecret", System.getenv("TWITTER_ACCESS_TOKEN_SECRET"))
+
+    val facebookAuth = FacebookAuth(accessToken = System.getenv("FACEBOOK_AUTH_TOKEN"), appId = System.getenv("FACEBOOK_APP_ID"), appSecret = System.getenv("FACEBOOK_APP_SECRET"))
 
     if (mode.contains("instagram")) {
       val instagramLocationStream = InstagramUtils.createLocationStream(ssc, instagramAuth, latitude = 49.25, longitude = -123.1)
@@ -89,6 +92,24 @@ object DemoFortis {
           val language = if (analyzedTweet.originalItem.getLang != null) { Some(analyzedTweet.originalItem.getLang.toLowerCase) } else { None }
           val inferredLocations = locationsExtractor.analyze(analyzedTweet.originalItem.getText, language).toList
           analyzedTweet.copy(analysis = analyzedTweet.analysis.copy(locations = inferredLocations ++ analyzedTweet.analysis.locations))
+        })
+        .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
+    }
+
+    if (mode.contains("facebook")) {
+      val facebookStream = FacebookUtils.createPageStream(ssc, facebookAuth, "aljazeera")
+
+      facebookStream
+        .map(post => {
+          val source = post.post.getPermalinkUrl.toString
+          val analysis = Analysis()  // TODO: do nlp category extraction here
+          AnalyzedItem(originalItem = post, analysis = analysis, source = source)
+        })
+        .map(analyzedPost => {
+          // infer locations from text
+          val language = Some("en") // TODO: do better than this...
+          val inferredLocations = locationsExtractor.analyze(analyzedPost.originalItem.post.getMessage, language).toList
+          analyzedPost.copy(analysis = analyzedPost.analysis.copy(locations = inferredLocations ++ analyzedPost.analysis.locations))
         })
         .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
     }
