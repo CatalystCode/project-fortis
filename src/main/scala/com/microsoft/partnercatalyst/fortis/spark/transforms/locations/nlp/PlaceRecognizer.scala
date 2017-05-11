@@ -1,25 +1,24 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
 
-import java.io._
+import java.io.{File, FileNotFoundException, IOError}
 import java.net.URL
 import java.nio.file.Files
-import java.util.Properties
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
-import eus.ixa.ixa.pipe.nerc.{Annotate => NerAnnotate}
-import eus.ixa.ixa.pipe.pos.{Annotate => PosAnnotate}
-import eus.ixa.ixa.pipe.tok.{Annotate => TokAnnotate}
-import ixa.kaflib.KAFDocument
+import ixa.kaflib.Entity
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 import scala.sys.process._
 
 @SerialVersionUID(100L)
 class PlaceRecognizer(
-  var modelsDirectory: Option[String] = None,
+  modelsSource: Option[String] = None,
   enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
 ) extends Serializable with Logger {
+
+  @volatile private lazy val modelDirectories = mutable.Map[String, String]()
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
     if (!enabledLanguages.contains(language)) {
@@ -27,16 +26,15 @@ class PlaceRecognizer(
     }
 
     try {
-      ensureModelsAreDownloaded(language)
+      val resourcesDirectory = ensureModelsAreDownloaded(language)
 
-      val kaf = new KAFDocument(language, "v1.naf")
-      tokAnnotate(text, language, kaf)
-      posAnnotate(language, kaf)
-      nerAnnotate(language, kaf)
+      var kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
+      OpeNER.posAnnotate(resourcesDirectory, language, kaf)
+      OpeNER.nerAnnotate(resourcesDirectory, language, kaf)
 
       logDebug(s"Analyzed text $text in language $language: $kaf")
 
-      kaf.getEntities.toList.filter(_.getType == "LOCATION").map(_.getStr).toSet
+      kaf.getEntities.toList.filter(entityIsPlace).map(_.getStr).toSet
     } catch {
       case ex @ (_ : NullPointerException | _ : IOError) =>
         logError(s"Unable to extract places for language $language", ex)
@@ -44,86 +42,55 @@ class PlaceRecognizer(
     }
   }
 
-  private def ensureModelsAreDownloaded(language: String): Unit = {
-    if (modelsDirectory.nonEmpty && hasModelFiles(modelsDirectory.get, language)) {
-      logDebug(s"Using model files from ${modelsDirectory.get}")
-      return
+  private def entityIsPlace(entity: Entity) = {
+    val entityType = entity.getType
+    entityType == "LOCATION" || entityType == "GPE"
+  }
+
+  private def ensureModelsAreDownloaded(language: String): String = {
+    val localPath = modelsSource.getOrElse("")
+    if (hasModelFiles(localPath, language)) {
+      logDebug(s"Using locally provided model files from $localPath")
+      modelDirectories.putIfAbsent(language, localPath)
+      return localPath
     }
 
-    val remotePath = modelsDirectory.getOrElse(s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip")
-    if (remotePath.startsWith("http://") || remotePath.startsWith("https://")) {
-      if (remotePath.endsWith(".zip")) {
-        val localFile = Files.createTempFile(getClass.getSimpleName, ".zip").toAbsolutePath.toString
-        val localDir = Files.createTempDirectory(getClass.getSimpleName).toAbsolutePath.toString
-        logDebug(s"Starting to download models from $remotePath to $localFile")
-        val exitCode = (new URL(remotePath) #> new File(localFile)).!
-        logDebug(s"Finished downloading models from $remotePath to $localFile")
-        if (exitCode != 0) {
-          throw new FileNotFoundException(s"Unable to download models for language $language from $remotePath")
-        }
-        new ZipFile(localFile).extractAll(localDir)
-        new File(localFile).delete()
-        modelsDirectory = Some(localDir)
-      }
+    val previouslyDownloadedPath = modelDirectories.getOrElse(language, "")
+    if (hasModelFiles(previouslyDownloadedPath, language)) {
+      logDebug(s"Using previously downloaded model files from $previouslyDownloadedPath")
+      return previouslyDownloadedPath
     }
 
-    if (!hasModelFiles(modelsDirectory.get, language)) {
+    val remotePath = modelsSource.getOrElse(s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip")
+    if ((!remotePath.startsWith("http://") && !remotePath.startsWith("https://")) || !remotePath.endsWith(".zip")) {
+      throw new FileNotFoundException(s"Unable to process $remotePath, should be http(s) link to zip file")
+    }
+    val localDir = downloadModels(remotePath)
+    if (!hasModelFiles(localDir, language)) {
       throw new FileNotFoundException(s"No models for language $language in $remotePath")
     }
+    modelDirectories.putIfAbsent(language, localDir)
+    localDir
   }
 
-  private def hasModelFiles(modelsDir: String, language: String) = {
+  private def downloadModels(remotePath: String): String = {
+    val localFile = Files.createTempFile(getClass.getSimpleName, ".zip").toAbsolutePath.toString
+    val localDir = Files.createTempDirectory(getClass.getSimpleName).toAbsolutePath.toString
+    logDebug(s"Starting to download models from $remotePath to $localFile")
+    val exitCode = (new URL(remotePath) #> new File(localFile)).!
+    logDebug(s"Finished downloading models from $remotePath to $localFile")
+    if (exitCode != 0) {
+      throw new FileNotFoundException(s"Unable to download models from $remotePath")
+    }
+    new ZipFile(localFile).extractAll(localDir)
+    new File(localFile).delete()
+    localDir
+  }
+
+  private def hasModelFiles(modelsDir: String, language: String): Boolean = {
+    if (modelsDir.isEmpty) return false
+
     val modelFiles = new File(modelsDir).listFiles
     modelFiles != null && modelFiles.exists(_.getName.startsWith(s"$language-"))
-  }
-
-  private def nerAnnotate(language: String, kaf: KAFDocument) = {
-    createNerAnnotate(language).annotateNEs(kaf)
-  }
-
-  private def posAnnotate(language: String, kaf: KAFDocument) = {
-    createPosAnnotate(language).annotatePOSToKAF(kaf)
-  }
-
-  private def tokAnnotate(text: String, language: String, kaf: KAFDocument) = {
-    createTokAnnotate(language, text).tokenizeToKAF(kaf)
-  }
-
-  private def createTokAnnotate(language: String, text: String): TokAnnotate = {
-    val properties = new Properties
-    properties.setProperty("language", language)
-    properties.setProperty("resourcesDirectory", modelsDirectory.get)
-    properties.setProperty("normalize", "default")
-    properties.setProperty("untokenizable", "no")
-    properties.setProperty("hardParagraph", "no")
-
-    val input = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text.getBytes("UTF-8"))))
-    new TokAnnotate(input, properties)
-  }
-
-  private def createPosAnnotate(language: String): PosAnnotate = {
-    val properties = new Properties
-    properties.setProperty("language", language)
-    properties.setProperty("model", new File(modelsDirectory.get, s"$language-pos.bin").getAbsolutePath)
-    properties.setProperty("lemmatizerModel", new File(modelsDirectory.get, s"$language-lemmatizer.bin").getAbsolutePath)
-    properties.setProperty("resourcesDirectory", modelsDirectory.get)
-    properties.setProperty("multiwords", "false")
-    properties.setProperty("dictag", "false")
-    properties.setProperty("useModelCache", "true")
-
-    new PosAnnotate(properties)
-  }
-
-  private def createNerAnnotate(language: String): NerAnnotate = {
-    val properties = new Properties
-    properties.setProperty("language", language)
-    properties.setProperty("model", new File(modelsDirectory.get, s"$language-nerc.bin").getAbsolutePath)
-    properties.setProperty("ruleBasedOption", "off")
-    properties.setProperty("dictTag", "off")
-    properties.setProperty("dictPath", "off")
-    properties.setProperty("clearFeatures", "no")
-    properties.setProperty("useModelCache", "true")
-
-    new NerAnnotate(properties)
   }
 }
