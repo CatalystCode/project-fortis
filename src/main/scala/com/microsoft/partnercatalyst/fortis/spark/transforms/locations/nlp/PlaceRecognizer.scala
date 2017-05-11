@@ -43,8 +43,8 @@ class PlaceRecognizer(
   }
 
   private def entityIsPlace(entity: Entity) = {
-    val entityType = entity.getType
-    entityType == "LOCATION" || entityType == "GPE"
+    val entityType = Option(entity.getType).getOrElse("").toLowerCase
+    entityType == "location" || entityType == "gpe"
   }
 
   private def ensureModelsAreDownloaded(language: String): String = {
