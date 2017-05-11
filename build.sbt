@@ -29,9 +29,13 @@ libraryDependencies ++= Seq(
   "net.lingala.zip4j" % "zip4j" % "1.3.2",
   "eus.ixa" % "ixa-pipe-pos" % "1.5.2",
   "eus.ixa" % "ixa-pipe-tok" % "1.8.6",
-  "eus.ixa" % "ixa-pipe-nerc" % "1.6.1",
-  "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+  "eus.ixa" % "ixa-pipe-nerc" % "1.6.1"
 )
+
+// Test dependencies
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "2.2.1"
+).map(_ % "test")
 
 // Configure fat JAR
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false) // Exclude Scala libs
