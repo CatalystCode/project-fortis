@@ -28,7 +28,7 @@ class PlaceRecognizer(
     try {
       val resourcesDirectory = ensureModelsAreDownloaded(language)
 
-      var kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
+      val kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
       OpeNER.posAnnotate(resourcesDirectory, language, kaf)
       OpeNER.nerAnnotate(resourcesDirectory, language, kaf)
 
