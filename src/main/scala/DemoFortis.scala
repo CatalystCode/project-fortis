@@ -136,7 +136,6 @@ object DemoFortis {
             val text = analyzedPost.originalItem.post.getMessage
             val language = analyzedPost.analysis.language.getOrElse("")
             val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
-            println(s"${text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')}\t${inferredSentiment.mkString}")
             analyzedPost.copy(analysis = analyzedPost.analysis.copy(sentiments = inferredSentiment ++ analyzedPost.analysis.sentiments))
           })
           .map(analyzedPost => {
