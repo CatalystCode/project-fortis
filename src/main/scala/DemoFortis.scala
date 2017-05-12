@@ -1,6 +1,6 @@
-import com.github.catalystcode.fortis.spark.streaming.facebook.{FacebookAuth, FacebookUtils}
+import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories.{InstagramLocationStreamFactory, InstagramTagStreamFactory, TwitterStreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.streamfactories.{FacebookPageStreamFactory, InstagramLocationStreamFactory, InstagramTagStreamFactory, TwitterStreamFactory}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
@@ -37,6 +37,11 @@ object DemoFortis {
           new TwitterStreamFactory
         )
       )
+      .withFactories(
+        List(
+          new FacebookPageStreamFactory
+        )
+      )
 
     val streamRegistry = buildRegistry()
 
@@ -54,8 +59,6 @@ object DemoFortis {
     val languageDetection = new LanguageDetector(LanguageDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
     val sentimentDetection = new SentimentDetector(SentimentDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
 
-
-    val facebookAuth = FacebookAuth(accessToken = System.getenv("FACEBOOK_AUTH_TOKEN"), appId = System.getenv("FACEBOOK_APP_ID"), appSecret = System.getenv("FACEBOOK_APP_SECRET"))
     if (mode.contains("instagram")) {
       streamProvider.buildStream[InstagramItem](ssc, streamRegistry("instagram")) match {
         case Some(stream) => stream
@@ -120,42 +123,43 @@ object DemoFortis {
     }
 
     if (mode.contains("facebook")) {
-      val facebookStream = FacebookUtils.createPageStream(ssc, facebookAuth, "aljazeera")
-
-      facebookStream
-        .map(post => {
-          val source = post.post.getPermalinkUrl.toString
-          val language = languageDetection.detectLanguage(post.post.getMessage)
-          val analysis = Analysis(language = language)
-          AnalyzedItem(originalItem = post, analysis = analysis, source = source)
-        })
-        .map(analyzedPost => {
-          // sentiment detection
-          val text = analyzedPost.originalItem.post.getMessage
-          val language = analyzedPost.analysis.language.getOrElse("")
-          val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
-          println(s"${text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')}\t${inferredSentiment.mkString}")
-          analyzedPost.copy(analysis = analyzedPost.analysis.copy(sentiments = inferredSentiment ++ analyzedPost.analysis.sentiments))
-        })
-        .map(analyzedPost => {
-          // map tagged locations to location features
-          var analyzed = analyzedPost
-          val place = Option(analyzed.originalItem.post.getPlace)
-          val location = if (place.isDefined) { Some(place.get.getLocation) } else { None }
-          if (location.isDefined) {
-            val lat = location.get.getLatitude
-            val lng = location.get.getLongitude
-            val sharedLocations = locationsExtractor.fetch(latitude = lat, longitude = lng).toList
-            analyzed = analyzed.copy(sharedLocations = sharedLocations ++ analyzed.sharedLocations)
-          }
-          analyzed
-        })
-        .map(analyzedPost => {
-          // infer locations from text
-          val inferredLocations = locationsExtractor.analyze(analyzedPost.originalItem.post.getMessage, analyzedPost.analysis.language).toList
-          analyzedPost.copy(analysis = analyzedPost.analysis.copy(locations = inferredLocations ++ analyzedPost.analysis.locations))
-        })
-        .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
+      streamProvider.buildStream[FacebookPost](ssc, streamRegistry("facebook")) match {
+        case Some(stream) => stream
+          .map(post => {
+            val source = post.post.getPermalinkUrl.toString
+            val language = languageDetection.detectLanguage(post.post.getMessage)
+            val analysis = Analysis(language = language)
+            AnalyzedItem(originalItem = post, analysis = analysis, source = source)
+          })
+          .map(analyzedPost => {
+            // sentiment detection
+            val text = analyzedPost.originalItem.post.getMessage
+            val language = analyzedPost.analysis.language.getOrElse("")
+            val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
+            println(s"${text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')}\t${inferredSentiment.mkString}")
+            analyzedPost.copy(analysis = analyzedPost.analysis.copy(sentiments = inferredSentiment ++ analyzedPost.analysis.sentiments))
+          })
+          .map(analyzedPost => {
+            // map tagged locations to location features
+            var analyzed = analyzedPost
+            val place = Option(analyzed.originalItem.post.getPlace)
+            val location = if (place.isDefined) { Some(place.get.getLocation) } else { None }
+            if (location.isDefined) {
+              val lat = location.get.getLatitude
+              val lng = location.get.getLongitude
+              val sharedLocations = locationsExtractor.fetch(latitude = lat, longitude = lng).toList
+              analyzed = analyzed.copy(sharedLocations = sharedLocations ++ analyzed.sharedLocations)
+            }
+            analyzed
+          })
+          .map(analyzedPost => {
+            // infer locations from text
+            val inferredLocations = locationsExtractor.analyze(analyzedPost.originalItem.post.getMessage, analyzedPost.analysis.language).toList
+            analyzedPost.copy(analysis = analyzedPost.analysis.copy(locations = inferredLocations ++ analyzedPost.analysis.locations))
+          })
+          .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
+        case None => println("No streams were configured for 'facebook' pipeline.")
+      }
     }
 
     ssc.start()
@@ -194,6 +198,17 @@ object DemoFortis {
             "consumerSecret" -> System.getenv("TWITTER_CONSUMER_SECRET"),
             "accessToken" -> System.getenv("TWITTER_ACCESS_TOKEN"),
             "accessTokenSecret" -> System.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+          )
+        )
+      ),
+      "facebook" -> List(
+        ConnectorConfig(
+          "FacebookPage",
+          Map(
+            "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
+            "appId" -> System.getenv("FACEBOOK_APP_ID"),
+            "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
+            "pageId" -> "aljazeera"
           )
         )
       )
