@@ -12,9 +12,12 @@ case class ImageAnalysisAuth(key: String, apiHost: String = "westus.api.cognitiv
 class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServiceClient) extends Serializable {
   def analyze(imageUrl: String): Analysis = {
     val requestBody = buildRequestBody(imageUrl)
+    val response = callCognitiveServices(requestBody)
+    parseResponse(response)
+  }
 
-    val response =
-      Http(s"https://${auth.apiHost}/vision/v1.0/analyze")
+  protected def callCognitiveServices(requestBody: String): String = {
+    Http(s"https://${auth.apiHost}/vision/v1.0/analyze")
       .params(
         "details" -> "Celebrities,Landmarks",
         "visualFeatures" -> "Categories,Tags,Description,Faces")
@@ -23,8 +26,7 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
         "Ocp-Apim-Subscription-Key" -> auth.key)
       .postData(requestBody)
       .asString
-
-    parseResponse(response.body)
+      .body
   }
 
   protected def buildRequestBody(imageUrl: String): String = {

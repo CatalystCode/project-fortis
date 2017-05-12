@@ -4,8 +4,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.JsonImage
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location, Tag}
 import org.scalatest.FlatSpec
 
-class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
-  def parse(): Analysis = parseResponse(response)
+class TestImageAnalyzer(cognitiveServicesResponse: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
+  override protected def callCognitiveServices(requestBody: String): String = cognitiveServicesResponse
   override def buildRequestBody(imageUrl: String): String = super.buildRequestBody(imageUrl)
   override def landmarksToLocations(landmarks: Iterable[JsonImageLandmark]): Iterable[Location] = landmarks.map(x => Location(x.name, Some(x.confidence)))
 }
@@ -117,7 +117,7 @@ class ImageAnalyzerSpec extends FlatSpec {
         |    "lineDrawingType": 0
         |  }
         |}
-      """.stripMargin).parse()
+      """.stripMargin).analyze("http://test.com/image.png")
 
     assert(response === Analysis(
       keywords = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
@@ -207,7 +207,7 @@ class ImageAnalyzerSpec extends FlatSpec {
         |    "lineDrawingType": 0
         |  }
         |}
-      """.stripMargin).parse()
+      """.stripMargin).analyze("http://test.com/image.png")
 
     assert(response === Analysis(
       keywords = List(Tag("person", 0.98979085683822632), Tag("man", 0.94493889808654785), Tag("outdoor", 0.938492476940155), Tag("window", 0.89513939619064331)),
