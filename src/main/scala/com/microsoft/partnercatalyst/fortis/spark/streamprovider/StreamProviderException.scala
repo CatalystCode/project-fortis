@@ -1,4 +1,4 @@
-package com.github.catalystcode.fortis.spark.streaming.streamprovider
+package com.microsoft.partnercatalyst.fortis.spark.streamprovider
 
 sealed trait StreamProviderException { self: Throwable =>
   // TODO

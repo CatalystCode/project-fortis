@@ -1,6 +1,6 @@
-package com.github.catalystcode.fortis.spark.streaming.streamfactories
+package com.microsoft.partnercatalyst.fortis.spark.streamfactories
 
-import com.github.catalystcode.fortis.spark.streaming.streamprovider.{ConnectorConfig, StreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.eventhubs.EventHubsUtils

@@ -1,3 +1,3 @@
-package com.github.catalystcode.fortis.spark.streaming.streamprovider
+package com.microsoft.partnercatalyst.fortis.spark.streamprovider
 
 case class ConnectorConfig(name: String, parameters: Map[String, String])
