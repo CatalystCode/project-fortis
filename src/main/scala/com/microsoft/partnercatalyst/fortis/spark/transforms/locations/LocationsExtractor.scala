@@ -40,7 +40,7 @@ class LocationsExtractor(
   private def extractCandidatePlaces(text: String, language: Option[String]): Iterable[String] = {
     var candidatePlaces = Iterable[String]()
     if (placeRecognizer.isDefined) {
-      val lang = language.getOrElse("")
+      val lang = language.getOrElse("").toLowerCase
       logDebug(s"Attempting to extract places for language '$lang'")
       candidatePlaces = placeRecognizer.get.extractPlaces(text, lang)
     }

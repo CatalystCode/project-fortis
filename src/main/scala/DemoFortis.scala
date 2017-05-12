@@ -72,7 +72,7 @@ object DemoFortis {
       twitterStream
         .map(tweet => {
           val source = s"https://twitter.com/statuses/${tweet.getId}"
-          val analysis = Analysis()  // TODO: do nlp category extraction here
+          val analysis = Analysis(language = Option(tweet.getLang))  // TODO: do nlp category extraction here
           AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
         })
         .map(analyzedTweet => {
@@ -89,8 +89,7 @@ object DemoFortis {
         })
         .map(analyzedTweet => {
           // infer locations from text
-          val language = if (analyzedTweet.originalItem.getLang != null) { Some(analyzedTweet.originalItem.getLang.toLowerCase) } else { None }
-          val inferredLocations = locationsExtractor.analyze(analyzedTweet.originalItem.getText, language).toList
+          val inferredLocations = locationsExtractor.analyze(analyzedTweet.originalItem.getText, analyzedTweet.analysis.language).toList
           analyzedTweet.copy(analysis = analyzedTweet.analysis.copy(locations = inferredLocations ++ analyzedTweet.analysis.locations))
         })
         .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
