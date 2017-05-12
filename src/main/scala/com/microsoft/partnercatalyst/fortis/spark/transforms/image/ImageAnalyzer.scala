@@ -11,6 +11,8 @@ case class ImageAnalysisAuth(key: String, apiHost: String = "westus.api.cognitiv
 @SerialVersionUID(100L)
 class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServiceClient) extends Serializable {
   def analyze(imageUrl: String): Analysis = {
+    val requestBody = buildRequestBody(imageUrl)
+
     val response =
       Http(s"https://${auth.apiHost}/vision/v1.0/analyze")
       .params(
@@ -19,10 +21,16 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
       .headers(
         "Content-Type" -> "application/json",
         "Ocp-Apim-Subscription-Key" -> auth.key)
-      .postData("{\"url\":\"" + imageUrl + "\"}")
+      .postData(requestBody)
       .asString
 
     parseResponse(response.body)
+  }
+
+  protected def buildRequestBody(imageUrl: String): String = {
+    implicit val formats = json.DefaultFormats
+    val requestBody = dto.JsonImageAnalysisRequest(url = imageUrl)
+    json.compactRender(json.Extraction.decompose(requestBody))
   }
 
   protected def parseResponse(apiResponse: String): Analysis = {

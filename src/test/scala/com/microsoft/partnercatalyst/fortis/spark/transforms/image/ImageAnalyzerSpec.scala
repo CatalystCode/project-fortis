@@ -6,6 +6,7 @@ import org.scalatest.FlatSpec
 
 class TestImageAnalyzer(response: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
   def parse(): Analysis = parseResponse(response)
+  override def buildRequestBody(imageUrl: String): String = super.buildRequestBody(imageUrl)
   override def landmarksToLocations(landmarks: Iterable[JsonImageLandmark]): Iterable[Location] = landmarks.map(x => Location(x.name, Some(x.confidence)))
 }
 
@@ -214,5 +215,12 @@ class ImageAnalyzerSpec extends FlatSpec {
       entities = List(),
       locations = List()
     ))
+  }
+
+  it should "build correct request body" in {
+    val imageUrl = "http://test.com/image.png"
+    val requestBody = new TestImageAnalyzer("").buildRequestBody(imageUrl)
+
+    assert(requestBody == s"""{"url":"$imageUrl"}""")
   }
 }

@@ -10,3 +10,5 @@ case class JsonImageCategory(name: String, score: Double, detail: Option[JsonIma
 case class JsonImageCategoryDetail(celebrities: Option[List[JsonImageCelebrity]], landmarks: Option[List[JsonImageLandmark]])
 case class JsonImageCelebrity(name: String, confidence: Double, faceRectangle: JsonFaceRectangle)
 case class JsonImageLandmark(name: String, confidence: Double)
+
+case class JsonImageAnalysisRequest(url: String)
