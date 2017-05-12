@@ -31,7 +31,7 @@ object DemoFortis {
         List(
           new InstagramLocationStreamFactory,
           new InstagramTagStreamFactory)
-      )
+        )
       .withFactories(
         List(
           new TwitterStreamFactory
@@ -57,7 +57,7 @@ object DemoFortis {
 
     val facebookAuth = FacebookAuth(accessToken = System.getenv("FACEBOOK_AUTH_TOKEN"), appId = System.getenv("FACEBOOK_APP_ID"), appSecret = System.getenv("FACEBOOK_APP_SECRET"))
     if (mode.contains("instagram")) {
-      streamProvider.buildPipeline[InstagramItem](ssc, streamRegistry("instagram")) match {
+      streamProvider.buildStream[InstagramItem](ssc, streamRegistry("instagram")) match {
         case Some(stream) => stream
           .map(instagram => {
             // do computer vision analysis: keyword extraction, etc.
@@ -82,7 +82,7 @@ object DemoFortis {
     }
 
     if (mode.contains("twitter")) {
-      streamProvider.buildPipeline[TwitterStatus](ssc, streamRegistry("twitter")) match {
+      streamProvider.buildStream[TwitterStatus](ssc, streamRegistry("twitter")) match {
         case Some(stream) => stream
           .map(tweet => {
             val source = s"https://twitter.com/statuses/${tweet.getId}"
@@ -164,7 +164,8 @@ object DemoFortis {
 
   /**
     * Build connector config registry from hard-coded values for demo.
-    * @return
+    *
+    * The key is the name of the pipeline and the value is a list of connector configs whose streams should comprise it.
     */
   private def buildRegistry() : Map[String, List[ConnectorConfig]] = {
     Map[String, List[ConnectorConfig]](
