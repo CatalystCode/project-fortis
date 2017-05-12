@@ -8,7 +8,7 @@ class TestLanguageDetector(cognitiveServicesResponse: String) extends LanguageDe
 }
 
 class LanguageDetectorSpec extends FlatSpec {
-  "The image analyzer" should "formulate correct request and parse response to domain types" in {
+  "The language detector" should "formulate correct request and parse response to domain types" in {
     val responseConfidence = 1.0
     val detector = new TestLanguageDetector(s"""{"documents":[{"id":"0","detectedLanguages":[{"name":"English","iso6391Name":"en","score":$responseConfidence}]}],"errors":[]}""")
     val language = detector.detectLanguage("some text")
