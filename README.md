@@ -15,6 +15,7 @@ Run it via:
 # set up all the requisite environment variables
 export INSTAGRAM_AUTH_TOKEN="..."
 export OXFORD_VISION_TOKEN="..."
+export OXFORD_LANGUAGE_TOKEN="..."
 export TWITTER_CONSUMER_KEY="..."
 export TWITTER_CONSUMER_SECRET="..."
 export TWITTER_ACCESS_TOKEN="..."

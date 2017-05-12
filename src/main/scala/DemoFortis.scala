@@ -2,6 +2,7 @@ import com.github.catalystcode.fortis.spark.streaming.facebook.{FacebookAuth, Fa
 import com.github.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
@@ -32,6 +33,7 @@ object DemoFortis {
     val featureServiceClient = new FeatureServiceClient("localhost:8080")
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
     val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
+    val languageDetection = new LanguageDetector(LanguageDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
 
     val instagramAuth = InstagramAuth(System.getenv("INSTAGRAM_AUTH_TOKEN"))
     System.setProperty("twitter4j.oauth.consumerKey", System.getenv("TWITTER_CONSUMER_KEY"))
@@ -72,7 +74,8 @@ object DemoFortis {
       twitterStream
         .map(tweet => {
           val source = s"https://twitter.com/statuses/${tweet.getId}"
-          val analysis = Analysis(language = Option(tweet.getLang))  // TODO: do nlp category extraction here
+          val language = if (Option(tweet.getLang).isDefined) { Option(tweet.getLang) } else { languageDetection.detectLanguage(tweet.getText) }
+          val analysis = Analysis(language = language)
           AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
         })
         .map(analyzedTweet => {
@@ -101,7 +104,8 @@ object DemoFortis {
       facebookStream
         .map(post => {
           val source = post.post.getPermalinkUrl.toString
-          val analysis = Analysis()  // TODO: do nlp category extraction here
+          val language = languageDetection.detectLanguage(post.post.getMessage)
+          val analysis = Analysis(language = language)
           AnalyzedItem(originalItem = post, analysis = analysis, source = source)
         })
         .map(analyzedPost => {
@@ -119,8 +123,7 @@ object DemoFortis {
         })
         .map(analyzedPost => {
           // infer locations from text
-          val language = Some("en") // TODO: do better than this...
-          val inferredLocations = locationsExtractor.analyze(analyzedPost.originalItem.post.getMessage, language).toList
+          val inferredLocations = locationsExtractor.analyze(analyzedPost.originalItem.post.getMessage, analyzedPost.analysis.language).toList
           analyzedPost.copy(analysis = analyzedPost.analysis.copy(locations = inferredLocations ++ analyzedPost.analysis.locations))
         })
         .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
