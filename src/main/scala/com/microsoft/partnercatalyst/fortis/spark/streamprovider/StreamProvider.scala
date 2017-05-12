@@ -60,12 +60,16 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
       s"stream creation must not be defined for more than 1 factory registered for type '$typeName' for a single config"
     )
 
-    val totalFunction = factories.map(_.createStream(streamingContext)).reduce(_.orElse(_))
-      .orElse[ConnectorConfig, DStream[A]]({
-        case _ => throw new UnsupportedConnectorConfigException
-      })
+    def throwUnsupported: PartialFunction[ConnectorConfig, DStream[A]] = {
+      case _ => throw new UnsupportedConnectorConfigException
+    }
 
-    val combinedStream = configs.collect(totalFunction).reduce(_.union(_))
+    val createStream: PartialFunction[ConnectorConfig, DStream[A]] = factories.map(_.createStream(streamingContext)).reduceOption(_.orElse(_)) match {
+      case Some(pf) => pf.orElse(throwUnsupported)
+      case None => throwUnsupported
+    }
+
+    val combinedStream = configs.collect(createStream).reduce(_.union(_))
     Some(combinedStream)
   }
 
