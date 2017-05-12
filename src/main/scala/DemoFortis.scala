@@ -6,6 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageD
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -34,6 +35,7 @@ object DemoFortis {
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
     val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
     val languageDetection = new LanguageDetector(LanguageDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
+    val sentimentDetection = new SentimentDetector(SentimentDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
 
     val instagramAuth = InstagramAuth(System.getenv("INSTAGRAM_AUTH_TOKEN"))
     System.setProperty("twitter4j.oauth.consumerKey", System.getenv("TWITTER_CONSUMER_KEY"))
@@ -78,6 +80,13 @@ object DemoFortis {
           val analysis = Analysis(language = language)
           AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
         })
+        .map(analyzedPost => {
+          // sentiment detection
+          val text = analyzedPost.originalItem.getText
+          val language = analyzedPost.analysis.language.getOrElse("")
+          val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
+          analyzedPost.copy(analysis = analyzedPost.analysis.copy(sentiments = inferredSentiment ++ analyzedPost.analysis.sentiments))
+        })
         .map(analyzedTweet => {
           // map tagged locations to location features
           var analyzed = analyzedTweet
@@ -107,6 +116,14 @@ object DemoFortis {
           val language = languageDetection.detectLanguage(post.post.getMessage)
           val analysis = Analysis(language = language)
           AnalyzedItem(originalItem = post, analysis = analysis, source = source)
+        })
+        .map(analyzedPost => {
+          // sentiment detection
+          val text = analyzedPost.originalItem.post.getMessage
+          val language = analyzedPost.analysis.language.getOrElse("")
+          val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
+          println(s"${text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')}\t${inferredSentiment.mkString}")
+          analyzedPost.copy(analysis = analyzedPost.analysis.copy(sentiments = inferredSentiment ++ analyzedPost.analysis.sentiments))
         })
         .map(analyzedPost => {
           // map tagged locations to location features

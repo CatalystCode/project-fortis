@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms
 case class Analysis(
   language: Option[String] = None,
   locations: List[Location] = List(),
-  sentiments: List[Tag] = List(),
+  sentiments: List[Double] = List(),
   moods: List[Tag] = List(),
   genders: List[Tag] = List(),
   keywords: List[Tag] = List(),
