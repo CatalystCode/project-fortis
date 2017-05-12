@@ -3,13 +3,13 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
 import java.io.{File, FileNotFoundException, IOError}
 import java.net.URL
 import java.nio.file.Files
+import java.util.concurrent.ConcurrentHashMap
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
 import ixa.kaflib.Entity
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable
 import scala.sys.process._
 
 @SerialVersionUID(100L)
@@ -18,7 +18,7 @@ class PlaceRecognizer(
   enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
 ) extends Serializable with Logger {
 
-  @volatile private lazy val modelDirectories = mutable.Map[String, String]()
+  @volatile private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
     if (!enabledLanguages.contains(language)) {
