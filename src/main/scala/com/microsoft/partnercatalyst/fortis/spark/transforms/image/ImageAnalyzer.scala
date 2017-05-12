@@ -49,6 +49,6 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
   protected def landmarksToLocations(marks: Iterable[dto.JsonImageLandmark]): Iterable[Location] = {
     val landmarks = marks.map(landmark => landmark.name -> landmark.confidence).toMap
     val features = featureServiceClient.name(landmarks.keys)
-    features.map(loc => Location(loc.id, landmarks.get(loc.name)))
+    features.map(loc => Location(wofId = loc.id, confidence = landmarks.get(loc.name)))
   }
 }

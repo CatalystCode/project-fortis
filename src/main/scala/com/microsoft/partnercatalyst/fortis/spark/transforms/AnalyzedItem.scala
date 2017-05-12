@@ -13,7 +13,9 @@ case class Analysis(
 
 case class Location(
   wofId: String,
-  confidence: Option[Double] = None
+  confidence: Option[Double] = None,
+  latitude: Option[Double] = None,
+  longitude: Option[Double] = None
 )
 
 case class Tag(

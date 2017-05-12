@@ -54,6 +54,6 @@ class LocationsExtractor(
   def fetch(latitude: Double, longitude: Double): Iterable[Location] = {
     val locationsForPoint = featureServiceClient.point(latitude = latitude, longitude = longitude)
     val locationsInGeofence = locationsForPoint.flatMap(location => lookup.get(location.name.toLowerCase)).flatten.toSet
-    locationsInGeofence.map(wofId => Location(wofId, confidence = Some(1.0)))
+    locationsInGeofence.map(wofId => Location(wofId, confidence = Some(1.0), latitude = Some(latitude), longitude = Some(longitude)))
   }
 }
