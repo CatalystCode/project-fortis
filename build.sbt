@@ -22,6 +22,8 @@ libraryDependencies ++= Seq(
 // Bundled dependencies
 libraryDependencies ++= Seq(
   "log4j" % "log4j" % "1.2.17",
+  "com.microsoft.azure" % "applicationinsights-core" % "1.0.6",
+  "com.microsoft.azure" % "applicationinsights-logging-log4j1_2" % "1.0.6",
   "com.github.catalystcode" % "streaming-instagram_2.11" % "0.0.5",
   "com.github.catalystcode" % "streaming-facebook_2.11" % "0.0.1",
   "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.0",
@@ -53,6 +55,7 @@ addArtifact(artifact in (Compile, assembly), assembly)
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "inject", xs @ _*) => MergeStrategy.last
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
+  case PathList("javax", "annotation", xs @ _*) => MergeStrategy.last
   case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
   case PathList("com", "github", "catalystcode", xs @ _*) => MergeStrategy.last
   case PathList("eus", "ixa", xs @ _*) => MergeStrategy.last

@@ -1,5 +1,6 @@
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
+import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories.{FacebookPageStreamFactory, InstagramLocationStreamFactory, InstagramTagStreamFactory, TwitterStreamFactory}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
@@ -45,6 +46,7 @@ object DemoFortis {
 
     val streamRegistry = buildRegistry()
 
+    AppInsights.init(Option(System.getenv("FORTIS_APPINSIGHTS_IKEY")))
     Logger.getLogger("org").setLevel(Level.ERROR)
     Logger.getLogger("akka").setLevel(Level.ERROR)
     Logger.getLogger("libinstagram").setLevel(Level.DEBUG)
