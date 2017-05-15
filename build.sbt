@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
 
 // Bundled dependencies
 libraryDependencies ++= Seq(
+  "log4j" % "log4j" % "1.2.17",
   "com.github.catalystcode" % "streaming-instagram_2.11" % "0.0.5",
   "com.github.catalystcode" % "streaming-facebook_2.11" % "0.0.1",
   "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.0",
