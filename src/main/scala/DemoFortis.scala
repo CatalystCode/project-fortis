@@ -60,6 +60,7 @@ object DemoFortis {
     val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
     val languageDetection = new LanguageDetector(LanguageDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
     val sentimentDetection = new SentimentDetector(SentimentDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
+    val supportedLanguages = Set("en", "fr", "de")
 
     if (mode.contains("instagram")) {
       streamProvider.buildStream[InstagramItem](ssc, streamRegistry("instagram")) match {
@@ -94,6 +95,9 @@ object DemoFortis {
             val language = if (Option(tweet.getLang).isDefined) { Option(tweet.getLang) } else { languageDetection.detectLanguage(tweet.getText) }
             val analysis = Analysis(language = language)
             AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
+          })
+          .filter(analyzedPost => {
+            supportedLanguages.contains(analyzedPost.analysis.language.getOrElse(""))
           })
           .map(analyzedPost => {
             // sentiment detection
@@ -132,6 +136,9 @@ object DemoFortis {
             val language = languageDetection.detectLanguage(post.post.getMessage)
             val analysis = Analysis(language = language)
             AnalyzedItem(originalItem = post, analysis = analysis, source = source)
+          })
+          .filter(analyzedPost => {
+            supportedLanguages.contains(analyzedPost.analysis.language.getOrElse(""))
           })
           .map(analyzedPost => {
             // sentiment detection
