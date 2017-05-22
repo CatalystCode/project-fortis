@@ -16,6 +16,7 @@ Run it via:
 ```sh
 # set up all the requisite environment variables
 export FORTIS_APPINSIGHTS_IKEY="..."
+export FORTIS_FEATURE_SERVICE_HOST="..."
 export INSTAGRAM_AUTH_TOKEN="..."
 export OXFORD_VISION_TOKEN="..."
 export OXFORD_LANGUAGE_TOKEN="..."
