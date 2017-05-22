@@ -31,7 +31,7 @@ export const TimeSeriesGraph = React.createClass({
     if(graphDataset && graphDataset.labels && graphDataset.graphData && colorMap){
         //this.trendingTimeSeries.dataProvider = graphDataset.graphData;
         if(graphDataset.labels){
-            graphDataset.labels.filter(label=>label.name.length > 1)
+            graphDataset.labels.filter(label=>label.name.length > 1 && edgeMap.has(label.name.toLowerCase()))
                                .forEach((label, index) => {
                                             const edge = edgeMap.get(label.name.toLowerCase());
                                             let name = edge['name_'+language];

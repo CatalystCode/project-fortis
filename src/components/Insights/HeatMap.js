@@ -314,8 +314,11 @@ export const HeatMap = React.createClass({
              let enableFilter = self.edgeSelected(edge.name, edge.type);
              let value = {"mentions": edge.mentionCount, "enabled": enableFilter}
              let languageEdgeMap = self.state.allEdges.get(DEFAULT_LANGUAGE);
-             value = Object.assign({}, value, languageEdgeMap.get(edge.name.toLowerCase()));
-             aggregatedAssociatedTermMentions.set(edge.name.toLowerCase(), value);
+             let edgeFilterDictionary = languageEdgeMap.get(edge.name.toLowerCase());
+             if(edgeFilterDictionary){
+                value = Object.assign({}, value, edgeFilterDictionary);
+                aggregatedAssociatedTermMentions.set(edge.name.toLowerCase(), value);
+             }
           });
       }
       
