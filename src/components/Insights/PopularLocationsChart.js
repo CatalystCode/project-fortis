@@ -34,19 +34,21 @@ export const PopularLocationsChart = React.createClass({
     const edgeMap = state.allEdges.get(DEFAULT_LANGUAGE);
     let activeIndex = -1;
     const selectedLocation = state.categoryValue["name_"+state.language];
-    let colorCells = [];
+    let colorCells = [], dataProvider = [];
 
-    let dataProvider = locations.map((location, index) => {
+    locations.forEach((location, index) => {
               const edge = edgeMap.get(location.name.toLowerCase());
-              const name = edge['name_'+lang];
-              let value = location.mentions;
-              let color = COLORS[index];
-              if(selectedLocation && name.toLowerCase() === selectedLocation.toLowerCase()){
-                activeIndex = index;
-              }
-              colorCells.push(<Cell key={0} fill={color}/>);
+              if(edge){
+                  const name = edge['name_'+lang];
+                  let value = location.mentions;
+                  let color = COLORS[index];
+                  if(selectedLocation && name.toLowerCase() === selectedLocation.toLowerCase()){
+                    activeIndex = index;
+                  }
+                  colorCells.push(<Cell key={0} fill={color}/>);
 
-              return Object.assign({}, edge, { value, name});
+                  dataProvider.push(Object.assign({}, edge, { value, name}));
+              }
     });
 
     this.setState({colorCells, dataProvider, activeIndex});

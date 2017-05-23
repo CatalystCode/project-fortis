@@ -34,20 +34,22 @@ export const PopularTermsChart = React.createClass({
     const edgeMap = state.allEdges.get(DEFAULT_LANGUAGE);
     const selectedTopic = state.categoryValue["name_"+state.language];
     let activeIndex = -1;
-    let colorCells = [];
+    let colorCells = [], dataProvider = [];
 
     if(summaryTerms){
-        let dataProvider = summaryTerms.map((term, index) => {
+        summaryTerms.forEach((term, index) => {
             const edge = edgeMap.get(term.name.toLowerCase());
-            let name = edge['name_'+state.language];
-            if(selectedTopic && name.toLowerCase() === selectedTopic.toLowerCase()){
-                activeIndex = index;
+            if(edge){
+                let name = edge['name_'+state.language];
+                if(selectedTopic && name.toLowerCase() === selectedTopic.toLowerCase()){
+                    activeIndex = index;
+                }
+                let value = term.mentions;
+                let color = state.colorMap.get(edge.name);
+                colorCells.push(<Cell key={0} fill={color}/>);
+                
+                dataProvider.push(Object.assign({}, edge, { value, name}));
             }
-            let value = term.mentions;
-            let color = state.colorMap.get(edge.name);
-            colorCells.push(<Cell key={0} fill={color}/>);
-            
-            return Object.assign({}, edge, { value, name});
         });
 
         this.setState({colorCells, dataProvider, activeIndex});
