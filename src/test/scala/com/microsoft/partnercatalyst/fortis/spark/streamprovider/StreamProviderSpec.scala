@@ -75,6 +75,7 @@ class StreamProviderSpec extends FlatSpec with BeforeAndAfter {
       case Some(stream) => {
         val capture = mutable.ArrayBuffer[String]()
 
+        // TODO: does this really work on non-local deployments?
         stream.foreachRDD(capture ++= _.collect())
 
         // Start an then Stop gracefully so we can ensure we've collected all test items
