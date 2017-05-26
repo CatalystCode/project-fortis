@@ -10,6 +10,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.Fe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -57,6 +58,7 @@ object DemoFortis {
     val placeRecognizer = new PlaceRecognizer(Option(System.getenv("FORTIS_MODELS_DIRECTORY")))
     val featureServiceClient = new FeatureServiceClient(System.getenv("FORTIS_FEATURE_SERVICE_HOST"))
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
+    val keywordExtractor = new KeywordExtractor(List("Ariana"))
     val imageAnalysis = new ImageAnalyzer(ImageAnalysisAuth(System.getenv("OXFORD_VISION_TOKEN")), featureServiceClient)
     val languageDetection = new LanguageDetector(LanguageDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
     val sentimentDetection = new SentimentDetector(SentimentDetectorAuth(System.getenv("OXFORD_LANGUAGE_TOKEN")))
@@ -68,7 +70,8 @@ object DemoFortis {
           .map(instagram => {
             // do computer vision analysis: keyword extraction, etc.
             val source = instagram.link
-            val analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
+            var analysis = imageAnalysis.analyze(instagram.images.standard_resolution.url)
+            analysis = analysis.copy(keywords = keywordExtractor.extractKeywords(instagram.caption.text))
             AnalyzedItem(originalItem = instagram, analysis = analysis, source = source)
           })
           .map(analyzedInstagram => {
@@ -93,7 +96,7 @@ object DemoFortis {
           .map(tweet => {
             val source = s"https://twitter.com/statuses/${tweet.getId}"
             val language = if (Option(tweet.getLang).isDefined) { Option(tweet.getLang) } else { languageDetection.detectLanguage(tweet.getText) }
-            val analysis = Analysis(language = language)
+            val analysis = Analysis(language = language, keywords = keywordExtractor.extractKeywords(tweet.getText))
             AnalyzedItem(originalItem = tweet, analysis = analysis, source = source)
           })
           .filter(analyzedPost => {
@@ -134,7 +137,7 @@ object DemoFortis {
           .map(post => {
             val source = post.post.getPermalinkUrl.toString
             val language = languageDetection.detectLanguage(post.post.getMessage)
-            val analysis = Analysis(language = language)
+            val analysis = Analysis(language = language, keywords = keywordExtractor.extractKeywords(post.post.getMessage))
             AnalyzedItem(originalItem = post, analysis = analysis, source = source)
           })
           .filter(analyzedPost => {
