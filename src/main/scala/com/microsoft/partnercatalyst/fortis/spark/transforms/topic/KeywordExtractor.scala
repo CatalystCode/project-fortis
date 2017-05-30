@@ -6,12 +6,9 @@ import org.apache.commons.collections4.trie.PatriciaTrie
 import scala.collection.mutable.ListBuffer
 
 @SerialVersionUID(100L)
-class KeywordExtractor(keyWords: Seq[String]) extends Serializable {
-  private val wordTokenizer = """\b""".r
-  private val keywordTrie = new PatriciaTrie[Unit]()
-  private val originalCase = Map[String, String](keyWords.map(s => (s.toLowerCase, s)): _*)
-
-  originalCase.keys.foreach(keywordTrie.put(_, ()))
+class KeywordExtractor(keywords: Seq[String]) extends Serializable {
+  @transient private lazy val wordTokenizer = """\b""".r
+  @transient private lazy val keywordTrie = initializeTrie(keywords)
 
   def extractKeywords(text: String): List[Tag] = {
 
@@ -24,9 +21,7 @@ class KeywordExtractor(keyWords: Seq[String]) extends Serializable {
       while (it.hasNext && !keywordTrie.prefixMap(prefix).isEmpty) {
         prefix = sb.append(it.next()).mkString
 
-        if (keywordTrie.containsKey(prefix)) {
-          result.append(originalCase(prefix))
-        }
+        Option(keywordTrie.get(prefix)).foreach(result.append(_))
       }
 
       result
@@ -34,5 +29,12 @@ class KeywordExtractor(keyWords: Seq[String]) extends Serializable {
 
     val tokens = wordTokenizer.split(text.toLowerCase).toSeq
     tokens.tails.flatMap(findMatches(_).map(Tag(_, 1))).toList
+  }
+
+  private def initializeTrie(keywords: Seq[String]): PatriciaTrie[String] = {
+    val trie = new PatriciaTrie[String]()
+    keywords.foreach(k => trie.put(k.toLowerCase, k))
+
+    trie
   }
 }
