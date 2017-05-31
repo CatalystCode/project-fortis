@@ -1,8 +1,10 @@
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories.{FacebookPageStreamFactory, InstagramLocationStreamFactory, InstagramTagStreamFactory, TwitterStreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
+import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadaWebAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
+import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadaWebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -24,10 +26,11 @@ object DemoFortis {
       System.exit(1)
     }
 
-    val conf = new SparkConf().setAppName("Simple Application").setIfMissing("spark.master", "local[*]")
+    val conf = new SparkConf().setAppName("project-fortis-spark").setIfMissing("spark.master", "local[*]")
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
+    import EventHubStreamFactory.utf8ToString
     val streamProvider = StreamProvider()
       .withFactories(
         List(
@@ -42,6 +45,11 @@ object DemoFortis {
       .withFactories(
         List(
           new FacebookPageStreamFactory
+        )
+      )
+      .withFactories(
+        List(
+          new EventHubStreamFactory("TadaWeb", TadaWebAdapter.apply, "/tmp/")
         )
       )
 
@@ -173,6 +181,13 @@ object DemoFortis {
       }
     }
 
+    if (mode.contains("tadaweb")) {
+      streamProvider.buildStream[TadaWebEvent](ssc, streamRegistry("tadaweb")) match {
+        case Some(stream) => stream.print()
+        case None => println("No streams were configured for 'tadaweb' pipeline.")
+      }
+    }
+
     ssc.start()
     ssc.awaitTerminationOrTimeout(Seconds(60).milliseconds)
   }
@@ -220,6 +235,19 @@ object DemoFortis {
             "appId" -> System.getenv("FACEBOOK_APP_ID"),
             "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
             "pageId" -> "aljazeera"
+          )
+        )
+      ),
+      "tadaweb" -> List(
+        ConnectorConfig(
+          "TadaWeb",
+          Map (
+            "policyName" -> System.getenv("TADAWEB_EH_POLICY_NAME"),
+            "policyKey" -> System.getenv("TADAWEB_EH_POLICY_KEY"),
+            "namespace" -> System.getenv("TADAWEB_EH_NAMESPACE"),
+            "name" -> System.getenv("TADAWEB_EH_NAME"),
+            "partitionCount" -> System.getenv("TADAWEB_EH_PARTITION_COUNT"),
+            "consumerGroup" -> "$Default"
           )
         )
       )
