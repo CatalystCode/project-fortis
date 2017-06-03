@@ -1,23 +1,23 @@
 package com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto
 
-case class TadaWebEvent(
+case class TadawebEvent(
   language: String,
   text: String,
-  cities: Seq[TadaWebCity],
+  cities: Seq[TadawebCity],
   sentiment: String,
-  tada: TadaWebTada,
+  tada: TadawebTada,
   tags: Seq[String],
   title: String,
   link: String,
   published_at: String
 )
 
-case class TadaWebCity(
+case class TadawebCity(
   city: String,
   coordinates: Seq[Double]
 )
 
-case class TadaWebTada(
+case class TadawebTada(
   description: String,
   id: String,
   name: String

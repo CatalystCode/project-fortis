@@ -2,9 +2,9 @@ import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadaWebAdapter
+import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadawebAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
-import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadaWebEvent
+import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -49,7 +49,7 @@ object DemoFortis {
       )
       .withFactories(
         List(
-          new EventHubStreamFactory("TadaWeb", TadaWebAdapter.apply, System.getenv("EH_PROGRESS_DIR"))
+          new EventHubStreamFactory("Tadaweb", TadawebAdapter.apply, System.getenv("EH_PROGRESS_DIR"))
         )
       )
 
@@ -182,7 +182,7 @@ object DemoFortis {
     }
 
     if (mode.contains("tadaweb")) {
-      streamProvider.buildStream[TadaWebEvent](ssc, streamRegistry("tadaweb")) match {
+      streamProvider.buildStream[TadawebEvent](ssc, streamRegistry("tadaweb")) match {
         case Some(stream) => stream
           .map(event => AnalyzedItem(
             event,
@@ -293,7 +293,7 @@ object DemoFortis {
       ),
       "tadaweb" -> List(
         ConnectorConfig(
-          "TadaWeb",
+          "Tadaweb",
           Map (
             "policyName" -> System.getenv("TADAWEB_EH_POLICY_NAME"),
             "policyKey" -> System.getenv("TADAWEB_EH_POLICY_KEY"),
