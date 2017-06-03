@@ -27,6 +27,12 @@ export TWITTER_ACCESS_TOKEN_SECRET="..."
 export FACEBOOK_AUTH_TOKEN="..."
 export FACEBOOK_APP_ID="..."
 export FACEBOOK_APP_SECRET="..."
+export TADAWEB_EH_POLICY_NAME="..."
+export TADAWEB_EH_POLICY_KEY="..."
+export TADAWEB_EH_NAMESPACE="..."
+export TADAWEB_EH_NAME="..."
+export TADAWEB_EH_PARTITION_COUNT="..."
+export EH_PROGRESS_DIR="..."
 
 # compile scala, run tests, build fat jar
 export JAVA_OPTS="-Xmx2048M"
@@ -36,4 +42,6 @@ sbt assembly
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar instagram
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar twitter
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar facebook
+spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar tadaweb
+```
 ```
