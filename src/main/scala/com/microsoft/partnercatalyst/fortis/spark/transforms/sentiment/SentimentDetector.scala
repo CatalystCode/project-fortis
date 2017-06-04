@@ -8,15 +8,10 @@ case class SentimentDetectorAuth(key: String, apiHost: String = "westus.api.cogn
 
 @SerialVersionUID(100L)
 class SentimentDetector(
-  auth: SentimentDetectorAuth,
-  enabledLanguages: Set[String] = Set("en", "es", "fr", "pt")
+  auth: SentimentDetectorAuth
 ) extends Serializable {
 
   def detectSentiment(text: String, language: String): Option[Double] = {
-    if (!enabledLanguages.contains(language)) {
-      return None
-    }
-
     val textId = "0"
     val requestBody = buildRequestBody(text, textId, language)
     val response = callCognitiveServices(requestBody)
@@ -45,6 +40,10 @@ class SentimentDetector(
   protected def parseResponse(apiResponse: String, textId: String): Option[Double] = {
     implicit val formats = json.DefaultFormats
     val response = json.parse(apiResponse).extract[dto.JsonSentimentDetectionResponse]
-    response.documents.find(_.id == textId).map(_.score)
+    if (response.errors.exists(_.id == textId)) {
+      None
+    } else {
+      response.documents.find(_.id == textId).map(_.score)
+    }
   }
 }

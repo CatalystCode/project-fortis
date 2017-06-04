@@ -17,7 +17,7 @@ class SentimentDetectorSpec extends FlatSpec {
   }
 
   it should "ignore unsupported languages" in {
-    val detector = new TestSentimentDetector("")
+    val detector = new TestSentimentDetector("""{"documents":[],"errors":[{"id":"0","message":"Supplied language not supported. Pass in one of:en,es,pt,fr,de,it,nl,no,sv,pl,da,fi,ru,el,tr"}]}""")
     val sentiment = detector.detectSentiment("some text", "zh")
 
     assert(sentiment.isEmpty)
