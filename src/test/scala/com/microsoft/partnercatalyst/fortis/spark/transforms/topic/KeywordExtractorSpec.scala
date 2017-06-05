@@ -13,7 +13,7 @@ class KeywordExtractorSpec extends FlatSpec {
     val extractor = new KeywordExtractor(keywords)
 
     val matches = extractor.extractKeywords("The quick brown fox.").map(_.name)
-    assert(keywords.forall(keyword => matches.exists(m => keyword == m)))
+    assert(keywords.forall(keyword => matches.contains(keyword)))
   }
 
   it should "respect word boundaries" in {
@@ -49,7 +49,7 @@ class KeywordExtractorSpec extends FlatSpec {
 
     val extractor = new KeywordExtractor(keywords)
 
-    val matches = extractor.extractKeywords("The quick browN fOx").map(_.name).toIterable
+    val matches = extractor.extractKeywords("The quick browN fOx").map(_.name)
     assert(matches.head == keywords.head)
   }
 
@@ -60,7 +60,7 @@ class KeywordExtractorSpec extends FlatSpec {
 
     val extractor = new KeywordExtractor(keywords)
 
-    val matches = extractor.extractKeywords("Testing{testing}123").map(_.name).toIterable
+    val matches = extractor.extractKeywords("Testing{testing}123").map(_.name)
     assert(matches.head == keywords.head)
   }
 }

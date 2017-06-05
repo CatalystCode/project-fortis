@@ -72,7 +72,7 @@ class StreamProviderSpec extends FlatSpec with BeforeAndAfter {
     ))
 
     testStream match {
-      case Some(stream) => {
+      case Some(stream) =>
         val capture = mutable.ArrayBuffer[String]()
 
         // TODO: does this really work on non-local deployments?
@@ -84,7 +84,6 @@ class StreamProviderSpec extends FlatSpec with BeforeAndAfter {
 
         assert(capture.exists(_.contains("A")))
         assert(capture.exists(_.contains("B")))
-      }
       case None => fail("no stream")
     }
   }

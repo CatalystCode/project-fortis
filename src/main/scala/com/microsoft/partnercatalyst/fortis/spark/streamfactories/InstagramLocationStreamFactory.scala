@@ -15,7 +15,7 @@ class InstagramLocationStreamFactory extends StreamFactory[InstagramItem]{
     * @return A partial function for transforming a connector config
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[InstagramItem]] = {
-    case ConnectorConfig("InstagramLocation", params) => {
+    case ConnectorConfig("InstagramLocation", params) =>
       val auth = InstagramAuth(params("authToken"))
 
       InstagramUtils.createLocationStream(
@@ -23,6 +23,5 @@ class InstagramLocationStreamFactory extends StreamFactory[InstagramItem]{
         auth,
         latitude = params("latitude").toDouble,
         longitude = params("longitude").toDouble)
-    }
   }
 }

@@ -17,7 +17,7 @@ class TwitterStreamFactory extends StreamFactory[Status] {
     * @return A partial function for transforming a connector config
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[Status]] = {
-    case ConnectorConfig("Twitter", params) => {
+    case ConnectorConfig("Twitter", params) =>
       val auth = new OAuthAuthorization(
         new ConfigurationBuilder()
           .setOAuthConsumerKey(params("consumerKey"))
@@ -31,6 +31,5 @@ class TwitterStreamFactory extends StreamFactory[Status] {
         streamingContext,
         twitterAuth = Some(auth),
         filters = Seq(/*"coffee", "tea", "drink", "beverage", "cup"*/))
-    }
   }
 }

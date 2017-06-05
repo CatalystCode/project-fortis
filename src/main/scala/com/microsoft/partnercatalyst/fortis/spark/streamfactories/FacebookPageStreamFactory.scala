@@ -15,10 +15,9 @@ class FacebookPageStreamFactory extends StreamFactory[FacebookPost] {
     * @return A partial function for transforming a connector config
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[FacebookPost]] = {
-    case ConnectorConfig("FacebookPage", params) => {
+    case ConnectorConfig("FacebookPage", params) =>
       val facebookAuth = FacebookAuth(params("appId"), params("appSecret"), params("accessToken"))
 
       FacebookUtils.createPageStream(streamingContext, facebookAuth, params("pageId"))
-    }
   }
 }
