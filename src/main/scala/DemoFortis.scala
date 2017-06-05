@@ -200,10 +200,7 @@ object DemoFortis {
               case "positive" => Some(1)
               case _ => language match {
                 case Some(lang) =>
-                  if (supportedLanguages.contains(lang))
-                    sentimentDetection.detectSentiment(fortisEvent.originalItem.text, lang)
-                  else
-                    None
+                  sentimentDetection.detectSentiment(fortisEvent.originalItem.text, lang)
                 case None => None
               }
             }
@@ -215,6 +212,7 @@ object DemoFortis {
               )
             )
           })
+          .filter(_.analysis.sentiments.nonEmpty)
           .map(fortisEvent => {
             val sharedLocations = fortisEvent.originalItem.cities.flatMap(city =>
               city.coordinates match {
