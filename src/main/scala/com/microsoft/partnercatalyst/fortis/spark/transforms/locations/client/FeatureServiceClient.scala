@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
+import java.io.IOException
+
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, Logger}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
@@ -35,16 +37,26 @@ class FeatureServiceClient(host: String) extends Serializable with Logger {
 
   protected def fetchBboxResponse(geofence: Geofence): String = {
     val fetch = s"http://$host/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
-    Source.fromURL(fetch)("UTF-8").mkString
+    fetchResponse(fetch)
   }
 
   protected def fetchPointResponse(latitude: Double, longitude: Double): String = {
     val fetch = s"http://$host/features/point/$latitude/$longitude"
-    Source.fromURL(fetch)("UTF-8").mkString
+    fetchResponse(fetch)
   }
 
   protected def fetchNameResponse(names: Iterable[String]): String = {
     val fetch = s"http://$host/features/name/${names.mkString(",")}"
-    Source.fromURL(fetch)("UTF-8").mkString
+    fetchResponse(fetch)
+  }
+
+  private def fetchResponse(url: String): String = {
+    try {
+      Source.fromURL(url)("UTF-8").mkString
+    } catch {
+      case ex: IOException =>
+        logError(s"Unable to fetch feature service url: $url", ex)
+        ""
+    }
   }
 }
