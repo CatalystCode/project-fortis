@@ -4,6 +4,7 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadawebAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
+import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio.RadioTranscription
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
