@@ -1,7 +1,7 @@
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories.{FacebookPageStreamFactory, InstagramLocationStreamFactory, InstagramTagStreamFactory, TwitterStreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
@@ -87,6 +87,36 @@ object DemoFortis {
           })
           .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
         case None => println("No streams were configured for 'instagram' pipeline.")
+      }
+    }
+
+    if (mode.contains("radio")) {
+      streamProvider.buildStream[RadioTranscription](ssc, streamRegistry("radio")) match {
+        case Some(stream) => stream
+          .map(radioTranscription => {
+            val language = Some(radioTranscription.language)
+            val keywords = keywordExtractor.extractKeywords(radioTranscription.text)
+            val analysis = Analysis(language = language, keywords = keywords)
+            val source = radioTranscription.radioUrl
+            AnalyzedItem(originalItem = radioTranscription, analysis = analysis, source = source)
+          })
+          .filter(analyzedRadio => {
+            supportedLanguages.contains(analyzedRadio.analysis.language.getOrElse(""))
+          })
+          .map(analyzedRadio => {
+            // sentiment detection
+            val text = analyzedRadio.originalItem.text
+            val language = analyzedRadio.analysis.language.getOrElse("")
+            val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
+            analyzedRadio.copy(analysis = analyzedRadio.analysis.copy(sentiments = inferredSentiment ++ analyzedRadio.analysis.sentiments))
+          })
+          .map(analyzedRadio => {
+            // infer locations from text
+            val inferredLocations = locationsExtractor.analyze(analyzedRadio.originalItem.text, analyzedRadio.analysis.language).toList
+            analyzedRadio.copy(analysis = analyzedRadio.analysis.copy(locations = inferredLocations ++ analyzedRadio.analysis.locations))
+          })
+          .map(x => s"${x.originalItem}").print(20)
+        case None => println("No streams were configured for 'radio' pipeline.")
       }
     }
 
@@ -209,6 +239,19 @@ object DemoFortis {
             "consumerSecret" -> System.getenv("TWITTER_CONSUMER_SECRET"),
             "accessToken" -> System.getenv("TWITTER_ACCESS_TOKEN"),
             "accessTokenSecret" -> System.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+          )
+        )
+      ),
+      "radio" -> List(
+        ConnectorConfig(
+          "Radio",
+          Map(
+            "subscriptionKey" -> System.getenv("OXFORD_SPEECH_TOKEN"),
+            "radioUrl" -> "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p",
+            "audioType" -> ".mp3",
+            "locale" -> "en-US",
+            "speechType" -> "CONVERSATION",
+            "outputFormat" -> "SIMPLE"
           )
         )
       ),
