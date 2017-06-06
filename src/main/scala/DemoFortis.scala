@@ -36,6 +36,11 @@ object DemoFortis {
         )
       .withFactories(
         List(
+          new RadioStreamFactory
+        )
+      )
+      .withFactories(
+        List(
           new TwitterStreamFactory
         )
       )
