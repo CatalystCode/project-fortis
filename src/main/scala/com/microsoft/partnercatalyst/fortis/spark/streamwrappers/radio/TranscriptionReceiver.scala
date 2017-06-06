@@ -3,10 +3,10 @@ package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio
 import java.io.InputStream
 import java.net.URL
 import java.util.Locale
+import java.util.function.Consumer
 
 import com.github.catalystcode.fortis.speechtotext.Transcriber
 import com.github.catalystcode.fortis.speechtotext.config.{OutputFormat, SpeechServiceConfig, SpeechType}
-import com.github.catalystcode.fortis.speechtotext.utils.Func
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.receiver.Receiver
 
@@ -24,15 +24,15 @@ class TranscriptionReceiver(
   private var audioStream: InputStream = _
   private var transcriber: Transcriber = _
 
-  private lazy val onTranscription = new Func[String] {
-    override def call(text: String): Unit = {
+  private val onTranscription = new Consumer[String] {
+    override def accept(text: String): Unit = {
       val transcription = RadioTranscription(text = text, language = language, radioUrl = radioUrl)
       store(transcription)
     }
   }
 
-  private lazy val onHypothesis = new Func[String] {
-    override def call(text: String): Unit = {
+  private val onHypothesis = new Consumer[String] {
+    override def accept(hypothesis: String): Unit = {
       // do nothing
     }
   }
