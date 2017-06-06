@@ -252,9 +252,9 @@ object DemoFortis {
           "Radio",
           Map(
             "subscriptionKey" -> System.getenv("OXFORD_SPEECH_TOKEN"),
-            "radioUrl" -> "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p",
+            "radioUrl" -> "http://live02.rfi.fr/rfimonde-32.mp3", // "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p",
             "audioType" -> ".mp3",
-            "locale" -> "en-US",
+            "locale" -> "fr-FR", //"en-US",
             "speechType" -> "CONVERSATION",
             "outputFormat" -> "SIMPLE"
           )
