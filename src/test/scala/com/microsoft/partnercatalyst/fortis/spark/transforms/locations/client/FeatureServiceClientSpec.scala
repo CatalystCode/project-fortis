@@ -4,8 +4,10 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature
 import org.scalatest.FlatSpec
 
+import scala.util.Try
+
 class TestFeatureServiceClient(bboxResponse: String) extends FeatureServiceClient(host = "unittest") {
-  override def fetchBboxResponse(geofence: Geofence): String = bboxResponse
+  override def fetchBboxResponse(geofence: Geofence): Try[String] = Try(bboxResponse)
 }
 
 class FeatureServiceClientSpec extends FlatSpec {
