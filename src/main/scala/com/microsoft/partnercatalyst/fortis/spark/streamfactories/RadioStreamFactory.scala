@@ -16,16 +16,16 @@ import org.apache.spark.streaming.receiver.Receiver
 class RadioStreamFactory extends StreamFactory[RadioTranscription]{
   override def createStream(ssc: StreamingContext): PartialFunction[ConnectorConfig, DStream[RadioTranscription]] = {
     case ConnectorConfig("Radio", params) =>
-      val audioType = params("audioType")
       val radioUrl = params("radioUrl")
-      val locale = new Locale(params("locale"))
-      val config = new SpeechServiceConfig(
-        params("subscriptionKey"),
-        SpeechType.valueOf(params("speechType")),
-        OutputFormat.valueOf(params("outputFormat")),
-        locale)
+      val audioType = params("audioType")
+      val locale = params("locale")
+      val subscriptionKey = params("subscriptionKey")
+      val speechType = params("speechType")
+      val outputFormat = params("outputFormat")
 
-      new RadioInputDStream(ssc, radioUrl, audioType, locale.getLanguage, config, StorageLevel.MEMORY_ONLY)
+      new RadioInputDStream(
+        ssc, radioUrl, audioType, locale, subscriptionKey,
+        speechType, outputFormat, StorageLevel.MEMORY_ONLY)
   }
 }
 
@@ -33,24 +33,29 @@ class RadioInputDStream(
   ssc: StreamingContext,
   radioUrl: String,
   audioType: String,
-  language: String,
-  config: SpeechServiceConfig,
+  locale: String,
+  subscriptionKey: String,
+  speechType: String,
+  outputFormat: String,
   storageLevel: StorageLevel
 ) extends ReceiverInputDStream[RadioTranscription](ssc) {
   override def getReceiver(): Receiver[RadioTranscription] = {
     logDebug("Creating radio transcription receiver")
-    new TranscriptionReceiver(radioUrl, audioType, language, config, storageLevel)
+    new TranscriptionReceiver(radioUrl, audioType, locale, subscriptionKey, speechType, outputFormat, storageLevel)
   }
 }
 
 class TranscriptionReceiver(
   radioUrl: String,
   audioType: String,
-  language: String,
-  config: SpeechServiceConfig,
+  locale: String,
+  subscriptionKey: String,
+  speechType: String,
+  outputFormat: String,
   storageLevel: StorageLevel
 ) extends Receiver[RadioTranscription](storageLevel) {
 
+  private val language = new Locale(locale).getLanguage
   private var audioStream: InputStream = _
   private var transcriber: Transcriber = _
 
@@ -68,6 +73,12 @@ class TranscriptionReceiver(
   }
 
   override def onStart(): Unit = {
+    val config = new SpeechServiceConfig(
+      subscriptionKey,
+      SpeechType.valueOf(speechType),
+      OutputFormat.valueOf(outputFormat),
+      new Locale(locale))
+
     transcriber = Transcriber.create(audioType, config)
     audioStream = new URL(radioUrl).openConnection.getInputStream
     transcriber.transcribe(audioStream, onTranscription, onHypothesis)
