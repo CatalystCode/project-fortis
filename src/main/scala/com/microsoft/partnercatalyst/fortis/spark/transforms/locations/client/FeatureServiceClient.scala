@@ -1,62 +1,59 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
-import java.io.IOException
-
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, Logger}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
-import net.liftweb.json.JsonParser.ParseException
 
 import scala.io.Source
+import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class FeatureServiceClient(host: String) extends Serializable with Logger {
   def bbox(geofence: Geofence): Iterable[FeatureServiceFeature] = {
-    parseResponse(fetchBboxResponse(geofence))
+    unpack(fetchBboxResponse(geofence), "bbox")
   }
 
   def point(latitude: Double, longitude: Double): Iterable[FeatureServiceFeature] = {
-    parseResponse(fetchPointResponse(latitude = latitude, longitude = longitude))
+    unpack(fetchPointResponse(latitude = latitude, longitude = longitude), "point")
   }
 
   def name(names: Iterable[String]): Iterable[FeatureServiceFeature] = {
-    parseResponse(fetchNameResponse(names))
+    unpack(fetchNameResponse(names), "name")
   }
 
-  private def parseResponse(response: String): Iterable[FeatureServiceFeature] = {
-    implicit val formats = json.DefaultFormats
-
-    try {
-      json.parse(response).extract[FeatureServiceResponse].features
-    } catch {
-      case ex: ParseException =>
-        logError(s"Unable to parse feature service response: $response", ex)
+  private def unpack(responseBody: Try[String], endpointName: String): Iterable[FeatureServiceFeature] = {
+    val parsedResponse = responseBody.flatMap(parseResponse)
+    parsedResponse match {
+      case Success(domainObject) =>
+        domainObject
+      case Failure(err) =>
+        logError(s"Error fetching feature service $endpointName", err)
         List()
     }
   }
 
-  protected def fetchBboxResponse(geofence: Geofence): String = {
+  private def parseResponse(response: String): Try[Iterable[FeatureServiceFeature]] = {
+    implicit val formats = json.DefaultFormats
+
+    Try(json.parse(response).extract[FeatureServiceResponse].features)
+  }
+
+  protected def fetchBboxResponse(geofence: Geofence): Try[String] = {
     val fetch = s"http://$host/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
     fetchResponse(fetch)
   }
 
-  protected def fetchPointResponse(latitude: Double, longitude: Double): String = {
+  protected def fetchPointResponse(latitude: Double, longitude: Double): Try[String] = {
     val fetch = s"http://$host/features/point/$latitude/$longitude"
     fetchResponse(fetch)
   }
 
-  protected def fetchNameResponse(names: Iterable[String]): String = {
+  protected def fetchNameResponse(names: Iterable[String]): Try[String] = {
     val fetch = s"http://$host/features/name/${names.mkString(",")}"
     fetchResponse(fetch)
   }
 
-  private def fetchResponse(url: String): String = {
-    try {
-      Source.fromURL(url)("UTF-8").mkString
-    } catch {
-      case ex: IOException =>
-        logError(s"Unable to fetch feature service url: $url", ex)
-        ""
-    }
+  private def fetchResponse(url: String): Try[String] = {
+    Try(Source.fromURL(url)("UTF-8").mkString)
   }
 }
