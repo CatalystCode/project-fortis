@@ -2,8 +2,9 @@ import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
+import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadawebAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
+import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
@@ -11,6 +12,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.Place
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
+import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -24,10 +26,11 @@ object DemoFortis {
       System.exit(1)
     }
 
-    val conf = new SparkConf().setAppName("Simple Application").setIfMissing("spark.master", "local[*]")
+    val conf = new SparkConf().setAppName("project-fortis-spark").setIfMissing("spark.master", "local[*]")
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
+    import EventHubStreamFactory.utf8ToString
     val streamProvider = StreamProvider()
       .withFactories(
         List(
@@ -47,6 +50,11 @@ object DemoFortis {
       .withFactories(
         List(
           new FacebookPageStreamFactory
+        )
+      )
+      .withFactories(
+        List(
+          new EventHubStreamFactory("Tadaweb", TadawebAdapter.apply, System.getenv("EH_PROGRESS_DIR"))
         )
       )
 
@@ -189,7 +197,7 @@ object DemoFortis {
             // map tagged locations to location features
             var analyzed = analyzedPost
             val place = Option(analyzed.originalItem.post.getPlace)
-            val location = if (place.isDefined) { Some(place.get.getLocation) } else { None }
+            val location = if (place.isDefined) Some(place.get.getLocation) else None
             if (location.isDefined) {
               val lat = location.get.getLatitude
               val lng = location.get.getLongitude
@@ -205,6 +213,64 @@ object DemoFortis {
           })
           .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
         case None => println("No streams were configured for 'facebook' pipeline.")
+      }
+    }
+
+    if (mode.contains("tadaweb")) {
+      streamProvider.buildStream[TadawebEvent](ssc, streamRegistry("tadaweb")) match {
+        case Some(stream) => stream
+          .map(event => AnalyzedItem(
+            event,
+            source = event.tada.name,
+            analysis = Analysis(keywords =
+              keywordExtractor.extractKeywords(event.text) ::: keywordExtractor.extractKeywords(event.title)
+            )
+          ))
+          .filter(_.analysis.keywords.nonEmpty)
+          .map(fortisEvent => {
+            val language = languageDetection.detectLanguage(fortisEvent.originalItem.text)
+            val sentiment: Option[Double] = fortisEvent.originalItem.sentiment match {
+              case "negative" => Some(0)
+              case "neutral" => Some(0.6)
+              case "positive" => Some(1)
+              case _ => language match {
+                case Some(lang) =>
+                  sentimentDetection.detectSentiment(fortisEvent.originalItem.text, lang)
+                case None => None
+              }
+            }
+
+            fortisEvent.copy(
+              analysis = fortisEvent.analysis.copy(
+                language = language,
+                sentiments = sentiment.toList ::: fortisEvent.analysis.sentiments
+              )
+            )
+          })
+          .filter(_.analysis.sentiments.nonEmpty)
+          .map(fortisEvent => {
+            val sharedLocations = fortisEvent.originalItem.cities.flatMap(city =>
+              city.coordinates match {
+                case Seq(latitude, longitude) => locationsExtractor.fetch(latitude = latitude, longitude = longitude)
+                case _ => None
+              }
+            ).toList
+
+            fortisEvent.copy(
+              sharedLocations = sharedLocations ::: fortisEvent.sharedLocations
+            )
+          })
+          .map(fortisEvent => {
+            val inferredLocations = locationsExtractor.analyze(fortisEvent.originalItem.text, fortisEvent.analysis.language)
+
+            fortisEvent.copy(
+              analysis = fortisEvent.analysis.copy(
+                locations = inferredLocations.toList ::: fortisEvent.analysis.locations
+              )
+            )
+          })
+          .print(20)
+        case None => println("No streams were configured for 'tadaweb' pipeline.")
       }
     }
 
@@ -268,6 +334,19 @@ object DemoFortis {
             "appId" -> System.getenv("FACEBOOK_APP_ID"),
             "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
             "pageId" -> "aljazeera"
+          )
+        )
+      ),
+      "tadaweb" -> List(
+        ConnectorConfig(
+          "Tadaweb",
+          Map (
+            "policyName" -> System.getenv("TADAWEB_EH_POLICY_NAME"),
+            "policyKey" -> System.getenv("TADAWEB_EH_POLICY_KEY"),
+            "namespace" -> System.getenv("TADAWEB_EH_NAMESPACE"),
+            "name" -> System.getenv("TADAWEB_EH_NAME"),
+            "partitionCount" -> System.getenv("TADAWEB_EH_PARTITION_COUNT"),
+            "consumerGroup" -> "$Default"
           )
         )
       )
