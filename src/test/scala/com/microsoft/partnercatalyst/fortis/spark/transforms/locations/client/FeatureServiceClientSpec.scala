@@ -23,4 +23,10 @@ class FeatureServiceClientSpec extends FlatSpec {
       FeatureServiceFeature(id = "wof-102061079", name = "Gowanus Heights", layer = "neighbourhood")
     ))
   }
+
+  it should "handle bad responses" in {
+    val response = new TestFeatureServiceClient("""<html>Certainly not json</html>""").bbox(null)
+
+    assert(response.toList.isEmpty)
+  }
 }

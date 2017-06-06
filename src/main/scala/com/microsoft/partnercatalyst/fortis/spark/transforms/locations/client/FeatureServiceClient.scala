@@ -1,13 +1,14 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, Logger}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
+import net.liftweb.json.JsonParser.ParseException
 
 import scala.io.Source
 
 @SerialVersionUID(100L)
-class FeatureServiceClient(host: String) extends Serializable {
+class FeatureServiceClient(host: String) extends Serializable with Logger {
   def bbox(geofence: Geofence): Iterable[FeatureServiceFeature] = {
     parseResponse(fetchBboxResponse(geofence))
   }
@@ -23,7 +24,13 @@ class FeatureServiceClient(host: String) extends Serializable {
   private def parseResponse(response: String): Iterable[FeatureServiceFeature] = {
     implicit val formats = json.DefaultFormats
 
-    json.parse(response).extract[FeatureServiceResponse].features
+    try {
+      json.parse(response).extract[FeatureServiceResponse].features
+    } catch {
+      case ex: ParseException =>
+        logError(s"Unable to parse feature service response: $response", ex)
+        List()
+    }
   }
 
   protected def fetchBboxResponse(geofence: Geofence): String = {
