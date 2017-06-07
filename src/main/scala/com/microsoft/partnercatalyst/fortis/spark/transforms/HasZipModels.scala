@@ -18,7 +18,7 @@ abstract class HasZipModels(
 
   @volatile private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
-  protected abstract def formatModelsDownloadUrl(language: String): String
+  protected def formatModelsDownloadUrl(language: String): String
 
   protected def ensureModelsAreDownloaded(language: String): String = {
     val localPath = modelsSource.getOrElse("")

@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import org.apache.log4j.{BasicConfigurator, Level, Logger}
+import org.apache.log4j.Logger.getLogger
+import org.apache.log4j.{BasicConfigurator, Level}
 import org.scalatest.FlatSpec
 
 class PlaceRecognizerSpec extends FlatSpec {
@@ -12,7 +13,7 @@ class PlaceRecognizerSpec extends FlatSpec {
     }
 
     BasicConfigurator.configure()
-    Logger.getLogger("liblocations").setLevel(Level.DEBUG)
+    getLogger("liblocations").setLevel(Level.DEBUG)
 
     val recognizer = new PlaceRecognizer(modelsSource = localModels)
     val placesEn1 = recognizer.extractPlaces("I went to Paris last week. France was great!", "en")
