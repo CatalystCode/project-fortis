@@ -4,6 +4,7 @@ import java.io.{File, IOError}
 import java.util.concurrent.ConcurrentHashMap
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.HasZipModels
+import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer.tokenize
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{NEGATIVE, NEUTRAL, POSITIVE}
 
 import scala.io.Source
@@ -13,13 +14,12 @@ class WordListSentimentDetector(
   modelsSource: Option[String] = None
 ) extends HasZipModels(modelsSource) {
 
-  @transient private lazy val wordTokenizer = """\b""".r
   @volatile private lazy val wordsCache = new ConcurrentHashMap[String, Set[String]]
 
   def detectSentiment(text: String, language: String): Option[Double] = {
     try {
       val resourcesDirectory = ensureModelsAreDownloaded(language)
-      val words = wordTokenizer.split(text.toLowerCase)
+      val words = tokenize(text.toLowerCase)
       val numPositiveWords = countPositiveWords(language, words, resourcesDirectory)
       val numNegativeWords = countNegativeWords(language, words, resourcesDirectory)
       computeSentimentScore(numPositiveWords, numNegativeWords)
