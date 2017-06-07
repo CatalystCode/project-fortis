@@ -12,15 +12,14 @@ import scala.collection.JavaConversions._
 import scala.sys.process._
 
 @SerialVersionUID(100L)
-abstract class HasZipModels(
+class ZipModelsProvider(
+  formatModelsDownloadUrl: String => String,
   modelsSource: Option[String] = None
 ) extends Serializable with Logger {
 
   @volatile private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
-  protected def formatModelsDownloadUrl(language: String): String
-
-  protected def ensureModelsAreDownloaded(language: String): String = {
+  def ensureModelsAreDownloaded(language: String): String = {
     val localPath = modelsSource.getOrElse("")
     if (hasModelFiles(localPath, language)) {
       logDebug(s"Using locally provided model files from $localPath")

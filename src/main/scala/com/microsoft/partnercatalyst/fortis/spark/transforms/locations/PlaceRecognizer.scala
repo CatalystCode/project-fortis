@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import java.io.IOError
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.HasZipModels
+import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.Entity
 
@@ -12,7 +12,9 @@ import scala.collection.JavaConversions._
 class PlaceRecognizer(
   modelsSource: Option[String] = None,
   enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
-) extends HasZipModels(modelsSource) {
+) extends Serializable with Logger {
+
+  @volatile private lazy val modelsProvider = new ZipModelsProvider(formatModelsDownloadUrl, modelsSource)
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
     if (!enabledLanguages.contains(language)) {
@@ -20,7 +22,7 @@ class PlaceRecognizer(
     }
 
     try {
-      val resourcesDirectory = ensureModelsAreDownloaded(language)
+      val resourcesDirectory = modelsProvider.ensureModelsAreDownloaded(language)
 
       val kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
       OpeNER.posAnnotate(resourcesDirectory, language, kaf)
@@ -41,7 +43,7 @@ class PlaceRecognizer(
     entityType == "location" || entityType == "gpe"
   }
 
-  override protected def formatModelsDownloadUrl(language: String): String = {
+  private def formatModelsDownloadUrl(language: String): String = {
     s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip"
   }
 }

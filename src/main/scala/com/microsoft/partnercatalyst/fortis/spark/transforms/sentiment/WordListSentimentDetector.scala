@@ -3,7 +3,8 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 import java.io.{File, IOError}
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.HasZipModels
+import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer.tokenize
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{NEGATIVE, NEUTRAL, POSITIVE}
 
@@ -12,13 +13,14 @@ import scala.io.Source
 @SerialVersionUID(100L)
 class WordListSentimentDetector(
   modelsSource: Option[String] = None
-) extends HasZipModels(modelsSource) {
+) extends Serializable with Logger {
 
   @volatile private lazy val wordsCache = new ConcurrentHashMap[String, Set[String]]
+  @volatile private lazy val modelsProvider = new ZipModelsProvider(formatModelsDownloadUrl, modelsSource)
 
   def detectSentiment(text: String, language: String): Option[Double] = {
     try {
-      val resourcesDirectory = ensureModelsAreDownloaded(language)
+      val resourcesDirectory = modelsProvider.ensureModelsAreDownloaded(language)
       val words = tokenize(text.toLowerCase)
       val numPositiveWords = countPositiveWords(language, words, resourcesDirectory)
       val numNegativeWords = countNegativeWords(language, words, resourcesDirectory)
@@ -66,7 +68,7 @@ class WordListSentimentDetector(
     new File(new File(directory), filename).toString
   }
 
-  override protected def formatModelsDownloadUrl(language: String): String = {
+  private def formatModelsDownloadUrl(language: String): String = {
     s"https://fortismodels.blob.core.windows.net/sentiment/sentiment-$language.zip"
   }
 }
