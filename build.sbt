@@ -6,6 +6,7 @@ name := "project-fortis-spark"
 scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq(
+  "-target:jvm-1.8",
   "-unchecked",
   "-deprecation",
   "-feature"
@@ -26,6 +27,7 @@ libraryDependencies ++= Seq(
   "com.microsoft.azure" % "applicationinsights-logging-log4j1_2" % "1.0.6",
   "com.github.catalystcode" % "streaming-instagram_2.11" % "0.0.5",
   "com.github.catalystcode" % "streaming-facebook_2.11" % "0.0.1",
+  "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.0",
   "org.apache.commons" % "commons-collections4" % "4.1",
   "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.0.5",

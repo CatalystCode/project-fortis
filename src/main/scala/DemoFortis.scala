@@ -4,8 +4,8 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadawebAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
+import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio.RadioTranscription
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
-import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
@@ -13,6 +13,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.Place
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
+import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -37,6 +38,11 @@ object DemoFortis {
           new InstagramLocationStreamFactory,
           new InstagramTagStreamFactory)
         )
+      .withFactories(
+        List(
+          new RadioStreamFactory
+        )
+      )
       .withFactories(
         List(
           new TwitterStreamFactory
@@ -95,6 +101,36 @@ object DemoFortis {
           })
           .map(x => s"${x.source} --> ${x.analysis.locations.mkString(",")}").print(20)
         case None => println("No streams were configured for 'instagram' pipeline.")
+      }
+    }
+
+    if (mode.contains("radio")) {
+      streamProvider.buildStream[RadioTranscription](ssc, streamRegistry("radio")) match {
+        case Some(stream) => stream
+          .map(radioTranscription => {
+            val language = Some(radioTranscription.language)
+            val keywords = keywordExtractor.extractKeywords(radioTranscription.text)
+            val analysis = Analysis(language = language, keywords = keywords)
+            val source = radioTranscription.radioUrl
+            AnalyzedItem(originalItem = radioTranscription, analysis = analysis, source = source)
+          })
+          .filter(analyzedRadio => {
+            supportedLanguages.contains(analyzedRadio.analysis.language.getOrElse(""))
+          })
+          .map(analyzedRadio => {
+            // sentiment detection
+            val text = analyzedRadio.originalItem.text
+            val language = analyzedRadio.analysis.language.getOrElse("")
+            val inferredSentiment = sentimentDetection.detectSentiment(text, language).map(List(_)).getOrElse(List())
+            analyzedRadio.copy(analysis = analyzedRadio.analysis.copy(sentiments = inferredSentiment ++ analyzedRadio.analysis.sentiments))
+          })
+          .map(analyzedRadio => {
+            // infer locations from text
+            val inferredLocations = locationsExtractor.analyze(analyzedRadio.originalItem.text, analyzedRadio.analysis.language).toList
+            analyzedRadio.copy(analysis = analyzedRadio.analysis.copy(locations = inferredLocations ++ analyzedRadio.analysis.locations))
+          })
+          .map(x => s"${x.originalItem}").print(20)
+        case None => println("No streams were configured for 'radio' pipeline.")
       }
     }
 
@@ -275,6 +311,19 @@ object DemoFortis {
             "consumerSecret" -> System.getenv("TWITTER_CONSUMER_SECRET"),
             "accessToken" -> System.getenv("TWITTER_ACCESS_TOKEN"),
             "accessTokenSecret" -> System.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+          )
+        )
+      ),
+      "radio" -> List(
+        ConnectorConfig(
+          "Radio",
+          Map(
+            "subscriptionKey" -> System.getenv("OXFORD_SPEECH_TOKEN"),
+            "radioUrl" -> "http://live02.rfi.fr/rfimonde-32.mp3", // "http://bbcmedia.ic.llnwd.net/stream/bbcmedia_radio3_mf_p",
+            "audioType" -> ".mp3",
+            "locale" -> "fr-FR", //"en-US",
+            "speechType" -> "CONVERSATION",
+            "outputFormat" -> "SIMPLE"
           )
         )
       ),

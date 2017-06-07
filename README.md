@@ -19,6 +19,7 @@ export FORTIS_APPINSIGHTS_IKEY="..."
 export FORTIS_FEATURE_SERVICE_HOST="..."
 export INSTAGRAM_AUTH_TOKEN="..."
 export OXFORD_VISION_TOKEN="..."
+export OXFORD_SPEECH_TOKEN="..."
 export OXFORD_LANGUAGE_TOKEN="..."
 export TWITTER_CONSUMER_KEY="..."
 export TWITTER_CONSUMER_SECRET="..."
@@ -40,6 +41,7 @@ sbt assembly
 
 # run on spark
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar instagram
+spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar radio
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar twitter
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar facebook
 spark-submit --class DemoFortis --master local[2] --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar tadaweb
