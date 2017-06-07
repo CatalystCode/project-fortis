@@ -68,11 +68,9 @@ class WordListSentimentDetector(
     new File(new File(directory), filename).toString
   }
 
-  private def formatModelsDownloadUrl(language: String): String = {
-    s"https://fortismodels.blob.core.windows.net/sentiment/sentiment-$language.zip"
-  }
-
   protected def createModelsProvider(): ZipModelsProvider = {
-    new ZipModelsProvider(formatModelsDownloadUrl, modelsSource)
+    new ZipModelsProvider(
+      language => s"https://fortismodels.blob.core.windows.net/sentiment/sentiment-$language.zip",
+      modelsSource)
   }
 }

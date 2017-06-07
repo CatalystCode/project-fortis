@@ -14,7 +14,7 @@ class PlaceRecognizer(
   enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
 ) extends Serializable with Logger {
 
-  @volatile private lazy val modelsProvider = new ZipModelsProvider(formatModelsDownloadUrl, modelsSource)
+  @volatile private lazy val modelsProvider = createModelsProvider()
 
   def extractPlaces(text: String, language: String): Iterable[String] = {
     if (!enabledLanguages.contains(language)) {
@@ -43,7 +43,9 @@ class PlaceRecognizer(
     entityType == "location" || entityType == "gpe"
   }
 
-  private def formatModelsDownloadUrl(language: String): String = {
-    s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip"
+  protected def createModelsProvider(): ZipModelsProvider = {
+    new ZipModelsProvider(
+      language => s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip",
+      modelsSource)
   }
 }
