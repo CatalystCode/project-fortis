@@ -1,9 +1,11 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+
 @SerialVersionUID(100L)
 class SentimentDetector(
   auth: SentimentDetectorAuth
-) extends Serializable {
+) extends Serializable with Logger {
 
   private lazy val cognitiveServicesSentimentDetector = new CognitiveServicesSentimentDetector(auth)
   private lazy val wordlistSentimentDetector = new WordListSentimentDetector()
@@ -14,6 +16,7 @@ class SentimentDetector(
       case Some(_) =>
         sentiment
       case None =>
+        logDebug(s"Unable to compute sentiment via cognitive services, falling back to word-list approach for $language")
         wordlistSentimentDetector.detectSentiment(text, language)
     }
   }

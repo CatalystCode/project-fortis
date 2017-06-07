@@ -58,6 +58,7 @@ class WordListSentimentDetector(
       case Some(words) =>
         words
       case None =>
+        logDebug(s"Loading positive/negative words from $path")
         val words = Source.fromFile(path).getLines().map(_.trim).filter(!_.isEmpty).map(_.toLowerCase).toSet
         wordsCache.putIfAbsent(path, words)
         words
