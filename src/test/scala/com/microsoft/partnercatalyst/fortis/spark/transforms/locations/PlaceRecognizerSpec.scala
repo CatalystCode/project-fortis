@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
+package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import org.apache.log4j.{BasicConfigurator, Level, Logger}
 import org.scalatest.FlatSpec

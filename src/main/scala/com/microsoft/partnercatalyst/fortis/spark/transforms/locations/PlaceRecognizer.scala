@@ -1,8 +1,9 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
+package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import java.io.IOError
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.HasZipModels
+import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.Entity
 
 import scala.collection.JavaConversions._

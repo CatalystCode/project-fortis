@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
+package com.microsoft.partnercatalyst.fortis.spark.transforms.nlp
 
 import java.io.{BufferedReader, ByteArrayInputStream, File, InputStreamReader}
 import java.util.Properties
