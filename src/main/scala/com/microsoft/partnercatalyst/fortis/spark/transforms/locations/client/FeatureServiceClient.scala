@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
@@ -9,7 +9,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
-class FeatureServiceClient(host: String) extends Serializable with Logger {
+class FeatureServiceClient(host: String) extends Serializable with Loggable {
   def bbox(geofence: Geofence): Iterable[FeatureServiceFeature] = {
     unpack(fetchBboxResponse(geofence), "bbox")
   }

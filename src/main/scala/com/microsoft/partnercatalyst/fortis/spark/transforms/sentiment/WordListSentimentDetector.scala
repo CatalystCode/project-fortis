@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 import java.io.{File, IOError, IOException}
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer.tokenize
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{NEGATIVE, NEUTRAL, POSITIVE}
@@ -13,7 +13,7 @@ import scala.io.Source
 @SerialVersionUID(100L)
 class WordListSentimentDetector(
   modelsSource: Option[String] = None
-) extends Serializable with Logger {
+) extends Serializable with Loggable {
 
   @volatile private lazy val wordsCache = new ConcurrentHashMap[String, Set[String]]
   @volatile private lazy val modelsProvider = createModelsProvider()

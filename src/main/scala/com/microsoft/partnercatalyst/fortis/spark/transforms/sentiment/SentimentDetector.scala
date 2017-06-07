@@ -1,13 +1,13 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class SentimentDetector(
   auth: SentimentDetectorAuth
-) extends Serializable with Logger {
+) extends Serializable with Loggable {
 
   private lazy val cognitiveServicesSentimentDetector = new CognitiveServicesSentimentDetector(auth)
   private lazy val wordlistSentimentDetector = new WordListSentimentDetector()

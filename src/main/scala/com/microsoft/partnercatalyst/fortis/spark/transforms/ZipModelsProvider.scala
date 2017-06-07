@@ -5,7 +5,7 @@ import java.net.URL
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
@@ -15,7 +15,7 @@ import scala.sys.process._
 class ZipModelsProvider(
   formatModelsDownloadUrl: String => String,
   modelsSource: Option[String] = None
-) extends Serializable with Logger {
+) extends Serializable with Loggable {
 
   @volatile private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 

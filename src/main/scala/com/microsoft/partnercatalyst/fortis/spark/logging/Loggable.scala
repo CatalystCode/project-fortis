@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.logging
 
 import org.apache.log4j.LogManager
 
-trait Logger {
+trait Loggable {
   @transient private lazy val log = LogManager.getLogger(getClass.getName)
 
   def logDebug(message: String): Unit = log.debug(message)

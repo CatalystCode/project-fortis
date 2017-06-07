@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import java.io.IOError
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.Entity
@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 class PlaceRecognizer(
   modelsSource: Option[String] = None,
   enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
-) extends Serializable with Logger {
+) extends Serializable with Loggable {
 
   @volatile private lazy val modelsProvider = createModelsProvider()
 
