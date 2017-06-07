@@ -2,6 +2,8 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
 
+import scala.util.{Failure, Success, Try}
+
 @SerialVersionUID(100L)
 class SentimentDetector(
   auth: SentimentDetectorAuth
@@ -11,11 +13,11 @@ class SentimentDetector(
   private lazy val wordlistSentimentDetector = new WordListSentimentDetector()
 
   def detectSentiment(text: String, language: String): Option[Double] = {
-    val sentiment = cognitiveServicesSentimentDetector.detectSentiment(text, language)
+    val sentiment = Try(cognitiveServicesSentimentDetector.detectSentiment(text, language))
     sentiment match {
-      case Some(_) =>
-        sentiment
-      case None =>
+      case Success(Some(sentimentScore)) =>
+        Some(sentimentScore)
+      case Success(None) | Failure(_) =>
         logDebug(s"Unable to compute sentiment via cognitive services, falling back to word-list approach for $language")
         wordlistSentimentDetector.detectSentiment(text, language)
     }
