@@ -1,19 +1,10 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import org.apache.log4j.Logger.getLogger
-import org.apache.log4j.{BasicConfigurator, Level}
-import org.scalatest.FlatSpec
+import com.microsoft.partnercatalyst.fortis.spark.IntegrationTestSpec
 
-class PlaceRecognizerSpec extends FlatSpec {
+class PlaceRecognizerIntegrationSpec extends IntegrationTestSpec {
   "The place recognizer" should "extract correct places" in {
-    val runIntegrationTests = Option(System.getenv("FORTIS_INTEGRATION_TESTS")).getOrElse("false").toBoolean
-    val localModels = Option(System.getenv("FORTIS_MODELS_DIRECTORY"))
-    if (!runIntegrationTests && localModels.isEmpty) {
-      cancel("Integration tests disabled and no local models available")
-    }
-
-    BasicConfigurator.configure()
-    getLogger("liblocations").setLevel(Level.DEBUG)
+    val localModels = checkIfShouldRunWithLocalModels()
 
     val recognizer = new PlaceRecognizer(modelsSource = localModels)
     val placesEn1 = recognizer.extractPlaces("I went to Paris last week. France was great!", "en")

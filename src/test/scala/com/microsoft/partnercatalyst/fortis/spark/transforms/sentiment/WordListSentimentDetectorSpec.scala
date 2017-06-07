@@ -63,14 +63,4 @@ class WordListSentimentDetectorSpec extends FlatSpec {
     val sentiment = detector.detectSentiment("bad good foo bar baz bad", "en")
     assert(sentiment.isEmpty)
   }
-
-  it should "download models from blob" in {
-    val detector = new WordListSentimentDetector()
-    val frSentiment1 = detector.detectSentiment("victoire supérieure véritable siège tuer révolte révolte", "fr")
-    assert(frSentiment1.contains(NEGATIVE))
-    val deSentiment = detector.detectSentiment("erfolgreich unbeschränkt Pflege Zweifel tot angegriffen", "de")
-    assert(deSentiment.contains(NEUTRAL))
-    val frSentiment2 = detector.detectSentiment("libération du quai", "fr")
-    assert(frSentiment2.contains(POSITIVE))
-  }
 }
