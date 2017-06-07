@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
-import java.io.{File, IOError}
+import java.io.{File, IOError, IOException}
 import java.util.concurrent.ConcurrentHashMap
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
@@ -16,7 +16,7 @@ class WordListSentimentDetector(
 ) extends Serializable with Logger {
 
   @volatile private lazy val wordsCache = new ConcurrentHashMap[String, Set[String]]
-  @volatile private lazy val modelsProvider = new ZipModelsProvider(formatModelsDownloadUrl, modelsSource)
+  @volatile private lazy val modelsProvider = createModelsProvider()
 
   def detectSentiment(text: String, language: String): Option[Double] = {
     try {
@@ -26,7 +26,7 @@ class WordListSentimentDetector(
       val numNegativeWords = countNegativeWords(language, words, resourcesDirectory)
       computeSentimentScore(numPositiveWords, numNegativeWords)
     } catch {
-      case ex: IOError =>
+      case ex @ (_ : IOException | _ : IOError) =>
         logError(s"Unable to extract sentiment for language $language", ex)
         None
     }
@@ -52,7 +52,7 @@ class WordListSentimentDetector(
     words.count(positiveWords.contains)
   }
 
-  private def readWords(path: String): Set[String] = {
+  protected def readWords(path: String): Set[String] = {
     val cachedWords = Option(wordsCache.get(path))
     cachedWords match {
       case Some(words) =>
@@ -70,5 +70,9 @@ class WordListSentimentDetector(
 
   private def formatModelsDownloadUrl(language: String): String = {
     s"https://fortismodels.blob.core.windows.net/sentiment/sentiment-$language.zip"
+  }
+
+  protected def createModelsProvider(): ZipModelsProvider = {
+    new ZipModelsProvider(formatModelsDownloadUrl, modelsSource)
   }
 }
