@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, Logger}
+import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
 

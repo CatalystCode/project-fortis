@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import java.io.IOError
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.Entity

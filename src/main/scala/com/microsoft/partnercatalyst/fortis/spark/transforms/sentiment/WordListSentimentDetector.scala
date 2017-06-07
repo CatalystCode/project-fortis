@@ -3,8 +3,8 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 import java.io.{File, IOError, IOException}
 import java.util.concurrent.ConcurrentHashMap
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer.tokenize
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{NEGATIVE, NEUTRAL, POSITIVE}
 

@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.Location
 

@@ -1,9 +1,9 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
+package com.microsoft.partnercatalyst.fortis.spark.logging
 
 import org.apache.log4j.LogManager
 
 trait Logger {
-  @transient private lazy val log = LogManager.getLogger("liblocations")
+  @transient private lazy val log = LogManager.getLogger(getClass.getName)
 
   def logDebug(message: String): Unit = log.debug(message)
   def logInfo(message: String): Unit = log.info(message)

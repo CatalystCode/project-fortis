@@ -5,7 +5,7 @@ import java.net.URL
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
+import com.microsoft.partnercatalyst.fortis.spark.logging.Logger
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
