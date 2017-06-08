@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.topic
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.Tag
-import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer.tokenize
+import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import org.apache.commons.collections4.trie.PatriciaTrie
 
 import scala.collection.mutable.ListBuffer
@@ -27,7 +27,7 @@ class KeywordExtractor(keywords: Seq[String]) extends Serializable {
       result
     }
 
-    val tokens = tokenize(text.toLowerCase)
+    val tokens = Tokenizer(text.toLowerCase)
     tokens.tails.flatMap(findMatches(_).map(Tag(_, 1))).toList
   }
 
