@@ -13,7 +13,7 @@ import scala.sys.process._
 
 @SerialVersionUID(100L)
 class ZipModelsProvider(
-  formatModelsDownloadUrl: String => String,
+  modelsUrlFromLanguage: String => String,
   modelsSource: Option[String] = None
 ) extends Serializable with Loggable {
 
@@ -33,7 +33,7 @@ class ZipModelsProvider(
       return previouslyDownloadedPath
     }
 
-    val remotePath = modelsSource.getOrElse(formatModelsDownloadUrl(language))
+    val remotePath = modelsSource.getOrElse(modelsUrlFromLanguage(language))
     if ((!remotePath.startsWith("http://") && !remotePath.startsWith("https://")) || !remotePath.endsWith(".zip")) {
       throw new FileNotFoundException(s"Unable to process $remotePath, should be http(s) link to zip file")
     }
