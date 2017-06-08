@@ -21,9 +21,9 @@ class TestWordListSentimentDetector(
 ) extends WordListSentimentDetector {
 
   protected override def readWords(path: String): Set[String] = {
-    if (path.contains("pos.txt")) {
+    if (path.endsWith("pos.txt")) {
       positiveWords
-    } else if (path.contains("neg.txt")) {
+    } else if (path.endsWith("neg.txt")) {
       negativeWords
     } else {
       throw new IllegalStateException(s"Requested words for unknown path: $path")
