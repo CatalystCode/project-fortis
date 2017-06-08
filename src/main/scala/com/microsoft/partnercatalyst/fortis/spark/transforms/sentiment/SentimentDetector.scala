@@ -25,7 +25,7 @@ class SentimentDetector(
 }
 
 object SentimentDetector {
-  val POSITIVE: Double = 1.0
-  val NEUTRAL: Double = 0.6
-  val NEGATIVE: Double = 0.0
+  val Positive: Double = 1.0
+  val Neutral: Double = 0.6
+  val Negative: Double = 0.0
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer.tokenize
-import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{NEGATIVE, NEUTRAL, POSITIVE}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{Negative, Neutral, Positive}
 
 import scala.io.Source
 
@@ -34,11 +34,11 @@ class WordListSentimentDetector(
 
   private def computeSentimentScore(numPositiveWords: Int, numNegativeWords: Int) = {
     if (numPositiveWords > numNegativeWords) {
-      Some(POSITIVE)
+      Some(Positive)
     } else if (numNegativeWords > numPositiveWords) {
-      Some(NEGATIVE)
+      Some(Negative)
     } else {
-      Some(NEUTRAL)
+      Some(Neutral)
     }
   }
 

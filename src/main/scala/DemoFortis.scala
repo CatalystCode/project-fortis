@@ -10,7 +10,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysi
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor, PlaceRecognizer}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{NEGATIVE, NEUTRAL, POSITIVE}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{Negative, Neutral, Positive}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
@@ -231,9 +231,9 @@ object DemoFortis {
           .map(fortisEvent => {
             val language = languageDetection.detectLanguage(fortisEvent.originalItem.text)
             val sentiment: Option[Double] = fortisEvent.originalItem.sentiment match {
-              case "negative" => Some(NEGATIVE)
-              case "neutral" => Some(NEUTRAL)
-              case "positive" => Some(POSITIVE)
+              case "negative" => Some(Negative)
+              case "neutral" => Some(Neutral)
+              case "positive" => Some(Positive)
               case _ => language match {
                 case Some(lang) =>
                   sentimentDetection.detectSentiment(fortisEvent.originalItem.text, lang)
