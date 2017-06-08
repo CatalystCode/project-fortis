@@ -17,7 +17,7 @@ class PlaceRecognizer(
 
   @volatile private lazy val modelsProvider = createModelsProvider()
 
-  def extractPlaces(text: String, language: String): Iterable[String] = {
+  def extractPlaces(text: String, language: String): Set[String] = {
     if (!enabledLanguages.contains(language)) {
       return Set()
     }
