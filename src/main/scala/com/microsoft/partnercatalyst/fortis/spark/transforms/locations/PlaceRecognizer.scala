@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import java.io.IOError
+import java.io.{IOError, IOException}
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
@@ -8,6 +8,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.Entity
 
 import scala.collection.JavaConversions._
+import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class PlaceRecognizer(
@@ -22,9 +23,18 @@ class PlaceRecognizer(
       return Set()
     }
 
-    try {
-      val resourcesDirectory = modelsProvider.ensureModelsAreDownloaded(language)
+    Try(modelsProvider.ensureModelsAreDownloaded(language)) match {
+      case Failure(ex) =>
+        logError(s"Unable to load models for language $language", ex)
+        Set()
 
+      case Success(resourcesDirectory) =>
+        extractPlacesUsingModels(text, language, resourcesDirectory)
+    }
+  }
+
+  private def extractPlacesUsingModels(text: String, language: String, resourcesDirectory: String): Set[String] = {
+    try {
       val kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
       OpeNER.posAnnotate(resourcesDirectory, language, kaf)
       OpeNER.nerAnnotate(resourcesDirectory, language, kaf)
@@ -33,7 +43,7 @@ class PlaceRecognizer(
 
       kaf.getEntities.toList.filter(entityIsPlace).map(_.getStr).toSet
     } catch {
-      case ex @ (_ : NullPointerException | _ : IOError) =>
+      case ex @ (_ : NullPointerException | _ : IOError | _ : IOException) =>
         logError(s"Unable to extract places for language $language", ex)
         Set()
     }
