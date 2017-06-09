@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.JsonImageLandmark
-import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location, Tag}
 import org.scalatest.FlatSpec
 
 class TestImageAnalyzer(cognitiveServicesResponse: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {

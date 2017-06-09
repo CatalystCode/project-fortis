@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, Location, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import net.liftweb.json
 

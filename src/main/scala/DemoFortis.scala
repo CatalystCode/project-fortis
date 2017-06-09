@@ -1,5 +1,6 @@
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadawebAdapter
@@ -29,15 +30,16 @@ object DemoFortis {
 
     val conf = new SparkConf().setAppName("project-fortis-spark").setIfMissing("spark.master", "local[*]")
     val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(1))
+    val ssc = new StreamingContext(sc, Seconds(1)) //TODO: add ENV for STREAMING_BATCH_SIZE
 
     import EventHubStreamFactory.utf8ToString
     val streamProvider = StreamProvider()
       .withFactories(
         List(
           new InstagramLocationStreamFactory,
-          new InstagramTagStreamFactory)
+          new InstagramTagStreamFactory
         )
+      )
       .withFactories(
         List(
           new RadioStreamFactory
@@ -62,6 +64,8 @@ object DemoFortis {
     val streamRegistry = buildRegistry()
 
     AppInsights.init(Option(System.getenv("FORTIS_APPINSIGHTS_IKEY")))
+
+    // TODO: get logger name from libraries
     Logger.getLogger("org").setLevel(Level.ERROR)
     Logger.getLogger("akka").setLevel(Level.ERROR)
     Logger.getLogger("libinstagram").setLevel(Level.DEBUG)

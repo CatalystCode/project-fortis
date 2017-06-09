@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.topic
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.Tag
+import com.microsoft.partnercatalyst.fortis.spark.dto.Tag
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import org.apache.commons.collections4.trie.PatriciaTrie
 
