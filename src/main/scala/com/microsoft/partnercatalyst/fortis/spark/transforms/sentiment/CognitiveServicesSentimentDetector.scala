@@ -9,7 +9,7 @@ case class SentimentDetectorAuth(key: String, apiHost: String = "westus.api.cogn
 @SerialVersionUID(100L)
 class CognitiveServicesSentimentDetector(
   auth: SentimentDetectorAuth
-) extends Serializable {
+) extends DetectsSentiment {
 
   def detectSentiment(text: String, language: String): Option[Double] = {
     val textId = "0"
