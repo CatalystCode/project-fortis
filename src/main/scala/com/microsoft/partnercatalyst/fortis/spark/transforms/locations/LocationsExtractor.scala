@@ -1,8 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.Location
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
 
 import scala.collection.mutable
 
@@ -14,7 +14,7 @@ class LocationsExtractor(
   geofence: Geofence,
   placeRecognizer: Option[PlaceRecognizer] = None,
   ngrams: Int = 3
-) extends Serializable with Logger {
+) extends Serializable with Loggable {
 
   protected var lookup: Map[String, Set[String]] = _
 

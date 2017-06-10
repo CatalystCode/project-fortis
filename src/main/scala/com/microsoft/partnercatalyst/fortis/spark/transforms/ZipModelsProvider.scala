@@ -1,53 +1,25 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp
+package com.microsoft.partnercatalyst.fortis.spark.transforms
 
-import java.io.{File, FileNotFoundException, IOError}
+import java.io.{File, FileNotFoundException}
 import java.net.URL
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Logger
-import ixa.kaflib.Entity
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
 import scala.sys.process._
 
 @SerialVersionUID(100L)
-class PlaceRecognizer(
-  modelsSource: Option[String] = None,
-  enabledLanguages: Set[String] = Set("de", "en", "es", "eu", "it", "nl")
-) extends Serializable with Logger {
+class ZipModelsProvider(
+  modelsUrlFromLanguage: String => String,
+  modelsSource: Option[String] = None
+) extends Serializable with Loggable {
 
   @volatile private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
-  def extractPlaces(text: String, language: String): Iterable[String] = {
-    if (!enabledLanguages.contains(language)) {
-      return Set()
-    }
-
-    try {
-      val resourcesDirectory = ensureModelsAreDownloaded(language)
-
-      val kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
-      OpeNER.posAnnotate(resourcesDirectory, language, kaf)
-      OpeNER.nerAnnotate(resourcesDirectory, language, kaf)
-
-      logDebug(s"Analyzed text $text in language $language: $kaf")
-
-      kaf.getEntities.toList.filter(entityIsPlace).map(_.getStr).toSet
-    } catch {
-      case ex @ (_ : NullPointerException | _ : IOError) =>
-        logError(s"Unable to extract places for language $language", ex)
-        Set()
-    }
-  }
-
-  private def entityIsPlace(entity: Entity) = {
-    val entityType = Option(entity.getType).getOrElse("").toLowerCase
-    entityType == "location" || entityType == "gpe"
-  }
-
-  private def ensureModelsAreDownloaded(language: String): String = {
+  def ensureModelsAreDownloaded(language: String): String = {
     val localPath = modelsSource.getOrElse("")
     if (hasModelFiles(localPath, language)) {
       logDebug(s"Using locally provided model files from $localPath")
@@ -61,7 +33,7 @@ class PlaceRecognizer(
       return previouslyDownloadedPath
     }
 
-    val remotePath = modelsSource.getOrElse(s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip")
+    val remotePath = modelsSource.getOrElse(modelsUrlFromLanguage(language))
     if ((!remotePath.startsWith("http://") && !remotePath.startsWith("https://")) || !remotePath.endsWith(".zip")) {
       throw new FileNotFoundException(s"Unable to process $remotePath, should be http(s) link to zip file")
     }

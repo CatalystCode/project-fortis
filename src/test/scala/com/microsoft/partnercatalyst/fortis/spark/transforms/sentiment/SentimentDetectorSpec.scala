@@ -1,34 +1,66 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
+import java.io.IOException
+
 import org.scalatest.FlatSpec
 
-class TestSentimentDetector(cognitiveServicesResponse: String) extends SentimentDetector(SentimentDetectorAuth("key")) {
-  protected override def callCognitiveServices(request: String): String = cognitiveServicesResponse
-  override def buildRequestBody(text: String, textId: String, language: String): String = super.buildRequestBody(text, textId, language)
+class FakeSentimentDetector(createSentimentScore: () => Option[Double]) extends DetectsSentiment {
+  var callCount = 0
+
+  override def detectSentiment(text: String, language: String): Option[Double] = {
+    callCount += 1
+    createSentimentScore()
+  }
+}
+
+class TestSentimentDetector(detectors: Seq[DetectsSentiment]) extends SentimentDetector(null) {
+  override protected def initializeDetectors(): Seq[DetectsSentiment] = detectors
 }
 
 class SentimentDetectorSpec extends FlatSpec {
-  "The sentiment detector" should "formulate correct request and parse response to domain types" in {
-    val responseSentiment = 0.8
-    val detector = new TestSentimentDetector(s"""{"documents":[{"id":"0","score":$responseSentiment}],"errors":[]}""")
-    val sentiment = detector.detectSentiment("some text", "en")
+  "The sentiment detector" should "use the best detector if possible" in {
+    val detector1 = new FakeSentimentDetector(() => Some(0.5))
+    val detector2 = new FakeSentimentDetector(() => Some(0.4))
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2)).detectSentiment("some text", "en")
 
-    assert(sentiment.contains(responseSentiment))
+    assert(detector1.callCount == 1)
+    assert(detector2.callCount == 0)
+    assert(sentiment.contains(0.5))
   }
 
-  it should "ignore unsupported languages" in {
-    val detector = new TestSentimentDetector("""{"documents":[],"errors":[{"id":"0","message":"Supplied language not supported. Pass in one of:en,es,pt,fr,de,it,nl,no,sv,pl,da,fi,ru,el,tr"}]}""")
-    val sentiment = detector.detectSentiment("some text", "zh")
+  it should "skip detectors that didn't detect sentiment" in {
+    val detector1 = new FakeSentimentDetector(() => None)
+    val detector2 = new FakeSentimentDetector(() => None)
+    val detector3 = new FakeSentimentDetector(() => Some(0.4))
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3)).detectSentiment("some text", "en")
 
+    assert(detector1.callCount == 1)
+    assert(detector2.callCount == 1)
+    assert(detector3.callCount == 1)
+    assert(sentiment.contains(0.4))
+  }
+
+  it should "skip detectors that errored" in {
+    val detector1 = new FakeSentimentDetector(() => throw new IOException())
+    val detector2 = new FakeSentimentDetector(() => Some(0.4))
+    val detector3 = new FakeSentimentDetector(() => throw new IOException())
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3)).detectSentiment("some text", "en")
+
+    assert(detector1.callCount == 1)
+    assert(detector2.callCount == 1)
+    assert(detector3.callCount == 0)
+    assert(sentiment.contains(0.4))
+  }
+
+  it should "return None if all detectors failed" in {
+    val detector1 = new FakeSentimentDetector(() => throw new IOException())
+    val detector2 = new FakeSentimentDetector(() => None)
+    val detector3 = new FakeSentimentDetector(() => throw new IOException())
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3)).detectSentiment("some text", "en")
+
+    assert(detector1.callCount == 1)
+    assert(detector2.callCount == 1)
+    assert(detector3.callCount == 1)
     assert(sentiment.isEmpty)
-  }
-
-  it should "build correct request body" in {
-    val id = "0"
-    val language = "en"
-    val text = "some text"
-    val requestBody = new TestSentimentDetector("").buildRequestBody(text, id, language)
-
-    assert(requestBody == s"""{"documents":[{"id":"$id","text":"$text","language":"en"}]}""")
   }
 }

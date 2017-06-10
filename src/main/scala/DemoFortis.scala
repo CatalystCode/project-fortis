@@ -9,8 +9,8 @@ import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.nlp.PlaceRecognizer
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor, PlaceRecognizer}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{Negative, Neutral, Positive}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.{Analysis, AnalyzedItem}
@@ -231,9 +231,9 @@ object DemoFortis {
           .map(fortisEvent => {
             val language = languageDetection.detectLanguage(fortisEvent.originalItem.text)
             val sentiment: Option[Double] = fortisEvent.originalItem.sentiment match {
-              case "negative" => Some(0)
-              case "neutral" => Some(0.6)
-              case "positive" => Some(1)
+              case "negative" => Some(Negative)
+              case "neutral" => Some(Neutral)
+              case "positive" => Some(Positive)
               case _ => language match {
                 case Some(lang) =>
                   sentimentDetection.detectSentiment(fortisEvent.originalItem.text, lang)

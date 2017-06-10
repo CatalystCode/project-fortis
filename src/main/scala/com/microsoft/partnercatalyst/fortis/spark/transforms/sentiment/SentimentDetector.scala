@@ -1,49 +1,43 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
-import net.liftweb.json
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 
-import scalaj.http.Http
-
-case class SentimentDetectorAuth(key: String, apiHost: String = "westus.api.cognitive.microsoft.com")
+import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class SentimentDetector(
   auth: SentimentDetectorAuth
-) extends Serializable {
+) extends DetectsSentiment {
+
+  private lazy val detectors = initializeDetectors()
 
   def detectSentiment(text: String, language: String): Option[Double] = {
-    val textId = "0"
-    val requestBody = buildRequestBody(text, textId, language)
-    val response = callCognitiveServices(requestBody)
-    parseResponse(response, textId)
+    detectors.view.map(detector => {
+      Try(detector.detectSentiment(text, language)) match {
+        case Success(Some(sentimentScore)) =>
+          logDebug(s"Computed sentiment via ${detector.getClass}")
+          Some(sentimentScore)
+        case Success(None) | Failure(_) =>
+          logDebug(s"Unable to compute sentiment via ${detector.getClass}")
+          None
+      }
+    })
+    .find(_.isDefined)
+    .getOrElse(None)
   }
 
-  protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"https://${auth.apiHost}/text/analytics/v2.0/sentiment")
-      .headers(
-        "Content-Type" -> "application/json",
-        "Ocp-Apim-Subscription-Key" -> auth.key)
-      .postData(requestBody)
-      .asString
-      .body
+  protected def initializeDetectors(): Seq[DetectsSentiment] = {
+    Seq(new CognitiveServicesSentimentDetector(auth),
+        new WordListSentimentDetector())
   }
+}
 
-  protected def buildRequestBody(text: String, textId: String, language: String): String = {
-    implicit val formats = json.DefaultFormats
-    val requestBody = dto.JsonSentimentDetectionRequest(documents = List(dto.JsonSentimentDetectionRequestItem(
-      id = textId,
-      language = language,
-      text = text)))
-    json.compactRender(json.Extraction.decompose(requestBody))
-  }
+object SentimentDetector {
+  val Positive: Double = 1.0
+  val Neutral: Double = 0.6
+  val Negative: Double = 0.0
+}
 
-  protected def parseResponse(apiResponse: String, textId: String): Option[Double] = {
-    implicit val formats = json.DefaultFormats
-    val response = json.parse(apiResponse).extract[dto.JsonSentimentDetectionResponse]
-    if (response.errors.exists(_.id == textId)) {
-      None
-    } else {
-      response.documents.find(_.id == textId).map(_.score)
-    }
-  }
+trait DetectsSentiment extends Serializable with Loggable {
+  def detectSentiment(text: String, language: String): Option[Double]
 }
