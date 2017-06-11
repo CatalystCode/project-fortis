@@ -39,7 +39,7 @@
             "value": "GEN-UNIQUE"
         },
         "postDeploymentGithubRepoPath": {
-            "value": "https://raw.githubusercontent.com/CatalystCode/fortis-containers"
+            "value": "https://raw.githubusercontent.com/CatalystCode/fortis-containers/master"
         },
         "postDeploymentExtensionScript": {
             "value": "fortis-deploy.sh"
