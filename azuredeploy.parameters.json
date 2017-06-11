@@ -1,0 +1,48 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "siteName": {
+            "value": "enter-your-fortis-site-name"
+        },
+        "acsMasterCount": {
+            "value": "1"
+        },
+        "acsAgentCount": {
+            "value": "6"
+        },
+        "agentVMSize": {
+            "value": "Standard_D2_v2"
+        },
+        "dnsNamePrefix": {
+            "value": "fortis"
+        },
+        "adminUsername": {
+            "value": "fortisadmin"
+        },
+        "sparkWorkers": {
+            "value": "6"
+        },
+        "cassandraNodes": {
+            "value": "5"
+        },
+        "siteType": {
+            "value": "humanitarian"
+        },
+        "sshPublicKey": {
+            "value": "GEN-UNIQUE"
+        },
+        "servicePrincipalClientId": {
+            "value": "GEN-UNIQUE"
+        },
+        "servicePrincipalClientSecret": {
+            "value": "GEN-UNIQUE"
+        },
+        "postDeploymentGithubRepoPath": {
+            "value": "https://raw.githubusercontent.com/CatalystCode/fortis-containers"
+        },
+        "postDeploymentExtensionScript": {
+            "value": "fortis-deploy.sh"
+        }
+    }
+}

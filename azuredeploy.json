@@ -1,0 +1,447 @@
+    {
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "siteName": {
+            "type": "string",
+            "metadata": {
+                "description": "The Site name for your Fortis pipeline."
+            }
+        },
+        "acsMasterCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "description": "The number of Kubernetes masters for the cluster."
+            }
+        },
+        "acsAgentCount": {
+            "type": "int",
+            "defaultValue": 6,
+            "metadata": {
+                "description": "The number of agents for the cluster.  This value can be from 1 to 100 (note, for Kubernetes clusters you will also get 1 or 2 public agents in addition to these seleted masters)"
+            }
+        },
+        "agentVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2_v2",
+            "allowedValues": [
+                    "Standard_A0", "Standard_A1", "Standard_A2", "Standard_A3", "Standard_A4", "Standard_A5",
+                    "Standard_A6", "Standard_A7", "Standard_A8", "Standard_A9", "Standard_A10", "Standard_A11",
+                    "Standard_D1", "Standard_D2", "Standard_D3", "Standard_D4",
+                    "Standard_D11", "Standard_D12", "Standard_D13", "Standard_D14",
+                    "Standard_D1_v2", "Standard_D2_v2", "Standard_D3_v2", "Standard_D4_v2", "Standard_D5_v2",
+                    "Standard_D11_v2", "Standard_D12_v2", "Standard_D13_v2", "Standard_D14_v2",
+                    "Standard_G1", "Standard_G2", "Standard_G3", "Standard_G4", "Standard_G5",
+                    "Standard_DS1", "Standard_DS2", "Standard_DS3", "Standard_DS4",
+                    "Standard_DS11", "Standard_DS12", "Standard_DS13", "Standard_DS14",
+                    "Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5"
+            ],
+            "metadata": {
+                "description": "The size of the Virtual Machine."
+            }
+        },
+        "dnsNamePrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Sets the Domain name prefix for the cluster.  The concatenation of the domain name and the regionalized DNS zone make up the fully qualified domain name associated with the public IP address."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "fortisadmin",
+            "metadata": {
+                "description": "User name for the Linux Virtual Machines."
+            }
+        },
+        "sparkWorkers": {
+            "type": "int",
+            "defaultValue": 5,
+            "metadata": {
+                "description": "The number of Spark Worker nodes to create."
+            }
+        },
+        "cassandraNodes": {
+            "type": "int",
+            "defaultValue": 5,
+            "metadata": {
+                "description": "The number of Cassandra nodes to create."
+            }
+        },
+        "siteType": {
+            "type": "string",
+            "defaultValue": "humanitarian",
+            "allowedValues": [
+                "humanitarian",
+                "health"
+            ],
+            "metadata": {
+                "description": "The type of fortis site that you want to deploy. This will drive the default list of sites, topics and Public Facebook pages that Fortis will start monitoring."
+            }
+        },
+        "sshPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string.  Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
+        },
+        "servicePrincipalClientId": {
+            "metadata": {
+                "description": "Client ID (used by cloudprovider)"
+            },
+            "type": "securestring",
+            "defaultValue": "n/a"
+        },
+        "servicePrincipalClientSecret": {
+            "metadata": {
+                "description": "The Service Principal Client Secret."
+            },
+            "type": "securestring",
+            "defaultValue": "n/a"
+        },
+        "postDeploymentGithubRepoPath": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/CatalystCode/fortis-containers",
+            "metadata": {
+                "description": "The github repository which hosts the post deployment extension script."
+            }
+        },
+        "postDeploymentExtensionScript": {
+            "type": "string",
+            "defaultValue": "fortis-deploy.sh",
+            "metadata": {
+                "description": "The extension script is the post deployment ."
+            }
+        }
+    },
+    "variables": {
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'storage')]",
+        "storageSku": "Premium_LRS",
+        "vmName": "FortisDeployVM",
+        "OSDiskName": "osdiskforlinuxsimple",
+        "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
+        "kubernetesName": "[concat('containerservice-', resourceGroup().name)]",
+        "orchestratorType": "Kubernetes",
+        "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+        "fortisEventHubName": "tadawebEHTopic",
+        "deploymentVmSize": "Standard_D2_v2",
+        "deploymentUbuntuOSVersion": "16.04.0-LTS",
+        "imagePublisher": "Canonical",
+        "imageOffer": "UbuntuServer",
+        "vmStorageAccountContainerName": "vhds",
+        "nicName": "fortisVMNic",
+        "managePolicy": "ManagePolicy",
+        "sendPolicy": "SendPolicy",
+        "listenPolicy": "ListenPolicy",
+        "ehVersion": "2015-08-01",
+        "ehConsumerGroupName": "fortisEHConsumerGroup",
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey]",
+        "addressPrefix": "10.0.0.0/16",
+        "publicIPAddressName": "fortisDeployPublicIP",
+        "subnetName": "Subnet",
+        "subnetPrefix": "10.0.0.0/24",
+        "publicIPAddressType": "Dynamic",
+        "virtualNetworkName": "FortisVNet",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+        "eventHubNamespace": "fortiseventhubns",
+        "eventHubName": "facts-eventhub"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('storageSku')]"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('ehVersion')]",
+            "name": "[variables('eventHubNamespace')]",
+            "type": "Microsoft.EventHub/namespaces",
+            "location": "[resourceGroup().location]",
+            "sku":{
+                "name":"Standard",
+                "tier":"Standard"
+            },
+            "resources": [
+                {
+                    "apiVersion": "[variables('ehVersion')]",
+                    "name": "[variables('eventHubName')]",
+                    "location": "[resourceGroup().location]",
+                    "type":"eventhubs",
+                    "dependsOn": [
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
+                    ],
+                    "properties": {
+                        "path": "[variables('eventHubName')]"
+                    },
+                    "resources": [{
+                        "apiVersion": "[variables('ehVersion')]",
+                        "name": "[variables('ehConsumerGroupName')]",
+                        "type": "ConsumerGroups",
+                        "dependsOn": [
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]"
+                        ],
+                        "properties": {}
+                    }, {
+                        "apiVersion": "[variables('ehVersion')]",
+                        "name": "[variables('managePolicy')]",
+                        "type": "authorizationRules",
+                        "dependsOn": [
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
+                        ],
+                        "properties": {
+                            "Rights": [
+                                "Send",
+                                "Listen",
+                                "Manage"
+                            ]
+                        }
+                    }, {
+                        "apiVersion": "[variables('ehVersion')]",
+                        "name": "[variables('sendPolicy')]",
+                        "type": "authorizationRules",
+                        "dependsOn": [
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('managePolicy'))]",
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
+                        ],
+                        "properties": {
+                            "Rights": [
+                                "Send"
+                            ]
+                        }
+                    }, {
+                        "apiVersion": "[variables('ehVersion')]",
+                        "name": "[variables('listenPolicy')]",
+                        "type": "authorizationRules",
+                        "dependsOn": [
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('managePolicy'))]",
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('sendPolicy'))]",
+                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
+                        ],
+                        "properties": {
+                            "Rights": [
+                                "Listen"
+                            ]
+                        }
+                    }]
+                }]
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+                "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
+                "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('deploymentVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": "true",
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[variables('sshKeyPath')]",
+                                    "keyData": "[parameters('sshPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[variables('deploymentUbuntuOSVersion')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "true",
+                        "storageUri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[variables('applicationInsightServiceName')]",
+            "type": "Microsoft.Insights/components",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2014-04-01",
+            "tags": {
+                "displayName": "Component ApplicationInsight"
+            },
+            "properties": {
+                "Application_Type": "other",
+                "applicationId": "[variables('applicationInsightServiceName')]"
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.ContainerService/containerServices",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('kubernetesName')]",
+            "properties": {
+                "orchestratorProfile": {
+                    "orchestratorType": "[variables('orchestratorType')]"
+                },
+                "masterProfile": {
+                    "count": "[parameters('acsMasterCount')]",
+                    "dnsPrefix": "[concat(parameters('dnsNamePrefix'),'mgmt')]"
+                },
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpools",
+                        "count": "[parameters('acsAgentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "dnsPrefix": "[concat(parameters('dnsNamePrefix'),'agents')]"
+                    }
+                ],
+                "linuxProfile": {
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshPublicKey')]"
+                            }
+                        ]
+                    }
+                },
+                "servicePrincipalProfile": {
+                    "ClientId": "[parameters('servicePrincipalAppId')]",
+                    "Secret": "[parameters('servicePrincipalAppKey')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/deploysite')]",
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]",
+                "[resourceId('Microsoft.ContainerService/containerServices/', variables('kubernetesName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+				"type": "CustomScript",
+				"typeHandlerVersion": "2.0",
+				"autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[concat(parameters('githubPath'),'/', parameters('postDeploymentExtensionScript'))]"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), ' -location \"', [resourceGroup().location], '\" -spk \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -gr \"', parameters('githubPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -ai \"', variables('APPINSIGHTS_INSTRUMENTATIONKEY'), '\" -sty \"', parameters('siteType'), '\" -spi \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'))]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "kubernetesMasterFQDN": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn]"
+        },
+        "kubernetesMasterSsh": {
+            "type": "string",
+            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn), ' -A -p 22']"
+        },
+        "agentFQDN": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.ContainerService/containerServices/', variables('kubernetesName'))).agentPoolProfiles[0].fqdn]"
+        }
+    }
+}
