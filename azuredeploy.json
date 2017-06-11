@@ -10,21 +10,18 @@
         },
         "acsMasterCount": {
             "type": "int",
-            "defaultValue": 1,
             "metadata": {
                 "description": "The number of Kubernetes masters for the cluster."
             }
         },
         "acsAgentCount": {
             "type": "int",
-            "defaultValue": 6,
             "metadata": {
                 "description": "The number of agents for the cluster.  This value can be from 1 to 100 (note, for Kubernetes clusters you will also get 1 or 2 public agents in addition to these seleted masters)"
             }
         },
         "agentVMSize": {
             "type": "string",
-            "defaultValue": "Standard_D2_v2",
             "allowedValues": [
                     "Standard_A0", "Standard_A1", "Standard_A2", "Standard_A3", "Standard_A4", "Standard_A5",
                     "Standard_A6", "Standard_A7", "Standard_A8", "Standard_A9", "Standard_A10", "Standard_A11",
@@ -56,21 +53,18 @@
         },
         "sparkWorkers": {
             "type": "int",
-            "defaultValue": 5,
             "metadata": {
                 "description": "The number of Spark Worker nodes to create."
             }
         },
         "cassandraNodes": {
             "type": "int",
-            "defaultValue": 5,
             "metadata": {
                 "description": "The number of Cassandra nodes to create."
             }
         },
         "siteType": {
             "type": "string",
-            "defaultValue": "humanitarian",
             "allowedValues": [
                 "humanitarian",
                 "health"
@@ -89,26 +83,22 @@
             "metadata": {
                 "description": "Client ID (used by cloudprovider)"
             },
-            "type": "securestring",
-            "defaultValue": "n/a"
+            "type": "securestring"
         },
         "servicePrincipalClientSecret": {
             "metadata": {
                 "description": "The Service Principal Client Secret."
             },
-            "type": "securestring",
-            "defaultValue": "n/a"
+            "type": "securestring"
         },
         "postDeploymentGithubRepoPath": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/CatalystCode/fortis-containers",
             "metadata": {
                 "description": "The github repository which hosts the post deployment extension script."
             }
         },
         "postDeploymentExtensionScript": {
             "type": "string",
-            "defaultValue": "fortis-deploy.sh",
             "metadata": {
                 "description": "The extension script is the post deployment ."
             }
