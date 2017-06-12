@@ -136,6 +136,8 @@
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
         "eventHubNamespace": "fortiseventhubns",
         "eventHubName": "facts-eventhub",
+        "eventHubMessagingUnits": "1",
+        "eventHubSku": "2",
 	"useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
 	"useServicePrincipalDictionary": {
             "DCOS": 0,
@@ -175,17 +177,20 @@
             }
         },
         {
-            "apiVersion": "[variables('ehVersion')]",
+            "apiVersion": "2015-08-01",
             "name": "[variables('eventHubNamespace')]",
             "type": "Microsoft.EventHub/namespaces",
             "location": "[resourceGroup().location]",
-            "sku":{
-                "name":"Standard",
-                "tier":"Standard"
+            "properties": {
+                "MessagingSku": "[variables('eventHubSku')]",
+                "MessagingSKUPlan": {
+                    "MessagingUnits": "[variables('eventHubMessagingUnits')]",
+                    "SKU": "[variables('eventHubSku')]"
+                }
             },
             "resources": [
                 {
-                    "apiVersion": "[variables('ehVersion')]",
+                    "apiVersion": "2015-08-01",
                     "name": "[variables('eventHubName')]",
                     "location": "[resourceGroup().location]",
                     "type":"eventhubs",
@@ -196,57 +201,14 @@
                         "path": "[variables('eventHubName')]"
                     },
                     "resources": [{
-                        "apiVersion": "[variables('ehVersion')]",
+                        "apiVersion": "2015-08-01",
                         "name": "[variables('ehConsumerGroupName')]",
-                        "type": "ConsumerGroups",
+                        "location": "[resourceGroup().location]",
+                        "type": "consumergroups",
                         "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]"
+                            "[parameters('eventHubName')]"
                         ],
                         "properties": {}
-                    }, {
-                        "apiVersion": "[variables('ehVersion')]",
-                        "name": "[variables('managePolicy')]",
-                        "type": "authorizationRules",
-                        "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
-                        ],
-                        "properties": {
-                            "Rights": [
-                                "Send",
-                                "Listen",
-                                "Manage"
-                            ]
-                        }
-                    }, {
-                        "apiVersion": "[variables('ehVersion')]",
-                        "name": "[variables('sendPolicy')]",
-                        "type": "authorizationRules",
-                        "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('managePolicy'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
-                        ],
-                        "properties": {
-                            "Rights": [
-                                "Send"
-                            ]
-                        }
-                    }, {
-                        "apiVersion": "[variables('ehVersion')]",
-                        "name": "[variables('listenPolicy')]",
-                        "type": "authorizationRules",
-                        "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('managePolicy'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('sendPolicy'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
-                        ],
-                        "properties": {
-                            "Rights": [
-                                "Listen"
-                            ]
-                        }
                     }]
                 }]
         },
