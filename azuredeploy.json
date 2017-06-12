@@ -424,10 +424,6 @@
             "type": "string",
             "value": "[reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn]"
         },
-        "kubernetesMasterSsh": {
-            "type": "string",
-            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, ' -A -p 22')]"
-        },
         "agentFQDN": {
             "type": "string",
             "value": "[reference(concat('Microsoft.ContainerService/containerServices/', variables('kubernetesName'))).agentPoolProfiles[0].fqdn]"
