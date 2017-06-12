@@ -176,7 +176,7 @@
                     "domainNameLabel": "[parameters('siteName')]"
                 }
             }
-        },
+        }, 
 	{
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('vmStorageAccountName')]",
