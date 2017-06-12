@@ -206,7 +206,7 @@
                         "location": "[resourceGroup().location]",
                         "type": "consumergroups",
                         "dependsOn": [
-                            "[parameters('eventHubName')]"
+                            "[variables('eventHubName')]"
                         ],
                         "properties": {}
                     }]
