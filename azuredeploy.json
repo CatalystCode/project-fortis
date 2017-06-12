@@ -389,7 +389,6 @@
                         "name": "agentpools",
                         "count": "[parameters('acsAgentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
-			"osType": "[variables('agentOsType')]",
                         "dnsPrefix": "[concat(parameters('dnsNamePrefix'),'agents')]"
                     }
                 ],
