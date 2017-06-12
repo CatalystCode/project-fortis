@@ -105,7 +105,7 @@
         }
     },
     "variables": {
-        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'premstorage')]",
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
         "storageSku": "Premium_LRS",
 	"vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
@@ -125,7 +125,7 @@
 	"agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
-	"vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'standardstorage')]",
+	"vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
@@ -400,7 +400,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'))]"
+                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" -location \"', resourceGroup().location, '\" -spk \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -ai \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -gr \"', parameters('githubPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -sty \"', parameters('siteType'), '\" -spi \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'))]"
                 }
             }
         }
