@@ -165,17 +165,6 @@
             "kind": "Storage",
             "properties": {}
         },
-	{
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('vmStorageAccountName')]",
-            "apiVersion": "2016-01-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "[variables('vmStorageAccountType')]"
-            },
-            "kind": "Storage",
-            "properties": {}
-        },
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/publicIPAddresses",
@@ -278,7 +267,6 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-		"[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
                 "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
                 "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
