@@ -119,6 +119,7 @@
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
+	"vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
         "managePolicy": "ManagePolicy",
         "sendPolicy": "SendPolicy",
