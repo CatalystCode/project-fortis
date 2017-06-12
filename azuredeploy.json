@@ -74,7 +74,7 @@
             }
         },
         "sshPublicKey": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Configure all linux machines with the SSH RSA public key string.  Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
             }
@@ -105,8 +105,9 @@
         }
     },
     "variables": {
-        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'storage')]",
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'premstorage')]",
         "storageSku": "Premium_LRS",
+	"vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
         "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
@@ -118,13 +119,13 @@
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
-        "vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
         "managePolicy": "ManagePolicy",
         "sendPolicy": "SendPolicy",
 	"agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
+	"vmStorageAccountName": "deploystorageacctname",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
@@ -160,6 +161,17 @@
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "[variables('storageSku')]"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+	{
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('vmStorageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('vmStorageAccountType')]"
             },
             "kind": "Storage",
             "properties": {}
@@ -266,6 +278,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+		"[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
                 "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
                 "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
@@ -299,7 +312,7 @@
                     "osDisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
+                            "uri": "[concat('http://', variables('vmStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -315,7 +328,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
-                        "storageUri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net')]"
+                        "storageUri": "[concat('http://', variables('vmStorageAccountName'),'.blob.core.windows.net')]"
                     }
                 }
             }
@@ -387,7 +400,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" -location \"', resourceGroup().location, '\" -spk \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -ai \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -gr \"', parameters('githubPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -sty \"', parameters('siteType'), '\" -spi \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'))]"
+                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" -location \"', resourceGroup().location, '\" -pst \"', variables('storageAccountName'), '\" -spk \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -ai \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -gr \"', parameters('githubPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -sty \"', parameters('siteType'), '\" -spi \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'))]"
                 }
             }
         }
