@@ -389,8 +389,8 @@
                     }
                 },
                 "servicePrincipalProfile": {
-                    "ClientId": "[parameters('servicePrincipalAppId')]",
-                    "Secret": "[parameters('servicePrincipalAppKey')]"
+                    "servicePrincipalClientID": "[parameters('servicePrincipalAppId')]",
+                    "servicePrincipalClientSecret": "[parameters('servicePrincipalAppKey')]"
                 }
             }
         },
