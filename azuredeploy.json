@@ -125,7 +125,7 @@
 	"agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
-	"vmStorageAccountName": "deploystorageacctname",
+	"vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'standardstorage')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
