@@ -177,6 +177,17 @@
                 }
             }
         },
+	{
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('vmStorageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('vmStorageAccountType')]"
+            },
+            "kind": "Storage",
+            "properties": {}
+        }
         {
             "apiVersion": "2015-08-01",
             "name": "[variables('eventHubNamespace')]",
@@ -269,6 +280,7 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
                 "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
+		"[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
                 "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
             ],
             "properties": {
