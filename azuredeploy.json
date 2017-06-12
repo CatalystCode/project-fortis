@@ -5,7 +5,7 @@
         "siteName": {
             "type": "string",
             "metadata": {
-                "description": "The Site name for your Fortis pipeline. Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
+                "description": "The Site name for your Fortis pipeline."
             }
         },
         "acsMasterCount": {
@@ -74,18 +74,18 @@
             }
         },
         "sshPublicKey": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Configure all linux machines with the SSH RSA public key string.  Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
             }
         },
-        "servicePrincipalClientId": {
+        "servicePrincipalAppId": {
             "metadata": {
                 "description": "Client ID (used by cloudprovider)"
             },
             "type": "securestring"
         },
-        "servicePrincipalClientSecret": {
+        "servicePrincipalAppKey": {
             "metadata": {
                 "description": "The Service Principal Client Secret."
             },
@@ -105,8 +105,9 @@
         }
     },
     "variables": {
-        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'storage')]",
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
         "storageSku": "Premium_LRS",
+	"vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
         "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
@@ -118,12 +119,14 @@
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
-        "vmStorageAccountContainerName": "vhds",
+	"vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
         "managePolicy": "ManagePolicy",
         "sendPolicy": "SendPolicy",
+	"agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
+	"vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
@@ -134,7 +137,22 @@
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
         "eventHubNamespace": "fortiseventhubns",
-        "eventHubName": "facts-eventhub"
+        "eventHubName": "facts-eventhub",
+        "eventHubMessagingUnits": "1",
+        "eventHubSku": "2",
+	"useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
+	"useServicePrincipalDictionary": {
+            "DCOS": 0,
+            "Swarm": 0,
+            "Kubernetes": 1
+        },
+	"servicePrincipalFields": [
+            null,
+            {
+                "ClientId": "[parameters('servicePrincipalAppId')]",
+                "Secret": "[parameters('servicePrincipalAppKey')]"
+            }
+        ]
     },
     "resources": [
         {
@@ -159,19 +177,33 @@
                     "domainNameLabel": "[parameters('siteName')]"
                 }
             }
+        }, 
+	{
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('vmStorageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('vmStorageAccountType')]"
+            },
+            "kind": "Storage",
+            "properties": {}
         },
         {
-            "apiVersion": "[variables('ehVersion')]",
+            "apiVersion": "2015-08-01",
             "name": "[variables('eventHubNamespace')]",
             "type": "Microsoft.EventHub/namespaces",
             "location": "[resourceGroup().location]",
-            "sku":{
-                "name":"Standard",
-                "tier":"Standard"
+            "properties": {
+                "MessagingSku": "[variables('eventHubSku')]",
+                "MessagingSKUPlan": {
+                    "MessagingUnits": "[variables('eventHubMessagingUnits')]",
+                    "SKU": "[variables('eventHubSku')]"
+                }
             },
             "resources": [
                 {
-                    "apiVersion": "[variables('ehVersion')]",
+                    "apiVersion": "2015-08-01",
                     "name": "[variables('eventHubName')]",
                     "location": "[resourceGroup().location]",
                     "type":"eventhubs",
@@ -182,57 +214,14 @@
                         "path": "[variables('eventHubName')]"
                     },
                     "resources": [{
-                        "apiVersion": "[variables('ehVersion')]",
+                        "apiVersion": "2015-08-01",
                         "name": "[variables('ehConsumerGroupName')]",
-                        "type": "ConsumerGroups",
+                        "location": "[resourceGroup().location]",
+                        "type": "consumergroups",
                         "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]"
+                            "[variables('eventHubName')]"
                         ],
                         "properties": {}
-                    }, {
-                        "apiVersion": "[variables('ehVersion')]",
-                        "name": "[variables('managePolicy')]",
-                        "type": "authorizationRules",
-                        "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
-                        ],
-                        "properties": {
-                            "Rights": [
-                                "Send",
-                                "Listen",
-                                "Manage"
-                            ]
-                        }
-                    }, {
-                        "apiVersion": "[variables('ehVersion')]",
-                        "name": "[variables('sendPolicy')]",
-                        "type": "authorizationRules",
-                        "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('managePolicy'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
-                        ],
-                        "properties": {
-                            "Rights": [
-                                "Send"
-                            ]
-                        }
-                    }, {
-                        "apiVersion": "[variables('ehVersion')]",
-                        "name": "[variables('listenPolicy')]",
-                        "type": "authorizationRules",
-                        "dependsOn": [
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('managePolicy'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/authorizationRules/', variables('sendPolicy'))]",
-                            "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'),'/eventhubs/',variables('eventHubName'), '/consumerGroups/', variables('ehConsumerGroupName'))]"
-                        ],
-                        "properties": {
-                            "Rights": [
-                                "Listen"
-                            ]
-                        }
                     }]
                 }]
         },
@@ -292,6 +281,7 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
                 "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
+		"[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
                 "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
             ],
             "properties": {
@@ -323,7 +313,7 @@
                     "osDisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
+                            "uri": "[concat('http://', variables('vmStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -339,7 +329,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": "true",
-                        "storageUri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net')]"
+                        "storageUri": "[concat('http://', variables('vmStorageAccountName'),'.blob.core.windows.net')]"
                     }
                 }
             }
@@ -358,7 +348,7 @@
             }
         },
         {
-            "apiVersion": "2016-03-30",
+            "apiVersion": "2017-01-31",
             "type": "Microsoft.ContainerService/containerServices",
             "location": "[resourceGroup().location]",
             "name": "[variables('kubernetesName')]",
@@ -388,10 +378,7 @@
                         ]
                     }
                 },
-                "servicePrincipalProfile": {
-                    "ClientId": "[parameters('servicePrincipalAppId')]",
-                    "Secret": "[parameters('servicePrincipalAppKey')]"
-                }
+		"servicePrincipalProfile": "[variables('servicePrincipalFields')[variables('useServicePrincipal')]]"
             }
         },
         {
@@ -410,11 +397,11 @@
 				"autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "[concat(parameters('githubPath'),'/', parameters('postDeploymentExtensionScript'))]"
+                        "[concat(parameters('postDeploymentGithubRepoPath'),'/', parameters('postDeploymentExtensionScript'))]"
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" -location \"', [resourceGroup().location], '\" -spk \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -gr \"', parameters('githubPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -ai \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -sty \"', parameters('siteType'), '\" -spi \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'))]"
+                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" -location \"', resourceGroup().location, '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -gr \"', parameters('postDeploymentGithubRepoPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -kn \"', variables('kubernetesName'))]"
                 }
             }
         }
@@ -423,10 +410,6 @@
         "kubernetesMasterFQDN": {
             "type": "string",
             "value": "[reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn]"
-        },
-        "kubernetesMasterSsh": {
-            "type": "string",
-            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, ' -A -p 22']"
         },
         "agentFQDN": {
             "type": "string",
