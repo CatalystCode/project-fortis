@@ -43,6 +43,9 @@
         },
         "postDeploymentExtensionScript": {
             "value": "fortis-deploy.sh"
+        },
+        "githubClonePath": {
+            "value": "https://github.com/CatalystCode/fortisdeploy.git"
         }
     }
 }

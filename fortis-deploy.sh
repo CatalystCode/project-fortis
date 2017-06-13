@@ -20,6 +20,8 @@ Arguments
   --cassandra_node_count|-cn         [Required] : Port used for Front50, defaulted to 8080
   --app_insights_id|-aii             [Required] : Application Insights Instramentation Key
   --kubernetes_name|-kn              [Required] : Kubernetes ACS Cluster Name
+  --gh_clone_path|-gc                [Required] : Github path to clone
+  --location|-lo                     [Required] : Container cluster locatoin
 EOF
 }
 
@@ -94,6 +96,14 @@ do
       kubernetes_name="$1"
       shift
       ;;
+    --gh_clone_path|-gc)
+      gh_clone_path="$1"
+      shift
+      ;;
+    --location|-lo)
+      location="$1"
+      shift
+      ;;
     *)
       echo "ERROR: Unknown argument '$key' to script '$0'" 1>&2
       exit -1
@@ -127,6 +137,7 @@ fi
 az login --service-principal -u $app_id -p $app_key -t $tenant_id
 az account set --subscription $subscription_id
 
+echo "Setting up access to locally copy the kubernetes cluster"
 # Create keys to copy over kube config
 temp_user_name=$(uuidgen | sed 's/-//g')
 temp_key_path=$(mktemp -d)/temp_key
@@ -142,6 +153,7 @@ az vm user update -u "$temp_user_name" --ssh-key-value "$temp_pub_key" --ids "$m
 # Copy kube config over from master kubernetes cluster and mark readable
 sudo mkdir -p $(dirname "$kube_config_dest_file")
 sudo sh -c "ssh -o StrictHostKeyChecking=no -i \"$temp_key_path\" $temp_user_name@$master_fqdn sudo cat /home/$user_name/.kube/config > \"$kube_config_dest_file\""
+echo "Pulled down the kube config"
 
 # Remove temporary credentials on all our K8 master vms
 az vm user delete -u "$temp_user_name" --ids "$master_vm_ids"
@@ -158,15 +170,35 @@ fi
 sudo chmod +r "$kube_config_dest_file"
 
 # Install and setup Kubernetes cli for admin user
+echo "Installing Kubectl"
 if !(command -v $kubectl_file >/dev/null); then
   sudo curl -L -s -o $kubectl_file https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
   sudo chmod +x $kubectl_file
 fi
+echo "Installed"
 
+echo "Installing Helm"
 # Install and setup Helm for cluster chart setup
 if !(command -v helm >/dev/null); then
     curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
     chmod 700 get_helm.sh
     ./get_helm.sh
 fi
+echo "Installed"
 
+#Create the K8 vhds storage container
+echo "creating vhds container"
+az storage container create --name vhds --account-key=$storage_account_key --account-name=$storage_account_name
+
+sudo apt-get install git
+
+git clone $gh_clone_path
+
+cd *deploy*/ops/
+
+export k8location=$location
+export k8cassandra_node_count=$cassandra_node_count
+export k8spark_worker_count=$spark_worker_count
+export k8resource_group=$resource_group
+
+./create-cluster.sh

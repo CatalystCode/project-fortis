@@ -102,12 +102,18 @@
             "metadata": {
                 "description": "The extension script is the post deployment ."
             }
+        },
+        "githubClonePath": {
+            "type": "string",
+            "metadata": {
+                "description": "The github clone url."
+            }
         }
     },
     "variables": {
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
         "storageSku": "Premium_LRS",
-	"vmStorageAccountType": "Standard_LRS",
+	    "vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
         "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
@@ -119,14 +125,14 @@
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
-	"vmStorageAccountContainerName": "vhds",
+	    "vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
         "managePolicy": "ManagePolicy",
         "sendPolicy": "SendPolicy",
-	"agentOsType": "Linux",
+	    "agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
-	"vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
+	    "vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
@@ -140,13 +146,13 @@
         "eventHubName": "facts-eventhub",
         "eventHubMessagingUnits": "1",
         "eventHubSku": "2",
-	"useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
-	"useServicePrincipalDictionary": {
+	    "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
+	    "useServicePrincipalDictionary": {
             "DCOS": 0,
             "Swarm": 0,
             "Kubernetes": 1
         },
-	"servicePrincipalFields": [
+	    "servicePrincipalFields": [
             null,
             {
                 "ClientId": "[parameters('servicePrincipalAppId')]",
@@ -401,7 +407,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" -location \"', resourceGroup().location, '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -gr \"', parameters('postDeploymentGithubRepoPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -kn \"', variables('kubernetesName'))]"
+                    "commandToExecute": "[concat('./', parameters('postDeploymentExtensionScript'), '\" --location \"', resourceGroup().location, '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey, '\" -gr \"', parameters('postDeploymentGithubRepoPath') , '\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -jf \"', reference(variables('publicIPAddressName')).dnsSettings.fqdn, '\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -kn \"', variables('kubernetesName'), '\" -gc \"', parameters('githubClonePath'))]"
                 }
             }
         }
