@@ -186,6 +186,8 @@ if !(command -v helm >/dev/null); then
 fi
 echo "Installed"
 
+helm init
+
 #Create the K8 vhds storage container
 echo "creating vhds container"
 az storage container create --name vhds --account-key=$storage_account_key --account-name=$storage_account_name
