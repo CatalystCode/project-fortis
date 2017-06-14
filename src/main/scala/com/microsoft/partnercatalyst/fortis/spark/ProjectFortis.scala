@@ -24,7 +24,9 @@ object ProjectFortis extends App {
     TadawebPipeline
   )
 
-  private implicit object Environment extends Environment {
+  // TODO: create helper method to augment Settings object with data from Cassandra
+  // TODO: move most of these settings to Cassandra
+  private implicit object Settings extends Settings {
     import scala.util.Properties.envOrNone
 
     val progressDir: String = envOrFail(Constants.Env.HighlyAvailableProgressDir)
@@ -46,7 +48,7 @@ object ProjectFortis extends App {
   }
 
   // TODO: logging configuration should be done in log4j config file
-  AppInsights.init(Environment.appInsightsKey)
+  AppInsights.init(Settings.appInsightsKey)
 
   Logger.getLogger("org").setLevel(Level.ERROR)
   Logger.getLogger("akka").setLevel(Level.ERROR)
@@ -56,13 +58,13 @@ object ProjectFortis extends App {
 
   private implicit object TransformContext extends TransformContext {
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
-    val placeRecognizer = new PlaceRecognizer(Environment.modelsDir)
-    val featureServiceClient = new FeatureServiceClient(Environment.featureServiceHost)
+    val placeRecognizer = new PlaceRecognizer(Settings.modelsDir)
+    val featureServiceClient = new FeatureServiceClient(Settings.featureServiceHost)
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
     val keywordExtractor = new KeywordExtractor(List("Ariana"))
-    val imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(Environment.oxfordVisionToken), featureServiceClient)
-    val languageDetector = new LanguageDetector(LanguageDetectorAuth(Environment.oxfordLanguageToken))
-    val sentimentDetector = new SentimentDetector(SentimentDetectorAuth(Environment.oxfordLanguageToken))
+    val imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(Settings.oxfordVisionToken), featureServiceClient)
+    val languageDetector = new LanguageDetector(LanguageDetectorAuth(Settings.oxfordLanguageToken))
+    val sentimentDetector = new SentimentDetector(SentimentDetectorAuth(Settings.oxfordLanguageToken))
     val supportedLanguages = Set("en", "fr", "de")
   }
 
@@ -93,7 +95,7 @@ object ProjectFortis extends App {
   }
 
   // Main starts here
-  val ssc = StreamingContext.getOrCreate(Environment.progressDir, createStreamingContext)
+  val ssc = StreamingContext.getOrCreate(Settings.progressDir, createStreamingContext)
 
   ssc.start()
   ssc.awaitTermination()

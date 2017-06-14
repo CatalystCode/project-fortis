@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-trait Environment {
+trait Settings {
   val progressDir: String
   val featureServiceHost: String
   val oxfordLanguageToken: String

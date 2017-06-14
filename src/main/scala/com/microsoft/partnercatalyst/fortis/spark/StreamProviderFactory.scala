@@ -7,7 +7,7 @@ import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
 
 object StreamProviderFactory {
-  def create()(implicit environment: Environment): StreamProvider = {
+  def create()(implicit settings: Settings): StreamProvider = {
     import EventHubStreamFactory.utf8ToString
     val streamProvider = StreamProvider()
       .withFactories(
@@ -34,7 +34,7 @@ object StreamProviderFactory {
       .withFactories(
         List(
           new EventHubStreamFactory("Tadaweb", TadawebAdapter.apply,
-            new File(environment.progressDir, Constants.EventHubProgressDir).getPath)
+            new File(settings.progressDir, Constants.EventHubProgressDir).getPath)
         )
       )
 
