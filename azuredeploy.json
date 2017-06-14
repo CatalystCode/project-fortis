@@ -90,12 +90,6 @@
                 "description": "The Service Principal Client Secret."
             },
             "type": "securestring"
-        },
-        "githubClonePath": {
-            "type": "string",
-            "metadata": {
-                "description": "The github clone url."
-            }
         }
     },
     "variables": {
