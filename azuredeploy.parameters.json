@@ -37,15 +37,6 @@
         },
         "servicePrincipalClientSecret": {
             "value": "GEN-UNIQUE"
-        },
-        "postDeploymentGithubRepoPath": {
-            "value": "https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master"
-        },
-        "postDeploymentExtensionScript": {
-            "value": "fortis-deploy.sh"
-        },
-        "githubClonePath": {
-            "value": "https://github.com/CatalystCode/fortisdeploy.git"
         }
     }
 }

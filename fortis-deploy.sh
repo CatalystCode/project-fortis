@@ -15,13 +15,13 @@ Arguments
   --master_fqdn|-mf                  [Required] : Master FQDN of your Kubernetes cluster
   --storage_account_name|-san        [Required] : Premium Storage Account name used for Kubernetes's persistent storage
   --storage_account_key|-sak         [Required] : Storage Account key used for Kubernetes persistent storage
-  --github_repository|-gr            [Required] : Github Repository to target for the deployment pipeline
   --spark_worker_count|-sw           [Required] : Spark Worker Node Count
   --cassandra_node_count|-cn         [Required] : Port used for Front50, defaulted to 8080
   --app_insights_id|-aii             [Required] : Application Insights Instramentation Key
   --kubernetes_name|-kn              [Required] : Kubernetes ACS Cluster Name
   --gh_clone_path|-gc                [Required] : Github path to clone
-  --location|-lo                     [Required] : Container cluster locatoin
+  --location|-lo                     [Required] : Container cluster location
+  --site_type|-sty                   [Required] : Fortis Site Type
 EOF
 }
 
@@ -68,16 +68,16 @@ do
       master_fqdn="$1"
       shift
       ;;
+    --site_type|-sty)
+      site_type="$1"
+      shift
+      ;;
     --storage_account_name|-san)
       storage_account_name="$1"
       shift
       ;;
     --storage_account_key|-sak)
       storage_account_key="$1"
-      shift
-      ;;
-    --github_repository|-gr)
-      github_repository="$1"
       shift
       ;;
     --spark_worker_count|-sw)
@@ -119,9 +119,10 @@ throw_if_empty --resource_group $resource_group
 throw_if_empty --master_fqdn $master_fqdn
 throw_if_empty --storage_account_name $storage_account_name
 throw_if_empty --storage_account_key $storage_account_key
-throw_if_empty --github_repository $github_repository
+throw_if_empty --gh_clone_path $gh_clone_path
 throw_if_empty --spark_worker_count $spark_worker_count
 throw_if_empty --cassandra_node_count $cassandra_node_count
+throw_if_empty --site_type $site_type
 
 kube_config_dest_file="/home/$user_name/.kube/config"
 kubectl_file="/usr/local/bin/kubectl"
@@ -186,11 +187,11 @@ if !(command -v helm >/dev/null); then
 fi
 echo "Installed"
 
-helm init
+sudo helm init
 
 #Create the K8 vhds storage container
 echo "creating vhds container"
-az storage container create --name vhds --account-key=$storage_account_key --account-name=$storage_account_name
+sudo az storage container create --name vhds --account-key=$storage_account_key --account-name=$storage_account_name
 
 sudo apt-get install git
 
@@ -203,4 +204,5 @@ export k8cassandra_node_count=$cassandra_node_count
 export k8spark_worker_count=$spark_worker_count
 export k8resource_group=$resource_group
 
-./create-cluster.sh
+chmod 752 create-cluster.sh
+sudo ./create-cluster.sh
