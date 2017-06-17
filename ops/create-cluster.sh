@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 chmod 752 *.sh
 
 sudo ./create-disk.sh

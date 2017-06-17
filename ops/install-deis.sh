@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo "creating deis storage account $k8location"
 DEIS_STORAGE_ACCOUNT_NAME=k8deisstorage
 
