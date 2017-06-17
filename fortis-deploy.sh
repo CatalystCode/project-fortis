@@ -181,9 +181,9 @@ echo "Installed"
 echo "Installing Helm"
 # Install and setup Helm for cluster chart setup
 if !(command -v helm >/dev/null); then
-    curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
-    chmod 700 get_helm.sh
-    ./get_helm.sh
+  curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+  chmod 700 get_helm.sh
+  ./get_helm.sh
 fi
 echo "Installed"
 
