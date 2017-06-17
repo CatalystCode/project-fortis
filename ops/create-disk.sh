@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 k8location="$1"
+storage_account_name="$2"
 
 echo "creating persistent volume storage class"
 cp disks/azure-disk.yaml.tmpl ./azure-disk.yaml

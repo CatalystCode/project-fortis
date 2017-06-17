@@ -205,4 +205,4 @@ k8spark_worker_count="${spark_worker_count}"
 k8resource_group="${resource_group}"
 
 chmod 752 create-cluster.sh
-sudo ./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}"
+sudo ./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}"
