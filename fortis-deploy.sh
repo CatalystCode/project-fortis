@@ -127,7 +127,7 @@ throw_if_empty --site_type ${site_type}
 kube_config_dest_file="/home/${user_name}/.kube/config"
 kubectl_file="/usr/local/bin/kubectl"
 
-if !(command -v az >/dev/null); then
+if ! (command -v az >/dev/null); then
   sudo apt-get update && sudo apt-get install -y libssl-dev libffi-dev python-dev
   echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/azure-cli/ wheezy main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
   sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
@@ -172,7 +172,7 @@ sudo chmod +r "${kube_config_dest_file}"
 
 # Install and setup Kubernetes cli for admin user
 echo "Installing Kubectl"
-if !(command -v ${kubectl_file} >/dev/null); then
+if ! (command -v ${kubectl_file} >/dev/null); then
   sudo curl -L -s -o ${kubectl_file} https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
   sudo chmod +x ${kubectl_file}
 fi
@@ -180,7 +180,7 @@ echo "Installed"
 
 echo "Installing Helm"
 # Install and setup Helm for cluster chart setup
-if !(command -v helm >/dev/null); then
+if ! (command -v helm >/dev/null); then
   curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
   chmod 700 get_helm.sh
   ./get_helm.sh
