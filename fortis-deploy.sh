@@ -193,7 +193,7 @@ sudo helm init
 echo "creating vhds container"
 sudo az storage container create --name vhds --account-key="${storage_account_key}" --account-name="${storage_account_name}"
 
-sudo apt-get install git
+sudo apt-get install -y git
 
 git clone "${gh_clone_path}"
 
