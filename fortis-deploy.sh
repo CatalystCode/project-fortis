@@ -199,10 +199,10 @@ git clone "${gh_clone_path}"
 
 cd -- *deploy*/ops/ || exit -2
 
-export k8location="${location}"
-export k8cassandra_node_count="${cassandra_node_count}"
-export k8spark_worker_count="${spark_worker_count}"
-export k8resource_group="${resource_group}"
+k8location="${location}"
+k8cassandra_node_count="${cassandra_node_count}"
+k8spark_worker_count="${spark_worker_count}"
+k8resource_group="${resource_group}"
 
 chmod 752 create-cluster.sh
-sudo ./create-cluster.sh
+sudo ./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}"

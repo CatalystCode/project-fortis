@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+k8location="$1"
+
 echo "creating persistent volume storage class"
 cp disks/azure-disk.yaml.tmpl ./azure-disk.yaml
 chmod 752 azure-disk.yaml
