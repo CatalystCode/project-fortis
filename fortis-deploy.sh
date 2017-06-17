@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function print_usage() {
+print_usage() {
   cat <<EOF
 https://github.com/CatalystCode/fortisdeploy/fortis-deploy.sh
 Command
@@ -25,7 +25,7 @@ Arguments
 EOF
 }
 
-function throw_if_empty() {
+throw_if_empty() {
   local name="$1"
   local value="$2"
   if [ -z "${value}" ]; then
