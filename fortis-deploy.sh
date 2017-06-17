@@ -197,7 +197,7 @@ sudo apt-get install git
 
 git clone ${gh_clone_path}
 
-cd -- *deploy*/ops/
+cd -- *deploy*/ops/ || exit -2
 
 export k8location=${location}
 export k8cassandra_node_count=${cassandra_node_count}
