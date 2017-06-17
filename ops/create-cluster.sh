@@ -15,6 +15,6 @@ git clone https://github.com/CatalystCode/charts.git
 
 sudo ./install-cassandra.sh "${k8cassandra_node_count}"
 sudo ./install-spark.sh "${k8spark_worker_count}"
-sudo ./install-postgis
+#./install-postgis
 #./install-elasticsearch
 #./install-kibana
