@@ -35,7 +35,7 @@ function throw_if_empty() {
   fi
 }
 
-while [[ $# > 0 ]]
+while [[ $# -gt 0 ]]
 do
   key="$1"
   shift
