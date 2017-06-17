@@ -89,11 +89,11 @@ do
       shift
       ;;
     --app_insights_id|-aii)
-      app_insights_id="$1"
+      app_insights_id="$1"  # shellcheck disable=SC2034
       shift
       ;;
     --kubernetes_name|-kn)
-      kubernetes_name="$1"
+      kubernetes_name="$1"  # shellcheck disable=SC2034
       shift
       ;;
     --gh_clone_path|-gc)
