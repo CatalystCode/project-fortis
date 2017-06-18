@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-sudo chmod 752 *.sh
-=======
 #!/usr/bin/env bash
->>>>>>> 6f3431bd439527d34af838f7aeefbea57bedfeda
 
 k8location="$1"
 k8cassandra_node_count="$2"
