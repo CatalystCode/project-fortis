@@ -179,7 +179,7 @@ fi
 echo "Installed"
 
 echo "Installing Helm"
-export HELM_HOME="/home/${user_name}/"
+
 export KUBECONFIG=${kube_config_dest_file}
 
 id
@@ -191,6 +191,7 @@ if ! (command -v helm >/dev/null); then
 fi
 echo "Installed"
 
+export HELM_HOME="/home/${user_name}/"
 sudo helm init
 
 #Create the K8 vhds storage container
