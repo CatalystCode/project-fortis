@@ -182,6 +182,8 @@ echo "Installing Helm"
 
 export KUBECONFIG=${kube_config_dest_file}
 
+kubectl cluster-info
+
 id
 # Install and setup Helm for cluster chart setup
 if ! (command -v helm >/dev/null); then
@@ -194,10 +196,13 @@ echo "Installed"
 export HELM_HOME="/home/${user_name}/"
 helm init
 
+sleep 30
+
 #Create the K8 vhds storage container
 echo "creating vhds container"
 sudo az storage container create --name vhds --account-key="${storage_account_key}" --account-name="${storage_account_name}"
 
+sleep 10
 sudo apt-get install -y git
 
 git clone "${gh_clone_path}"

@@ -9,6 +9,8 @@ storage_account_name="$5"
 chmod 752 -- *.sh
 
 ./create-disk.sh "${k8location}" "${storage_account_name}"
+sleep 10
+
 ./install-deis.sh "${k8location}" "${k8resource_group}"
 
 git clone https://github.com/CatalystCode/charts.git
