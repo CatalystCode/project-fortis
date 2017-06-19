@@ -179,7 +179,7 @@ fi
 echo "Installed"
 
 echo "Installing Helm"
-export HELM_HOME="/home/${user_name}/"
+
 export KUBECONFIG=${kube_config_dest_file}
 
 id
@@ -191,7 +191,8 @@ if ! (command -v helm >/dev/null); then
 fi
 echo "Installed"
 
-sudo helm init
+export HELM_HOME="/home/${user_name}/"
+helm init
 
 #Create the K8 vhds storage container
 echo "creating vhds container"
@@ -209,4 +210,4 @@ k8spark_worker_count="${spark_worker_count}"
 k8resource_group="${resource_group}"
 
 chmod 752 create-cluster.sh
-sudo ./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}"
+./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}"

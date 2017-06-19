@@ -8,13 +8,13 @@ storage_account_name="$5"
 
 chmod 752 -- *.sh
 
-sudo ./create-disk.sh "${k8location}" "${storage_account_name}"
-sudo ./install-deis.sh "${k8location}" "${k8resource_group}"
+./create-disk.sh "${k8location}" "${storage_account_name}"
+./install-deis.sh "${k8location}" "${k8resource_group}"
 
 git clone https://github.com/CatalystCode/charts.git
 
-sudo ./install-cassandra.sh "${k8cassandra_node_count}"
-sudo ./install-spark.sh "${k8spark_worker_count}"
+./install-cassandra.sh "${k8cassandra_node_count}"
+./install-spark.sh "${k8spark_worker_count}"
 #./install-postgis
 #./install-elasticsearch
 #./install-kibana
