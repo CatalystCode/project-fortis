@@ -179,6 +179,10 @@ fi
 echo "Installed"
 
 echo "Installing Helm"
+export HELM_HOME="/home/${user_name}/"
+export KUBECONFIG=${kube_config_dest_file}
+
+id
 # Install and setup Helm for cluster chart setup
 if ! (command -v helm >/dev/null); then
   curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
