@@ -27,6 +27,8 @@ object OpeNER {
 
   def entityIsPlace(entity: Entity): Boolean = entityIs(entity, Set("location", "gpe"))
 
+  def entityIsPerson(entity: Entity): Boolean = entityIs(entity, Set("person", "organization"))
+
   private def entityIs(entity: Entity, types: Set[String]): Boolean = {
     val entityType = Option(entity.getType).getOrElse("").toLowerCase
     types.contains(entityType)
