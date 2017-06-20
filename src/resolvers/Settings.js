@@ -3,10 +3,9 @@
 let Promise = require('promise');
 let azureTableService = require('../storageClients/AzureTableStorageManager');
 let postgresMessageService = require('../postgresClients/PostgresLocationManager');
-const DEFAULT_LANGUAGE = 'en';
 
 module.exports = {
-    sites(args, res){
+    sites(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
@@ -23,7 +22,7 @@ module.exports = {
                     });
         });
     },
-    createOrReplaceSite(args, res){
+    createOrReplaceSite(args, res){ // eslint-disable-line no-unused-vars
         const siteDefintion = args.input;
 
         return new Promise((resolve, reject) => {
@@ -38,7 +37,7 @@ module.exports = {
                     });
         });
     },
-    modifyFacebookPages(args, res){
+    modifyFacebookPages(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const inputDefinition = args.input;
         const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
@@ -57,7 +56,7 @@ module.exports = {
                     });
         });
     },
-    modifyTrustedTwitterAccounts(args, res){
+    modifyTrustedTwitterAccounts(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const inputDefinition = args.input;
         console.log(inputDefinition);
@@ -80,7 +79,7 @@ module.exports = {
                     });
         });
     },
-    removeFacebookPages(args, res){
+    removeFacebookPages(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const inputDefinition = args.input;
         const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
@@ -99,7 +98,7 @@ module.exports = {
                     });
         });
     },
-    removeTrustedTwitterAccounts(args, res){
+    removeTrustedTwitterAccounts(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const inputDefinition = args.input;
         const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
@@ -118,7 +117,7 @@ module.exports = {
                     });
         });
     },
-    modifyTwitterAccounts(args, res){
+    modifyTwitterAccounts(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const twitterAccountDefintions = args.input;
         const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {'_': twitterAccountDefintions.site}, RowKey: {'_': account.accountName}}));
@@ -137,7 +136,7 @@ module.exports = {
                     });
         });
     },
-    removeTwitterAccounts(args, res){
+    removeTwitterAccounts(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const twitterAccountDefintions = args.input;
         const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {'_': twitterAccountDefintions.site}, RowKey: {'_': account.accountName}}));
@@ -156,7 +155,7 @@ module.exports = {
                     });
         });
     },
-    twitterAccounts(args, res){
+    twitterAccounts(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
@@ -173,7 +172,7 @@ module.exports = {
                     });
         });
     },
-    trustedTwitterAccounts(args, res){
+    trustedTwitterAccounts(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
@@ -190,7 +189,7 @@ module.exports = {
                     });
         });
     },
-    facebookPages(args, res){
+    facebookPages(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
@@ -207,7 +206,7 @@ module.exports = {
                     });
         });
     },
-    facebookAnalytics(args, res) {
+    facebookAnalytics(args, res) { // eslint-disable-line no-unused-vars
         const days = args.days;
         const site = args.siteId;
         return new Promise((resolve, reject) => {
@@ -223,7 +222,7 @@ module.exports = {
                     });
         });
     },
-    termBlacklist(args, res){
+    termBlacklist(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
@@ -240,7 +239,7 @@ module.exports = {
                     });
         });
     },
-    modifyBlacklist(args, res){
+    modifyBlacklist(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const blacklistTermDefinitions = args.input;
         const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, {PartitionKey: {'_': blacklistTermDefinitions.site}, RowKey: {'_': item.RowKey}, filteredTerms: JSON.stringify(item.filteredTerms), lang: item.lang}));
@@ -258,7 +257,7 @@ module.exports = {
                     });
         });
     },
-    removeBlacklist(args, res){
+    removeBlacklist(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const blacklistTermDefinitions = args.input;
         const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, item, {PartitionKey: {'_': blacklistTermDefinitions.site}, RowKey: {'_': item.RowKey}}));

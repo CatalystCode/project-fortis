@@ -12,7 +12,7 @@ const ASYNC_QUEUE_LIMIT = 50;
 function getAzureQueueService(){
     let queueSvc = azure.createQueueService();
     queueSvc.messageEncoder = new TextBase64QueueMessageEncoder();
-    queueSvc.createQueueIfNotExists(PRE_NLP_QUEUE, (error, result, response) => {
+    queueSvc.createQueueIfNotExists(PRE_NLP_QUEUE, (error, result, response) => { // eslint-disable-line no-unused-vars
         if (error) {
             RaiseException(`Unable to create new azure queue ${PRE_NLP_QUEUE}`);
         }
@@ -27,7 +27,7 @@ function RaiseException(errorMsg) {
 
 function pushMessageToStorageQueue(message, queueSvc, callback){
     try {
-        queueSvc.createMessage(PRE_NLP_QUEUE, JSON.stringify(message), (error, result, response) => {
+        queueSvc.createMessage(PRE_NLP_QUEUE, JSON.stringify(message), (error, result, response) => { // eslint-disable-line no-unused-vars
             if (error) {
                 const errMsg = `Azure Queue push error occured error [${error}]`;
                 RaiseException(errMsg);
@@ -44,7 +44,7 @@ function pushMessageToStorageQueue(message, queueSvc, callback){
 }
 
 function processMessage(item, queueSvc, asyncCB){
-    let eventDate, geoJson;
+    let eventDate;
 
     try{
         eventDate = moment(item.created_at, DATE_FORMAT, 'en').toISOString();

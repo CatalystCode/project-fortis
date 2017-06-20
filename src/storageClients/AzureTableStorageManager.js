@@ -1,6 +1,5 @@
 'use strict';
 
-let request = require('request');
 let azureStorage = require('azure-storage');
 const AZURE_TBL_KEYWORD = 'searchTerms';
 const AZURE_TBL_SITES = 'fortisSites';
@@ -41,9 +40,9 @@ function GetKeywordsFromAzureTbl(siteKey, tableService, callback){
     const queryString = 'PartitionKey eq ?';
     const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-    tableService.createTableIfNotExists(AZURE_TBL_KEYWORD, (error, result, response) => {
+    tableService.createTableIfNotExists(AZURE_TBL_KEYWORD, (error, result, response) => { // eslint-disable-line no-unused-vars
         if(!error){
-            tableService.queryEntities(AZURE_TBL_KEYWORD, query, null, (error, result, response) => {
+            tableService.queryEntities(AZURE_TBL_KEYWORD, query, null, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(!error){
                     callback(undefined, result.entries ? result.entries.map(term => {
                         let keyword = {'type': 'Term', 'name': term.name._, 'RowKey': term.RowKey._};
@@ -56,7 +55,7 @@ function GetKeywordsFromAzureTbl(siteKey, tableService, callback){
                         return keyword;
                     }) : []);
                 }else{
-                    callback(`There was an error querying table [${AZURE_TBL_SITES}] siteId[${siteId}]`);
+                    callback(`There was an error querying table [${AZURE_TBL_SITES}] siteId[${siteKey}]`);
                 }
             });
         }else{
@@ -69,13 +68,13 @@ function GetFbPagesFromAzureTbl(siteKey, tableService, callback){
     const queryString = 'PartitionKey eq ?';
     const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-    tableService.createTableIfNotExists(AZURE_TBL_FB_PAGES, (error, result, response) => {
+    tableService.createTableIfNotExists(AZURE_TBL_FB_PAGES, (error, result, response) => { // eslint-disable-line no-unused-vars
         if(!error){
-            tableService.queryEntities(AZURE_TBL_FB_PAGES, query, null, (error, result, response) => {
+            tableService.queryEntities(AZURE_TBL_FB_PAGES, query, null, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(!error){
                     callback(undefined, result.entries ? result.entries.map(page => Object.assign({}, {'pageUrl': page.pageUrl._, 'RowKey': page.RowKey._})) : []);
                 }else{
-                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
+                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteKey}]`);
                 }
             });
         }else{
@@ -88,9 +87,9 @@ function GetBlacklistFromAzureTbl(siteKey, tableService, callback){
     const queryString = 'PartitionKey eq ?';
     const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-    tableService.createTableIfNotExists(AZURE_TBL_BLACKLIST, (error, result, response) => {
+    tableService.createTableIfNotExists(AZURE_TBL_BLACKLIST, (error, result, response) => { // eslint-disable-line no-unused-vars
         if(!error){
-            tableService.queryEntities(AZURE_TBL_BLACKLIST, query, null, (error, result, response) => {
+            tableService.queryEntities(AZURE_TBL_BLACKLIST, query, null, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(!error){
                     callback(undefined, result.entries ? result.entries.map(filter => {
                         const filteredTerm = Object.assign({}, {
@@ -102,7 +101,7 @@ function GetBlacklistFromAzureTbl(siteKey, tableService, callback){
                         return filteredTerm;
                     }) : []);
                 }else{
-                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
+                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteKey}]`);
                 }
             });
         }else{
@@ -115,9 +114,9 @@ function GetTwitterAccountsFromAzureTbl(siteKey, tableService, callback){
     const queryString = 'PartitionKey eq ?';
     const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-    tableService.createTableIfNotExists(AZURE_TBL_TWITTER_ACCOUNTS, (error, result, response) => {
+    tableService.createTableIfNotExists(AZURE_TBL_TWITTER_ACCOUNTS, (error, result, response) => { // eslint-disable-line no-unused-vars
         if(!error){
-            tableService.queryEntities(AZURE_TBL_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
+            tableService.queryEntities(AZURE_TBL_TWITTER_ACCOUNTS, query, null, (error, result2, response) => { // eslint-disable-line no-unused-vars
                 if(!error){
                     callback(undefined, result2.entries ? result2.entries.map(acct => {
                         let account = {'consumerSecret': acct.consumerSecret ? acct.consumerSecret._ : '',
@@ -130,7 +129,7 @@ function GetTwitterAccountsFromAzureTbl(siteKey, tableService, callback){
                         return account;
                     }) : []);
                 }else{
-                    callback(`There was an error querying table [${AZURE_TBL_TWITTER_ACCOUNTS}] siteId[${siteId}]`);
+                    callback(`There was an error querying table [${AZURE_TBL_TWITTER_ACCOUNTS}] siteId[${siteKey}]`);
                 }
             });
         }else{
@@ -143,13 +142,13 @@ function GetTrustedTwitterAccountsFromAzureTbl(siteKey, tableService, callback){
     const queryString = 'PartitionKey eq ?';
     const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-    tableService.createTableIfNotExists(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, (error, result, response) => {
+    tableService.createTableIfNotExists(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, (error, result, response) => { // eslint-disable-line no-unused-vars
         if(!error){
-            tableService.queryEntities(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
+            tableService.queryEntities(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, query, null, (error, result2, response) => { // eslint-disable-line no-unused-vars
                 if(!error){
                     callback(undefined, result2.entries ? result2.entries.map(account => Object.assign({}, {'acctUrl': account.acctUrl._, 'RowKey': account.RowKey._})) : []);
                 }else{
-                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
+                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteKey}]`);
                 }
             });
         }else{
@@ -162,9 +161,9 @@ function FetchSiteDefinitions(siteId, tableService, callback){
     const queryString = `PartitionKey eq ?${siteId ? ' and RowKey eq ?' : ''}`;
     const query = new azureStorage.TableQuery().where(queryString, AZURE_TBL_SITES_PARTITION_KEY, siteId);
 
-    tableService.createTableIfNotExists(AZURE_TBL_SITES, (error, result, response) => {
+    tableService.createTableIfNotExists(AZURE_TBL_SITES, (error, result, response) => { // eslint-disable-line no-unused-vars
         if(!error){
-            tableService.queryEntities(AZURE_TBL_SITES, query, null, (error, result, response) => {
+            tableService.queryEntities(AZURE_TBL_SITES, query, null, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(!error){
                     const siteEntities = result.entries.map(site => {
                         return {
@@ -210,9 +209,9 @@ module.exports = {
             RowKey: siteDefintion.name
         });
 
-        tableService.createTableIfNotExists(AZURE_TBL_SITES, (error, result, response) => {
+        tableService.createTableIfNotExists(AZURE_TBL_SITES, (error, result, response) => { // eslint-disable-line no-unused-vars
             if(!error){
-                tableService.insertOrReplaceEntity(AZURE_TBL_SITES, tableEnity, (error2, result, response) => {
+                tableService.insertOrReplaceEntity(AZURE_TBL_SITES, tableEnity, (error2, result, response) => { // eslint-disable-line no-unused-vars
                     if(!error2){
                         FetchSiteDefinitions(siteDefintion.name, tableService, callback);
                     }else{
@@ -246,7 +245,7 @@ module.exports = {
         while(offset < terms.length){
             const batch = GetAzureTblBatchAction(offset, siteKey, terms, action);
             batchedOperationSize += batch.size();
-            tableService.executeBatch(AZURE_TBL_KEYWORD, batch, (error, result, response) => {
+            tableService.executeBatch(AZURE_TBL_KEYWORD, batch, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(error) {
                     callback('Error occured while trying to remove entities from azure table.', undefined);
 
@@ -265,7 +264,7 @@ module.exports = {
         while(offset < terms.length){
             const batch = GetAzureTblBatchAction(offset, siteKey, terms, action);
             batchedOperationSize += batch.size();
-            tableService.executeBatch(AZURE_TBL_BLACKLIST, batch, (error, result, response) => {
+            tableService.executeBatch(AZURE_TBL_BLACKLIST, batch, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(error) {
                     callback('Error occured while trying to remove entities from azure table.', undefined);
 
@@ -285,7 +284,7 @@ module.exports = {
         while(offset < twitterAccounts.length){
             const batch = GetAzureTblBatchAction(offset, siteId, twitterAccounts, action);
             batchedOperationSize += batch.size();
-            tableService.executeBatch(AZURE_TBL_TWITTER_ACCOUNTS, batch, (error, result, response) => {
+            tableService.executeBatch(AZURE_TBL_TWITTER_ACCOUNTS, batch, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(error) {
                     callback('Error occured while trying to remove entities from azure table.', undefined);
 
@@ -305,7 +304,7 @@ module.exports = {
         while(offset < trustedTwitterAccounts.length){
             const batch = GetAzureTblBatchAction(offset, siteId, trustedTwitterAccounts, action);
             batchedOperationSize += batch.size();
-            tableService.executeBatch(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, batch, (error, result, response) => {
+            tableService.executeBatch(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, batch, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(error) {
                     callback('Error occured while trying to remove entities from azure table.', undefined);
 
@@ -325,7 +324,7 @@ module.exports = {
         while(offset < fbPages.length){
             const batch = GetAzureTblBatchAction(offset, siteId, fbPages, action);
             batchedOperationSize += batch.size();
-            tableService.executeBatch(AZURE_TBL_FB_PAGES, batch, (error, result, response) => {
+            tableService.executeBatch(AZURE_TBL_FB_PAGES, batch, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if(error) {
                     callback('Error occured while trying to modify entities from azure table.', undefined);
 

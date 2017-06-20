@@ -4,14 +4,12 @@ let Promise = require('promise');
 let azureQueueManager = require('../storageClients/AzureQueueManager');
 let postgresMessageService = require('../postgresClients/PostgresLocationManager');
 let translatorService = require('../translatorClient/MsftTranslator');
-let geotile = require('geotile');
 
 const DEFAULT_LIMIT = 20;
 const DEFAULT_LANGUAGE = 'en';
 
 module.exports = {
-    byBbox(args, res){
-        let response = res.res;
+    byBbox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode;
@@ -37,8 +35,7 @@ module.exports = {
                         });
         });
     },
-    byLocation(args, res){
-        let response = res.res;
+    byLocation(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode;
@@ -69,8 +66,7 @@ module.exports = {
                         });
         });
     },
-    byEdges(args, res){
-        let response = res.res;
+    byEdges(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode;
@@ -96,8 +92,7 @@ module.exports = {
                         });
         });
     },
-    event(args, res){
-        let response = res.res;
+    event(args, res){ // eslint-disable-line no-unused-vars
         const messageId = args.messageId;
         const site = args.site;
         const langCode = args.langCode || DEFAULT_LANGUAGE;
@@ -116,7 +111,7 @@ module.exports = {
         });
     },
 
-    publishEvents(args, res){
+    publishEvents(args, res){ // eslint-disable-line no-unused-vars
         const actionPost = args.input;
         const messages = actionPost.messages;
 
@@ -133,8 +128,7 @@ module.exports = {
         });
     },
 
-    translate(args, res) {
-        let response = res.res;
+    translate(args, res) { // eslint-disable-line no-unused-vars
         let sentence = args.sentence;
         let fromLanguage = args.fromLanguage;
         let toLanguage = args.toLanguage;
@@ -144,7 +138,7 @@ module.exports = {
         });
     },
 
-    translateWords(args, res) {
+    translateWords(args, res) { // eslint-disable-line no-unused-vars
         let wordsToTranslate = args.words;
         let fromLanguage = args.fromLanguage;
         let toLanguage = args.toLanguage;

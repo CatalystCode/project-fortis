@@ -24,7 +24,7 @@ function CoordinatesToNearbyTiles(multiPointArray){
 }
 
 module.exports = {
-    fetchTilesByBBox(args, res){
+    fetchTilesByBBox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const filters = args.filteredEdges || [];
         const bbox = args.bbox;
@@ -51,7 +51,7 @@ module.exports = {
         });
     },
 
-    fetchTilesByLocations(args, res){
+    fetchTilesByLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const locations = args.locations;
 
@@ -82,7 +82,7 @@ module.exports = {
         }
     },
 
-    fetchPlacesByBBox(args, res){
+    fetchPlacesByBBox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const bbox = args.bbox;
 
@@ -109,7 +109,7 @@ module.exports = {
         }
     },
 
-    fetchEdgesByLocations(args, res){
+    fetchEdgesByLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const locations = args.locations;
 
@@ -139,7 +139,7 @@ module.exports = {
         }
     },
 
-    fetchEdgesByBBox(args, res){
+    fetchEdgesByBBox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const layerType = args.layerType || DEFAULT_LAYER_TYPE;
         const timespan = args.timespan;

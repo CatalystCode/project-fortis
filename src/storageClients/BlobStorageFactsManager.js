@@ -2,7 +2,6 @@
 
 let azure = require('azure-storage');
 let Promise = require('promise');
-var fs = require('fs');
 const DEFAULT_PAGE_SIZE = 20;
 const DEFAULT_SKIP = 0;
 const FACTS_CONTAINER_NAME = 'factsout';
@@ -10,11 +9,11 @@ const FACTS_STORAGE_CONNECTION_STRING = process.env.FACTS_STORAGE_CONNECTION_STR
 
 module.exports = {
 
-    GetFact: function (id, callback, logger) {
+    GetFact: function (id, callback, logger) { // eslint-disable-line no-unused-vars
         var blobSvc = azure.createBlobService(FACTS_STORAGE_CONNECTION_STRING);
         let blobPrefix = id.split('-')[0] + '/' + id.split('-')[1] + '/' + id.split('-')[2];
         let factIndex = id.split('-')[3];
-        blobSvc.listBlobsSegmentedWithPrefix(FACTS_CONTAINER_NAME, blobPrefix, null, null, (error, result, response) => {
+        blobSvc.listBlobsSegmentedWithPrefix(FACTS_CONTAINER_NAME, blobPrefix, null, null, (error, result, response) => { // eslint-disable-line no-unused-vars
             if (error || !result || !result.entries || result.entries.length == 0) {
                 callback(null, error);
             }
@@ -44,7 +43,7 @@ module.exports = {
 
         var blobSvc = azure.createBlobService(FACTS_STORAGE_CONNECTION_STRING);
         new Promise((resolve, reject) => {
-            blobSvc.listBlobsSegmented(FACTS_CONTAINER_NAME, null, (error, result, response) => {
+            blobSvc.listBlobsSegmented(FACTS_CONTAINER_NAME, null, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if (!error) {
                     let blobs = result.entries.filter(blob => {
                         return blob.name.indexOf('.json') != -1 && blob.lastModified;
@@ -71,7 +70,7 @@ module.exports = {
         function getReadBlobPromises(blobs, tagFilter) {
             var blobReadPromises = [];
             blobs.forEach(blob => {
-                blobReadPromises.push(new Promise((resolve, reject) => {
+                blobReadPromises.push(new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
                     blobSvc.getBlobToText(FACTS_CONTAINER_NAME, blob.name, null, function (error, text) {
                         let factIndex = 0;
                         text.split('\n').forEach(factText => {

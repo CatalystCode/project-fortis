@@ -10,7 +10,7 @@ const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
 
 module.exports = {
-    terms(args, res){
+    terms(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         let siteCode = args.site;
         let fromDate = args.fromDate;
@@ -41,7 +41,7 @@ module.exports = {
             }
         });
     },
-    locations(args, res){
+    locations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         let siteCode = args.site;
 
@@ -57,7 +57,7 @@ module.exports = {
                         });
         });
     },
-    removeKeywords(args, res){
+    removeKeywords(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
@@ -75,7 +75,7 @@ module.exports = {
                     });
         });
     },
-    addKeywords(args, res){
+    addKeywords(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
@@ -93,7 +93,7 @@ module.exports = {
                     });
         });
     },
-    saveLocations(args, res){
+    saveLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
@@ -111,7 +111,7 @@ module.exports = {
                         });
         });
     },
-    removeLocations(args, res){
+    removeLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
@@ -129,7 +129,7 @@ module.exports = {
                     });
         });
     },
-    popularLocations(args, res){
+    popularLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode || DEFAULT_LANGUAGE;
@@ -155,7 +155,7 @@ module.exports = {
                     });
         });
     },
-    timeSeries(args, res){
+    timeSeries(args, res){ // eslint-disable-line no-unused-vars
         const site = args.site;
         const fromDate = args.fromDate;
         const toDate = args.toDate;
@@ -178,7 +178,7 @@ module.exports = {
         });
     },
 
-    topSources(args,res) {
+    topSources(args,res) { // eslint-disable-line no-unused-vars
         let fromDate = args.fromDate;
         let toDate = args.toDate;
         const site = args.site;

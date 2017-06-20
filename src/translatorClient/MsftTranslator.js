@@ -53,33 +53,6 @@ function getAccessTokenForTranslation() {
     });
 }
 
-function TranslateWord(access_token, sentence, fromLanguage, toLanguage) {
-    var payload = { text: sentence, to: toLanguage, from: fromLanguage };
-    var headers = { Authorization: 'Bearer ' + access_token };
-
-    var options = {
-        url: translator_uri,
-        headers: headers,
-        qs: payload
-    };
-    return new Promise((resolve, reject) => {
-        request(options, function (err, response, body) {
-            if (err || !response || response.statusCode !== 200) {
-                reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
-            }
-            else {
-                xml2js.parseString(body, (err, result) => {
-                    if (!err & !!result && !!result['string'] && !!result['string']['_']) {
-                        resolve(result['string']['_']);
-                    } else {
-                        reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
-                    }
-                });
-            }
-        });
-    });
-}
-
 function TranslateSentenceArray(access_token, wordsToTranslate, fromLanguage, toLanguage) {
     const headers = {
         'Authorization': 'Bearer ' + access_token,

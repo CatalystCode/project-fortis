@@ -9,7 +9,7 @@ let Promise = require('promise');
 let postgresMessageService = require('../postgresClients/PostgresLocationManager');
 
 module.exports = {
-    popularLocations(args, res){
+    popularLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode || DEFAULT_LANGUAGE;

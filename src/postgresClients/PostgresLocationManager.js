@@ -3,7 +3,6 @@
 let azureTableService = require('../storageClients/AzureTableStorageManager');
 let nconf = require('nconf');
 let memoryStore = new nconf.Memory();
-let request = require('request');
 let moment = require('moment');
 let async = require('async');
 let pg = require('pg');
@@ -13,8 +12,6 @@ const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 const PUSH_PARALLELISM = 50;
 const MAX_RETRIES = 5;
-//FIXME: Temporarily pulling timeseries from blob storage. Long term goal is to pull from Postgres
-const TIMESERIES_BLOB_CONTAINER_NAME = 'processed-timeseries-bysource';
 const MIN_SEARCH_TERM_LENGTH = 4;
 const ENGLISH_LANG_CODE = 'en';
 
@@ -48,7 +45,7 @@ const WritePostgresRecord = (stmt, client, callback) => {
         },
         pgCallback => {
             //console.log(stmt);
-            client.query(stmt, (pgErr, results) => {
+            client.query(stmt, (pgErr, results) => { // eslint-disable-line no-unused-vars
                 attempts++;
 
                 if (!pgErr){
@@ -264,7 +261,6 @@ module.exports = {
     },
 
     FetchEvent: function(site, messageId, sources, langCode, callback){
-        langCode = langCode ? langCode : feature.orig_language;
         let query = ` SELECT st_asgeojson(geog) as featurecollection, to_char(createdtime, 'MM/DD/YYYY HH:MI:SS AM') as createdtime_fmt,
                              array_to_json(keywords) as edges, array_to_json(original_sources) as original_sources_json, *
                       FROM tilemessages
@@ -276,7 +272,6 @@ module.exports = {
                 PostgresService(siteDefinition.featuresConnectionString, query, (error, results) => {
                     if(!error && results.rows.length > 0){
                         const feature = results.rows[0];
-                        const lang = langCode ? langCode : feature.orig_language;
                         const eventResponse = Object.assign({}, JSON.parse(feature.featurecollection), {
                             'properties': {
                                 'createdtime': feature.createdtime_fmt,
@@ -286,7 +281,7 @@ module.exports = {
                                 'edges': feature.edges,
                                 'sentence': feature[langCode+'_sentence'] ? feature[langCode+'_sentence'] : feature[feature.orig_language+'_sentence'],
                                 'language': feature[langCode+'_sentence'] ? langCode : feature.orig_language,
-                                'fullText': feature.full_text && feature.full_text !== '' ? feature.full_text : feature[language+'_sentence']  || feature[feature.orig_language+'_sentence'],
+                                'fullText': feature.full_text && feature.full_text !== '' ? feature.full_text : feature[feature.orig_language+'_sentence']  || feature[feature.orig_language+'_sentence'],
                                 'properties': {
                                     'title': feature.title || '',
                                     'link': feature.link || '',

@@ -5,7 +5,6 @@ var port = process.env.PORT || 8000;
 var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
-var path = require('path');
 var graphqlHTTP = require('express-graphql');
 var SpatialMessageSchema = require('./src/schemas/MessageSchema');
 var SpatialMessageResolver = require('./src/resolvers/Messages');
