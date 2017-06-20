@@ -3,6 +3,7 @@ language:
 
 node_js:
   - "7"
+  - "6"
 
 install:
   - npm install
