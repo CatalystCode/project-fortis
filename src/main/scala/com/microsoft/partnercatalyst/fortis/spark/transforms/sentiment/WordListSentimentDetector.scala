@@ -70,7 +70,7 @@ class WordListSentimentDetector(
 
   protected def createModelsProvider(): ZipModelsProvider = {
     new ZipModelsProvider(
-      language => s"https://fortismodels.blob.core.windows.net/sentiment/sentiment-$language.zip",
+      language => s"https://fortiscentral.blob.core.windows.net/sentiment/sentiment-$language.zip",
       modelsSource)
   }
 }
