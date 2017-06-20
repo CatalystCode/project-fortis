@@ -1,12 +1,12 @@
-"use strict"
+'use strict';
 
 let Promise = require('promise');
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-let azureTableService = require("../storageClients/AzureTableStorageManager");
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+let azureTableService = require('../storageClients/AzureTableStorageManager');
 let DEFAULT_LANGUAGE='en';
 
 const DEFAULT_LIMIT = 5;
-const DEFAULT_LAYER_TYPE = "associations";
+const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
 
 module.exports = {
@@ -18,27 +18,27 @@ module.exports = {
         let toDate = args.toDate;
 
         return new Promise((resolve, reject) => {
-                if(fromDate && toDate){
-                    postgresMessageService.FetchMessageTopicList(siteCode, sourceFilter, fromDate, toDate, 
+            if(fromDate && toDate){
+                postgresMessageService.FetchMessageTopicList(siteCode, sourceFilter, fromDate, toDate, 
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
                             }
-                    });
-                }else{
-                    azureTableService.GetKeywordList(siteCode, 
+                        });
+            }else{
+                azureTableService.GetKeywordList(siteCode, 
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Term"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Term'}));
                             }
-                    });
-                }
+                        });
+            }
         });
     },
     locations(args, res){
@@ -46,22 +46,22 @@ module.exports = {
         let siteCode = args.site;
 
         return new Promise((resolve, reject) => {
-                postgresMessageService.FetchAllLocations(siteCode, 
+            postgresMessageService.FetchAllLocations(siteCode, 
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
                             }
-                });
+                        });
         });
     },
     removeKeywords(args, res){
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
-        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {"_": siteId}, RowKey: {"_": term.RowKey}}));
+        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {'_': siteId}, RowKey: {'_': term.RowKey}}));
         
         return new Promise((resolve, reject) => {
             azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
@@ -70,16 +70,16 @@ module.exports = {
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
-                            resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Term"}));
+                            resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Term'}));
                         }
-            });
+                    });
         });
     },
     addKeywords(args, res){
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
-        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {"_": siteId}, RowKey: {"_": term.RowKey}}));
+        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {'_': siteId}, RowKey: {'_': term.RowKey}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
@@ -88,9 +88,9 @@ module.exports = {
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
-                            resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Term"}));
+                            resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Term'}));
                         }
-            });
+                    });
         });
     },
     saveLocations(args, res){
@@ -106,9 +106,9 @@ module.exports = {
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
                             }
-            });
+                        });
         });
     },
     removeLocations(args, res){
@@ -120,13 +120,13 @@ module.exports = {
         return new Promise((resolve, reject) => {
             postgresMessageService.RemoveLocalities(siteId, locations, 
                     (error, result) => {
-                            if(error){
-                                let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
-                                reject(errorMsg);
-                            }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
-                            }
-            });
+                        if(error){
+                            let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
+                            reject(errorMsg);
+                        }else{
+                            resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
+                        }
+                    });
         });
     },
     popularLocations(args, res){
@@ -152,7 +152,7 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            });
+                    });
         });
     },
     timeSeries(args, res){
@@ -174,7 +174,7 @@ module.exports = {
                         }else{
                             resolve(results);
                         }
-            });
+                    });
         });
     },
     
@@ -195,7 +195,7 @@ module.exports = {
                             let collection = Object.assign({}, {sources: results});
                             resolve(collection);
                         }
-            });
+                    });
         });
     }
 };

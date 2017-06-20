@@ -1,12 +1,12 @@
-"use strict"
+'use strict';
 
-const DEFAULT_LAYER_TYPE = "associations";
+const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = 'en';
 const DEFAULT_LIMIT = 5;
 
 let Promise = require('promise');
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
 
 module.exports = {
     popularLocations(args, res){
@@ -32,7 +32,7 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            });
+                    });
         });
     }
 };

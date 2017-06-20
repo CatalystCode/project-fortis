@@ -1,14 +1,14 @@
-"use strict"
+'use strict';
 
 let request = require('request');
 let azureStorage = require('azure-storage');
-const AZURE_TBL_KEYWORD = "searchTerms";
-const AZURE_TBL_SITES = "fortisSites";
-const AZURE_TBL_BLACKLIST = "keywordFilters";
-const AZURE_TBL_FB_PAGES = "fortisFacebookPages";
-const AZURE_TBL_TWITTER_ACCOUNTS = "fortisTwitterAccounts";
-const AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS = "fortisTrustedTwitterAccounts";
-const AZURE_TBL_SITES_PARTITION_KEY = "site";
+const AZURE_TBL_KEYWORD = 'searchTerms';
+const AZURE_TBL_SITES = 'fortisSites';
+const AZURE_TBL_BLACKLIST = 'keywordFilters';
+const AZURE_TBL_FB_PAGES = 'fortisFacebookPages';
+const AZURE_TBL_TWITTER_ACCOUNTS = 'fortisTwitterAccounts';
+const AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS = 'fortisTrustedTwitterAccounts';
+const AZURE_TBL_SITES_PARTITION_KEY = 'site';
 const AZURE_TABLE_BATCH_MAX_OPERATIONS = 100;
 const AZURE_TABLE_BATCH_ACTIONS = {
     DELETE: 1,
@@ -38,128 +38,128 @@ function GetAzureTblBatchAction(offset, partitionKey, tasks, action){
 }
 
 function GetKeywordsFromAzureTbl(siteKey, tableService, callback){
-       const queryString = `PartitionKey eq ?`;
-       const query = new azureStorage.TableQuery().where(queryString, siteKey);
+    const queryString = 'PartitionKey eq ?';
+    const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-       tableService.createTableIfNotExists(AZURE_TBL_KEYWORD, (error, result, response) => {
-           if(!error){
-                tableService.queryEntities(AZURE_TBL_KEYWORD, query, null, (error, result, response) => {
-                    if(!error){
-                        callback(undefined, result.entries ? result.entries.map(term => {
-                            let keyword = {"type": "Term", "name": term.name._, "RowKey": term.RowKey._};
-                            Object.keys(term).forEach(entityField=>{
-                                if(entityField.startsWith("name_") && term[entityField]._){
-                                    keyword[entityField] = term[entityField]._.toLowerCase();
-                                }
-                            });
+    tableService.createTableIfNotExists(AZURE_TBL_KEYWORD, (error, result, response) => {
+        if(!error){
+            tableService.queryEntities(AZURE_TBL_KEYWORD, query, null, (error, result, response) => {
+                if(!error){
+                    callback(undefined, result.entries ? result.entries.map(term => {
+                        let keyword = {'type': 'Term', 'name': term.name._, 'RowKey': term.RowKey._};
+                        Object.keys(term).forEach(entityField=>{
+                            if(entityField.startsWith('name_') && term[entityField]._){
+                                keyword[entityField] = term[entityField]._.toLowerCase();
+                            }
+                        });
 
-                            return keyword;
-                        }) : []);
-                    }else{
-                        callback(`There was an error querying table [${AZURE_TBL_SITES}] siteId[${siteId}]`);
-                    }
-                });
-             }else{
-                 callback('Error occured while trying to create azure table.', undefined);
-             }
-      });
+                        return keyword;
+                    }) : []);
+                }else{
+                    callback(`There was an error querying table [${AZURE_TBL_SITES}] siteId[${siteId}]`);
+                }
+            });
+        }else{
+            callback('Error occured while trying to create azure table.', undefined);
+        }
+    });
 }
 
 function GetFbPagesFromAzureTbl(siteKey, tableService, callback){
-       const queryString = `PartitionKey eq ?`;
-       const query = new azureStorage.TableQuery().where(queryString, siteKey);
+    const queryString = 'PartitionKey eq ?';
+    const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-       tableService.createTableIfNotExists(AZURE_TBL_FB_PAGES, (error, result, response) => {
-           if(!error){
-                tableService.queryEntities(AZURE_TBL_FB_PAGES, query, null, (error, result, response) => {
-                    if(!error){
-                        callback(undefined, result.entries ? result.entries.map(page => Object.assign({}, {"pageUrl": page.pageUrl._, "RowKey": page.RowKey._})) : []);
-                    }else{
-                        callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
-                    }
-                });
-             }else{
-                 callback('Error occured while trying to create azure table.', undefined);
-             }
-      });
+    tableService.createTableIfNotExists(AZURE_TBL_FB_PAGES, (error, result, response) => {
+        if(!error){
+            tableService.queryEntities(AZURE_TBL_FB_PAGES, query, null, (error, result, response) => {
+                if(!error){
+                    callback(undefined, result.entries ? result.entries.map(page => Object.assign({}, {'pageUrl': page.pageUrl._, 'RowKey': page.RowKey._})) : []);
+                }else{
+                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
+                }
+            });
+        }else{
+            callback('Error occured while trying to create azure table.', undefined);
+        }
+    });
 }
 
 function GetBlacklistFromAzureTbl(siteKey, tableService, callback){
-       const queryString = `PartitionKey eq ?`;
-       const query = new azureStorage.TableQuery().where(queryString, siteKey);
+    const queryString = 'PartitionKey eq ?';
+    const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-       tableService.createTableIfNotExists(AZURE_TBL_BLACKLIST, (error, result, response) => {
-           if(!error){
-                tableService.queryEntities(AZURE_TBL_BLACKLIST, query, null, (error, result, response) => {
-                    if(!error){
-                        callback(undefined, result.entries ? result.entries.map(filter => {
-                            const filteredTerm = Object.assign({}, {
-                                                                    "filteredTerms": filter.filteredTerms ? JSON.parse(filter.filteredTerms._) : [], 
-                                                                    "RowKey": filter.RowKey._,
-                                                                    "lang": filter.lang._,
-                                                                   });
+    tableService.createTableIfNotExists(AZURE_TBL_BLACKLIST, (error, result, response) => {
+        if(!error){
+            tableService.queryEntities(AZURE_TBL_BLACKLIST, query, null, (error, result, response) => {
+                if(!error){
+                    callback(undefined, result.entries ? result.entries.map(filter => {
+                        const filteredTerm = Object.assign({}, {
+                            'filteredTerms': filter.filteredTerms ? JSON.parse(filter.filteredTerms._) : [], 
+                            'RowKey': filter.RowKey._,
+                            'lang': filter.lang._
+                        });
 
-                            return filteredTerm;
-                        }) : []);
-                    }else{
-                        callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
-                    }
-                });
-             }else{
-                 callback('Error occured while trying to create azure table.', undefined);
-             }
-      });
+                        return filteredTerm;
+                    }) : []);
+                }else{
+                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
+                }
+            });
+        }else{
+            callback('Error occured while trying to create azure table.', undefined);
+        }
+    });
 }
 
 function GetTwitterAccountsFromAzureTbl(siteKey, tableService, callback){
-       const queryString = `PartitionKey eq ?`;
-       const query = new azureStorage.TableQuery().where(queryString, siteKey);
+    const queryString = 'PartitionKey eq ?';
+    const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-       tableService.createTableIfNotExists(AZURE_TBL_TWITTER_ACCOUNTS, (error, result, response) => {
-           if(!error){
-                tableService.queryEntities(AZURE_TBL_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
-                    if(!error){
-                        callback(undefined, result2.entries ? result2.entries.map(acct => {
-                            let account = {"consumerSecret": acct.consumerSecret ? acct.consumerSecret._ : "", 
-                                           "consumerKey": acct.consumerKey ? acct.consumerKey._ : "", 
-                                           "accountName": acct.RowKey._,
-                                           "token": acct.token ? acct.token._ : "",
-                                           "tokenSecret": acct.tokenSecret ? acct.tokenSecret._ : ""
+    tableService.createTableIfNotExists(AZURE_TBL_TWITTER_ACCOUNTS, (error, result, response) => {
+        if(!error){
+            tableService.queryEntities(AZURE_TBL_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
+                if(!error){
+                    callback(undefined, result2.entries ? result2.entries.map(acct => {
+                        let account = {'consumerSecret': acct.consumerSecret ? acct.consumerSecret._ : '', 
+                                           'consumerKey': acct.consumerKey ? acct.consumerKey._ : '', 
+                                           'accountName': acct.RowKey._,
+                                           'token': acct.token ? acct.token._ : '',
+                                           'tokenSecret': acct.tokenSecret ? acct.tokenSecret._ : ''
                                           };
                             
-                            return account;
-                        }) : []);
-                    }else{
-                        callback(`There was an error querying table [${AZURE_TBL_TWITTER_ACCOUNTS}] siteId[${siteId}]`);
-                    }
-                });
-             }else{
-                 callback('Error occured while trying to create azure table.', undefined);
-             }
-      });
+                        return account;
+                    }) : []);
+                }else{
+                    callback(`There was an error querying table [${AZURE_TBL_TWITTER_ACCOUNTS}] siteId[${siteId}]`);
+                }
+            });
+        }else{
+            callback('Error occured while trying to create azure table.', undefined);
+        }
+    });
 }
 
 function GetTrustedTwitterAccountsFromAzureTbl(siteKey, tableService, callback){
-       const queryString = `PartitionKey eq ?`;
-       const query = new azureStorage.TableQuery().where(queryString, siteKey);
+    const queryString = 'PartitionKey eq ?';
+    const query = new azureStorage.TableQuery().where(queryString, siteKey);
 
-       tableService.createTableIfNotExists(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, (error, result, response) => {
-           if(!error){
-                tableService.queryEntities(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
-                    if(!error){
-                        callback(undefined, result2.entries ? result2.entries.map(account => Object.assign({}, {"acctUrl": account.acctUrl._, "RowKey": account.RowKey._})) : []);
-                    }else{
-                        callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
-                    }
-                });
-             }else{
-                 callback('Error occured while trying to create azure table.', undefined);
-             }
-      });
+    tableService.createTableIfNotExists(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, (error, result, response) => {
+        if(!error){
+            tableService.queryEntities(AZURE_TBL_TRUSTED_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
+                if(!error){
+                    callback(undefined, result2.entries ? result2.entries.map(account => Object.assign({}, {'acctUrl': account.acctUrl._, 'RowKey': account.RowKey._})) : []);
+                }else{
+                    callback(`There was an error querying table [${AZURE_TBL_FB_PAGES}] siteId[${siteId}]`);
+                }
+            });
+        }else{
+            callback('Error occured while trying to create azure table.', undefined);
+        }
+    });
 }
 
 function FetchSiteDefinitions(siteId, tableService, callback){
-    const queryString = `PartitionKey eq ?${siteId ? ` and RowKey eq ?` : ``}`;
+    const queryString = `PartitionKey eq ?${siteId ? ' and RowKey eq ?' : ''}`;
     const query = new azureStorage.TableQuery().where(queryString, AZURE_TBL_SITES_PARTITION_KEY, siteId);
 
     tableService.createTableIfNotExists(AZURE_TBL_SITES, (error, result, response) => {
@@ -167,21 +167,21 @@ function FetchSiteDefinitions(siteId, tableService, callback){
             tableService.queryEntities(AZURE_TBL_SITES, query, null, (error, result, response) => {
                 if(!error){
                     const siteEntities = result.entries.map(site => {
-                                return {
-                                        "name": site.RowKey._,
-                                        "properties": {
-                                            "logo": site.logo ? site.logo._ : '',
-                                            "title": site.title ? site.title._ : '',
-                                            "supportedLanguages": site.supportedLanguages ? JSON.parse(site.supportedLanguages._) : [],
-                                            "defaultZoomLevel": site.defaultZoomLevel._,
-                                            "fbToken": site.fbToken ? site.fbToken._ : "",
-                                            "mapzenApiKey": site.mapzenApiKey ? site.mapzenApiKey._ : "",
-                                            "targetBbox": site.targetBbox ? JSON.parse(site.targetBbox._) : [],
-                                            "defaultLocation": site.defaultLocation ? JSON.parse(site.defaultLocation._) : [],
-                                            "storageConnectionString": site.storageConnectionString ? site.storageConnectionString._ : '',
-                                            "featuresConnectionString": site.featuresConnectionString ? site.featuresConnectionString._ : ''
-                                        }
-                                }
+                        return {
+                            'name': site.RowKey._,
+                            'properties': {
+                                'logo': site.logo ? site.logo._ : '',
+                                'title': site.title ? site.title._ : '',
+                                'supportedLanguages': site.supportedLanguages ? JSON.parse(site.supportedLanguages._) : [],
+                                'defaultZoomLevel': site.defaultZoomLevel._,
+                                'fbToken': site.fbToken ? site.fbToken._ : '',
+                                'mapzenApiKey': site.mapzenApiKey ? site.mapzenApiKey._ : '',
+                                'targetBbox': site.targetBbox ? JSON.parse(site.targetBbox._) : [],
+                                'defaultLocation': site.defaultLocation ? JSON.parse(site.defaultLocation._) : [],
+                                'storageConnectionString': site.storageConnectionString ? site.storageConnectionString._ : '',
+                                'featuresConnectionString': site.featuresConnectionString ? site.featuresConnectionString._ : ''
+                            }
+                        };
                     });
                     callback(undefined, result.entries ? siteEntities : []);
                 }else{
@@ -189,7 +189,7 @@ function FetchSiteDefinitions(siteId, tableService, callback){
                 }
             });
         }else{
-           callback('Error occured while trying to create azure table.', undefined);
+            callback('Error occured while trying to create azure table.', undefined);
         }
     });
 }
@@ -207,12 +207,12 @@ module.exports = {
             targetBbox: JSON.stringify(siteDefintion.targetBbox),
             supportedLanguages: JSON.stringify(siteDefintion.supportedLanguages),
             PartitionKey: AZURE_TBL_SITES_PARTITION_KEY,
-            RowKey: siteDefintion.name,
+            RowKey: siteDefintion.name
         });
 
         tableService.createTableIfNotExists(AZURE_TBL_SITES, (error, result, response) => {
             if(!error){
-                 tableService.insertOrReplaceEntity(AZURE_TBL_SITES, tableEnity, (error2, result, response) => {
+                tableService.insertOrReplaceEntity(AZURE_TBL_SITES, tableEnity, (error2, result, response) => {
                     if(!error2){
                         FetchSiteDefinitions(siteDefintion.name, tableService, callback);
                     }else{
@@ -226,19 +226,19 @@ module.exports = {
     },
 
     GetKeywordList(siteKey, callback){
-       GetKeywordsFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
+        GetKeywordsFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
     },
     GetTwitterAccounts(siteKey, callback){
-       GetTwitterAccountsFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
+        GetTwitterAccountsFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
     },
     GetTrustedTwitterAccounts(siteKey, callback){
-       GetTrustedTwitterAccountsFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
+        GetTrustedTwitterAccountsFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
     },
     GetFacebookPages(siteKey, callback){
-       GetFbPagesFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
+        GetFbPagesFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
     },
     GetBlacklistTerms(siteKey, callback){
-       GetBlacklistFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
+        GetBlacklistFromAzureTbl(siteKey, azureStorage.createTableService(), callback);
     },
     ModifyTermEntities(terms, siteKey, action, callback){
         const tableService = azureStorage.createTableService();
@@ -338,4 +338,4 @@ module.exports = {
             offset += AZURE_TABLE_BATCH_MAX_OPERATIONS;
         }
     }
-}
+};

@@ -1,13 +1,13 @@
-"use strict"
+'use strict';
 
 let Promise = require('promise');
-let azureQueueManager = require("../storageClients/AzureQueueManager");
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-let translatorService = require("../translatorClient/MsftTranslator");
+let azureQueueManager = require('../storageClients/AzureQueueManager');
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+let translatorService = require('../translatorClient/MsftTranslator');
 let geotile = require('geotile');
 
 const DEFAULT_LIMIT = 20;
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = 'en';
 
 module.exports = {
     byBbox(args, res){
@@ -27,14 +27,14 @@ module.exports = {
             postgresMessageService.FetchSentences(site, originalSource, bbox, undefined, mainTerm, fromDate, toDate, args.limit, args.offset,
                     filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
-                            resolve(messages);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
+                                resolve(messages);
+                            }
+                        });
         });
     },
     byLocation(args, res){
@@ -52,21 +52,21 @@ module.exports = {
         let offset = args.offset || 0;
 
         if(coordinates.length !== 2){
-            throw new Error("Empty tileId error.");
+            throw new Error('Empty tileId error.');
         }
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, undefined, coordinates, undefined, fromDate, toDate, limit, offset,
                     filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
-                            resolve(messages);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
+                                resolve(messages);
+                            }
+                        });
         });
     },
     byEdges(args, res){
@@ -86,14 +86,14 @@ module.exports = {
             postgresMessageService.FetchSentences(site, originalSource, undefined, undefined, undefined, fromDate, toDate, limit, offset,
                     filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
-                            resolve(messages);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
+                                resolve(messages);
+                            }
+                        });
         });
     },
     event(args, res){
@@ -106,13 +106,13 @@ module.exports = {
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchEvent(site, messageId, dataSources, langCode, 
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            resolve(results);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                resolve(results);
+                            }
+                        });
         });
     },
 
@@ -123,13 +123,13 @@ module.exports = {
         return new Promise((resolve, reject) => {
             azureQueueManager.customEvents(messages, 
                     (error, result) => {
-                            if(error){
-                                let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
-                                reject(errorMsg);
-                            }else{
-                                resolve(result);
-                            }
-            });
+                        if(error){
+                            let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
+                            reject(errorMsg);
+                        }else{
+                            resolve(result);
+                        }
+                    });
         });
     },
 

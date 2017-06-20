@@ -1,9 +1,9 @@
-"use strict"
+'use strict';
 
 let Promise = require('promise');
-let azureTableService = require("../storageClients/AzureTableStorageManager");
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-const DEFAULT_LANGUAGE = "en";
+let azureTableService = require('../storageClients/AzureTableStorageManager');
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+const DEFAULT_LANGUAGE = 'en';
 
 module.exports = {
     sites(args, res){
@@ -20,7 +20,7 @@ module.exports = {
                             
                             resolve(siteCollection);
                         }
-            });
+                    });
         });
     },
     createOrReplaceSite(args, res){
@@ -35,13 +35,13 @@ module.exports = {
                         }else{
                             resolve(result && result.length > 0 ? result[0] : {});
                         }
-            });
+                    });
         });
     },
     modifyFacebookPages(args, res){
         const startTime = Date.now();
         const inputDefinition = args.input;
-        const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {"_": inputDefinition.site}, RowKey: {"_": page.RowKey}}));
+        const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyFacebookPages(inputDefinition.site, fbPages, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
@@ -54,16 +54,16 @@ module.exports = {
 
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     modifyTrustedTwitterAccounts(args, res){
         const startTime = Date.now();
         const inputDefinition = args.input;
         console.log(inputDefinition);
-        console.log("Modifying collection");
+        console.log('Modifying collection');
 
-        const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {"_": inputDefinition.site}, RowKey: {"_": page.RowKey}}));
+        const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         console.log(trustedAccts);
         return new Promise((resolve, reject) => {
@@ -77,13 +77,13 @@ module.exports = {
 
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     removeFacebookPages(args, res){
         const startTime = Date.now();
         const inputDefinition = args.input;
-        const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {"_": inputDefinition.site}, RowKey: {"_": page.RowKey}}));
+        const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyFacebookPages(inputDefinition.site, fbPages, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
@@ -96,13 +96,13 @@ module.exports = {
 
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     removeTrustedTwitterAccounts(args, res){
         const startTime = Date.now();
         const inputDefinition = args.input;
-        const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {"_": inputDefinition.site}, RowKey: {"_": page.RowKey}}));
+        const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyTrustedTwitterAccounts(inputDefinition.site, trustedAccts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
@@ -115,13 +115,13 @@ module.exports = {
 
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     modifyTwitterAccounts(args, res){
         const startTime = Date.now();
         const twitterAccountDefintions = args.input;
-        const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {"_": twitterAccountDefintions.site}, RowKey: {"_": account.accountName}}));
+        const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {'_': twitterAccountDefintions.site}, RowKey: {'_': account.accountName}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyTwitterAccounts(twitterAccountDefintions.site, twitterAccounts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
@@ -134,13 +134,13 @@ module.exports = {
 
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     removeTwitterAccounts(args, res){
         const startTime = Date.now();
         const twitterAccountDefintions = args.input;
-        const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {"_": twitterAccountDefintions.site}, RowKey: {"_": account.accountName}}));
+        const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {'_': twitterAccountDefintions.site}, RowKey: {'_': account.accountName}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyTwitterAccounts(twitterAccountDefintions.site, twitterAccounts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
@@ -153,7 +153,7 @@ module.exports = {
 
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     twitterAccounts(args, res){
@@ -170,7 +170,7 @@ module.exports = {
                             
                             resolve(acctCollection);
                         }
-            });
+                    });
         });
     },
     trustedTwitterAccounts(args, res){
@@ -187,7 +187,7 @@ module.exports = {
                             
                             resolve(collection);
                         }
-            });
+                    });
         });
     },
     facebookPages(args, res){
@@ -204,13 +204,13 @@ module.exports = {
                             
                             resolve(collection);
                         }
-            });
+                    });
         });
     },
     facebookAnalytics(args, res) {
         const days = args.days;
         const site = args.siteId;
-                return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             postgresMessageService.FetchFacebookAnalytics(site,days, 
                     (error, results) => {
                         if(error){
@@ -220,7 +220,7 @@ module.exports = {
                             let collection = Object.assign({}, {analytics: results});
                             resolve(collection);
                         }
-            });
+                    });
         });
     },
     termBlacklist(args, res){
@@ -237,13 +237,13 @@ module.exports = {
                             
                             resolve(collection);
                         }
-            });
+                    });
         });
     },
     modifyBlacklist(args, res){
         const startTime = Date.now();
         const blacklistTermDefinitions = args.input;
-        const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, {PartitionKey: {"_": blacklistTermDefinitions.site}, RowKey: {"_": item.RowKey}, filteredTerms: JSON.stringify(item.filteredTerms), lang: item.lang}));
+        const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, {PartitionKey: {'_': blacklistTermDefinitions.site}, RowKey: {'_': item.RowKey}, filteredTerms: JSON.stringify(item.filteredTerms), lang: item.lang}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyBlacklistTerms(blacklistTerms, blacklistTermDefinitions.site, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
@@ -255,13 +255,13 @@ module.exports = {
                             const termCollection = Object.assign({}, {runTime: Date.now() - startTime, filters: results});
                             resolve(termCollection);
                         }
-            });
+                    });
         });
     },
     removeBlacklist(args, res){
         const startTime = Date.now();
         const blacklistTermDefinitions = args.input;
-        const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, item, {PartitionKey: {"_": blacklistTermDefinitions.site}, RowKey: {"_": item.RowKey}}));
+        const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, item, {PartitionKey: {'_': blacklistTermDefinitions.site}, RowKey: {'_': item.RowKey}}));
 
         return new Promise((resolve, reject) => {
             azureTableService.ModifyBlacklistTerms(blacklistTerms, blacklistTermDefinitions.site, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
@@ -273,7 +273,7 @@ module.exports = {
                             const termCollection = Object.assign({}, {runTime: Date.now() - startTime, filters: results});
                             resolve(termCollection);
                         }
-            });
+                    });
         });
     }
 };

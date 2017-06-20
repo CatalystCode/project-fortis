@@ -1,14 +1,14 @@
-"use strict"
+'use strict';
 
-const DEFAULT_LAYER_TYPE = "associations";
+const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
 const DEFAULT_PLACE_ZOOM_LEVEL = 8;
 const RADIUS_DISTANCE_IN_MILES = 5;
 
 let Promise = require('promise');
 let GeoPoint = require('geopoint');
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-let tileService = require("../osmClients/TileServiceManager");
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+let tileService = require('../osmClients/TileServiceManager');
 let geotile = require('geotile');
 
 function CoordinatesToNearbyTiles(multiPointArray){
@@ -47,7 +47,7 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            });
+                    });
         });
     },
 
@@ -75,10 +75,10 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-                     })
+                    });
             });
         }else{
-            throw new Error("Empty location list error");
+            throw new Error('Empty location list error');
         }
     },
 
@@ -99,13 +99,13 @@ module.exports = {
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
-                            let featureCollection = Object.assign({}, results, {bbox: bbox, type: "FeatureCollection", runTime: Date.now() - startTime, features: results});
+                            let featureCollection = Object.assign({}, results, {bbox: bbox, type: 'FeatureCollection', runTime: Date.now() - startTime, features: results});
                             resolve(featureCollection);
                         }
-                     })
+                    });
             });
         }else{
-            throw new Error("Empty bbox error");
+            throw new Error('Empty bbox error');
         }
     },
 
@@ -132,10 +132,10 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-                     })
+                    });
             });
         }else{
-            throw new Error("Empty location list error");
+            throw new Error('Empty location list error');
         }
     },
 
@@ -161,7 +161,7 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            })
+                    });
         });
     }
 };

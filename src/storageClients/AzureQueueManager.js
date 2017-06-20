@@ -1,4 +1,4 @@
-"use strict"
+'use strict';
 
 let azure = require('azure-storage');
 let moment = require('moment');
@@ -6,17 +6,17 @@ let asyncEachLimit = require('async/eachLimit');
 let TextBase64QueueMessageEncoder = require('azure-storage').QueueMessageEncoder.TextBase64QueueMessageEncoder;
 
 const PRE_NLP_QUEUE = process.env.PRE_NLP_QUEUE;
-const DATE_FORMAT = "MM/DD/YYYY HH:mm";
+const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
 const ASYNC_QUEUE_LIMIT = 50;
 
 function getAzureQueueService(){
     let queueSvc = azure.createQueueService();
-        queueSvc.messageEncoder = new TextBase64QueueMessageEncoder();
-        queueSvc.createQueueIfNotExists(PRE_NLP_QUEUE, (error, result, response) => {
-            if (error) {
-                RaiseException(`Unable to create new azure queue ${PRE_NLP_QUEUE}`);
-            }
-        });
+    queueSvc.messageEncoder = new TextBase64QueueMessageEncoder();
+    queueSvc.createQueueIfNotExists(PRE_NLP_QUEUE, (error, result, response) => {
+        if (error) {
+            RaiseException(`Unable to create new azure queue ${PRE_NLP_QUEUE}`);
+        }
+    });
 
     return queueSvc;
 }
@@ -28,14 +28,14 @@ function RaiseException(errorMsg) {
 function pushMessageToStorageQueue(message, queueSvc, callback){
     try {
         queueSvc.createMessage(PRE_NLP_QUEUE, JSON.stringify(message), (error, result, response) => {
-                if (error) {
-                    const errMsg = `Azure Queue push error occured error [${error}]`; 
-                    RaiseException(errMsg);
-                    callback(errMsg);
-                }else{
-                    console.log(`Wrote ${JSON.stringify(message)} to output queue.`);
-                    callback();
-                }
+            if (error) {
+                const errMsg = `Azure Queue push error occured error [${error}]`; 
+                RaiseException(errMsg);
+                callback(errMsg);
+            }else{
+                console.log(`Wrote ${JSON.stringify(message)} to output queue.`);
+                callback();
+            }
         });
     } catch (error) {
         RaiseException(`Issue with pushing message ${JSON.stringify(message)} to out queue.`);
@@ -56,17 +56,17 @@ function processMessage(item, queueSvc, asyncCB){
     }
 
     let message = {
-                        "source": "custom",
-                        "created_at": eventDate,
-                        "lang": item.language,
-                        "message": {
-                            "id": item.RowKey,
-                            "geo": item.featureCollection,
-                            "message": item.message,
-                            "link": item.link,
-                            "originalSources": [item.source],
-                            "title": item.title
-                        }
+        'source': 'custom',
+        'created_at': eventDate,
+        'lang': item.language,
+        'message': {
+            'id': item.RowKey,
+            'geo': item.featureCollection,
+            'message': item.message,
+            'link': item.link,
+            'originalSources': [item.source],
+            'title': item.title
+        }
     };
 
     pushMessageToStorageQueue(message, queueSvc, asyncCB);
@@ -88,8 +88,8 @@ module.exports = {
                                    }
                                    
                                    callback(finalCBErr, processedEvents);
-                                }
+                               }
             );
         }
     }
-}
+};

@@ -1,7 +1,7 @@
-"use strict"
+'use strict';
 
 let Promise = require('promise');
-let blobStorageManager = require("../storageClients/BlobStorageFactsManager");
+let blobStorageManager = require('../storageClients/BlobStorageFactsManager');
 
 module.exports = {
     list(args, res) {
@@ -16,7 +16,7 @@ module.exports = {
                     let errorMsg = `Internal server error: [${JSON.stringify(error)}]`;
                     reject(`Error occured retrieving facts. [${error}]`);
                 } else {
-                    let facts = { "type": "FactCollection", facts: results, runTime: Date.now() - startTime };
+                    let facts = { 'type': 'FactCollection', facts: results, runTime: Date.now() - startTime };
                     resolve(facts);
                 }
             });
