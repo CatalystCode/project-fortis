@@ -6,6 +6,6 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 trait Pipeline {
-  def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]])
-    (implicit ssc: StreamingContext, transformContext: TransformContext): Option[DStream[FortisItem]]
+  def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]], ssc: StreamingContext,
+    transformContext: TransformContext): Option[DStream[FortisItem]]
 }

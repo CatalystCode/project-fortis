@@ -56,7 +56,7 @@ object ProjectFortis extends App {
   Logger.getLogger("libfacebook").setLevel(Level.DEBUG)
   Logger.getLogger("liblocations").setLevel(Level.DEBUG)
 
-  private implicit object TransformContext extends TransformContext {
+  private object TransformContext extends TransformContext {
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
     val placeRecognizer = new PlaceRecognizer(Settings.modelsDir)
     val featureServiceClient = new FeatureServiceClient(Settings.featureServiceHost)
@@ -73,7 +73,7 @@ object ProjectFortis extends App {
       .setAppName(Constants.SparkAppName)
       .setIfMissing("spark.master", Constants.SparkMasterDefault)
 
-    implicit val streamingContext = new StreamingContext(
+    val ssc = new StreamingContext(
       new SparkContext(conf),
       Seconds(Constants.SparkStreamingBatchSizeDefault))
 
@@ -83,15 +83,13 @@ object ProjectFortis extends App {
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = pipelines.flatMap(
-      pipeline => pipeline(streamProvider, streamRegistry)
+      pipeline => pipeline(streamProvider, streamRegistry, ssc, TransformContext)
     ).reduceOption(_.union(_))
 
     // TODO: other computations and save to DB
-    fortisEvents.foreach(
-      _.foreachRDD(
-        _.foreachPartition(throw new NotImplementedException)))
+    fortisEvents.foreach(_.print())
 
-    streamingContext
+    ssc
   }
 
   // Main starts here

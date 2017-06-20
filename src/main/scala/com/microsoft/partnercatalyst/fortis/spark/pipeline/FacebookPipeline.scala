@@ -7,8 +7,8 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 object FacebookPipeline extends Pipeline {
-  override def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]])
-    (implicit ssc: StreamingContext, transformContext: TransformContext): Option[DStream[FortisItem]] = {
+  override def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]],
+    ssc: StreamingContext, transformContext: TransformContext): Option[DStream[FortisItem]] = {
     import transformContext._
 
     streamProvider.buildStream[FacebookPost](ssc, streamRegistry("facebook")).map(
