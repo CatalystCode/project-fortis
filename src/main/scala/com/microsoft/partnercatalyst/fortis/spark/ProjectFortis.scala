@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.pipeline._
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSchema
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.ConnectorConfig
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -13,6 +14,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtrac
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import com.datastax.spark.connector.streaming._
 
 object ProjectFortis extends App {
 
@@ -92,8 +94,10 @@ object ProjectFortis extends App {
       pipeline => pipeline(streamProvider, streamRegistry, ssc, TransformContext)
     ).reduceOption(_.union(_))
 
-    // TODO: other computations and save to DB
-    fortisEvents.foreach(_.print())
+    fortisEvents match {
+      case Some(stream) =>
+        stream.map(CassandraSchema(_)).saveToCassandra("todo", "todo")
+    }
 
     ssc.checkpoint(Settings.progressDir)
     ssc
