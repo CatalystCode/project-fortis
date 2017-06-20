@@ -41,8 +41,7 @@ object ProjectFortis extends App {
       envOrNone(name) match {
         case Some(v) => v
         case None =>
-          DriverLog.error(s"Environment variable not defined: $name")
-          sys.exit(1)
+          sys.error(s"Environment variable not defined: $name")
       }
     }
   }
@@ -172,21 +171,5 @@ object ProjectFortis extends App {
         )
       )
     )
-  }
-
-  private object DriverLog {
-    import java.io.{IOException, NotSerializableException}
-
-    @throws(classOf[IOException])
-    private def writeObject(out: java.io.ObjectOutputStream): Unit = throw new NotSerializableException()
-
-    @throws(classOf[IOException])
-    private def readObject(in: java.io.ObjectOutputStream): Unit = throw new NotSerializableException()
-
-    private lazy val logger = LogManager.getLogger(ProjectFortis.getClass.getName)
-
-    def info(message: AnyRef): Unit = logger.info(message)
-    def warn(message: AnyRef): Unit = logger.warn(message)
-    def error(message: AnyRef): Unit = logger.error(message)
   }
 }
