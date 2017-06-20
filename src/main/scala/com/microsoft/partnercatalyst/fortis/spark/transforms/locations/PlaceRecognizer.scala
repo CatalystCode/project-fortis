@@ -56,7 +56,7 @@ class PlaceRecognizer(
 
   protected def createModelsProvider(): ZipModelsProvider = {
     new ZipModelsProvider(
-      language => s"https://fortismodels.blob.core.windows.net/public/opener-$language.zip",
+      language => s"https://fortiscentral.blob.core.windows.net/opener/opener-$language.zip",
       modelsSource)
   }
 }
