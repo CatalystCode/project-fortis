@@ -29,13 +29,13 @@ object ProjectFortis extends App {
   private implicit object Settings extends Settings {
     import scala.util.Properties.envOrNone
 
-    val progressDir: String = envOrFail(Constants.Env.HighlyAvailableProgressDir)
-    val featureServiceHost: String = envOrFail(Constants.Env.FeatureServiceHost)
-    val oxfordLanguageToken: String = envOrFail(Constants.Env.OxfordLanguageToken)
-    val oxfordVisionToken: String = envOrFail(Constants.Env.OxfordVisionToken)
+    val progressDir = envOrFail(Constants.Env.HighlyAvailableProgressDir)
+    val featureServiceHost = envOrFail(Constants.Env.FeatureServiceHost)
+    val oxfordLanguageToken = envOrFail(Constants.Env.OxfordLanguageToken)
+    val oxfordVisionToken = envOrFail(Constants.Env.OxfordVisionToken)
 
-    val appInsightsKey: Option[String] = envOrNone(Constants.Env.AppInsightsKey)
-    val modelsDir: Option[String] = envOrNone(Constants.Env.LanguageModelDir)
+    val appInsightsKey = envOrNone(Constants.Env.AppInsightsKey)
+    val modelsDir = envOrNone(Constants.Env.LanguageModelDir)
 
     private def envOrFail(name: String): String = {
       envOrNone(name) match {
