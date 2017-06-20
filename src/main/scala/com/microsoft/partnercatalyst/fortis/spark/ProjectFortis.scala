@@ -9,10 +9,9 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
-import org.apache.log4j.{Level, LogManager, Logger}
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 object ProjectFortis extends App {
 
@@ -71,6 +70,10 @@ object ProjectFortis extends App {
     val conf = new SparkConf()
       .setAppName(Constants.SparkAppName)
       .setIfMissing("spark.master", Constants.SparkMasterDefault)
+      .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .set("spark.kryo.registrator", "com.microsoft.partnercatalyst.fortis.spark.serialization.KryoRegistrator")
+      .set("spark.kryoserializer.buffer", "128k")
+      .set("spark.kryoserializer.buffer.max", "64m")
 
     val ssc = new StreamingContext(
       new SparkContext(conf),
