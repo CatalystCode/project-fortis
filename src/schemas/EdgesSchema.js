@@ -1,5 +1,5 @@
 var graphql = require('graphql');
- 
+
 module.exports = graphql.buildSchema(`
   interface Edge {
     name: String!
@@ -15,7 +15,7 @@ module.exports = graphql.buildSchema(`
   enum EdgeType {
     Location
     Term
-  } 
+  }
 
   type Location implements Edge{
     name: String!
@@ -140,7 +140,7 @@ module.exports = graphql.buildSchema(`
   type Query {
     locations(site: String!, query: String): LocationCollection
     terms(site: String!, query: String, fromDate: String, toDate: String, sourceFilter: [String]): TermCollection
-    popularLocations(site: String!, langCode: String, limit: Int, timespan: String!, 
+    popularLocations(site: String!, langCode: String, limit: Int, timespan: String!,
                      zoomLevel: Int, layertype: String, sourceFilter: [String], fromDate: String, toDate: String): TopNLocationCollection
     timeSeries(site: String!, fromDate: String!, toDate: String!, zoomLevel: Int, limit: Int, layertype: String, sourceFilter: [String], mainEdge: String): EdgeTimeSeriesCollection
     topSources(site: String!, fromDate: String!, toDate: String!, limit: Int!, mainTerm: String, sourceFilter: [String]): TopSourcesCollection

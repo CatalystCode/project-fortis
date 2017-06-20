@@ -41,7 +41,7 @@ const FetchSiteDefintion = (siteId, callback) => {
 const WritePostgresRecord = (stmt, client, callback) => {
     let successful = false;
     let attempts = 0;
-    
+
     async.whilst(
         () => {
             return !successful && attempts < MAX_RETRIES;
@@ -50,7 +50,7 @@ const WritePostgresRecord = (stmt, client, callback) => {
             //console.log(stmt);
             client.query(stmt, (pgErr, results) => {
                 attempts++;
-                                    
+
                 if (!pgErr){
                     successful = true;
                 }else{
@@ -72,7 +72,7 @@ const PostgresStmtBatch = (stmtList, siteId, callback) => {
             postgresClient.connect(err => {
                 console.log(`processing ${stmtList.length} record write operations`);
                 if(!err){
-                    async.eachLimit(stmtList, PUSH_PARALLELISM, (stmt, cb)=>WritePostgresRecord(stmt, postgresClient, cb), err=>callback(siteDefinition.supportedLanguages, postgresClient, err));    
+                    async.eachLimit(stmtList, PUSH_PARALLELISM, (stmt, cb)=>WritePostgresRecord(stmt, postgresClient, cb), err=>callback(siteDefinition.supportedLanguages, postgresClient, err));
                 }else{
                     const errMsg = 'An error occured obtaining a postgres connection';
                     callback(siteDefinition.supportedLanguages, postgresClient, errMsg);
@@ -109,11 +109,11 @@ function QueryLocalities(languages, pgClient, callback){
                     'region': location.region || '',
                     'RowKey': location.rowkey.toString()
                 };
-                    
+
                 nameFieldNames.forEach(nameFieldName => {
                     mutatedLocation[nameFieldName] = location[nameFieldName];
                 });
-              
+
                 return mutatedLocation;
             });
 
@@ -131,11 +131,11 @@ function FetchPopularTerms(site, additionalEdge, limit, fromDate, toDate, zoomLe
         let query;
 
         if(additionalEdge){
-            query = `SELECT * FROM 
+            query = `SELECT * FROM
                             (SELECT keyword, sum(mentions) as mentions, CASE WHEN keyword IN('${additionalEdge}') THEN 1 ELSE 0 END as defaultOrder
                              FROM tiles
                              WHERE mentions > 0 and zoom = ${zoomLevel}
-                               and periodtype='hour' and perioddate between '${fromDate}' and '${toDate}' 
+                               and periodtype='hour' and perioddate between '${fromDate}' and '${toDate}'
                                and layertype = '${layertype}' and keyword is not null and layer = 'none'
                                ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
                              GROUP BY keyword
@@ -146,12 +146,12 @@ function FetchPopularTerms(site, additionalEdge, limit, fromDate, toDate, zoomLe
             query = `SELECT keyword, sum(mentions) as mentions
                           FROM tiles
                           WHERE mentions > 0 and zoom = ${zoomLevel}
-                               and periodtype='hour' and perioddate between '${fromDate}' and '${toDate}' 
+                               and periodtype='hour' and perioddate between '${fromDate}' and '${toDate}'
                                and layertype = '${layertype}' and keyword is not null and layer = 'none'
                                ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
                              GROUP BY keyword
                           ORDER BY mentions desc
-                          LIMIT ${limit}`;               
+                          LIMIT ${limit}`;
         }
 
         console.log(query);
@@ -159,8 +159,8 @@ function FetchPopularTerms(site, additionalEdge, limit, fromDate, toDate, zoomLe
             if(!error){
                 PostgresService(siteDefinition.featuresConnectionString, query, (error, results) => {
                     if(!error){
-                            
-                            
+
+
                         let response = {
                             'edges': results.rows.map(item => Object.assign({}, {
                                 'name': item.keyword,
@@ -181,7 +181,7 @@ function FetchPopularTerms(site, additionalEdge, limit, fromDate, toDate, zoomLe
 function TilesFetchInnerQueryUnfiltered(keyword, selectClause, whereClause){
     let innerQuery = `SELECT ${selectClause}, layer
                             FROM tiles
-                            WHERE ${whereClause} 
+                            WHERE ${whereClause}
                                 AND keyword = '${keyword}' and layer = 'none'`;
 
     return innerQuery;
@@ -193,24 +193,24 @@ function TilesFetchInnerQueryWithFilters(keyword, selectClause, whereClause, fil
                       WHERE ${whereClause}
                          AND keyword = '${keyword}'
                          AND layer IN('${filteredEdges.join('\',\'')}')
-                      UNION 
+                      UNION
                       SELECT ${selectClause}, keyword as edge
                       FROM tiles
                       WHERE ${whereClause}
-                          AND layer = '${keyword}' 
+                          AND layer = '${keyword}'
                           AND keyword IN('${filteredEdges.join('\',\'')}')`;
 
     return innerQuery;
 }
 
 module.exports = {
-    FetchSentences: function(site, originalSource, bbox, locationCoords, mainTerm, fromDate, ToDate, limit, offset, filteredEdges, 
+    FetchSentences: function(site, originalSource, bbox, locationCoords, mainTerm, fromDate, ToDate, limit, offset, filteredEdges,
                              language, sourceFilter, fulltextTerm, callback){
         let offsetValue = offset || DEFAULT_OFFSET;
         let limitValue = limit || DEFAULT_LIMIT;
-        let radiusDistance = 3000; 
+        let radiusDistance = 3000;
 
-        let query = ` SELECT st_asgeojson(geog) as featurecollection, array_to_json(keywords) as edges, array_to_json(original_sources) as original_sources_json, 
+        let query = ` SELECT st_asgeojson(geog) as featurecollection, array_to_json(keywords) as edges, array_to_json(original_sources) as original_sources_json,
                              to_char(createdtime, 'MM/DD/YYYY HH:MI:SS AM') as createdtime_fmt, *
                       FROM tilemessages
                       WHERE createdtime <= '${ToDate}' and createdtime >= '${fromDate}'
@@ -230,7 +230,7 @@ module.exports = {
             if(!error){
                 PostgresService(siteDefinition.featuresConnectionString, query, (error, results) => {
                     if(!error){
-                        
+
                         let sentencesResponse = {
                             'type': 'FeatureCollection',
                             'bbox': bbox,
@@ -265,7 +265,7 @@ module.exports = {
 
     FetchEvent: function(site, messageId, sources, langCode, callback){
         langCode = langCode ? langCode : feature.orig_language;
-        let query = ` SELECT st_asgeojson(geog) as featurecollection, to_char(createdtime, 'MM/DD/YYYY HH:MI:SS AM') as createdtime_fmt, 
+        let query = ` SELECT st_asgeojson(geog) as featurecollection, to_char(createdtime, 'MM/DD/YYYY HH:MI:SS AM') as createdtime_fmt,
                              array_to_json(keywords) as edges, array_to_json(original_sources) as original_sources_json, *
                       FROM tilemessages
                       WHERE messageid = '${messageId}' and source IN('${sources.join('\',\'')}')
@@ -293,7 +293,7 @@ module.exports = {
                                     'originalSources': feature.original_sources_json && Array.isArray(feature.original_sources_json) ? feature.original_sources_json : [feature.source]
                                 }
                             }
-                        }); 
+                        });
 
                         callback(undefined, eventResponse);
                     }else{
@@ -313,7 +313,7 @@ module.exports = {
                           and tileid IN('${tileIds.join('\',\'')}') and layer = 'none'
                           ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
                         GROUP BY keyword`;
-            
+
             console.log(query);
             FetchSiteDefintion(site, (error, siteDefinition) => {
                 if(!error){
@@ -352,7 +352,7 @@ module.exports = {
                             ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
                             ${fromDate && toDate ? ` AND perioddate between '${fromDate}' and '${toDate}' and periodtype='hour'` : ` and period = '${timespan}'`}
                             and zoom = ${zoomLevel} AND keyword = '${keyword}' AND layer NOT IN('none', '${keyword}')
-                           UNION 
+                           UNION
                             SELECT mentions, keyword as edge
                             FROM tiles
                             WHERE mentions > 0 and layertype = '${layertype}'
@@ -392,14 +392,14 @@ module.exports = {
         //Removing these data sources as the original_sources was originally backfilled with these values when the field was introduced.
         const invalidDataSources = ['{facebook-messages}', '{facebook-comments}', '{twitter}', '{acled}', '{tadaweb}'];
         const query = ` select original_sources, count(*), source
-                        from tilemessages where original_sources not in('${invalidDataSources.join('\',\'')}') 
+                        from tilemessages where original_sources not in('${invalidDataSources.join('\',\'')}')
                             ${sourceFilter && sourceFilter.length > 0 ? ` and source IN('${sourceFilter.join('\',\'')}') ` : ''}
                             ${mainTerm && mainTerm.length > 0 ? ` and array['${mainTerm}'] && keywords`: ''}
                             and createdtime <= '${toDate}' and createdtime >= '${fromDate}'
                         group by original_sources, source
                         order by count DESC
                         limit ${limit};`;
-        
+
         console.log(query);
         FetchSiteDefintion(site, (error, siteDefinition) => {
             if (!error) {
@@ -469,7 +469,7 @@ group by original_sources;`;
                        FROM tilemessages
                        WHERE createdtime <= '${toDate}' and createdtime >= '${fromDate}'
                             ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}`;
-                
+
                 PostgresService(siteDefinition.featuresConnectionString, query, (error, results) => {
                     if (!error) {
                         const topicsResponse = results.rows.map(row => Object.assign({}, {'type': 'Term', 'name': row.topics, 'RowKey': row.topics}));
@@ -500,8 +500,8 @@ group by original_sources;`;
                             ${bbox ? ` and tiles.geog && ST_MakeEnvelope(${bbox.join(', ')}, 4326)` : ''}
                             ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
                             ${zoomLevel ? ` and zoom = ${zoomLevel}` : ''}`;
-            
-            
+
+
             let selectClause = 'geog, neg_sentiment, pos_sentiment, mentions, tileid';
             let query, innerQuery, fromClause;
 
@@ -511,11 +511,11 @@ group by original_sources;`;
                 fromClause = TilesFetchInnerQueryWithFilters(keyword, selectClause, whereClause, filteredEdges);
             }
 
-            fromClause = `SELECT features.geog, tileid, SUM(mentions*pos_sentiment) as pos_wavg, sum(mentions) as mentions, 
+            fromClause = `SELECT features.geog, tileid, SUM(mentions*pos_sentiment) as pos_wavg, sum(mentions) as mentions,
 				                 SUM(mentions*neg_sentiment) as neg_wavg
                           FROM (${fromClause}) features
                           GROUP BY geog, tileid`;
-            
+
             innerQuery = `SELECT geog, tileid, neg_wavg/mentions AS neg_wavg,
                                 pos_wavg/mentions AS pos_wavg,
                                 mentions as mentions
@@ -525,7 +525,7 @@ group by original_sources;`;
                      FROM (SELECT (select l.name as location_name FROM localities as l ORDER BY a.geog <-> l.geog LIMIT 1), a.*
                            FROM (${innerQuery}) a) tiles, localities b
                      WHERE location_name = b.name`;
-            
+
             console.log(query);
 
             FetchSiteDefintion(site, (error, siteDefinition) => {
@@ -572,11 +572,11 @@ group by original_sources;`;
                           ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
                           ${edgeFilters.length === 0 ? ' and keyword is not null ': ` and keyword IN('${edgeFilters.join('\',\'')}')`}`;
 
-            fromClause = `SELECT features.geog, tileid, SUM(mentions*pos_sentiment) as pos_wavg, sum(mentions) as mentions, 
+            fromClause = `SELECT features.geog, tileid, SUM(mentions*pos_sentiment) as pos_wavg, sum(mentions) as mentions,
 				                 SUM(mentions*neg_sentiment) as neg_wavg
                           FROM (${fromClause}) features
                           GROUP BY geog, tileid`;
-            
+
             innerQuery = `SELECT geog, tileid, neg_wavg/mentions AS neg_wavg,
                                 pos_wavg/mentions AS pos_wavg,
                                 mentions as mentions
@@ -623,15 +623,15 @@ group by original_sources;`;
             let nameFieldName = langCode !== ENGLISH_LANG_CODE ? `${langCode}_name` : 'name';
 
             let query = `SELECT  location_name, SUM(mentions) as mentions, ST_X(b.geog::geometry) as longitude, ST_Y(b.geog::geometry) as latitude, population
-                         FROM 
+                         FROM
                             (SELECT (select l.${nameFieldName} as location_name FROM localities as l ORDER BY a.geog <-> l.geog LIMIT 1), a.*
                             FROM   (SELECT geog, tileid, sum(mentions) as mentions
                                 FROM tiles
-                                WHERE mentions > 0 and zoom = ${zoomLevel} 
+                                WHERE mentions > 0 and zoom = ${zoomLevel}
                                     ${fromDate && toDate ? ` AND perioddate between '${fromDate}' and '${toDate}' and periodtype='hour'` : ` and period = '${timespan}'`}
                                     and layertype = '${layertype}' and keyword is not null and layer = 'none'
                                     ${sourceFilter && sourceFilter.length > 0 ? ` AND source IN('${sourceFilter.join('\',\'')}')` : ''}
-                                GROUP BY geog, tileid) a) locations, 
+                                GROUP BY geog, tileid) a) locations,
                                 localities b
                          WHERE locations.location_name = b.name
                          GROUP BY location_name, b.geog, population
@@ -661,7 +661,7 @@ group by original_sources;`;
         }
     },
 
-    FetchAllLocations: function(siteCode, callback){        
+    FetchAllLocations: function(siteCode, callback){
         if(siteCode){
             FetchSiteDefintion(siteCode, (error, siteDefinition) => {
                 if(!error){
@@ -681,15 +681,15 @@ group by original_sources;`;
             });
         }
     },
-    SaveLocalities: function(siteCode, modifiedLocations, callback){        
+    SaveLocalities: function(siteCode, modifiedLocations, callback){
         if(siteCode){
             const upsertStmts = modifiedLocations.map(location=>{
                 return `INSERT INTO localities (
-                            geonameid, originalsource, feature_class, name, region, alternatenames, 
+                            geonameid, originalsource, feature_class, name, region, alternatenames,
                             aciiname, country_iso, geog, adminid, population, ar_name, ur_name, id_name, de_name
                         ) VALUES (
-                            ${parseInt(location.RowKey)}, 
-                            '${location.originalsource}', 
+                            ${parseInt(location.RowKey)},
+                            '${location.originalsource}',
                             'PPL',
                             '${location.name ? location.name.replace(/\'/g, '\'\'') : ''}',
                             '${location.region ? location.region.replace(/\'/g, '\'\'') : ''}',
@@ -748,7 +748,7 @@ group by original_sources;`;
     },
     EdgeTimeSeries: function(siteKey, limit, zoom, layertype, fromDate, toDate, selectedEdge, dataSource, callback){
         if(siteKey){
-            FetchPopularTerms(siteKey, selectedEdge || undefined, limit, fromDate, toDate, 
+            FetchPopularTerms(siteKey, selectedEdge || undefined, limit, fromDate, toDate,
                               zoom, layertype, dataSource, (error, popularTerms, featureConnString) => {
                                   if(!error){
                                       const labels = popularTerms.edges;
@@ -756,13 +756,13 @@ group by original_sources;`;
                                       if(labels && labels.length > 0){
                                           const query = ` SELECT keyword, sum(mentions) as mentions, perioddate
                                         FROM tiles
-                                        WHERE zoom = ${zoom} and keyword is not null and layer = 'none' and periodtype='hour' 
+                                        WHERE zoom = ${zoom} and keyword is not null and layer = 'none' and periodtype='hour'
                                             and perioddate between '${fromDate}' and '${toDate}'
                                             ${dataSource && dataSource.length > 0 ? ` AND source IN('${dataSource.join('\',\'')}')` : ''}
                                             and layertype = '${layertype}' and keyword in ('${labels.map(edge=>edge.name).join('\',\'')}')
                                         GROUP BY keyword, perioddate
                                         ORDER BY perioddate, keyword`;
-                        
+
                                           PostgresService(featureConnString, query, (error, results) => {
                                               if(!error){
                                                   let aggregateMap = new Map();
@@ -779,7 +779,7 @@ group by original_sources;`;
                                                       timeSeriesEntry.edges.push(item.keyword);
                                                       timeSeriesEntry.mentions.push(item.mentions);
                                                   });
-                                
+
                                                   callback(null, {labels: labels, graphData: Array.from(aggregateMap.values())});
                                               }else{
                                                   callback(`response for locations request returned error [${error}]`, undefined);

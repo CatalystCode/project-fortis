@@ -1,5 +1,5 @@
 var graphql = require('graphql');
- 
+
 module.exports = graphql.buildSchema(`
   type SiteProperties {
     targetBbox: [Float],
@@ -135,7 +135,7 @@ module.exports = graphql.buildSchema(`
     pages: [FacebookPageInput]!
     site: String!
   }
-  
+
   type Query {
     sites(siteId: String): SiteCollection
     twitterAccounts(siteId: String!): TwitterAccountCollection

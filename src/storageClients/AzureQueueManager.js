@@ -29,7 +29,7 @@ function pushMessageToStorageQueue(message, queueSvc, callback){
     try {
         queueSvc.createMessage(PRE_NLP_QUEUE, JSON.stringify(message), (error, result, response) => {
             if (error) {
-                const errMsg = `Azure Queue push error occured error [${error}]`; 
+                const errMsg = `Azure Queue push error occured error [${error}]`;
                 RaiseException(errMsg);
                 callback(errMsg);
             }else{
@@ -45,7 +45,7 @@ function pushMessageToStorageQueue(message, queueSvc, callback){
 
 function processMessage(item, queueSvc, asyncCB){
     let eventDate, geoJson;
-    
+
     try{
         eventDate = moment(item.created_at, DATE_FORMAT, 'en').toISOString();
     }catch(error){
@@ -76,7 +76,7 @@ module.exports = {
     customEvents(eventList, callback){
         let queueSvc = getAzureQueueService();
         if(eventList){
-            asyncEachLimit(eventList, ASYNC_QUEUE_LIMIT, (item, asyncCB)=>processMessage(item, queueSvc, asyncCB), 
+            asyncEachLimit(eventList, ASYNC_QUEUE_LIMIT, (item, asyncCB)=>processMessage(item, queueSvc, asyncCB),
                                finalCBErr => {
                                    let processedEvents;
 
@@ -86,7 +86,7 @@ module.exports = {
                                        console.log(`Finished writing ${eventList.length} to ${PRE_NLP_QUEUE}`);
                                        processedEvents = eventList.map(ev=>ev.RowKey);
                                    }
-                                   
+
                                    callback(finalCBErr, processedEvents);
                                }
             );

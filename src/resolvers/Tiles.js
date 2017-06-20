@@ -38,7 +38,7 @@ module.exports = {
         const zoom = args.zoomLevel || DEFAULT_ZOOM_LEVEL;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchTilesByBbox(site, bbox, zoom, filters, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate, 
+            postgresMessageService.FetchTilesByBbox(site, bbox, zoom, filters, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -64,9 +64,9 @@ module.exports = {
             const toDate = args.toDate;
             const site = args.site;
             const sourceFilter = args.sourceFilter;
-            
+
             return new Promise((resolve, reject) => {
-                postgresMessageService.FetchTilesByIds(site, tileIds, filters, timespan, layerType, sourceFilter, fromDate, toDate, 
+                postgresMessageService.FetchTilesByIds(site, tileIds, filters, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -93,7 +93,7 @@ module.exports = {
             const populationMax = args.populationMax;
 
             return new Promise((resolve, reject) => {
-                tileService.FetchTilesInsideBbox(site, bbox, zoom, populationMin, populationMax, 
+                tileService.FetchTilesInsideBbox(site, bbox, zoom, populationMin, populationMax,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -121,9 +121,9 @@ module.exports = {
             const toDate = args.toDate;
             const site = args.site;
             const sourceFilter = args.sourceFilter;
-            
+
             return new Promise((resolve, reject) => {
-                postgresMessageService.FetchEdgesByTileIds(site, tileIds, timespan, layerType, sourceFilter, fromDate, toDate, 
+                postgresMessageService.FetchEdgesByTileIds(site, tileIds, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -144,15 +144,15 @@ module.exports = {
         const layerType = args.layerType || DEFAULT_LAYER_TYPE;
         const timespan = args.timespan;
         const fromDate = args.fromDate;
-        const toDate = args.toDate;        
+        const toDate = args.toDate;
         const bbox = args.bbox;
         const site = args.site;
         const zoom = args.zoomLevel || DEFAULT_ZOOM_LEVEL;
         const sourceFilter = args.sourceFilter;
         const mainTerm = args.mainEdge;
-            
+
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchEdgesByTerm(site, bbox, zoom, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate,  
+            postgresMessageService.FetchEdgesByTerm(site, bbox, zoom, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;

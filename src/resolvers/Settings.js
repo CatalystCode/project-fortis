@@ -10,14 +10,14 @@ module.exports = {
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
-            azureTableService.GetSiteDefinition(siteId, 
+            azureTableService.GetSiteDefinition(siteId,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
                             let siteCollection = Object.assign({}, {runTime: Date.now() - startTime, sites: results});
-                            
+
                             resolve(siteCollection);
                         }
                     });
@@ -27,7 +27,7 @@ module.exports = {
         const siteDefintion = args.input;
 
         return new Promise((resolve, reject) => {
-            azureTableService.InsertOrReplaceSiteDefinition(siteDefintion, 
+            azureTableService.InsertOrReplaceSiteDefinition(siteDefintion,
                     (error, result) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -44,7 +44,7 @@ module.exports = {
         const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyFacebookPages(inputDefinition.site, fbPages, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
+            azureTableService.ModifyFacebookPages(inputDefinition.site, fbPages, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -67,7 +67,7 @@ module.exports = {
 
         console.log(trustedAccts);
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTrustedTwitterAccounts(inputDefinition.site, trustedAccts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
+            azureTableService.ModifyTrustedTwitterAccounts(inputDefinition.site, trustedAccts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -86,7 +86,7 @@ module.exports = {
         const fbPages = inputDefinition.pages.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyFacebookPages(inputDefinition.site, fbPages, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
+            azureTableService.ModifyFacebookPages(inputDefinition.site, fbPages, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -105,7 +105,7 @@ module.exports = {
         const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTrustedTwitterAccounts(inputDefinition.site, trustedAccts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
+            azureTableService.ModifyTrustedTwitterAccounts(inputDefinition.site, trustedAccts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -124,7 +124,7 @@ module.exports = {
         const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {'_': twitterAccountDefintions.site}, RowKey: {'_': account.accountName}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTwitterAccounts(twitterAccountDefintions.site, twitterAccounts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
+            azureTableService.ModifyTwitterAccounts(twitterAccountDefintions.site, twitterAccounts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -143,7 +143,7 @@ module.exports = {
         const twitterAccounts = twitterAccountDefintions.accounts.map(account => Object.assign({}, account, {PartitionKey: {'_': twitterAccountDefintions.site}, RowKey: {'_': account.accountName}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTwitterAccounts(twitterAccountDefintions.site, twitterAccounts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
+            azureTableService.ModifyTwitterAccounts(twitterAccountDefintions.site, twitterAccounts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -160,14 +160,14 @@ module.exports = {
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
-            azureTableService.GetTwitterAccounts(siteId, 
+            azureTableService.GetTwitterAccounts(siteId,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
                             let acctCollection = Object.assign({}, {runTime: Date.now() - startTime, accounts: results});
-                            
+
                             resolve(acctCollection);
                         }
                     });
@@ -177,14 +177,14 @@ module.exports = {
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
-            azureTableService.GetTrustedTwitterAccounts(siteId, 
+            azureTableService.GetTrustedTwitterAccounts(siteId,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
                             let collection = Object.assign({}, {runTime: Date.now() - startTime, accounts: results});
-                            
+
                             resolve(collection);
                         }
                     });
@@ -194,14 +194,14 @@ module.exports = {
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
-            azureTableService.GetFacebookPages(siteId, 
+            azureTableService.GetFacebookPages(siteId,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
                             let collection = Object.assign({}, {runTime: Date.now() - startTime, pages: results});
-                            
+
                             resolve(collection);
                         }
                     });
@@ -211,7 +211,7 @@ module.exports = {
         const days = args.days;
         const site = args.siteId;
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchFacebookAnalytics(site,days, 
+            postgresMessageService.FetchFacebookAnalytics(site,days,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal facebook analytics error: [${JSON.stringify(error)}]`;
@@ -227,14 +227,14 @@ module.exports = {
         const startTime = Date.now();
         const siteId = args.siteId;
         return new Promise((resolve, reject) => {
-            azureTableService.GetBlacklistTerms(siteId, 
+            azureTableService.GetBlacklistTerms(siteId,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
                             let collection = Object.assign({}, {runTime: Date.now() - startTime, filters: results});
-                            
+
                             resolve(collection);
                         }
                     });
@@ -246,7 +246,7 @@ module.exports = {
         const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, {PartitionKey: {'_': blacklistTermDefinitions.site}, RowKey: {'_': item.RowKey}, filteredTerms: JSON.stringify(item.filteredTerms), lang: item.lang}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyBlacklistTerms(blacklistTerms, blacklistTermDefinitions.site, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
+            azureTableService.ModifyBlacklistTerms(blacklistTerms, blacklistTermDefinitions.site, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
                     (error, results) => {
                         if(error){
                             const errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -264,7 +264,7 @@ module.exports = {
         const blacklistTerms = blacklistTermDefinitions.terms.map(item => Object.assign({}, item, {PartitionKey: {'_': blacklistTermDefinitions.site}, RowKey: {'_': item.RowKey}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyBlacklistTerms(blacklistTerms, blacklistTermDefinitions.site, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
+            azureTableService.ModifyBlacklistTerms(blacklistTerms, blacklistTermDefinitions.site, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;

@@ -17,7 +17,7 @@ const AZURE_TABLE_BATCH_ACTIONS = {
 
 function GetAzureTblBatchAction(offset, partitionKey, tasks, action){
     const batch = new azureStorage.TableBatch();
-    
+
     if(Array.isArray(tasks) && offset < tasks.length){
         const upperBounds = offset + AZURE_TABLE_BATCH_MAX_OPERATIONS < tasks.length ? offset + AZURE_TABLE_BATCH_MAX_OPERATIONS : tasks.length;
         const batchTasks = tasks.slice(offset, upperBounds);
@@ -94,7 +94,7 @@ function GetBlacklistFromAzureTbl(siteKey, tableService, callback){
                 if(!error){
                     callback(undefined, result.entries ? result.entries.map(filter => {
                         const filteredTerm = Object.assign({}, {
-                            'filteredTerms': filter.filteredTerms ? JSON.parse(filter.filteredTerms._) : [], 
+                            'filteredTerms': filter.filteredTerms ? JSON.parse(filter.filteredTerms._) : [],
                             'RowKey': filter.RowKey._,
                             'lang': filter.lang._
                         });
@@ -120,13 +120,13 @@ function GetTwitterAccountsFromAzureTbl(siteKey, tableService, callback){
             tableService.queryEntities(AZURE_TBL_TWITTER_ACCOUNTS, query, null, (error, result2, response) => {
                 if(!error){
                     callback(undefined, result2.entries ? result2.entries.map(acct => {
-                        let account = {'consumerSecret': acct.consumerSecret ? acct.consumerSecret._ : '', 
-                                           'consumerKey': acct.consumerKey ? acct.consumerKey._ : '', 
+                        let account = {'consumerSecret': acct.consumerSecret ? acct.consumerSecret._ : '',
+                                           'consumerKey': acct.consumerKey ? acct.consumerKey._ : '',
                                            'accountName': acct.RowKey._,
                                            'token': acct.token ? acct.token._ : '',
                                            'tokenSecret': acct.tokenSecret ? acct.tokenSecret._ : ''
                                           };
-                            
+
                         return account;
                     }) : []);
                 }else{
@@ -195,7 +195,7 @@ function FetchSiteDefinitions(siteId, tableService, callback){
 }
 
 module.exports = {
-    AZURE_TABLE_BATCH_ACTIONS, 
+    AZURE_TABLE_BATCH_ACTIONS,
     GetSiteDefinition(siteId, callback){
         FetchSiteDefinitions(siteId, azureStorage.createTableService(), callback);
     },

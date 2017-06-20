@@ -16,14 +16,14 @@ module.exports = {
         let site = args.site;
         let timespan = args.timespan;
         let fromDate = args.fromDate;
-        let toDate = args.toDate;        
+        let toDate = args.toDate;
         let sourceFilter = args.sourceFilter;
         let limit = args.limit || DEFAULT_LIMIT;
         let zoom = args.zoomLevel || DEFAULT_ZOOM_LEVEL;
         let layertype = args.layertype || DEFAULT_LAYER_TYPE;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchPopularLocations(site, requestedLanguage, limit, timespan, zoom, layertype, sourceFilter, fromDate, toDate,  
+            postgresMessageService.FetchPopularLocations(site, requestedLanguage, limit, timespan, zoom, layertype, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;

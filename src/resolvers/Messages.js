@@ -25,7 +25,7 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, bbox, undefined, mainTerm, fromDate, toDate, args.limit, args.offset,
-                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
+                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm,
                         (error, results) => {
                             if(error){
                                 let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -57,7 +57,7 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, undefined, coordinates, undefined, fromDate, toDate, limit, offset,
-                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
+                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm,
                         (error, results) => {
                             if(error){
                                 let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -84,7 +84,7 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, undefined, undefined, undefined, fromDate, toDate, limit, offset,
-                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
+                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm,
                         (error, results) => {
                             if(error){
                                 let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -104,7 +104,7 @@ module.exports = {
         const dataSources = args.dataSources;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchEvent(site, messageId, dataSources, langCode, 
+            postgresMessageService.FetchEvent(site, messageId, dataSources, langCode,
                         (error, results) => {
                             if(error){
                                 let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -119,9 +119,9 @@ module.exports = {
     publishEvents(args, res){
         const actionPost = args.input;
         const messages = actionPost.messages;
-        
+
         return new Promise((resolve, reject) => {
-            azureQueueManager.customEvents(messages, 
+            azureQueueManager.customEvents(messages,
                     (error, result) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;

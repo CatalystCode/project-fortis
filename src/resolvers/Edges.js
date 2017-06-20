@@ -19,7 +19,7 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             if(fromDate && toDate){
-                postgresMessageService.FetchMessageTopicList(siteCode, sourceFilter, fromDate, toDate, 
+                postgresMessageService.FetchMessageTopicList(siteCode, sourceFilter, fromDate, toDate,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -29,7 +29,7 @@ module.exports = {
                             }
                         });
             }else{
-                azureTableService.GetKeywordList(siteCode, 
+                azureTableService.GetKeywordList(siteCode,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -46,7 +46,7 @@ module.exports = {
         let siteCode = args.site;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchAllLocations(siteCode, 
+            postgresMessageService.FetchAllLocations(siteCode,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -62,9 +62,9 @@ module.exports = {
         const actionPost = args.input;
         const siteId = actionPost.site;
         const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {'_': siteId}, RowKey: {'_': term.RowKey}}));
-        
+
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
+            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE,
                     (error, result) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -82,7 +82,7 @@ module.exports = {
         const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {'_': siteId}, RowKey: {'_': term.RowKey}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
+            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
                     (error, result) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -100,7 +100,7 @@ module.exports = {
         const locations = actionPost.edges;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.SaveLocalities(siteId, locations, 
+            postgresMessageService.SaveLocalities(siteId, locations,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -116,9 +116,9 @@ module.exports = {
         const actionPost = args.input;
         const siteId = actionPost.site;
         const locations = actionPost.edges;
-        
+
         return new Promise((resolve, reject) => {
-            postgresMessageService.RemoveLocalities(siteId, locations, 
+            postgresMessageService.RemoveLocalities(siteId, locations,
                     (error, result) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -143,7 +143,7 @@ module.exports = {
         let layertype = args.layertype || DEFAULT_LAYER_TYPE;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchPopularLocations(site, requestedLanguage, limit, timespan, zoom, layertype, sourceFilter, fromDate, toDate, 
+            postgresMessageService.FetchPopularLocations(site, requestedLanguage, limit, timespan, zoom, layertype, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -166,7 +166,7 @@ module.exports = {
         const mainEdge = args.mainEdge;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.EdgeTimeSeries(site, limit, zoom, layertype, fromDate, toDate, mainEdge, dataSource, 
+            postgresMessageService.EdgeTimeSeries(site, limit, zoom, layertype, fromDate, toDate, mainEdge, dataSource,
                     (error, results) => {
                         if(error || !(results.labels && results.graphData)){
                             let errorMsg = `Internal time series server error: [${JSON.stringify(error)}]`;
@@ -177,7 +177,7 @@ module.exports = {
                     });
         });
     },
-    
+
     topSources(args,res) {
         let fromDate = args.fromDate;
         let toDate = args.toDate;
