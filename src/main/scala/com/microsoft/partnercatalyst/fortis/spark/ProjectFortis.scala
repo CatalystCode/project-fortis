@@ -88,6 +88,7 @@ object ProjectFortis extends App {
     // TODO: other computations and save to DB
     fortisEvents.foreach(_.print())
 
+    ssc.checkpoint(Settings.progressDir)
     ssc
   }
 
