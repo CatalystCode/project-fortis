@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.pipeline._
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSchema
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSink
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.ConnectorConfig
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -14,7 +14,6 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtrac
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import com.datastax.spark.connector.streaming._
 
 object ProjectFortis extends App {
 
@@ -90,14 +89,8 @@ object ProjectFortis extends App {
 
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
-    val fortisEvents = pipelines.flatMap(
-      pipeline => pipeline(streamProvider, streamRegistry, ssc, TransformContext)
-    ).reduceOption(_.union(_))
-
-    fortisEvents match {
-      case Some(stream) =>
-        stream.map(CassandraSchema(_)).saveToCassandra("todo", "todo")
-    }
+    val fortisEvents = pipelines.flatMap(pipeline => pipeline(streamProvider, streamRegistry, ssc, TransformContext)).reduceOption(_.union(_))
+    CassandraSink(fortisEvents, "keyspaceName", "tableName") // todo: fill in real values
 
     ssc.checkpoint(Settings.progressDir)
     ssc
