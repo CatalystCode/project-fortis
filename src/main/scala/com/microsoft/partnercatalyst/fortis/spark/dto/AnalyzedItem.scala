@@ -1,4 +1,11 @@
-package com.microsoft.partnercatalyst.fortis.spark.transforms
+package com.microsoft.partnercatalyst.fortis.spark.dto
+
+case class AnalyzedItem[T](
+  originalItem: T,
+  source: String,
+  sharedLocations: List[Location] = List(),
+  analysis: Analysis
+) extends FortisItem
 
 case class Analysis(
   language: Option[String] = None,
@@ -21,11 +28,4 @@ case class Location(
 case class Tag(
   name: String,
   confidence: Double
-)
-
-case class AnalyzedItem[T](
-  originalItem: T,
-  source: String,
-  sharedLocations: List[Location] = List(),
-  analysis: Analysis
 )

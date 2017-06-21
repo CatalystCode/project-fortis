@@ -1,8 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
+import com.microsoft.partnercatalyst.fortis.spark.dto.Location
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
-import com.microsoft.partnercatalyst.fortis.spark.transforms.Location
 
 import scala.collection.mutable
 
