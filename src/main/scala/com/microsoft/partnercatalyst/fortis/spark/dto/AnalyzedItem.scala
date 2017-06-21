@@ -1,11 +1,12 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
-case class AnalyzedItem[T](
-  originalItem: T,
+case class AnalyzedItem(
+  body: String,
+  title: String,
   source: String,
   sharedLocations: List[Location] = List(),
   analysis: Analysis
-) extends FortisItem
+)
 
 case class Analysis(
   language: Option[String] = None,
