@@ -1,20 +1,19 @@
-"use strict"
+'use strict';
 
 let azure = require('azure-storage');
 let Promise = require('promise');
-var fs = require('fs');
 const DEFAULT_PAGE_SIZE = 20;
 const DEFAULT_SKIP = 0;
-const FACTS_CONTAINER_NAME = "factsout";
+const FACTS_CONTAINER_NAME = 'factsout';
 const FACTS_STORAGE_CONNECTION_STRING = process.env.FACTS_STORAGE_CONNECTION_STRING;
 
 module.exports = {
 
-    GetFact: function (id, callback, logger) {
+    GetFact: function (id, callback, logger) { // eslint-disable-line no-unused-vars
         var blobSvc = azure.createBlobService(FACTS_STORAGE_CONNECTION_STRING);
-        let blobPrefix = id.split("-")[0] + "/" + id.split("-")[1] + "/" + id.split("-")[2];
-        let factIndex = id.split("-")[3];
-        blobSvc.listBlobsSegmentedWithPrefix(FACTS_CONTAINER_NAME, blobPrefix, null, null, (error, result, response) => {
+        let blobPrefix = id.split('-')[0] + '/' + id.split('-')[1] + '/' + id.split('-')[2];
+        let factIndex = id.split('-')[3];
+        blobSvc.listBlobsSegmentedWithPrefix(FACTS_CONTAINER_NAME, blobPrefix, null, null, (error, result, response) => { // eslint-disable-line no-unused-vars
             if (error || !result || !result.entries || result.entries.length == 0) {
                 callback(null, error);
             }
@@ -26,7 +25,7 @@ module.exports = {
                     }
                     else {
                         try {
-                            let rawFact = JSON.parse(text.split("\n")[factIndex]);
+                            let rawFact = JSON.parse(text.split('\n')[factIndex]);
                             callback(getFactObject(rawFact, blobName, factIndex));
                         }
                         catch (e) {
@@ -44,10 +43,10 @@ module.exports = {
 
         var blobSvc = azure.createBlobService(FACTS_STORAGE_CONNECTION_STRING);
         new Promise((resolve, reject) => {
-            blobSvc.listBlobsSegmented(FACTS_CONTAINER_NAME, null, (error, result, response) => {
+            blobSvc.listBlobsSegmented(FACTS_CONTAINER_NAME, null, (error, result, response) => { // eslint-disable-line no-unused-vars
                 if (!error) {
                     let blobs = result.entries.filter(blob => {
-                        return blob.name.indexOf(".json") != -1 && blob.lastModified;
+                        return blob.name.indexOf('.json') != -1 && blob.lastModified;
                     }).sort(function (a, b) {
                         return Date.parse(getDateFromBlobName(a.name)) < Date.parse(getDateFromBlobName(b.name)) ? 1 : -1;
                     }).slice(skip, skip + pageSize);
@@ -71,10 +70,10 @@ module.exports = {
         function getReadBlobPromises(blobs, tagFilter) {
             var blobReadPromises = [];
             blobs.forEach(blob => {
-                blobReadPromises.push(new Promise((resolve, reject) => {
+                blobReadPromises.push(new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
                     blobSvc.getBlobToText(FACTS_CONTAINER_NAME, blob.name, null, function (error, text) {
                         let factIndex = 0;
-                        text.split("\n").forEach(factText => {
+                        text.split('\n').forEach(factText => {
                             try {
                                 let rawFact = JSON.parse(factText);
                                 if (tagFilter && tagFilter.length != 0 && !tagsMatchFilter(tagFilter, rawFact.tags)) {
@@ -92,17 +91,17 @@ module.exports = {
                                 resolve();
                             }
 
-                        })
+                        });
                     });
                 }));
             });
             return blobReadPromises;
         }
     }
-}
+};
 
 function getDateFromBlobName(name) {
-    return name.split("/")[0] + "-" + name.split("/")[1] + "-" + name.split("/")[2];
+    return name.split('/')[0] + '-' + name.split('/')[1] + '-' + name.split('/')[2];
 }
 
 function tagsMatchFilter(tagFilter, factTags) {
@@ -111,7 +110,7 @@ function tagsMatchFilter(tagFilter, factTags) {
 
 function getFactObject(rawFact, blobName, factIndex) {
     return {
-        id: getDateFromBlobName(blobName) + "-" + factIndex,
+        id: getDateFromBlobName(blobName) + '-' + factIndex,
         language: rawFact.language,
         title: rawFact.title,
         tags: rawFact.tags,
@@ -119,5 +118,5 @@ function getFactObject(rawFact, blobName, factIndex) {
         sources: rawFact.sources,
         text: rawFact.text,
         link: rawFact.link
-    }
+    };
 }

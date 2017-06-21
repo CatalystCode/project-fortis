@@ -1,16 +1,16 @@
-"use strict"
+'use strict';
 
 let Promise = require('promise');
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-let azureTableService = require("../storageClients/AzureTableStorageManager");
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+let azureTableService = require('../storageClients/AzureTableStorageManager');
 let DEFAULT_LANGUAGE='en';
 
 const DEFAULT_LIMIT = 5;
-const DEFAULT_LAYER_TYPE = "associations";
+const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
 
 module.exports = {
-    terms(args, res){
+    terms(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         let siteCode = args.site;
         let fromDate = args.fromDate;
@@ -18,118 +18,118 @@ module.exports = {
         let toDate = args.toDate;
 
         return new Promise((resolve, reject) => {
-                if(fromDate && toDate){
-                    postgresMessageService.FetchMessageTopicList(siteCode, sourceFilter, fromDate, toDate, 
+            if(fromDate && toDate){
+                postgresMessageService.FetchMessageTopicList(siteCode, sourceFilter, fromDate, toDate,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
                             }
-                    });
-                }else{
-                    azureTableService.GetKeywordList(siteCode, 
+                        });
+            }else{
+                azureTableService.GetKeywordList(siteCode,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Term"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Term'}));
                             }
-                    });
-                }
+                        });
+            }
         });
     },
-    locations(args, res){
+    locations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         let siteCode = args.site;
 
         return new Promise((resolve, reject) => {
-                postgresMessageService.FetchAllLocations(siteCode, 
+            postgresMessageService.FetchAllLocations(siteCode,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
                             }
-                });
+                        });
         });
     },
-    removeKeywords(args, res){
+    removeKeywords(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
-        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {"_": siteId}, RowKey: {"_": term.RowKey}}));
-        
-        return new Promise((resolve, reject) => {
-            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE, 
-                    (error, result) => {
-                        if(error){
-                            let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Term"}));
-                        }
-            });
-        });
-    },
-    addKeywords(args, res){
-        const startTime = Date.now();
-        const actionPost = args.input;
-        const siteId = actionPost.site;
-        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {"_": siteId}, RowKey: {"_": term.RowKey}}));
+        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {'_': siteId}, RowKey: {'_': term.RowKey}}));
 
         return new Promise((resolve, reject) => {
-            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY, 
+            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.DELETE,
                     (error, result) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
-                            resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Term"}));
+                            resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Term'}));
                         }
-            });
+                    });
         });
     },
-    saveLocations(args, res){
+    addKeywords(args, res){ // eslint-disable-line no-unused-vars
+        const startTime = Date.now();
+        const actionPost = args.input;
+        const siteId = actionPost.site;
+        const terms = actionPost.edges.map(term=>Object.assign({}, term, {PartitionKey: {'_': siteId}, RowKey: {'_': term.RowKey}}));
+
+        return new Promise((resolve, reject) => {
+            azureTableService.ModifyTermEntities(terms, siteId, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
+                    (error, result) => {
+                        if(error){
+                            let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
+                            reject(errorMsg);
+                        }else{
+                            resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Term'}));
+                        }
+                    });
+        });
+    },
+    saveLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
         const locations = actionPost.edges;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.SaveLocalities(siteId, locations, 
+            postgresMessageService.SaveLocalities(siteId, locations,
                         (error, result) => {
                             if(error){
                                 let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
+                                resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
                             }
-            });
+                        });
         });
     },
-    removeLocations(args, res){
+    removeLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const actionPost = args.input;
         const siteId = actionPost.site;
         const locations = actionPost.edges;
-        
+
         return new Promise((resolve, reject) => {
-            postgresMessageService.RemoveLocalities(siteId, locations, 
+            postgresMessageService.RemoveLocalities(siteId, locations,
                     (error, result) => {
-                            if(error){
-                                let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
-                                reject(errorMsg);
-                            }else{
-                                resolve(Object.assign({}, {"runTime": Date.now() - startTime, "edges": result, "type": "Location"}));
-                            }
-            });
+                        if(error){
+                            let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
+                            reject(errorMsg);
+                        }else{
+                            resolve(Object.assign({}, {'runTime': Date.now() - startTime, 'edges': result, 'type': 'Location'}));
+                        }
+                    });
         });
     },
-    popularLocations(args, res){
+    popularLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode || DEFAULT_LANGUAGE;
@@ -143,7 +143,7 @@ module.exports = {
         let layertype = args.layertype || DEFAULT_LAYER_TYPE;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchPopularLocations(site, requestedLanguage, limit, timespan, zoom, layertype, sourceFilter, fromDate, toDate, 
+            postgresMessageService.FetchPopularLocations(site, requestedLanguage, limit, timespan, zoom, layertype, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
@@ -152,10 +152,10 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            });
+                    });
         });
     },
-    timeSeries(args, res){
+    timeSeries(args, res){ // eslint-disable-line no-unused-vars
         const site = args.site;
         const fromDate = args.fromDate;
         const toDate = args.toDate;
@@ -166,7 +166,7 @@ module.exports = {
         const mainEdge = args.mainEdge;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.EdgeTimeSeries(site, limit, zoom, layertype, fromDate, toDate, mainEdge, dataSource, 
+            postgresMessageService.EdgeTimeSeries(site, limit, zoom, layertype, fromDate, toDate, mainEdge, dataSource,
                     (error, results) => {
                         if(error || !(results.labels && results.graphData)){
                             let errorMsg = `Internal time series server error: [${JSON.stringify(error)}]`;
@@ -174,11 +174,11 @@ module.exports = {
                         }else{
                             resolve(results);
                         }
-            });
+                    });
         });
     },
-    
-    topSources(args,res) {
+
+    topSources(args,res) { // eslint-disable-line no-unused-vars
         let fromDate = args.fromDate;
         let toDate = args.toDate;
         const site = args.site;
@@ -195,7 +195,7 @@ module.exports = {
                             let collection = Object.assign({}, {sources: results});
                             resolve(collection);
                         }
-            });
+                    });
         });
     }
 };

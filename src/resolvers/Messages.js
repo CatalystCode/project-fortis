@@ -1,17 +1,15 @@
-"use strict"
+'use strict';
 
 let Promise = require('promise');
-let azureQueueManager = require("../storageClients/AzureQueueManager");
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-let translatorService = require("../translatorClient/MsftTranslator");
-let geotile = require('geotile');
+let azureQueueManager = require('../storageClients/AzureQueueManager');
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+let translatorService = require('../translatorClient/MsftTranslator');
 
 const DEFAULT_LIMIT = 20;
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = 'en';
 
 module.exports = {
-    byBbox(args, res){
-        let response = res.res;
+    byBbox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode;
@@ -25,20 +23,19 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, bbox, undefined, mainTerm, fromDate, toDate, args.limit, args.offset,
-                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
+                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm,
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
-                            resolve(messages);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
+                                resolve(messages);
+                            }
+                        });
         });
     },
-    byLocation(args, res){
-        let response = res.res;
+    byLocation(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode;
@@ -52,25 +49,24 @@ module.exports = {
         let offset = args.offset || 0;
 
         if(coordinates.length !== 2){
-            throw new Error("Empty tileId error.");
+            throw new Error('Empty tileId error.');
         }
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, undefined, coordinates, undefined, fromDate, toDate, limit, offset,
-                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
+                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm,
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
-                            resolve(messages);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
+                                resolve(messages);
+                            }
+                        });
         });
     },
-    byEdges(args, res){
-        let response = res.res;
+    byEdges(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
 
         let requestedLanguage = args.langCode;
@@ -84,57 +80,55 @@ module.exports = {
 
         return new Promise((resolve, reject) => {
             postgresMessageService.FetchSentences(site, originalSource, undefined, undefined, undefined, fromDate, toDate, limit, offset,
-                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm, 
+                    filteredEdges, requestedLanguage, args.sourceFilter, args.fulltextTerm,
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
-                            resolve(messages);
-                        }
-            });
+                            if(error){
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
+                                reject(errorMsg);
+                            }else{
+                                let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
+                                resolve(messages);
+                            }
+                        });
         });
     },
-    event(args, res){
-        let response = res.res;
+    event(args, res){ // eslint-disable-line no-unused-vars
         const messageId = args.messageId;
         const site = args.site;
         const langCode = args.langCode || DEFAULT_LANGUAGE;
         const dataSources = args.dataSources;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchEvent(site, messageId, dataSources, langCode, 
+            postgresMessageService.FetchEvent(site, messageId, dataSources, langCode,
                         (error, results) => {
-                        if(error){
-                            let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
-                            reject(errorMsg);
-                        }else{
-                            resolve(results);
-                        }
-            });
-        });
-    },
-
-    publishEvents(args, res){
-        const actionPost = args.input;
-        const messages = actionPost.messages;
-        
-        return new Promise((resolve, reject) => {
-            azureQueueManager.customEvents(messages, 
-                    (error, result) => {
                             if(error){
-                                let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
+                                let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
                                 reject(errorMsg);
                             }else{
-                                resolve(result);
+                                resolve(results);
                             }
-            });
+                        });
         });
     },
 
-    translate(args, res) {
-        let response = res.res;
+    publishEvents(args, res){ // eslint-disable-line no-unused-vars
+        const actionPost = args.input;
+        const messages = actionPost.messages;
+
+        return new Promise((resolve, reject) => {
+            azureQueueManager.customEvents(messages,
+                    (error, result) => {
+                        if(error){
+                            let errorMsg = `Internal location server error: [${JSON.stringify(error)}]`;
+                            reject(errorMsg);
+                        }else{
+                            resolve(result);
+                        }
+                    });
+        });
+    },
+
+    translate(args, res) { // eslint-disable-line no-unused-vars
         let sentence = args.sentence;
         let fromLanguage = args.fromLanguage;
         let toLanguage = args.toLanguage;
@@ -144,7 +138,7 @@ module.exports = {
         });
     },
 
-    translateWords(args, res) {
+    translateWords(args, res) { // eslint-disable-line no-unused-vars
         let wordsToTranslate = args.words;
         let fromLanguage = args.fromLanguage;
         let toLanguage = args.toLanguage;

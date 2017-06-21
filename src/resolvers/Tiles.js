@@ -1,14 +1,14 @@
-"use strict"
+'use strict';
 
-const DEFAULT_LAYER_TYPE = "associations";
+const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
 const DEFAULT_PLACE_ZOOM_LEVEL = 8;
 const RADIUS_DISTANCE_IN_MILES = 5;
 
 let Promise = require('promise');
 let GeoPoint = require('geopoint');
-let postgresMessageService = require("../postgresClients/PostgresLocationManager");
-let tileService = require("../osmClients/TileServiceManager");
+let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+let tileService = require('../osmClients/TileServiceManager');
 let geotile = require('geotile');
 
 function CoordinatesToNearbyTiles(multiPointArray){
@@ -24,7 +24,7 @@ function CoordinatesToNearbyTiles(multiPointArray){
 }
 
 module.exports = {
-    fetchTilesByBBox(args, res){
+    fetchTilesByBBox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const filters = args.filteredEdges || [];
         const bbox = args.bbox;
@@ -38,7 +38,7 @@ module.exports = {
         const zoom = args.zoomLevel || DEFAULT_ZOOM_LEVEL;
 
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchTilesByBbox(site, bbox, zoom, filters, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate, 
+            postgresMessageService.FetchTilesByBbox(site, bbox, zoom, filters, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -47,11 +47,11 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            });
+                    });
         });
     },
 
-    fetchTilesByLocations(args, res){
+    fetchTilesByLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const locations = args.locations;
 
@@ -64,9 +64,9 @@ module.exports = {
             const toDate = args.toDate;
             const site = args.site;
             const sourceFilter = args.sourceFilter;
-            
+
             return new Promise((resolve, reject) => {
-                postgresMessageService.FetchTilesByIds(site, tileIds, filters, timespan, layerType, sourceFilter, fromDate, toDate, 
+                postgresMessageService.FetchTilesByIds(site, tileIds, filters, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -75,14 +75,14 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-                     })
+                    });
             });
         }else{
-            throw new Error("Empty location list error");
+            throw new Error('Empty location list error');
         }
     },
 
-    fetchPlacesByBBox(args, res){
+    fetchPlacesByBBox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const bbox = args.bbox;
 
@@ -93,23 +93,23 @@ module.exports = {
             const populationMax = args.populationMax;
 
             return new Promise((resolve, reject) => {
-                tileService.FetchTilesInsideBbox(site, bbox, zoom, populationMin, populationMax, 
+                tileService.FetchTilesInsideBbox(site, bbox, zoom, populationMin, populationMax,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
                             reject(errorMsg);
                         }else{
-                            let featureCollection = Object.assign({}, results, {bbox: bbox, type: "FeatureCollection", runTime: Date.now() - startTime, features: results});
+                            let featureCollection = Object.assign({}, results, {bbox: bbox, type: 'FeatureCollection', runTime: Date.now() - startTime, features: results});
                             resolve(featureCollection);
                         }
-                     })
+                    });
             });
         }else{
-            throw new Error("Empty bbox error");
+            throw new Error('Empty bbox error');
         }
     },
 
-    fetchEdgesByLocations(args, res){
+    fetchEdgesByLocations(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const locations = args.locations;
 
@@ -121,9 +121,9 @@ module.exports = {
             const toDate = args.toDate;
             const site = args.site;
             const sourceFilter = args.sourceFilter;
-            
+
             return new Promise((resolve, reject) => {
-                postgresMessageService.FetchEdgesByTileIds(site, tileIds, timespan, layerType, sourceFilter, fromDate, toDate, 
+                postgresMessageService.FetchEdgesByTileIds(site, tileIds, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -132,27 +132,27 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-                     })
+                    });
             });
         }else{
-            throw new Error("Empty location list error");
+            throw new Error('Empty location list error');
         }
     },
 
-    fetchEdgesByBBox(args, res){
+    fetchEdgesByBBox(args, res){ // eslint-disable-line no-unused-vars
         const startTime = Date.now();
         const layerType = args.layerType || DEFAULT_LAYER_TYPE;
         const timespan = args.timespan;
         const fromDate = args.fromDate;
-        const toDate = args.toDate;        
+        const toDate = args.toDate;
         const bbox = args.bbox;
         const site = args.site;
         const zoom = args.zoomLevel || DEFAULT_ZOOM_LEVEL;
         const sourceFilter = args.sourceFilter;
         const mainTerm = args.mainEdge;
-            
+
         return new Promise((resolve, reject) => {
-            postgresMessageService.FetchEdgesByTerm(site, bbox, zoom, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate,  
+            postgresMessageService.FetchEdgesByTerm(site, bbox, zoom, mainTerm, timespan, layerType, sourceFilter, fromDate, toDate,
                     (error, results) => {
                         if(error){
                             let errorMsg = `Internal tile server error: [${JSON.stringify(error)}]`;
@@ -161,7 +161,7 @@ module.exports = {
                             let messages = Object.assign({}, results, {runTime: Date.now() - startTime});
                             resolve(messages);
                         }
-            })
+                    });
         });
     }
 };

@@ -1,8 +1,8 @@
 var graphql = require('graphql');
- 
+
 module.exports = graphql.buildSchema(`
   type Query {
-    popularLocations(site: String!, langCode: String, limit: Int, timespan: String!, 
+    popularLocations(site: String!, langCode: String, limit: Int, timespan: String!,
                      zoomLevel: Int, layertype: String, sourceFilter: [String], fromDate: String, toDate: String): FeatureCollection
   }
 
