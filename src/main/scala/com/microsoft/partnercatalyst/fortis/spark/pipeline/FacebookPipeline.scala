@@ -9,10 +9,8 @@ import org.apache.spark.streaming.dstream.DStream
 object FacebookPipeline extends Pipeline {
 
   override def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]], ssc: StreamingContext, transformContext: TransformContext): Option[DStream[AnalyzedItem]] = {
-    streamProvider.buildStream[FacebookPost](ssc, streamRegistry("facebook")) match {
-      case None => None
-      case Some(stream) => Some(TextPipeline(convertToSchema(stream, transformContext), transformContext))
-    }
+    streamProvider.buildStream[FacebookPost](ssc, streamRegistry("facebook")).map(stream =>
+      TextPipeline(convertToSchema(stream, transformContext), transformContext))
   }
 
   private def convertToSchema(stream: DStream[FacebookPost], transformContext: TransformContext): DStream[AnalyzedItem] = {

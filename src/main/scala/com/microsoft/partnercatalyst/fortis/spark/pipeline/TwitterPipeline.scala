@@ -9,10 +9,8 @@ import twitter4j.{Status => TwitterStatus}
 object TwitterPipeline extends Pipeline {
 
   override def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]], ssc: StreamingContext, transformContext: TransformContext): Option[DStream[AnalyzedItem]] = {
-    streamProvider.buildStream[TwitterStatus](ssc, streamRegistry("twitter")) match {
-      case None => None
-      case Some(stream) => Some(TextPipeline(convertToSchema(stream, transformContext), transformContext))
-    }
+    streamProvider.buildStream[TwitterStatus](ssc, streamRegistry("twitter")).map(stream =>
+      TextPipeline(convertToSchema(stream, transformContext), transformContext))
   }
 
   private def convertToSchema(stream: DStream[TwitterStatus], transformContext: TransformContext): DStream[AnalyzedItem] = {

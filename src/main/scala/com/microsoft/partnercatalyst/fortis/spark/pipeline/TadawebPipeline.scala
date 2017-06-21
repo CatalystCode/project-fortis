@@ -9,10 +9,8 @@ import org.apache.spark.streaming.dstream.DStream
 
 object TadawebPipeline extends Pipeline {
   override def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]], ssc: StreamingContext, transformContext: TransformContext): Option[DStream[AnalyzedItem]] = {
-    streamProvider.buildStream[TadawebEvent](ssc, streamRegistry("tadaweb")) match {
-      case None => None
-      case Some(stream) => Some(TextPipeline(convertToSchema(stream, transformContext), transformContext))
-    }
+    streamProvider.buildStream[TadawebEvent](ssc, streamRegistry("tadaweb")).map(stream =>
+      TextPipeline(convertToSchema(stream, transformContext), transformContext))
   }
 
   private def convertToSchema(stream: DStream[TadawebEvent], transformContext: TransformContext): DStream[AnalyzedItem] = {

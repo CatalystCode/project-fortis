@@ -9,10 +9,8 @@ import org.apache.spark.streaming.dstream.DStream
 object RadioPipeline extends Pipeline {
 
   override def apply(streamProvider: StreamProvider, streamRegistry: Map[String, List[ConnectorConfig]], ssc: StreamingContext, transformContext: TransformContext): Option[DStream[AnalyzedItem]] = {
-    streamProvider.buildStream[RadioTranscription](ssc, streamRegistry("radio")) match {
-      case None => None
-      case Some(stream) => Some(TextPipeline(convertToSchema(stream, transformContext), transformContext))
-    }
+    streamProvider.buildStream[RadioTranscription](ssc, streamRegistry("radio")).map(stream =>
+      TextPipeline(convertToSchema(stream, transformContext), transformContext))
   }
 
   private def convertToSchema(stream: DStream[RadioTranscription], transformContext: TransformContext): DStream[AnalyzedItem] = {
