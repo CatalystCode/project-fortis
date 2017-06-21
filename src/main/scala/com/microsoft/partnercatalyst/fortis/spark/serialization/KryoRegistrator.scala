@@ -5,7 +5,11 @@ import org.apache.spark.serializer.{KryoRegistrator => BaseKryoRegistrator}
 
 class KryoRegistrator extends BaseKryoRegistrator {
   override def registerClasses(kryo: Kryo): Unit = {
-    // fortis
+    // !!!!!!!!!!!! ATTENTION !!!!!!!!!!!!
+    // the order of these registration calls matters as it determines the class ids
+    // so always add new classes at the end of this list
+    // more information: https://stackoverflow.com/a/32869053/3817588
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem[_]])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer])
@@ -20,15 +24,11 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.CognitiveServicesSentimentDetector])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.WordListSentimentDetector])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth])
-
-    // twitter
     kryo.register(classOf[twitter4j.Status])
     kryo.register(classOf[twitter4j.GeoLocation])
     kryo.register(classOf[twitter4j.Place])
     kryo.register(classOf[twitter4j.User])
     kryo.register(classOf[twitter4j.Scopes])
-
-    // facebook
     kryo.register(classOf[facebook4j.Post])
     kryo.register(classOf[facebook4j.Category])
     kryo.register(classOf[facebook4j.Privacy])
@@ -36,16 +36,10 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[facebook4j.Comment])
     kryo.register(classOf[facebook4j.Application])
     kryo.register(classOf[facebook4j.Targeting])
-
-    // tadaweb
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebCity])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebTada])
-
-    // radio
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio.RadioTranscription])
-
-    // instagram
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramUser])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramLocation])
