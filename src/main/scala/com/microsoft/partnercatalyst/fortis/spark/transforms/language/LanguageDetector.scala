@@ -13,6 +13,10 @@ class LanguageDetector(
 ) extends Serializable {
 
   def detectLanguage(text: String): Option[String] = {
+    if (text.isEmpty) {
+      return None
+    }
+
     val textId = "0"
     val requestBody = buildRequestBody(text, textId)
     val response = callCognitiveServices(requestBody)

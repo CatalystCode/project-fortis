@@ -32,6 +32,10 @@ class LocationsExtractor(
   }
 
   def analyze(text: String, language: Option[String] = None): Iterable[Location] = {
+    if (text.isEmpty) {
+      return List()
+    }
+
     val candidatePlaces = extractCandidatePlaces(text, language)
     val locationsInGeofence = candidatePlaces.flatMap(place => lookup.get(place.toLowerCase)).flatten.toSet
     locationsInGeofence.map(wofId => Location(wofId, confidence = Some(0.5)))
