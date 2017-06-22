@@ -6,9 +6,8 @@ import com.datastax.spark.connector.streaming._
 
 object CassandraSink {
   def apply(dstream: Option[DStream[AnalyzedItem]], keyspaceName: String, tableName: String): Unit = {
-    dstream match {
-      case Some(stream) =>
-        stream.map(CassandraSchema(_)).saveToCassandra(keyspaceName, tableName)
+    if (dstream.isDefined) {
+      dstream.get.map(CassandraSchema(_)).saveToCassandra(keyspaceName, tableName)
     }
   }
 }
