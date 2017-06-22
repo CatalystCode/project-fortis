@@ -11,6 +11,9 @@ class KeywordExtractor(keywords: Seq[String]) extends Serializable {
   @transient private lazy val keywordTrie = initializeTrie(keywords)
 
   def extractKeywords(text: String): List[Tag] = {
+    if (text.isEmpty) {
+      return List()
+    }
 
     def findMatches(segment: Seq[String]): Iterable[String] = {
       val sb = new StringBuilder()
