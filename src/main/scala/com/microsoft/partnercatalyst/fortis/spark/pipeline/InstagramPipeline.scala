@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
@@ -16,6 +18,7 @@ object InstagramPipeline extends Pipeline {
         // do computer vision analysis
         val analysis = imageAnalyzer.analyze(instagram.images.standard_resolution.url)
         AnalyzedItem(
+          createdAtEpoch = now.getEpochSecond,
           body = analysis.summary.getOrElse(""),
           title = instagram.caption.text,
           sharedLocations = instagram.location match {

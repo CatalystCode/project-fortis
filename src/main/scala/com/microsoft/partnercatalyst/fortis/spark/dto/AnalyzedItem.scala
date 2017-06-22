@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
 case class AnalyzedItem(
+  createdAtEpoch: Long,
   body: String,
   title: String,
   publisher: String,

@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import org.apache.spark.streaming.StreamingContext
@@ -17,6 +19,7 @@ object TwitterPipeline extends Pipeline {
     import transformContext._
 
     stream.map(tweet => AnalyzedItem(
+      createdAtEpoch = now.getEpochSecond,
       body = tweet.getText,
       title = "",
       publisher = "Twitter",

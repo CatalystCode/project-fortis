@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
@@ -17,6 +19,7 @@ object FacebookPipeline extends Pipeline {
     import transformContext._
 
     stream.map(post => AnalyzedItem(
+      createdAtEpoch = now.getEpochSecond,
       body = post.post.getMessage,
       title = "",
       publisher = "Facebook",

@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
@@ -17,6 +19,7 @@ object TadawebPipeline extends Pipeline {
     import transformContext._
 
     stream.map(tada => AnalyzedItem(
+      createdAtEpoch = now.getEpochSecond,
       body = tada.text,
       title = tada.title,
       publisher = "TadaWeb",
