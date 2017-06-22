@@ -19,6 +19,7 @@ object TadawebPipeline extends Pipeline {
     stream.map(tada => AnalyzedItem(
       body = tada.text,
       title = tada.title,
+      publisher = "TadaWeb",
       sourceUrl = tada.tada.name,
       sharedLocations = tada.cities.flatMap(city => city.coordinates match {
         case Seq(latitude, longitude) => locationsExtractor.fetch(latitude, longitude)

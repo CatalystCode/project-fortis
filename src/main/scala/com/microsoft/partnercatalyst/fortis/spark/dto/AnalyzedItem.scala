@@ -3,6 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.dto
 case class AnalyzedItem(
   body: String,
   title: String,
+  publisher: String,
   sourceUrl: String,
   sharedLocations: List[Location] = List(),
   analysis: Analysis

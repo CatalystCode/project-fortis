@@ -23,6 +23,7 @@ object InstagramPipeline extends Pipeline {
             case None => List()},
           analysis = analysis.copy(
             keywords = analysis.keywords.filter(tag => targetKeywords.contains(tag.name))),
+          publisher = "Instagram",
           sourceUrl = instagram.link)
       })
       .map(analyzedItem => {
