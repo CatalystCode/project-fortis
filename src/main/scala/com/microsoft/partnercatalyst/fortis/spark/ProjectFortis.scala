@@ -19,6 +19,7 @@ object ProjectFortis extends App {
   private val pipelines = List[Pipeline](
     InstagramPipeline,
     RadioPipeline,
+    BingPipeline,
     TwitterPipeline,
     FacebookPipeline,
     TadawebPipeline
@@ -125,6 +126,16 @@ object ProjectFortis extends App {
             "authToken" -> System.getenv("INSTAGRAM_AUTH_TOKEN"),
             "latitude" -> "49.25",
             "longitude" -> "-123.1"
+          )
+        )
+      ),
+      "bing" -> List(
+        ConnectorConfig(
+          "BingPage",
+          Map(
+            "accessToken" -> System.getenv("BING_ACCESS_TOKEN"),
+            "searchInstanceId" -> System.getenv("BING_SEARCH_INSTANCE_ID"),
+            "keywords" -> "isis|attack"
           )
         )
       ),

@@ -18,6 +18,11 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
+          new BingPageStreamFactory
+        )
+      )
+      .withFactories(
+        List(
           new RadioStreamFactory
         )
       )

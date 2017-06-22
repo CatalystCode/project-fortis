@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "com.microsoft.azure" % "applicationinsights-logging-log4j1_2" % "1.0.6",
   "com.github.catalystcode" %% "streaming-instagram" % "0.0.5",
   "com.github.catalystcode" %% "streaming-facebook" % "0.0.1",
+  "com.github.catalystcode" %% "streaming-bing" % "0.0.1",
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.0",
   "org.apache.commons" % "commons-collections4" % "4.1",
