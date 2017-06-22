@@ -3,7 +3,6 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.entities.EntityRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
-import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER.entityIsPlace
 
 @SerialVersionUID(100L)
 class PlaceRecognizer(
@@ -14,7 +13,7 @@ class PlaceRecognizer(
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 
   def extractPlaces(text: String, language: String): Set[String] = {
-    entityRecognizer.extractEntities(text, language).filter(entityIsPlace).map(_.getStr).toSet
+    entityRecognizer.extractEntities(text, language).filter(OpeNER.entityIsPlace).map(_.getStr).toSet
   }
 
   protected def createEntityRecognizer(): EntityRecognizer = {
