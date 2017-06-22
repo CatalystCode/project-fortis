@@ -41,9 +41,9 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
 
     Analysis(
       summary = response.description.captions.map(x => x.text).headOption,
-      entities = response.categories.flatMap(_.detail.flatMap(_.celebrities)).flatten(x => x).map(x => Tag(x.name, x.confidence)),
+      entities = response.categories.flatMap(_.detail.flatMap(_.celebrities)).flatten(x => x).map(x => Tag(x.name, Some(x.confidence))),
       locations = landmarksToLocations(response.categories.flatMap(_.detail.flatMap(_.landmarks)).flatten(x => x)).toList,
-      keywords = response.tags.map(x => Tag(x.name, x.confidence)))
+      keywords = response.tags.map(x => Tag(x.name, Some(x.confidence))))
   }
 
   protected def landmarksToLocations(marks: Iterable[dto.JsonImageLandmark]): Iterable[Location] = {

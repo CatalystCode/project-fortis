@@ -41,7 +41,7 @@ object TextPipeline {
         case 0 =>
           val bodyEntities = peopleRecognizer.extractPeople(analyzedItem.body, analyzedItem.analysis.language.getOrElse(""))
           val titleEntities = peopleRecognizer.extractPeople(analyzedItem.title, analyzedItem.analysis.language.getOrElse(""))
-          val entities = (titleEntities ::: bodyEntities).map(entity => Tag(entity, confidence = 1))
+          val entities = (titleEntities ::: bodyEntities).map(entity => Tag(entity, confidence = None))
           analyzedItem.copy(analysis = analyzedItem.analysis.copy(entities = entities))
         case _ => analyzedItem
       }

@@ -28,5 +28,5 @@ case class Location(
 
 case class Tag(
   name: String,
-  confidence: Double
+  confidence: Option[Double]
 )

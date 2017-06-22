@@ -31,7 +31,7 @@ class KeywordExtractor(keywords: Seq[String]) extends Serializable {
     }
 
     val tokens = Tokenizer(text.toLowerCase)
-    tokens.tails.flatMap(findMatches(_).map(Tag(_, 1))).toList
+    tokens.tails.flatMap(findMatches(_).map(Tag(_, confidence = None))).toList
   }
 
   private def initializeTrie(keywords: Seq[String]): PatriciaTrie[String] = {
