@@ -9,6 +9,7 @@ object TextPipeline {
     .map(inferLanguage(_, transformContext))
     .filter(isLanguageSupported(_, transformContext))
     .map(extractKeywords(_, transformContext))
+    .filter(hasKeywords(_, transformContext))
     .map(extractEntities(_, transformContext))
     .map(analyzeSentiment(_, transformContext))
     .map(extractLocations(_, transformContext))
@@ -45,6 +46,10 @@ object TextPipeline {
         analyzedItem.copy(analysis = analyzedItem.analysis.copy(keywords = keywords))
       case _ => analyzedItem
     }
+  }
+
+  private def hasKeywords(analyzedItem: AnalyzedItem, transformContext: TransformContext): Boolean = {
+    analyzedItem.analysis.keywords.nonEmpty
   }
 
   private def extractEntities(analyzedItem: AnalyzedItem, transformContext: TransformContext): AnalyzedItem = {

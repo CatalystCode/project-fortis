@@ -9,6 +9,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 
 trait TransformContext {
+  val targetKeywords: Set[String]
   val geofence: Geofence
   val placeRecognizer: PlaceRecognizer
   val peopleRecognizer: PeopleRecognizer

@@ -57,12 +57,13 @@ object ProjectFortis extends App {
   Logger.getLogger("liblocations").setLevel(Level.DEBUG)
 
   private object TransformContext extends TransformContext {
+    val targetKeywords = Set("Ariana")
     val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
     val placeRecognizer = new PlaceRecognizer(Settings.modelsDir)
     val peopleRecognizer = new PeopleRecognizer(Settings.modelsDir)
     val featureServiceClient = new FeatureServiceClient(Settings.featureServiceHost)
     val locationsExtractor = new LocationsExtractor(featureServiceClient, geofence, Some(placeRecognizer)).buildLookup()
-    val keywordExtractor = new KeywordExtractor(List("Ariana"))
+    val keywordExtractor = new KeywordExtractor(targetKeywords)
     val imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(Settings.oxfordVisionToken), featureServiceClient)
     val languageDetector = new LanguageDetector(LanguageDetectorAuth(Settings.oxfordLanguageToken))
     val sentimentDetector = new SentimentDetector(SentimentDetectorAuth(Settings.oxfordLanguageToken))
