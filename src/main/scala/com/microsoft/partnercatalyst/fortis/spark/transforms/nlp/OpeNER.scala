@@ -6,9 +6,11 @@ import java.util.Properties
 import eus.ixa.ixa.pipe.nerc.{Annotate => NerAnnotate}
 import eus.ixa.ixa.pipe.pos.{Annotate => PosAnnotate}
 import eus.ixa.ixa.pipe.tok.{Annotate => TokAnnotate}
-import ixa.kaflib.KAFDocument
+import ixa.kaflib.{Entity, KAFDocument}
 
 object OpeNER {
+  val EnabledLanguages = Set("de", "en", "es", "eu", "it", "nl")
+
   def tokAnnotate(resourcesDirectory: String, text: String, language: String): KAFDocument = {
     val kaf = new KAFDocument(language, "v1.naf")
     createTokAnnotate(resourcesDirectory, language, text).tokenizeToKAF(kaf)
@@ -21,6 +23,15 @@ object OpeNER {
 
   def nerAnnotate(resourcesDirectory: String, language: String, kaf: KAFDocument): Unit = {
     createNerAnnotate(resourcesDirectory, language).annotateNEs(kaf)
+  }
+
+  def entityIsPlace(entity: Entity): Boolean = entityIs(entity, Set("location", "gpe"))
+
+  def entityIsPerson(entity: Entity): Boolean = entityIs(entity, Set("person", "organization"))
+
+  private def entityIs(entity: Entity, types: Set[String]): Boolean = {
+    val entityType = Option(entity.getType).getOrElse("").toLowerCase
+    types.contains(entityType)
   }
 
   private def createTokAnnotate(resourcesDirectory: String, language: String, text: String): TokAnnotate = {

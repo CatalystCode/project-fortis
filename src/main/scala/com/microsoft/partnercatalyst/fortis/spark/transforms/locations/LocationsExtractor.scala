@@ -36,8 +36,8 @@ class LocationsExtractor(
       return List()
     }
 
-    val candidatePlaces = extractCandidatePlaces(text, language)
-    val locationsInGeofence = candidatePlaces.flatMap(place => lookup.get(place.toLowerCase)).flatten.toSet
+    val candidatePlaces = extractCandidatePlaces(text, language).toSet
+    val locationsInGeofence = candidatePlaces.flatMap(place => lookup.get(place.toLowerCase)).flatten
     locationsInGeofence.map(wofId => Location(wofId, confidence = Some(0.5)))
   }
 

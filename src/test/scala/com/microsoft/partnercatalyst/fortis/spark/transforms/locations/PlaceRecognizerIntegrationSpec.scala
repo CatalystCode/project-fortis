@@ -11,8 +11,8 @@ class PlaceRecognizerIntegrationSpec extends IntegrationTestSpec {
     val placesIt = recognizer.extractPlaces("A mi me piace Roma.", "it")
     val placesEn2 = recognizer.extractPlaces("I love Rome.", "en")
 
-    assert(placesEn1 == Set("France", "Paris"))
-    assert(placesEn2 == Set("Rome"))
-    assert(placesIt == Set("Roma"))
+    assert(placesEn1 == List("France", "Paris"))
+    assert(placesEn2 == List("Rome"))
+    assert(placesIt == List("Roma"))
   }
 }
