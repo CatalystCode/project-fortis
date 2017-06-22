@@ -19,7 +19,7 @@ object FacebookPipeline extends Pipeline {
     stream.map(post => AnalyzedItem(
       body = post.post.getMessage,
       title = "",
-      source = post.post.getPermalinkUrl.toString,
+      sourceUrl = post.post.getPermalinkUrl.toString,
       sharedLocations = Option(post.post.getPlace).map(_.getLocation) match {
         case Some(location) => locationsExtractor.fetch(location.getLatitude, location.getLongitude).toList
         case None => List()},

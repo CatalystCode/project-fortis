@@ -17,7 +17,7 @@ object RadioPipeline extends Pipeline {
     stream.map(transcription => AnalyzedItem(
       body = transcription.text,
       title = "",
-      source = transcription.radioUrl,
+      sourceUrl = transcription.radioUrl,
       analysis = Analysis(
         language = Some(transcription.language)
       )))

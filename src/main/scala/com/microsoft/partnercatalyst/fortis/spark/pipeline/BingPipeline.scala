@@ -17,7 +17,7 @@ object BingPipeline extends Pipeline {
     stream.map(post => AnalyzedItem(
       body = post.snippet,
       title = post.name,
-      source = post.url,
+      sourceUrl = post.url,
       analysis = Analysis()
     ))
   }

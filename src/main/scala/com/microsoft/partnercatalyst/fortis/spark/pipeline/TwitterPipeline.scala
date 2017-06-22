@@ -19,7 +19,7 @@ object TwitterPipeline extends Pipeline {
     stream.map(tweet => AnalyzedItem(
       body = tweet.getText,
       title = "",
-      source = s"https://twitter.com/statuses/${tweet.getId}",
+      sourceUrl = s"https://twitter.com/statuses/${tweet.getId}",
       sharedLocations = Option(tweet.getGeoLocation) match {
         case Some(location) => locationsExtractor.fetch(location.getLatitude, location.getLongitude).toList
         case None => List()},
