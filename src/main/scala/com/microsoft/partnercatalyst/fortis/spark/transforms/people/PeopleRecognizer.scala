@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.people
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.Tag
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.entities.EntityRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
@@ -14,9 +13,8 @@ class PeopleRecognizer(
 
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 
-  def extractPeople(text: String, language: String): List[Tag] = {
-    entityRecognizer.extractEntities(text, language).filter(entityIsPerson)
-      .map(entity => Tag(name = entity.getStr, confidence = 1.0))
+  def extractPeople(text: String, language: String): List[String] = {
+    entityRecognizer.extractEntities(text, language).filter(entityIsPerson).map(_.getStr)
   }
 
   protected def createEntityRecognizer(): EntityRecognizer = {

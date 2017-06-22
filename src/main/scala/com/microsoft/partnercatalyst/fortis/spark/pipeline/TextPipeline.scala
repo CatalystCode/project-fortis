@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem
+import com.microsoft.partnercatalyst.fortis.spark.dto.{AnalyzedItem, Tag}
 import org.apache.spark.streaming.dstream.DStream
 
 object TextPipeline {
@@ -32,6 +32,17 @@ object TextPipeline {
           val titleKeywords = keywordExtractor.extractKeywords(analyzedItem.title)
           val keywords = titleKeywords ::: bodyKewords
           analyzedItem.copy(analysis = analyzedItem.analysis.copy(keywords = keywords))
+        case _ => analyzedItem
+      }
+    })
+    .map(analyzedItem => {
+      // people extraction
+      analyzedItem.analysis.entities.length match {
+        case 0 =>
+          val bodyEntities = peopleRecognizer.extractPeople(analyzedItem.body, analyzedItem.analysis.language.getOrElse(""))
+          val titleEntities = peopleRecognizer.extractPeople(analyzedItem.title, analyzedItem.analysis.language.getOrElse(""))
+          val entities = (titleEntities ::: bodyEntities).map(entity => Tag(entity, confidence = 1))
+          analyzedItem.copy(analysis = analyzedItem.analysis.copy(entities = entities))
         case _ => analyzedItem
       }
     })

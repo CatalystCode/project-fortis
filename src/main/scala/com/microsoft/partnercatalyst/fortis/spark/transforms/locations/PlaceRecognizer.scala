@@ -12,8 +12,8 @@ class PlaceRecognizer(
 
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 
-  def extractPlaces(text: String, language: String): Set[String] = {
-    entityRecognizer.extractEntities(text, language).filter(OpeNER.entityIsPlace).map(_.getStr).toSet
+  def extractPlaces(text: String, language: String): List[String] = {
+    entityRecognizer.extractEntities(text, language).filter(OpeNER.entityIsPlace).map(_.getStr)
   }
 
   protected def createEntityRecognizer(): EntityRecognizer = {
