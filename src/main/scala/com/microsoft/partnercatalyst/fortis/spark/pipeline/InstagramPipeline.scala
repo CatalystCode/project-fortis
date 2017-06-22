@@ -16,8 +16,8 @@ object InstagramPipeline extends Pipeline {
         // do computer vision analysis
         val analysis = imageAnalyzer.analyze(instagram.images.standard_resolution.url)
         AnalyzedItem(
-          body = instagram.caption.text,
-          title = "",
+          body = analysis.summary.getOrElse(""),
+          title = instagram.caption.text,
           sharedLocations = instagram.location match {
             case Some(location) => locationsExtractor.fetch(location.latitude, location.longitude).toList
             case None => List()},
@@ -27,7 +27,7 @@ object InstagramPipeline extends Pipeline {
       })
       .map(analyzedItem => {
         // keyword extraction
-        val keywords = keywordExtractor.extractKeywords(analyzedItem.body)
+        val keywords = keywordExtractor.extractKeywords(analyzedItem.title) ::: keywordExtractor.extractKeywords(analyzedItem.body)
         analyzedItem.copy(analysis = analyzedItem.analysis.copy(keywords = keywords ::: analyzedItem.analysis.keywords))
       })
       .filter(_.analysis.keywords.nonEmpty))
