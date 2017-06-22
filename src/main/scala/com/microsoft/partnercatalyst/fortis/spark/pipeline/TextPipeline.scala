@@ -26,20 +26,32 @@ object TextPipeline {
     })
     .map(analyzedItem => {
       // keywords extraction
-      val bodyKewords = keywordExtractor.extractKeywords(analyzedItem.body)
-      val titleKeywords = keywordExtractor.extractKeywords(analyzedItem.title)
-      val keywords = titleKeywords ::: bodyKewords
-      analyzedItem.copy(analysis = analyzedItem.analysis.copy(keywords = keywords ::: analyzedItem.analysis.keywords))
+      analyzedItem.analysis.keywords.length match {
+        case 0 =>
+          val bodyKewords = keywordExtractor.extractKeywords(analyzedItem.body)
+          val titleKeywords = keywordExtractor.extractKeywords(analyzedItem.title)
+          val keywords = titleKeywords ::: bodyKewords
+          analyzedItem.copy(analysis = analyzedItem.analysis.copy(keywords = keywords))
+        case _ => analyzedItem
+      }
     })
     .map(analyzedItem => {
       // analyze sentiment
-      val sentiments = sentimentDetector.detectSentiment(analyzedItem.body, analyzedItem.analysis.language.getOrElse("")).map(List(_)).getOrElse(List())
-      analyzedItem.copy(analysis = analyzedItem.analysis.copy(sentiments = sentiments ::: analyzedItem.analysis.sentiments))
+      analyzedItem.analysis.sentiments.length match {
+        case 0 =>
+          val sentiments = sentimentDetector.detectSentiment(analyzedItem.body, analyzedItem.analysis.language.getOrElse("")).map(List(_)).getOrElse(List())
+          analyzedItem.copy(analysis = analyzedItem.analysis.copy(sentiments = sentiments))
+        case _ => analyzedItem
+      }
     })
     .map(analyzedItem => {
       // infer locations from text
-      val locations = locationsExtractor.analyze(analyzedItem.body, analyzedItem.analysis.language).toList
-      analyzedItem.copy(analysis = analyzedItem.analysis.copy(locations = locations ::: analyzedItem.analysis.locations))
+      analyzedItem.analysis.locations.length match {
+        case 0 =>
+          val locations = locationsExtractor.analyze(analyzedItem.body, analyzedItem.analysis.language).toList
+          analyzedItem.copy(analysis = analyzedItem.analysis.copy(locations = locations))
+        case _ => analyzedItem
+      }
     })
   }
 }
