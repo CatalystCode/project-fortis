@@ -7,7 +7,7 @@ import org.apache.commons.collections4.trie.PatriciaTrie
 import scala.collection.mutable.ListBuffer
 
 @SerialVersionUID(100L)
-class KeywordExtractor(keywords: Seq[String]) extends Serializable {
+class KeywordExtractor(keywords: Iterable[String]) extends Serializable {
   @transient private lazy val keywordTrie = initializeTrie(keywords)
 
   def extractKeywords(text: String): List[Tag] = {
@@ -34,7 +34,7 @@ class KeywordExtractor(keywords: Seq[String]) extends Serializable {
     tokens.tails.flatMap(findMatches(_).map(Tag(_, confidence = None))).toList
   }
 
-  private def initializeTrie(keywords: Seq[String]): PatriciaTrie[String] = {
+  private def initializeTrie(keywords: Iterable[String]): PatriciaTrie[String] = {
     val trie = new PatriciaTrie[String]()
     keywords.foreach(k => trie.put(k.toLowerCase, k))
 
