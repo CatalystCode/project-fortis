@@ -17,6 +17,7 @@ val sparkVersion = "2.1.0"
 // Dependencies provided by the Spark distro
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
+  "org.apache.spark" %% "spark-sql" % sparkVersion,
   "org.apache.spark" %% "spark-streaming" % sparkVersion
 ).map(_ % "provided")
 
