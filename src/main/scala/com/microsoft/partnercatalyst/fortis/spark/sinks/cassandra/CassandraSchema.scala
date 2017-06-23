@@ -5,6 +5,7 @@ import java.util.UUID
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.Utils.{mean, rescale}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.gender.GenderDetector.{Female, Male}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.Neutral
 
 case class Sentiment(
@@ -71,8 +72,8 @@ object CassandraSchema {
         pos_avg = if (positiveSentiments.nonEmpty) mean(rescale(positiveSentiments, 0, 1)).toFloat else -1,
         neg_avg = if (negativeSentiments.nonEmpty) mean(rescale(negativeSentiments, 0, 1)).toFloat else -1),
       gender = Gender(
-        male_mentions = genderCounts.getOrElse("M", -1),
-        female_mentions = genderCounts.getOrElse("F", -1)),
+        male_mentions = genderCounts.getOrElse(Male, -1),
+        female_mentions = genderCounts.getOrElse(Female, -1)),
       entities = entityCounts.map(kv => Entities(
         name = kv._1,
         count = kv._2,
