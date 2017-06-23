@@ -86,10 +86,10 @@ object CassandraSchema {
 object Utils {
   def mean(items: List[Double]): Option[Double] = {
     if (items.isEmpty) {
-      None
-    } else {
-      Some(items.sum / items.length)
+      return None
     }
+
+    Some(items.sum / items.length)
   }
 
   /** @see https://stats.stackexchange.com/a/25897 */
@@ -100,11 +100,11 @@ object Utils {
 
     val min_old = items.min
     val max_old = items.max
-    if (max_old == min_old) {
-      None
-    } else {
-      val coef = (max_new - min_new) / (max_old - min_old)
-      Some(items.map(v => coef * (v - max_old) + max_new))
+    if (max_old == min_old) {t
+      return None
     }
+
+    val coef = (max_new - min_new) / (max_old - min_old)
+    Some(items.map(v => coef * (v - max_old) + max_new))
   }
 }
