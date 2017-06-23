@@ -1,12 +1,16 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
-case class FortisItem(
-  body: String,
-  title: String,
-  source: String,
-  sharedLocations: List[Location] = List(),
-  analysis: Analysis
-)
+trait FortisMessage {
+  val body: String
+  val title: String
+  val source: String
+  val sharedLocations: List[Location]
+}
+
+trait FortisAnalysis {
+  val fortisMessage: FortisMessage
+  val analysis: Analysis
+}
 
 case class Analysis(
   language: Option[String] = None,

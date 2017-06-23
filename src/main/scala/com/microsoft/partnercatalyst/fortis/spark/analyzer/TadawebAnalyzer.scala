@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisItem}
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
@@ -8,8 +7,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 
 class TadawebAnalyzer extends Analyzer[TadawebEvent]
   with AnalyzerDefault.EnableAll[TadawebEvent] {
-  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): FortisItem = {
-    FortisItem(
+  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzerMessage[TadawebEvent] = {
+    AnalyzerMessage(
       body = item.text,
       title = item.title,
       source = item.tada.name,
@@ -17,11 +16,11 @@ class TadawebAnalyzer extends Analyzer[TadawebEvent]
         case Seq(latitude, longitude) => locationsExtractor.fetch(latitude, longitude)
         case _ => None
       }).toList,
-      analysis = Analysis()
+      original = item
     )
   }
 
-  override def detectSentiment(item: AnalyzerItem[TadawebEvent], sentimentDetector: SentimentDetector): List[Double] = {
+  override def detectSentiment(item: AnalyzerMessage[TadawebEvent], sentimentDetector: SentimentDetector): List[Double] = {
     item.original.sentiment match {
       case "negative" => List(SentimentDetector.Negative)
       case "neutral" => List(SentimentDetector.Neutral)

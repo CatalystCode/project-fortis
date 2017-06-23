@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
@@ -8,8 +7,8 @@ import twitter4j.{Status => TwitterStatus}
 
 class TwitterAnalyzer extends Analyzer[TwitterStatus]
   with AnalyzerDefault.EnableAll[TwitterStatus] {
-  override def toSchema(item: TwitterStatus, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): FortisItem = {
-    FortisItem(
+  override def toSchema(item: TwitterStatus, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzerMessage[TwitterStatus] = {
+    AnalyzerMessage(
       body = item.getText,
       title = "",
       source = s"https://twitter.com/statuses/${item.getId}",
@@ -17,11 +16,11 @@ class TwitterAnalyzer extends Analyzer[TwitterStatus]
         case Some(location) => locationsExtractor.fetch(location.getLatitude, location.getLongitude).toList
         case None => List()
       },
-      analysis = Analysis()
+      original = item
     )
   }
 
-  override def detectLanguage(item: AnalyzerItem[TwitterStatus], languageDetector: LanguageDetector): Option[String] = {
+  override def detectLanguage(item: AnalyzerMessage[TwitterStatus], languageDetector: LanguageDetector): Option[String] = {
     Option(item.original.getLang) match {
       case Some(lang) => Some(lang)
       case None => super.detectLanguage(item, languageDetector)

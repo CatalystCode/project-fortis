@@ -4,9 +4,9 @@ package com.microsoft.partnercatalyst.fortis.spark
 import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 
 import scala.reflect.runtime.universe.TypeTag
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, AnalyzerItem}
+import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, AnalyzerOutput}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisItem}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisAnalysis}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -19,9 +19,9 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 object Pipeline {
-  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisItem]] = {
-    val configs = configurationManager.fetchStreamConfiguration(name)
-    val sourceStream = streamProvider.buildStream[T](ssc, configs)
+  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisAnalysis]] = {
+    @transient val configs = configurationManager.fetchStreamConfiguration(name)
+    @transient val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
     sourceStream.map(_.transform(rdd => {
 
@@ -37,37 +37,55 @@ object Pipeline {
       val sentimentDetector = new SentimentDetector(SentimentDetectorAuth(Settings.oxfordLanguageToken))
       val supportedLanguages = Set("en", "fr", "de")
 
+      def convertToSchema(original: T): AnalyzerOutput[T] = {
+        val message = analyzer.toSchema(original, locationsExtractor, imageAnalyzer)
+        AnalyzerOutput(message, Analysis())
+      }
+
+      def addLanguage(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
+        val language = analyzer.detectLanguage(item.fortisMessage, languageDetector)
+        item.copy(analysis = Analysis(language = language))
+      }
+
+      def isLanguageSupported(analysis: Analysis): Boolean = {
+        analysis.language match {
+          case None => false
+          case Some(language) => supportedLanguages.contains(language)
+        }
+      }
+
+      def addKeywords(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
+        val keywords = analyzer.extractKeywords(item.fortisMessage, keywordExtractor)
+        item.copy(analysis = item.analysis.copy(keywords = keywords))
+      }
+
+      def hasKeywords(analysis: Analysis): Boolean = {
+        analysis.keywords.nonEmpty
+      }
+
+      def addEntities(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
+        val entities = analyzer.extractEntities(item.fortisMessage, peopleRecognizer)
+        item.copy(analysis = item.analysis.copy(entities = entities))
+      }
+
+      def addSentiments(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
+        val sentiments = analyzer.detectSentiment(item.fortisMessage, sentimentDetector)
+        item.copy(analysis = item.analysis.copy(sentiments = sentiments))
+      }
+
+      def addLocations(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
+        val locations = analyzer.extractLocations(item.fortisMessage, locationsExtractor)
+        item.copy(analysis = item.analysis.copy(locations = locations))
+      }
+
+      // Configure analysis pipeline
       rdd
-        .map(item => AnalyzerItem(item, analyzer.toSchema(item, locationsExtractor, imageAnalyzer)))
-        .map(item => item.copy(
-          analyzedItem = item.analyzedItem.copy(
-            analysis = Analysis(language = analyzer.detectLanguage(item, languageDetector))
-          )
-        ))
-        .filter(item =>
-          item.analyzedItem.analysis.language match {
-            case Some(language) => supportedLanguages.contains(language)
-            case None => false
-          }
-        )
-        .map(item => item.copy(
-          analyzedItem = item.analyzedItem.copy(
-            analysis = item.analyzedItem.analysis.copy(
-              keywords = analyzer.extractKeywords(item, keywordExtractor)
-            )
-          )
-        ))
-        .filter(item => item.analyzedItem.analysis.keywords.nonEmpty)
-        .map(item => item.copy(
-          analyzedItem = item.analyzedItem.copy(
-            analysis = item.analyzedItem.analysis.copy(
-              entities = analyzer.extractEntities(item, peopleRecognizer),
-              sentiments = analyzer.detectSentiment(item, sentimentDetector),
-              locations = analyzer.extractLocations(item, locationsExtractor)
-            )
-          )
-        ))
-        .map(item => item.analyzedItem)
+        .map(convertToSchema)
+        .map(addLanguage)
+        .filter(item => isLanguageSupported(item.analysis))
+        .map(addKeywords)
+        .filter(item => hasKeywords(item.analysis))
+        .map(item => addLocations(addSentiments(addEntities(item))))
     }))
   }
 }
