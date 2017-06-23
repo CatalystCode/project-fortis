@@ -100,7 +100,7 @@ object Utils {
 
     val min_old = items.min
     val max_old = items.max
-    if (max_old == min_old) {t
+    if (max_old == min_old) {
       return None
     }
 
