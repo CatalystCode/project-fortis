@@ -69,8 +69,8 @@ object CassandraSchema {
     Features(
       mentions = -1,
       sentiment = Sentiment(
-        pos_avg = if (positiveSentiments.nonEmpty) mean(rescale(positiveSentiments, 0, 1)).toFloat else -1,
-        neg_avg = if (negativeSentiments.nonEmpty) mean(rescale(negativeSentiments, 0, 1)).toFloat else -1),
+        pos_avg = rescale(positiveSentiments, 0, 1).flatMap(mean).map(_.toFloat).getOrElse(-1),
+        neg_avg = rescale(negativeSentiments, 0, 1).flatMap(mean).map(_.toFloat).getOrElse(-1)),
       gender = Gender(
         male_mentions = genderCounts.getOrElse(Male, -1),
         female_mentions = genderCounts.getOrElse(Female, -1)),
@@ -84,15 +84,23 @@ object CassandraSchema {
 }
 
 object Utils {
-  def mean(items: List[Double]): Double = {
-    items.sum / items.length
+  def mean(items: List[Double]): Option[Double] = {
+    if (items.isEmpty) {
+      None
+    } else {
+      Some(items.sum / items.length)
+    }
   }
 
   /** @see https://stats.stackexchange.com/a/25897 */
-  def rescale(items: List[Double], min_new: Double, max_new: Double): List[Double] = {
+  def rescale(items: List[Double], min_new: Double, max_new: Double): Option[List[Double]] = {
     val min_old = items.min
     val max_old = items.max
-    val coef = (max_new - min_new) / (max_old - min_old)
-    items.map(v => coef * (v - max_old) + max_new)
+    if (max_old == min_old) {
+      None
+    } else {
+      val coef = (max_new - min_new) / (max_old - min_old)
+      Some(items.map(v => coef * (v - max_old) + max_new))
+    }
   }
 }
