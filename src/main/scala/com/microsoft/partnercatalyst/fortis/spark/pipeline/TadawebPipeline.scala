@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
@@ -17,9 +19,11 @@ object TadawebPipeline extends Pipeline {
     import transformContext._
 
     stream.map(tada => AnalyzedItem(
+      createdAtEpoch = now.getEpochSecond,
       body = tada.text,
       title = tada.title,
-      source = tada.tada.name,
+      publisher = "TadaWeb",
+      sourceUrl = tada.tada.name,
       sharedLocations = tada.cities.flatMap(city => city.coordinates match {
         case Seq(latitude, longitude) => locationsExtractor.fetch(latitude, longitude)
         case _ => None

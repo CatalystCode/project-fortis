@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
 import org.apache.spark.streaming.StreamingContext
@@ -17,9 +19,11 @@ object TwitterPipeline extends Pipeline {
     import transformContext._
 
     stream.map(tweet => AnalyzedItem(
+      createdAtEpoch = now.getEpochSecond,
       body = tweet.getText,
       title = "",
-      source = s"https://twitter.com/statuses/${tweet.getId}",
+      publisher = "Twitter",
+      sourceUrl = s"https://twitter.com/statuses/${tweet.getId}",
       sharedLocations = Option(tweet.getGeoLocation) match {
         case Some(location) => locationsExtractor.fetch(location.getLatitude, location.getLongitude).toList
         case None => List()},

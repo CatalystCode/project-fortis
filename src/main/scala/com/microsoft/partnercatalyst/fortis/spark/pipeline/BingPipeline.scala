@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
+import java.time.Instant.now
+
 import com.github.catalystcode.fortis.spark.streaming.bing.dto.BingPost
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
@@ -15,9 +17,11 @@ object BingPipeline extends Pipeline {
 
   private def convertToSchema(stream: DStream[BingPost], transformContext: TransformContext): DStream[AnalyzedItem] = {
     stream.map(post => AnalyzedItem(
+      createdAtEpoch = now.getEpochSecond,
       body = post.snippet,
       title = post.name,
-      source = post.url,
+      publisher = "Bing",
+      sourceUrl = post.url,
       analysis = Analysis()
     ))
   }

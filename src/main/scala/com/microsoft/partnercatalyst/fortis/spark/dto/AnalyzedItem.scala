@@ -1,9 +1,11 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
 case class AnalyzedItem(
+  createdAtEpoch: Long,
   body: String,
   title: String,
-  source: String,
+  publisher: String,
+  sourceUrl: String,
   sharedLocations: List[Location] = List(),
   analysis: Analysis
 )
