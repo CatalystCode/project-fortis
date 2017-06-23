@@ -16,5 +16,6 @@ class UtilsSpec extends FlatSpec {
     assert(Utils.rescale(List(10, 20, 30), 1, 3).contains(List(1, 2, 3)))
     assert(Utils.rescale(List(0.2, 0.4, 0.6), 0, 1).getOrElse(List()).map(formatter.format) == List("0", "0.5", "1"))
     assert(Utils.rescale(List(1, 1, 1), 0, 1).isEmpty)
+    assert(Utils.rescale(List(), 0, 1).isEmpty)
   }
 }

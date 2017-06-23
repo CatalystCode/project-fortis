@@ -94,6 +94,10 @@ object Utils {
 
   /** @see https://stats.stackexchange.com/a/25897 */
   def rescale(items: List[Double], min_new: Double, max_new: Double): Option[List[Double]] = {
+    if (items.isEmpty) {
+      return None
+    }
+
     val min_old = items.min
     val max_old = items.max
     if (max_old == min_old) {
