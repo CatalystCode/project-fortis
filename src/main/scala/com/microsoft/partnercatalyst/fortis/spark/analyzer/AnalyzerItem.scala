@@ -1,8 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem
+import com.microsoft.partnercatalyst.fortis.spark.dto.FortisItem
 
-case class AnalyzerItem[T](
+private[analyzer] case class AnalyzerItem[T](
   original: T,
-  analyzedItem: AnalyzedItem
+  analyzedItem: FortisItem
 )

@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisItem}
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
@@ -8,8 +8,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 
 class TadawebAnalyzer extends Analyzer[TadawebEvent]
   with AnalyzerDefault.EnableAll[TadawebEvent] {
-  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzedItem = {
-    AnalyzedItem(
+  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): FortisItem = {
+    FortisItem(
       body = item.text,
       title = item.title,
       source = item.tada.name,

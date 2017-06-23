@@ -6,7 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 import scala.reflect.runtime.universe.TypeTag
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, AnalyzerItem}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -19,7 +19,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 object Pipeline {
-  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[AnalyzedItem]] = {
+  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisItem]] = {
     val configs = configurationManager.fetchStreamConfiguration(name)
     val sourceStream = streamProvider.buildStream[T](ssc, configs)
 

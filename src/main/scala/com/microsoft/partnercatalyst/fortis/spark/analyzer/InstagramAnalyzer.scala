@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem, Location, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisItem, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
@@ -10,10 +10,10 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 
 class InstagramAnalyzer extends Analyzer[InstagramItem]
   with AnalyzerDefault.EnableKeyword[InstagramItem] {
-  override def toSchema(item: InstagramItem, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzedItem = {
+  override def toSchema(item: InstagramItem, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): FortisItem = {
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
 
-    AnalyzedItem(
+    FortisItem(
       body = imageAnalysis.summary.getOrElse(""),
       title = item.caption.text,
       sharedLocations = item.location match {

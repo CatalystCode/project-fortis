@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{AnalyzedItem, Location, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{FortisItem, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
@@ -9,7 +9,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 
 trait Analyzer[T] {
-  def toSchema(item: T, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzedItem
+  def toSchema(item: T, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): FortisItem
   def extractKeywords(item: AnalyzerItem[T], keywordExtractor: KeywordExtractor): List[Tag]
   def extractLocations(item: AnalyzerItem[T], locationsExtractor: LocationsExtractor): List[Location]
   def extractEntities(item: AnalyzerItem[T], peopleRecognizer: PeopleRecognizer): List[Tag]
