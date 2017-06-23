@@ -5,7 +5,8 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 
-class FacebookAnalyzer extends Analyzer[FacebookPost] {
+class FacebookAnalyzer extends Analyzer[FacebookPost]
+  with AnalyzerDefault.EnableAll[FacebookPost] {
   override def toSchema(item: FacebookPost, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzedItem = {
     AnalyzedItem(
       body = item.post.getMessage,

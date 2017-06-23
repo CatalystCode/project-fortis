@@ -6,7 +6,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
-class TadawebAnalyzer extends Analyzer[TadawebEvent] {
+class TadawebAnalyzer extends Analyzer[TadawebEvent]
+  with AnalyzerDefault.EnableAll[TadawebEvent] {
   override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzedItem = {
     AnalyzedItem(
       body = item.text,
