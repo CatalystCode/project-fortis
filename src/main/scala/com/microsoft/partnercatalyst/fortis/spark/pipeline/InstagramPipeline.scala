@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
 import java.time.Instant.now
+import java.util.UUID.randomUUID
 
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem
@@ -18,6 +19,7 @@ object InstagramPipeline extends Pipeline {
         // do computer vision analysis
         val analysis = imageAnalyzer.analyze(instagram.images.standard_resolution.url)
         AnalyzedItem(
+          id = randomUUID(),
           createdAtEpoch = now.getEpochSecond,
           body = analysis.summary.getOrElse(""),
           title = instagram.caption.text,

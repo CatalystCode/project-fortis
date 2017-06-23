@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.pipeline._
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSink
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.ConnectorConfig
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -88,12 +89,8 @@ object ProjectFortis extends App {
 
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
-    val fortisEvents = pipelines.flatMap(
-      pipeline => pipeline(streamProvider, streamRegistry, ssc, TransformContext)
-    ).reduceOption(_.union(_))
-
-    // TODO: other computations and save to DB
-    fortisEvents.foreach(_.print())
+    val fortisEvents = pipelines.flatMap(pipeline => pipeline(streamProvider, streamRegistry, ssc, TransformContext)).reduceOption(_.union(_))
+    CassandraSink(fortisEvents, "fortistest", "events") // todo: fill in real values
 
     ssc.checkpoint(Settings.progressDir)
     ssc

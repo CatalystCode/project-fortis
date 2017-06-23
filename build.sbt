@@ -17,6 +17,7 @@ val sparkVersion = "2.1.0"
 // Dependencies provided by the Spark distro
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
+  "org.apache.spark" %% "spark-sql" % sparkVersion,
   "org.apache.spark" %% "spark-streaming" % sparkVersion
 ).map(_ % "provided")
 
@@ -33,6 +34,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-collections4" % "4.1",
   "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.0.5",
   "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
+  "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2",
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
   "net.lingala.zip4j" % "zip4j" % "1.3.2",

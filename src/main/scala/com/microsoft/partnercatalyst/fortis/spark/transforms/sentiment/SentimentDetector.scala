@@ -32,7 +32,7 @@ class SentimentDetector(
   }
 }
 
-object SentimentDetector {
+object SentimentDetector extends Enumeration {
   val Positive: Double = 1.0
   val Neutral: Double = 0.6
   val Negative: Double = 0.0
