@@ -1,18 +1,25 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamprovider
+package com.microsoft.partnercatalyst.fortis.spark
 
-import org.apache.spark.{SparkConf, SparkContext}
+import java.time.Instant
+
+import com.datastax.spark.connector._
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraSink}
+import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory, StreamProvider, UnsupportedConnectorConfigException}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 
 import scala.collection.mutable
 
-class StreamProviderSpec extends FlatSpec with BeforeAndAfter {
+class SparkSpec extends FlatSpec with BeforeAndAfter {
   private val master = "local[2]"
   private val appName = "test-stream-provider"
   private val batchDuration = Seconds(1)
 
+  private var conf: SparkConf = _
   private var sc: SparkContext = _
   private var ssc: StreamingContext = _
 
@@ -35,11 +42,10 @@ class StreamProviderSpec extends FlatSpec with BeforeAndAfter {
   }
 
   before {
-    //assume(Option(System.getenv("FORTIS_INTEGRATION_TESTS")).getOrElse("false").toBoolean)
-
-    val conf = new SparkConf()
+    conf = new SparkConf()
       .setMaster(master)
       .setAppName(appName)
+    CassandraConfig.init(conf, batchDuration)
 
     ssc = new StreamingContext(conf, batchDuration)
     sc = ssc.sparkContext
@@ -112,5 +118,48 @@ class StreamProviderSpec extends FlatSpec with BeforeAndAfter {
         ConnectorConfig(TestStreamFactory.Name, Map())
       ))
     }
+  }
+
+  "The cassandra sink" should "write to cassandra" in {
+    if (conf.get("spark.cassandra.connection.host").isEmpty) {
+      cancel("No cassandra connection defined, skipping test")
+    }
+
+    val rdds = mutable.Queue[RDD[AnalyzedItem]]()
+    rdds += sc.makeRDD(Seq(
+      AnalyzedItem(
+        createdAtEpoch = Instant.now.getEpochSecond,
+        body = "body-1",
+        title = "title-1",
+        publisher = "publisher-1",
+        sourceUrl = "sourceUrl-1",
+        analysis = Analysis())))
+    rdds += sc.makeRDD(Seq(
+      AnalyzedItem(
+        createdAtEpoch = Instant.now.getEpochSecond,
+        body = "body-2",
+        title = "title-2",
+        publisher = "publisher-2",
+        sourceUrl = "sourceUrl-2",
+        analysis = Analysis()),
+      AnalyzedItem(
+        createdAtEpoch = Instant.now.getEpochSecond,
+        body = "body-3",
+        title = "title-3",
+        publisher = "publisher-3",
+        sourceUrl = "sourceUrl-3",
+        analysis = Analysis())))
+    val stream = Some(ssc.queueStream(rdds))
+
+    val keyspaceName = "fortistest"
+    val tableName = "events"
+    sc.cassandraTable(keyspaceName, tableName).deleteFromCassandra(keyspaceName, tableName)
+
+    CassandraSink(stream, keyspaceName, tableName)
+    ssc.start()
+    ssc.awaitTerminationOrTimeout(Seconds(5).milliseconds)
+
+    val numRows = sc.cassandraTable(keyspaceName, tableName).count()
+    assert(numRows == 3)
   }
 }
