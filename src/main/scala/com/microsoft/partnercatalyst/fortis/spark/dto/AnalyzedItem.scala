@@ -1,6 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
+import java.util.UUID
+
 case class AnalyzedItem(
+  id: UUID,
   createdAtEpoch: Long,
   body: String,
   title: String,

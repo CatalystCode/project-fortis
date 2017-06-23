@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.pipeline
 
 import java.time.Instant.now
+import java.util.UUID.randomUUID
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamProvider}
@@ -17,6 +18,7 @@ object RadioPipeline extends Pipeline {
 
   private def convertToSchema(stream: DStream[RadioTranscription], transformContext: TransformContext): DStream[AnalyzedItem] = {
     stream.map(transcription => AnalyzedItem(
+      id = randomUUID(),
       createdAtEpoch = now.getEpochSecond,
       body = transcription.text,
       title = "",

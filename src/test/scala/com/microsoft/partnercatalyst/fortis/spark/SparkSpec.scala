@@ -1,6 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
 import java.time.Instant
+import java.util.UUID
+import java.util.UUID.randomUUID
 
 import com.datastax.spark.connector._
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
@@ -128,6 +130,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
     val rdds = mutable.Queue[RDD[AnalyzedItem]]()
     rdds += sc.makeRDD(Seq(
       AnalyzedItem(
+        id = randomUUID(),
         createdAtEpoch = Instant.now.getEpochSecond,
         body = "body-1",
         title = "title-1",
@@ -136,6 +139,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
         analysis = Analysis())))
     rdds += sc.makeRDD(Seq(
       AnalyzedItem(
+        id = randomUUID(),
         createdAtEpoch = Instant.now.getEpochSecond,
         body = "body-2",
         title = "title-2",
@@ -143,6 +147,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
         sourceUrl = "sourceUrl-2",
         analysis = Analysis()),
       AnalyzedItem(
+        id = randomUUID(),
         createdAtEpoch = Instant.now.getEpochSecond,
         body = "body-3",
         title = "title-3",
