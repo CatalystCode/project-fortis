@@ -4,9 +4,9 @@ package com.microsoft.partnercatalyst.fortis.spark
 import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 
 import scala.reflect.runtime.universe.TypeTag
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, AnalyzerOutput}
+import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisAnalysis}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
@@ -19,7 +19,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 object Pipeline {
-  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisAnalysis]] = {
+  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisEvent]] = {
     @transient val configs = configurationManager.fetchStreamConfiguration(name)
     @transient val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
@@ -37,14 +37,14 @@ object Pipeline {
       val sentimentDetector = new SentimentDetector(SentimentDetectorAuth(Settings.oxfordLanguageToken))
       val supportedLanguages = Set("en", "fr", "de")
 
-      def convertToSchema(original: T): AnalyzerOutput[T] = {
+      def convertToSchema(original: T): ExtendedEvent[T] = {
         val message = analyzer.toSchema(original, locationsExtractor, imageAnalyzer)
-        AnalyzerOutput(message, Analysis())
+        ExtendedEvent(message, Analysis())
       }
 
-      def addLanguage(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
-        val language = analyzer.detectLanguage(item.fortisMessage, languageDetector)
-        item.copy(analysis = Analysis(language = language))
+      def addLanguage(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+        val language = analyzer.detectLanguage(event.details, languageDetector)
+        event.copy(analysis = Analysis(language = language))
       }
 
       def isLanguageSupported(analysis: Analysis): Boolean = {
@@ -54,28 +54,28 @@ object Pipeline {
         }
       }
 
-      def addKeywords(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
-        val keywords = analyzer.extractKeywords(item.fortisMessage, keywordExtractor)
-        item.copy(analysis = item.analysis.copy(keywords = keywords))
+      def addKeywords(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+        val keywords = analyzer.extractKeywords(event.details, keywordExtractor)
+        event.copy(analysis = event.analysis.copy(keywords = keywords))
       }
 
       def hasKeywords(analysis: Analysis): Boolean = {
         analysis.keywords.nonEmpty
       }
 
-      def addEntities(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
-        val entities = analyzer.extractEntities(item.fortisMessage, peopleRecognizer)
-        item.copy(analysis = item.analysis.copy(entities = entities))
+      def addEntities(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+        val entities = analyzer.extractEntities(event.details, peopleRecognizer)
+        event.copy(analysis = event.analysis.copy(entities = entities))
       }
 
-      def addSentiments(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
-        val sentiments = analyzer.detectSentiment(item.fortisMessage, sentimentDetector)
-        item.copy(analysis = item.analysis.copy(sentiments = sentiments))
+      def addSentiments(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+        val sentiments = analyzer.detectSentiment(event.details, sentimentDetector)
+        event.copy(analysis = event.analysis.copy(sentiments = sentiments))
       }
 
-      def addLocations(item: AnalyzerOutput[T]): AnalyzerOutput[T] = {
-        val locations = analyzer.extractLocations(item.fortisMessage, locationsExtractor)
-        item.copy(analysis = item.analysis.copy(locations = locations))
+      def addLocations(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+        val locations = analyzer.extractLocations(event.details, locationsExtractor)
+        event.copy(analysis = event.analysis.copy(locations = locations))
       }
 
       // Configure analysis pipeline

@@ -1,15 +1,15 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
-trait FortisMessage {
+trait FortisEvent {
+  val details: Details
+  val analysis: Analysis
+}
+
+trait Details {
   val body: String
   val title: String
   val source: String
   val sharedLocations: List[Location]
-}
-
-trait FortisAnalysis {
-  val fortisMessage: FortisMessage
-  val analysis: Analysis
 }
 
 case class Analysis(

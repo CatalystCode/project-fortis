@@ -10,7 +10,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     // so always add new classes at the end of this list
     // more information: https://stackoverflow.com/a/32869053/3817588
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.FortisAnalysis])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor])

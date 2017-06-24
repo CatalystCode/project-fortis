@@ -9,11 +9,11 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecogn
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
 class InstagramAnalyzer extends Analyzer[InstagramItem]
-  with AnalyzerDefault.EnableKeyword[InstagramItem] {
-  override def toSchema(item: InstagramItem, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzerMessage[InstagramItem] = {
+  with AnalysisDefaults.EnableKeyword[InstagramItem] {
+  override def toSchema(item: InstagramItem, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[InstagramItem] = {
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
 
-    AnalyzerMessage(
+    ExtendedDetails(
       body = imageAnalysis.summary.getOrElse(""),
       title = item.caption.text,
       sharedLocations = item.location match {
@@ -25,8 +25,8 @@ class InstagramAnalyzer extends Analyzer[InstagramItem]
     )
   }
 
-  override def detectLanguage(item: AnalyzerMessage[InstagramItem], languageDetector: LanguageDetector): Option[String] = None
-  override def detectSentiment(item: AnalyzerMessage[InstagramItem], sentimentDetector: SentimentDetector): List[Double] = List()
-  override def extractLocations(item: AnalyzerMessage[InstagramItem], locationsExtractor: LocationsExtractor): List[Location] = List()
-  override def extractEntities(item: AnalyzerMessage[InstagramItem], peopleRecognizer: PeopleRecognizer): List[Tag] = List()
+  override def detectLanguage(details: ExtendedDetails[InstagramItem], languageDetector: LanguageDetector): Option[String] = None
+  override def detectSentiment(details: ExtendedDetails[InstagramItem], sentimentDetector: SentimentDetector): List[Double] = List()
+  override def extractLocations(details: ExtendedDetails[InstagramItem], locationsExtractor: LocationsExtractor): List[Location] = List()
+  override def extractEntities(details: ExtendedDetails[InstagramItem], peopleRecognizer: PeopleRecognizer): List[Tag] = List()
 }

@@ -5,9 +5,9 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 
 class FacebookAnalyzer extends Analyzer[FacebookPost]
-  with AnalyzerDefault.EnableAll[FacebookPost] {
-  override def toSchema(item: FacebookPost, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzerMessage[FacebookPost] = {
-    AnalyzerMessage(
+  with AnalysisDefaults.EnableAll[FacebookPost] {
+  override def toSchema(item: FacebookPost, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[FacebookPost] = {
+    ExtendedDetails(
       body = item.post.getMessage,
       title = "",
       source = item.post.getPermalinkUrl.toString,

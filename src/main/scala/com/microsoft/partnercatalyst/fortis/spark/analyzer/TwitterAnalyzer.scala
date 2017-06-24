@@ -6,9 +6,9 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Locations
 import twitter4j.{Status => TwitterStatus}
 
 class TwitterAnalyzer extends Analyzer[TwitterStatus]
-  with AnalyzerDefault.EnableAll[TwitterStatus] {
-  override def toSchema(item: TwitterStatus, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzerMessage[TwitterStatus] = {
-    AnalyzerMessage(
+  with AnalysisDefaults.EnableAll[TwitterStatus] {
+  override def toSchema(item: TwitterStatus, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TwitterStatus] = {
+    ExtendedDetails(
       body = item.getText,
       title = "",
       source = s"https://twitter.com/statuses/${item.getId}",
@@ -20,10 +20,10 @@ class TwitterAnalyzer extends Analyzer[TwitterStatus]
     )
   }
 
-  override def detectLanguage(item: AnalyzerMessage[TwitterStatus], languageDetector: LanguageDetector): Option[String] = {
-    Option(item.original.getLang) match {
+  override def detectLanguage(details: ExtendedDetails[TwitterStatus], languageDetector: LanguageDetector): Option[String] = {
+    Option(details.original.getLang) match {
       case Some(lang) => Some(lang)
-      case None => super.detectLanguage(item, languageDetector)
+      case None => super.detectLanguage(details, languageDetector)
     }
   }
 }

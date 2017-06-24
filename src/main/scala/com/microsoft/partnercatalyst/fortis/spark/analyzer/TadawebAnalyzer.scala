@@ -6,9 +6,9 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Locations
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
 class TadawebAnalyzer extends Analyzer[TadawebEvent]
-  with AnalyzerDefault.EnableAll[TadawebEvent] {
-  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): AnalyzerMessage[TadawebEvent] = {
-    AnalyzerMessage(
+  with AnalysisDefaults.EnableAll[TadawebEvent] {
+  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TadawebEvent] = {
+    ExtendedDetails(
       body = item.text,
       title = item.title,
       source = item.tada.name,
@@ -20,12 +20,12 @@ class TadawebAnalyzer extends Analyzer[TadawebEvent]
     )
   }
 
-  override def detectSentiment(item: AnalyzerMessage[TadawebEvent], sentimentDetector: SentimentDetector): List[Double] = {
-    item.original.sentiment match {
+  override def detectSentiment(details: ExtendedDetails[TadawebEvent], sentimentDetector: SentimentDetector): List[Double] = {
+    details.original.sentiment match {
       case "negative" => List(SentimentDetector.Negative)
       case "neutral" => List(SentimentDetector.Neutral)
       case "positive" => List(SentimentDetector.Positive)
-      case _ => super.detectSentiment(item, sentimentDetector)
+      case _ => super.detectSentiment(details, sentimentDetector)
     }
   }
 }
