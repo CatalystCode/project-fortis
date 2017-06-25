@@ -7,13 +7,14 @@ import org.scalatest.FlatSpec
 class FakeSentimentDetector(createSentimentScore: () => Option[Double]) extends DetectsSentiment {
   var callCount = 0
 
-  override def detectSentiment(text: String, language: String): Option[Double] = {
+  override def detectSentiment(text: String): Option[Double] = {
     callCount += 1
     createSentimentScore()
   }
 }
 
-class TestSentimentDetector(detectors: Seq[DetectsSentiment]) extends SentimentDetector(null) {
+class TestSentimentDetector(detectors: Seq[DetectsSentiment], language: String)
+  extends SentimentDetector(modelsProvider = null, auth = null, language = Some(language)) {
   override protected def initializeDetectors(): Seq[DetectsSentiment] = detectors
 }
 
@@ -21,7 +22,7 @@ class SentimentDetectorSpec extends FlatSpec {
   "The sentiment detector" should "use the best detector if possible" in {
     val detector1 = new FakeSentimentDetector(() => Some(0.5))
     val detector2 = new FakeSentimentDetector(() => Some(0.4))
-    val sentiment = new TestSentimentDetector(Seq(detector1, detector2)).detectSentiment("some text", "en")
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2), "en").detectSentiment("some text")
 
     assert(detector1.callCount == 1)
     assert(detector2.callCount == 0)
@@ -32,7 +33,7 @@ class SentimentDetectorSpec extends FlatSpec {
     val detector1 = new FakeSentimentDetector(() => None)
     val detector2 = new FakeSentimentDetector(() => None)
     val detector3 = new FakeSentimentDetector(() => Some(0.4))
-    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3)).detectSentiment("some text", "en")
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3), "en").detectSentiment("some text")
 
     assert(detector1.callCount == 1)
     assert(detector2.callCount == 1)
@@ -44,7 +45,7 @@ class SentimentDetectorSpec extends FlatSpec {
     val detector1 = new FakeSentimentDetector(() => throw new IOException())
     val detector2 = new FakeSentimentDetector(() => Some(0.4))
     val detector3 = new FakeSentimentDetector(() => throw new IOException())
-    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3)).detectSentiment("some text", "en")
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3), "en").detectSentiment("some text")
 
     assert(detector1.callCount == 1)
     assert(detector2.callCount == 1)
@@ -56,7 +57,7 @@ class SentimentDetectorSpec extends FlatSpec {
     val detector1 = new FakeSentimentDetector(() => throw new IOException())
     val detector2 = new FakeSentimentDetector(() => None)
     val detector3 = new FakeSentimentDetector(() => throw new IOException())
-    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3)).detectSentiment("some text", "en")
+    val sentiment = new TestSentimentDetector(Seq(detector1, detector2, detector3), "en").detectSentiment("some text")
 
     assert(detector1.callCount == 1)
     assert(detector2.callCount == 1)

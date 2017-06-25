@@ -17,8 +17,9 @@ class ErrorZipModelsProvider extends ZipModelsProvider(s => s) {
 class TestWordListSentimentDetector(
   positiveWords: Set[String],
   negativeWords: Set[String],
+  language: String,
   modelsProvider: ZipModelsProvider = new TestZipModelsProvider
-) extends WordListSentimentDetector {
+) extends WordListSentimentDetector(modelsProvider, language) {
 
   protected override def readWords(path: String): Set[String] = {
     if (path.endsWith("pos.txt")) {
@@ -29,38 +30,36 @@ class TestWordListSentimentDetector(
       throw new IllegalStateException(s"Requested words for unknown path: $path")
     }
   }
-
-  override protected def createModelsProvider(): ZipModelsProvider = modelsProvider
 }
 
 class WordListSentimentDetectorSpec extends FlatSpec {
   "The word list sentiment detector" should "compute neutral sentiment if no positive/negative words present" in {
-    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"))
-    val sentiment = detector.detectSentiment("foo bar baz", "en")
+    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"), "en")
+    val sentiment = detector.detectSentiment("foo bar baz")
     assert(sentiment.contains(Neutral))
   }
 
   it should "compute positive sentiment if more positive words present" in {
-    val detector = new TestWordListSentimentDetector(Set("good", "great"), Set("bad", "terrible"))
-    val sentiment = detector.detectSentiment("good foo bar baz great good terrible bad", "en")
+    val detector = new TestWordListSentimentDetector(Set("good", "great"), Set("bad", "terrible"), "en")
+    val sentiment = detector.detectSentiment("good foo bar baz great good terrible bad")
     assert(sentiment.contains(Positive))
   }
 
   it should "compute negative sentiment if more negative words present" in {
-    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"))
-    val sentiment = detector.detectSentiment("bad good foo bar baz bad", "en")
+    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"), "en")
+    val sentiment = detector.detectSentiment("bad good foo bar baz bad")
     assert(sentiment.contains(Negative))
   }
 
   it should "compute neutral sentiment if same positive/negative words present" in {
-    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"))
-    val sentiment = detector.detectSentiment("bad good foo bar", "en")
+    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"), "en")
+    val sentiment = detector.detectSentiment("bad good foo bar")
     assert(sentiment.contains(Neutral))
   }
 
   it should "not compute sentiment when there is an error" in {
-    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"), new ErrorZipModelsProvider)
-    val sentiment = detector.detectSentiment("bad good foo bar baz bad", "en")
+    val detector = new TestWordListSentimentDetector(Set("good"), Set("bad"), "en", new ErrorZipModelsProvider)
+    val sentiment = detector.detectSentiment("bad good foo bar baz bad")
     assert(sentiment.isEmpty)
   }
 }
