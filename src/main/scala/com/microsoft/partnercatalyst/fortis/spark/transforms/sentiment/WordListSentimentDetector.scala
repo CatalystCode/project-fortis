@@ -11,13 +11,13 @@ import scala.io.Source
 
 @SerialVersionUID(100L)
 class WordListSentimentDetector(
-  modelsSource: Option[String] = None
+  modelsProvider: ZipModelsProvider,
+  language: String
 ) extends DetectsSentiment {
 
-  @volatile private lazy val wordsCache = new ConcurrentHashMap[String, Set[String]]
-  @volatile private lazy val modelsProvider = createModelsProvider()
+  @transient private lazy val wordsCache = new ConcurrentHashMap[String, Set[String]]
 
-  def detectSentiment(text: String, language: String): Option[Double] = {
+  def detectSentiment(text: String): Option[Double] = {
     try {
       val resourcesDirectory = modelsProvider.ensureModelsAreDownloaded(language)
       val words = Tokenizer(text.toLowerCase)
@@ -66,11 +66,5 @@ class WordListSentimentDetector(
 
   private def join(directory: String, filename: String): String = {
     new File(new File(directory), filename).toString
-  }
-
-  protected def createModelsProvider(): ZipModelsProvider = {
-    new ZipModelsProvider(
-      language => s"https://fortiscentral.blob.core.windows.net/sentiment/sentiment-$language.zip",
-      modelsSource)
   }
 }

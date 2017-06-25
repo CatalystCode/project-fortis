@@ -9,7 +9,9 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 
 trait Analyzer[T] {
-  def toSchema(item: T, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[T]
+  type LocationFetcher = (Double, Double) => Iterable[Location]
+
+  def toSchema(item: T, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[T]
   def extractKeywords(details: ExtendedDetails[T], keywordExtractor: KeywordExtractor): List[Tag]
   def extractLocations(details: ExtendedDetails[T], locationsExtractor: LocationsExtractor): List[Location]
   def extractEntities(details: ExtendedDetails[T], peopleRecognizer: PeopleRecognizer): List[Tag]

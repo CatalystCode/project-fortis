@@ -2,18 +2,17 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import twitter4j.{Status => TwitterStatus}
 
 class TwitterAnalyzer extends Analyzer[TwitterStatus]
   with AnalysisDefaults.EnableAll[TwitterStatus] {
-  override def toSchema(item: TwitterStatus, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TwitterStatus] = {
+  override def toSchema(item: TwitterStatus, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TwitterStatus] = {
     ExtendedDetails(
       body = item.getText,
       title = "",
       source = s"https://twitter.com/statuses/${item.getId}",
       sharedLocations = Option(item.getGeoLocation) match {
-        case Some(location) => locationsExtractor.fetch(location.getLatitude, location.getLongitude).toList
+        case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
         case None => List()
       },
       original = item

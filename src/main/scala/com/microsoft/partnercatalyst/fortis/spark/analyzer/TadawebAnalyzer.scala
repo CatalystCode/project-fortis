@@ -2,18 +2,17 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
 class TadawebAnalyzer extends Analyzer[TadawebEvent]
   with AnalysisDefaults.EnableAll[TadawebEvent] {
-  override def toSchema(item: TadawebEvent, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TadawebEvent] = {
+  override def toSchema(item: TadawebEvent, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TadawebEvent] = {
     ExtendedDetails(
       body = item.text,
       title = item.title,
       source = item.tada.name,
       sharedLocations = item.cities.flatMap(city => city.coordinates match {
-        case Seq(latitude, longitude) => locationsExtractor.fetch(latitude, longitude)
+        case Seq(latitude, longitude) => locationFetcher(latitude, longitude)
         case _ => None
       }).toList,
       original = item

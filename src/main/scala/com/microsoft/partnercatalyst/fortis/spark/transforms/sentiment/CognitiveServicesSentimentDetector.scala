@@ -8,12 +8,13 @@ case class SentimentDetectorAuth(key: String, apiHost: String = "westus.api.cogn
 
 @SerialVersionUID(100L)
 class CognitiveServicesSentimentDetector(
+  language: String,
   auth: SentimentDetectorAuth
 ) extends DetectsSentiment {
 
-  def detectSentiment(text: String, language: String): Option[Double] = {
+  def detectSentiment(text: String): Option[Double] = {
     val textId = "0"
-    val requestBody = buildRequestBody(text, textId, language)
+    val requestBody = buildRequestBody(text, textId)
     val response = callCognitiveServices(requestBody)
     parseResponse(response, textId)
   }
@@ -28,7 +29,7 @@ class CognitiveServicesSentimentDetector(
       .body
   }
 
-  protected def buildRequestBody(text: String, textId: String, language: String): String = {
+  protected def buildRequestBody(text: String, textId: String): String = {
     implicit val formats = json.DefaultFormats
     val requestBody = dto.JsonSentimentDetectionRequest(documents = List(dto.JsonSentimentDetectionRequestItem(
       id = textId,

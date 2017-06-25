@@ -17,7 +17,7 @@ class ZipModelsProvider(
   modelsSource: Option[String] = None
 ) extends Serializable with Loggable {
 
-  @volatile private lazy val modelDirectories = new ConcurrentHashMap[String, String]
+  @transient private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
   def ensureModelsAreDownloaded(language: String): String = {
     val localPath = modelsSource.getOrElse("")

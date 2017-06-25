@@ -33,15 +33,15 @@ private[analyzer] object AnalysisDefaults {
   trait EnableLocation[T] {
     this: Analyzer[T] =>
     override def extractLocations(details: ExtendedDetails[T], locationsExtractor: LocationsExtractor): List[Location] = {
-      locationsExtractor.analyze(details.body, details.analysis.language).toList
+      locationsExtractor.analyze(details.body).toList
     }
   }
 
   trait EnableEntity[T] {
     this: Analyzer[T] =>
     override def extractEntities(details: ExtendedDetails[T], peopleRecognizer: PeopleRecognizer): List[Tag] = {
-      val bodyEntities = peopleRecognizer.extractPeople(details.body, details.analysis.language.getOrElse(""))
-      val titleEntities = peopleRecognizer.extractPeople(details.title, details.analysis.language.getOrElse(""))
+      val bodyEntities = peopleRecognizer.extractPeople(details.body)
+      val titleEntities = peopleRecognizer.extractPeople(details.title)
       (titleEntities ::: bodyEntities).map(entity => Tag(entity, confidence = None))
     }
   }
@@ -56,7 +56,7 @@ private[analyzer] object AnalysisDefaults {
   trait EnableSentiment[T] {
     this: Analyzer[T] =>
     override def detectSentiment(details: ExtendedDetails[T], sentimentDetector: SentimentDetector): List[Double] = {
-      sentimentDetector.detectSentiment(details.body, details.analysis.language.getOrElse("")).toList
+      sentimentDetector.detectSentiment(details.body).toList
     }
   }
 }

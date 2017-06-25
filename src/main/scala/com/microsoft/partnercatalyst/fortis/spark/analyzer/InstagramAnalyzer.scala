@@ -10,14 +10,14 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
 
 class InstagramAnalyzer extends Analyzer[InstagramItem]
   with AnalysisDefaults.EnableKeyword[InstagramItem] {
-  override def toSchema(item: InstagramItem, locationsExtractor: LocationsExtractor, imageAnalyzer: ImageAnalyzer): ExtendedDetails[InstagramItem] = {
+  override def toSchema(item: InstagramItem, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[InstagramItem] = {
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
 
     ExtendedDetails(
       body = imageAnalysis.summary.getOrElse(""),
       title = item.caption.text,
       sharedLocations = item.location match {
-        case Some(location) => locationsExtractor.fetch(location.latitude, location.longitude).toList
+        case Some(location) => locationFetcher(location.latitude, location.longitude).toList
         case None => List()
       },
       source = item.link,
