@@ -1,6 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent, Details, Location}
+import java.util.UUID
+
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Details, FortisEvent, Location}
 
 case class ExtendedEvent[T](
   details: ExtendedDetails[T],
@@ -8,9 +10,12 @@ case class ExtendedEvent[T](
 ) extends FortisEvent
 
 case class ExtendedDetails[T](
+  id: UUID,
+  createdAtEpoch: Long,
   body: String,
   title: String,
-  source: String,
+  publisher: String,
+  sourceUrl: String,
   sharedLocations: List[Location] = List(),
   original: T
 ) extends Details

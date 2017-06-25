@@ -1,14 +1,19 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
+import java.util.UUID
+
 trait FortisEvent {
   val details: Details
   val analysis: Analysis
 }
 
 trait Details {
+  val id: UUID
+  val createdAtEpoch: Long
   val body: String
   val title: String
-  val source: String
+  val publisher: String
+  val sourceUrl: String
   val sharedLocations: List[Location]
 }
 

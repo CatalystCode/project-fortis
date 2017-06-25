@@ -1,5 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
+import java.util.UUID.randomUUID
+import java.time.Instant.now
+
 import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio.RadioTranscription
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 
@@ -7,9 +10,12 @@ class RadioAnalyzer extends Analyzer[RadioTranscription]
   with AnalysisDefaults.EnableAll[RadioTranscription] {
   override def toSchema(item: RadioTranscription, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RadioTranscription] = {
     ExtendedDetails(
+      id = randomUUID(),
+      createdAtEpoch = now.getEpochSecond,
       body = item.text,
       title = "",
-      source = item.radioUrl,
+      publisher = "Radio",
+      sourceUrl = item.radioUrl,
       original = item
     )
   }
