@@ -48,5 +48,13 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramLikes])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.BingAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.FacebookAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.InstagramAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.RadioAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.TadawebAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.TwitterAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider])
   }
 }

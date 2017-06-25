@@ -6,7 +6,8 @@ import java.time.Instant.now
 import com.github.catalystcode.fortis.spark.streaming.bing.dto.BingPost
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 
-class BingAnalyzer extends Analyzer[BingPost]
+@SerialVersionUID(100L)
+class BingAnalyzer extends Analyzer[BingPost] with Serializable
   with AnalysisDefaults.EnableAll[BingPost] {
   override def toSchema(item: BingPost, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[BingPost] = {
     ExtendedDetails(

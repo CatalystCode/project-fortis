@@ -7,7 +7,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import twitter4j.{Status => TwitterStatus}
 
-class TwitterAnalyzer extends Analyzer[TwitterStatus]
+@SerialVersionUID(100L)
+class TwitterAnalyzer extends Analyzer[TwitterStatus] with Serializable
   with AnalysisDefaults.EnableAll[TwitterStatus] {
   override def toSchema(item: TwitterStatus, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TwitterStatus] = {
     ExtendedDetails(

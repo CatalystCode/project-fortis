@@ -7,7 +7,8 @@ import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
-class TadawebAnalyzer extends Analyzer[TadawebEvent]
+@SerialVersionUID(100L)
+class TadawebAnalyzer extends Analyzer[TadawebEvent] with Serializable
   with AnalysisDefaults.EnableAll[TadawebEvent] {
   override def toSchema(item: TadawebEvent, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TadawebEvent] = {
     ExtendedDetails(

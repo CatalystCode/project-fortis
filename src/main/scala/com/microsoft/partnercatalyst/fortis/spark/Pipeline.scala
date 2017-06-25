@@ -21,8 +21,8 @@ import org.apache.spark.streaming.dstream.DStream
 
 object Pipeline {
   def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisEvent]] = {
-    @transient val configs = configurationManager.fetchStreamConfiguration(name)
-    @transient val sourceStream = streamProvider.buildStream[T](ssc, configs)
+    val configs = configurationManager.fetchStreamConfiguration(name)
+    val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
     sourceStream.map(_.transform(rdd => {
 
