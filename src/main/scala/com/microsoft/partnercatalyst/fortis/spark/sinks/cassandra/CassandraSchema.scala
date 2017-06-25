@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 import java.time.Instant.now
 import java.util.UUID
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem
+import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.Utils.{mean, rescale}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.gender.GenderDetector.{Female, Male}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.Neutral
@@ -44,24 +44,24 @@ case class Event(
   title: String)
 
 object CassandraSchema {
-  def apply(item: AnalyzedItem): Event = {
+  def apply(item: FortisEvent): Event = {
     Event(
-      pipeline = item.publisher,
+      pipeline = item.details.publisher,
       externalid = "", // todo
       computedfeatures = getFeature(item),
       detectedkeywords = item.analysis.keywords.map(_.name).toSet,
       detectedplaceids = item.analysis.locations.map(_.wofId).toSet,
-      event_time = item.createdAtEpoch,
+      event_time = item.details.createdAtEpoch,
       eventlangcode = item.analysis.language.orNull,
-      id = item.id,
+      id = item.details.id,
       insertion_time = now.getEpochSecond,
-      messagebody = item.body,
+      messagebody = item.details.body,
       sourceid = "", // todo
-      sourceurl = item.sourceUrl,
-      title = item.title)
+      sourceurl = item.details.sourceUrl,
+      title = item.details.title)
   }
 
-  private def getFeature(item: AnalyzedItem): Features = {
+  private def getFeature(item: FortisEvent): Features = {
     val genderCounts = item.analysis.genders.map(_.name).groupBy(identity).mapValues(_.size)
     val entityCounts = item.analysis.entities.map(_.name).groupBy(identity).mapValues(_.size)
     val positiveSentiments = item.analysis.sentiments.filter(_ > Neutral)

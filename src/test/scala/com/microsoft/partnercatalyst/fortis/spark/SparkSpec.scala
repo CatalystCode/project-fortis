@@ -1,11 +1,10 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
 import java.time.Instant
-import java.util.UUID
 import java.util.UUID.randomUUID
 
 import com.datastax.spark.connector._
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, AnalyzedItem}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraSink}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory, StreamProvider, UnsupportedConnectorConfigException}
 import org.apache.spark.rdd.RDD
@@ -127,32 +126,38 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
       cancel("No cassandra connection defined, skipping test")
     }
 
-    val rdds = mutable.Queue[RDD[AnalyzedItem]]()
+    val rdds = mutable.Queue[RDD[FortisEvent]]()
     rdds += sc.makeRDD(Seq(
-      AnalyzedItem(
-        id = randomUUID(),
-        createdAtEpoch = Instant.now.getEpochSecond,
-        body = "body-1",
-        title = "title-1",
-        publisher = "publisher-1",
-        sourceUrl = "sourceUrl-1",
+      TestFortisEvent(
+        details = TestFortisDetails(
+          id = randomUUID(),
+          createdAtEpoch = Instant.now.getEpochSecond,
+          body = "body-1",
+          title = "title-1",
+          publisher = "publisher-1",
+          sourceUrl = "sourceUrl-1"
+        ),
         analysis = Analysis())))
     rdds += sc.makeRDD(Seq(
-      AnalyzedItem(
-        id = randomUUID(),
-        createdAtEpoch = Instant.now.getEpochSecond,
-        body = "body-2",
-        title = "title-2",
-        publisher = "publisher-2",
-        sourceUrl = "sourceUrl-2",
+      TestFortisEvent(
+        details = TestFortisDetails(
+          id = randomUUID(),
+          createdAtEpoch = Instant.now.getEpochSecond,
+          body = "body-2",
+          title = "title-2",
+          publisher = "publisher-2",
+          sourceUrl = "sourceUrl-2"
+        ),
         analysis = Analysis()),
-      AnalyzedItem(
-        id = randomUUID(),
-        createdAtEpoch = Instant.now.getEpochSecond,
-        body = "body-3",
-        title = "title-3",
-        publisher = "publisher-3",
-        sourceUrl = "sourceUrl-3",
+      TestFortisEvent(
+        details = TestFortisDetails(
+          id = randomUUID(),
+          createdAtEpoch = Instant.now.getEpochSecond,
+          body = "body-3",
+          title = "title-3",
+          publisher = "publisher-3",
+          sourceUrl = "sourceUrl-3"
+        ),
         analysis = Analysis())))
     val stream = Some(ssc.queueStream(rdds))
 
