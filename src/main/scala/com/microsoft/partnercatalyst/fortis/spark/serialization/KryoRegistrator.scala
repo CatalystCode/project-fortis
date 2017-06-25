@@ -48,6 +48,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramLikes])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.ExtendedFortisEvent[_]])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.BingAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.FacebookAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.InstagramAnalyzer])

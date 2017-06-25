@@ -4,7 +4,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 
 import scala.reflect.runtime.universe.TypeTag
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedEvent}
+import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
@@ -26,7 +26,10 @@ object Pipeline {
 
     sourceStream.map(_.transform(rdd => {
 
-      // TODO: replace with global update/broadcast wrappers which will update and (where applicable) broadcast
+      // TODO: populate these local variables with values from global update/broadcast wrappers,
+      // which will use the ConfigurationManager (cassandra) to update themselves and (where applicable)
+      // broadcast changes across the Spark cluster.
+
       val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
       val modelsProvider = new ZipModelsProvider(
         language => s"https://fortiscentral.blob.core.windows.net/opener/opener-$language.zip",
@@ -41,12 +44,12 @@ object Pipeline {
       val sentimentDetectorAuth = SentimentDetectorAuth(Settings.oxfordLanguageToken)
       val supportedLanguages = Set("en", "fr", "de")
 
-      def convertToSchema(original: T): ExtendedEvent[T] = {
+      def convertToSchema(original: T): ExtendedFortisEvent[T] = {
         val message = analyzer.toSchema(original, locationFetcher, imageAnalyzer)
-        ExtendedEvent(message, Analysis())
+        ExtendedFortisEvent(message, Analysis())
       }
 
-      def addLanguage(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+      def addLanguage(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val language = analyzer.detectLanguage(event.details, languageDetector)
         event.copy(analysis = Analysis(language = language))
       }
@@ -58,7 +61,7 @@ object Pipeline {
         }
       }
 
-      def addKeywords(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+      def addKeywords(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val keywords = analyzer.extractKeywords(event.details, keywordExtractor)
         event.copy(analysis = event.analysis.copy(keywords = keywords))
       }
@@ -67,18 +70,18 @@ object Pipeline {
         analysis.keywords.nonEmpty
       }
 
-      def addEntities(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+      def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val entities = analyzer.extractEntities(event.details, new PeopleRecognizer(modelsProvider, event.analysis.language))
         event.copy(analysis = event.analysis.copy(entities = entities))
       }
 
-      def addSentiments(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+      def addSentiments(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val sentiments = analyzer.detectSentiment(event.details,
           new SentimentDetector(modelsProvider, event.analysis.language, sentimentDetectorAuth))
         event.copy(analysis = event.analysis.copy(sentiments = sentiments))
       }
 
-      def addLocations(event: ExtendedEvent[T]): ExtendedEvent[T] = {
+      def addLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val locations = analyzer.extractLocations(event.details,
           locationsExtractorFactory.create(Some(new PlaceRecognizer(modelsProvider, event.analysis.language))))
         event.copy(analysis = event.analysis.copy(locations = locations))

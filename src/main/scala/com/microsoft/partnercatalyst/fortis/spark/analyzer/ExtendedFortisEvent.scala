@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Details, FortisEvent, Location}
 
-case class ExtendedEvent[T](
+case class ExtendedFortisEvent[T](
   details: ExtendedDetails[T],
   analysis: Analysis
 ) extends FortisEvent
