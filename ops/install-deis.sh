@@ -20,7 +20,11 @@ echo "Installing Deis on Cluster"
 
 helm install deis/workflow --name deis --namespace=deis --set global.storage=azure,azure.accountname="${DEIS_STORAGE_ACCOUNT_NAME}",azure.accountkey="${DEIS_STORAGE_ACCOUNT_KEY}",azure.registry_container=registry,azure.database_container=database,azure.builder_container=builder
 
-DEIS_ROUTER_HOST_ROOT=$(kubectl --namespace=deis get svc deis-router -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
+while [[ -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
+   DEIS_ROUTER_HOST_ROOT=$(kubectl --namespace=deis get svc deis-router -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
+   sleep 3
+done
+
 DEIS_HOSTNAME_URL="http://deis.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 echo "Registering Deis Load Balancer"
@@ -28,7 +32,7 @@ deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --login=true --passwo
 
 echo "Adding deis public key"
 ssh-keygen -t rsa -N "" -f "./deis_certs" -V "+365d"
-eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan "${DEIS_BUILDER_HOSTNAME}" >> ~/.ssh/known_hosts
+eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan -t rsa -p 2222 "${DEIS_BUILDER_HOSTNAME}" >> ~/.ssh/known_hosts
 deis keys:add deis_certs.pub
 deis keys:list
 
