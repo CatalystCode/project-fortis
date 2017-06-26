@@ -32,6 +32,8 @@ while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    retries=$((retries+1))
 
    if [[ $retries -eq $max_retry_count ]]; then echo "FAILURE: Service host fetch retry count exceeded "; exit 1; fi
+
+   sleep 3
 done
 
 graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nio.io"
@@ -41,6 +43,7 @@ spark_config_map_name="spark-master-conf"
 chmod 752 ./storage-ddls/*.sh
 
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
+kubectl create -f ./spark-namespace.yaml
 ./setup-environment.sh "${cassandra_host}" "${app_insights_id}" "${site_name}" "${feature_service_host}" "${spark_config_map_name}" "${graphql_service_host}"
 ./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}"
 
