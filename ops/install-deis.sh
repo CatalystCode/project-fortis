@@ -2,10 +2,9 @@
 
 k8location="$1"
 k8resource_group="$2"
-cluster_prefix="$3"
 
 curl -sSL http://deis.io/deis-cli/install-v2.sh | bash
-sudo ln -fs $PWD/deis /usr/local/bin/deis
+sudo ln -fs "${PWD}/deis" /usr/local/bin/deis
 
 echo "creating deis storage account ${k8location}"
 DEIS_STORAGE_ACCOUNT_NAME=k8deisstorage
@@ -23,13 +22,13 @@ helm install deis/workflow --name deis --namespace=deis --set global.storage=azu
 
 DEIS_ROUTER_HOST_ROOT=$(kubectl --namespace=deis get svc deis-router -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
 DEIS_HOSTNAME_URL="http://deis.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 echo "Registering Deis Load Balancer"
-deis register ${DEIS_HOSTNAME_URL} --username=deis-admin --password=test --email=newuser@deis.io
+deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --login=true --password=test --email=newuser@deis.io
 
 echo "Adding deis public key"
 ssh-keygen -t rsa -N "" -f "./deis_certs" -V "+365d"
-eval $(ssh-agent -s)
-ssh-add ./deis_certs
+eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan "${DEIS_BUILDER_HOSTNAME}" >> ~/.ssh/known_hosts
 deis keys:add deis_certs.pub
 deis keys:list
 

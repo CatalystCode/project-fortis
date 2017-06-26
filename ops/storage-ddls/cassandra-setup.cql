@@ -158,6 +158,6 @@ CREATE TABLE events(
 
 CREATE INDEX ON events (FULL(detectedplaceids));
 CREATE INDEX ON events (FULL(detectedkeywords));
-CREATE INDEX ON events (FULL(computedfeatures));
+CREATE INDEX ON events (computedfeatures);
 CREATE INDEX ON events (eventlangcode);
 CREATE INDEX ON events (event_time);
