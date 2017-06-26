@@ -1,6 +1,27 @@
 var graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
+  type Query {
+    sites(siteId: String): SiteCollection
+    twitterAccounts(siteId: String!): TwitterAccountCollection
+    trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
+    facebookPages(siteId: String!): FacebookPageCollection
+    facebookAnalytics(siteId: String!, days: Int!): FacebookPageAnalyticsCollection
+    termBlacklist(siteId: String!): BlacklistCollection
+  }
+
+  type Mutation {
+    removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
+    modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
+    createOrReplaceSite(input: SiteDefinition!): Site
+    modifyTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection
+    removeTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection
+    modifyTrustedTwitterAccounts(input: TrustedTwitterAccountDefintion!): TrustedTwitterAccountCollection
+    removeTrustedTwitterAccounts(input: TrustedTwitterAccountDefintion!): TrustedTwitterAccountCollection
+    modifyBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
+    removeBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
+  }
+
   type SiteProperties {
     targetBbox: [Float],
     defaultZoomLevel: Int,
@@ -134,26 +155,5 @@ module.exports = graphql.buildSchema(`
   input FacebookPageListInput {
     pages: [FacebookPageInput]!
     site: String!
-  }
-
-  type Query {
-    sites(siteId: String): SiteCollection
-    twitterAccounts(siteId: String!): TwitterAccountCollection
-    trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
-    facebookPages(siteId: String!): FacebookPageCollection
-    facebookAnalytics(siteId: String!, days: Int!): FacebookPageAnalyticsCollection
-    termBlacklist(siteId: String!): BlacklistCollection
-  }
-
-  type Mutation {
-    removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
-    modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
-    createOrReplaceSite(input: SiteDefinition!): Site
-    modifyTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection
-    removeTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection
-    modifyTrustedTwitterAccounts(input: TrustedTwitterAccountDefintion!): TrustedTwitterAccountCollection
-    removeTrustedTwitterAccounts(input: TrustedTwitterAccountDefintion!): TrustedTwitterAccountCollection
-    modifyBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
-    removeBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
   }
 `);
