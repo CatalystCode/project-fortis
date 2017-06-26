@@ -5,7 +5,6 @@ k8cassandra_node_count="$2"
 k8spark_worker_count="$3"
 k8resource_group="$4"
 storage_account_name="$5"
-cluster_prefix="$5"
 app_insights_id="$6"
 site_name="$7"
 
