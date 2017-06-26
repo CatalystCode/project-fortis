@@ -28,7 +28,7 @@ deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --login=true --passwo
 
 echo "Adding deis public key"
 ssh-keygen -t rsa -N "" -f "./deis_certs" -V "+365d"
-eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan ${DEIS_BUILDER_HOSTNAME} >> ~/.ssh/known_hosts
+eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan "${DEIS_BUILDER_HOSTNAME}" >> ~/.ssh/known_hosts
 deis keys:add deis_certs.pub
 deis keys:list
 
