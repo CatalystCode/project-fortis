@@ -99,7 +99,7 @@ do
       shift
       ;;
     --app_insights_id|-aii)
-      app_insights_id="$1"  # shellcheck disable=SC2034
+      app_insights_id="$1"
       shift
       ;;
     --kubernetes_name|-kn)
@@ -227,4 +227,4 @@ k8spark_worker_count="${spark_worker_count}"
 k8resource_group="${resource_group}"
 
 chmod 752 create-cluster.sh
-./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}" "${prefix}" "${app_insights_id}" "${site_name}"
+./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}" "${app_insights_id}" "${site_name}"
