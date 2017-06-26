@@ -17,7 +17,7 @@ sleep 10
 git clone https://github.com/CatalystCode/charts.git
 
 ./install-cassandra.sh "${k8cassandra_node_count}"
-./install-deis.sh "${k8location}" "${k8resource_group}" "${cluster_prefix}" "${ssh_key}"
+./install-deis.sh "${k8location}" "${k8resource_group}"
 
 sleep 10
 max_retry_count=50
