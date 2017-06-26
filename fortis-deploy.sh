@@ -23,7 +23,6 @@ Arguments
   --location|-lo                     [Required] : Container cluster location
   --site_type|-sty                   [Required] : Fortis Site Type
   --prefix|-pf                       [Required] : Fortis Site Prefix
-  --ssh_key|sk                       [Required] : SSH Public Key for Deis Certificates
   --site_name|sn                     [Required] : Fortis Site Name
 EOF
 }
@@ -95,10 +94,6 @@ do
       spark_worker_count="$1"
       shift
       ;;
-    --ssh_key|-sk)
-      ssh_key="$1"
-      shift
-      ;;
     --cassandra_node_count|-cn)
       cassandra_node_count="$1"
       shift
@@ -139,7 +134,6 @@ throw_if_empty --spark_worker_count "${spark_worker_count}"
 throw_if_empty --cassandra_node_count "${cassandra_node_count}"
 throw_if_empty --site_type "${site_type}"
 throw_if_empty --prefix "${prefix}"
-throw_if_empty --ssh_key "${ssh_key}"
 throw_if_empty --site_name "${site_name}"
 
 kube_config_dest_file="/home/${user_name}/.kube/config"
