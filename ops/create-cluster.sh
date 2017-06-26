@@ -9,6 +9,7 @@ app_insights_id="$6"
 site_name="$7"
 
 chmod 752 -- *.sh
+chmod 752 -- ./deis-apps/fortis-services/*.sh
 
 ./create-disk.sh "${k8location}" "${storage_account_name}"
 sleep 10
@@ -17,13 +18,15 @@ git clone https://github.com/CatalystCode/charts.git
 
 ./install-cassandra.sh "${k8cassandra_node_count}"
 ./install-deis.sh "${k8location}" "${k8resource_group}"
+./deis-apps/fortis-services/create-app.sh
+./deis-apps/fortis-services/deploy-app.sh
 
 sleep 10
 max_retry_count=50
 retries=0
 
 while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
-   cassandra_host=$(kubectl --namespace=cassandra get svc cassandra-cassandra-ext -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
+   cassandra_host=$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
 
    DEIS_ROUTER_HOST_ROOT=$(kubectl --namespace=deis get svc deis-router -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
    retries=$((retries+1))

@@ -4,8 +4,8 @@ cassandra_host="$1"
 cassandra_ddl_script="./storage-ddls/cassandra-setup.cql"
 
 echo "Installing CQLSH"
-apt install python-pip
+sudo apt-get install python-pip -y
 pip install cqlsh
 cqlsh --version
 
-cqlsh "${cassandra_host}" -f "${cassandra_ddl_script}"
+cqlsh "${cassandra_host}" --cqlversion="3.4.2" -f "${cassandra_ddl_script}"
