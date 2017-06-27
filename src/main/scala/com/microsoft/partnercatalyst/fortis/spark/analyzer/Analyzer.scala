@@ -6,12 +6,13 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
-import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
 
 trait Analyzer[T] {
   type LocationFetcher = (Double, Double) => Iterable[Location]
 
   def toSchema(item: T, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[T]
+  def hasBlacklistedTerms(details: ExtendedDetails[T], blacklist: Blacklist): Boolean
   def extractKeywords(details: ExtendedDetails[T], keywordExtractor: KeywordExtractor): List[Tag]
   def extractLocations(details: ExtendedDetails[T], locationsExtractor: LocationsExtractor): List[Location]
   def extractEntities(details: ExtendedDetails[T], peopleRecognizer: PeopleRecognizer): List[Tag]

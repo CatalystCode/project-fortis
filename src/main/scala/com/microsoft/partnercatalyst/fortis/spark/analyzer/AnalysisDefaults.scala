@@ -5,7 +5,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
-import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
 
 /**
   * Provides default analysis method implementations for a concrete [[Analyzer]].
@@ -19,6 +19,7 @@ private[analyzer] object AnalysisDefaults {
     with EnableLocation[T]
     with EnableEntity[T]
     with EnableLanguage[T]
+    with EnableBlacklist[T]
     with EnableSentiment[T] {
     this: Analyzer[T] =>
   }
@@ -57,6 +58,13 @@ private[analyzer] object AnalysisDefaults {
     this: Analyzer[T] =>
     override def detectSentiment(details: ExtendedDetails[T], sentimentDetector: SentimentDetector): List[Double] = {
       sentimentDetector.detectSentiment(details.body).toList
+    }
+  }
+
+  trait EnableBlacklist[T] {
+    this: Analyzer[T] =>
+    override def hasBlacklistedTerms(details: ExtendedDetails[T], blacklist: Blacklist): Boolean = {
+      blacklist.matches(details.body) || blacklist.matches(details.title)
     }
   }
 }
