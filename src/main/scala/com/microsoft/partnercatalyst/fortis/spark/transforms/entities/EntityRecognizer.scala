@@ -12,32 +12,30 @@ import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class EntityRecognizer(
-  modelsSource: Option[String] = None,
-  enabledLanguages: Set[String] = OpeNER.EnabledLanguages
+  modelsProvider: ZipModelsProvider,
+  language: Option[String]
 ) extends Serializable with Loggable {
 
-  @volatile private lazy val modelsProvider = createModelsProvider()
-
-  def extractEntities(text: String, language: String): List[Entity] = {
-    if (!enabledLanguages.contains(language)) {
+  def extractEntities(text: String): List[Entity] = {
+    if (language.isEmpty || !OpeNER.EnabledLanguages.contains(language)) {
       return List()
     }
 
-    Try(modelsProvider.ensureModelsAreDownloaded(language)) match {
+    Try(modelsProvider.ensureModelsAreDownloaded(language.get)) match {
       case Failure(ex) =>
         logError(s"Unable to load models for language $language", ex)
         List()
 
       case Success(resourcesDirectory) =>
-        extractEntitiesUsingModels(text, language, resourcesDirectory)
+        extractEntitiesUsingModels(text, resourcesDirectory)
     }
   }
 
-  private def extractEntitiesUsingModels(text: String, language: String, resourcesDirectory: String): List[Entity] = {
+  private def extractEntitiesUsingModels(text: String, resourcesDirectory: String): List[Entity] = {
     try {
-      val kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language)
-      OpeNER.posAnnotate(resourcesDirectory, language, kaf)
-      OpeNER.nerAnnotate(resourcesDirectory, language, kaf)
+      val kaf = OpeNER.tokAnnotate(resourcesDirectory, text, language.get)
+      OpeNER.posAnnotate(resourcesDirectory, language.get, kaf)
+      OpeNER.nerAnnotate(resourcesDirectory, language.get, kaf)
 
       logDebug(s"Analyzed text $text in language $language: $kaf")
 
@@ -47,11 +45,5 @@ class EntityRecognizer(
         logError(s"Unable to extract entities for language $language", ex)
         List()
     }
-  }
-
-  protected def createModelsProvider(): ZipModelsProvider = {
-    new ZipModelsProvider(
-      language => s"https://fortiscentral.blob.core.windows.net/opener/opener-$language.zip",
-      modelsSource)
   }
 }

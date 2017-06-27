@@ -2,16 +2,20 @@ package com.microsoft.partnercatalyst.fortis.spark.dto
 
 import java.util.UUID
 
-case class AnalyzedItem(
-  id: UUID,
-  createdAtEpoch: Long,
-  body: String,
-  title: String,
-  publisher: String,
-  sourceUrl: String,
-  sharedLocations: List[Location] = List(),
-  analysis: Analysis
-)
+trait FortisEvent {
+  val details: Details
+  val analysis: Analysis
+}
+
+trait Details {
+  val id: UUID
+  val createdAtEpoch: Long
+  val body: String
+  val title: String
+  val publisher: String
+  val sourceUrl: String
+  val sharedLocations: List[Location]
+}
 
 case class Analysis(
   language: Option[String] = None,

@@ -10,7 +10,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     // so always add new classes at the end of this list
     // more information: https://stackoverflow.com/a/32869053/3817588
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.AnalyzedItem])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor])
@@ -48,5 +48,14 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramLikes])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.ExtendedFortisEvent[_]])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.BingAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.FacebookAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.InstagramAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.RadioAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.TadawebAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.TwitterAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider])
   }
 }

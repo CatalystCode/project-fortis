@@ -1,19 +1,27 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class SentimentDetector(
+  modelsProvider: ZipModelsProvider,
+  language: Option[String],
   auth: SentimentDetectorAuth
+
 ) extends DetectsSentiment {
 
-  private lazy val detectors = initializeDetectors()
+  private lazy val detectors = language.map(_ => initializeDetectors())
 
-  def detectSentiment(text: String, language: String): Option[Double] = {
-    detectors.view.map(detector => {
-      Try(detector.detectSentiment(text, language)) match {
+  def detectSentiment(text: String): Option[Double] = {
+    if (detectors.isEmpty) {
+      return None
+    }
+
+    detectors.get.view.map(detector => {
+      Try(detector.detectSentiment(text)) match {
         case Success(Some(sentimentScore)) =>
           logDebug(s"Computed sentiment via ${detector.getClass}")
           Some(sentimentScore)
@@ -27,8 +35,8 @@ class SentimentDetector(
   }
 
   protected def initializeDetectors(): Seq[DetectsSentiment] = {
-    Seq(new CognitiveServicesSentimentDetector(auth),
-        new WordListSentimentDetector())
+    Seq(new CognitiveServicesSentimentDetector(language.get, auth),
+        new WordListSentimentDetector(modelsProvider, language.get))
   }
 }
 
@@ -39,5 +47,5 @@ object SentimentDetector extends Enumeration {
 }
 
 trait DetectsSentiment extends Serializable with Loggable {
-  def detectSentiment(text: String, language: String): Option[Double]
+  def detectSentiment(text: String): Option[Double]
 }
