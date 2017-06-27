@@ -16,7 +16,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.Fe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -39,7 +39,7 @@ object Pipeline {
       val featureServiceClient = new FeatureServiceClient(Settings.featureServiceHost)
       val locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, geofence).buildLookup()
       val locationFetcher = locationsExtractorFactory.fetch _
-      val blacklist = Set("Trump", "Hilary")
+      val blacklist = new Blacklist(Seq(Set("Trump", "Hilary")))
       val keywordExtractor = new KeywordExtractor(List("Ariana"))
       val imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(Settings.oxfordVisionToken), featureServiceClient)
       val languageDetector = new LanguageDetector(LanguageDetectorAuth(Settings.oxfordLanguageToken))
@@ -73,8 +73,7 @@ object Pipeline {
       }
 
       def hasBlacklistedTerms(details: Details): Boolean = {
-        val tokens = Tokenizer(details.body) ++ Tokenizer(details.title)
-        tokens.exists(blacklist.contains)
+        blacklist.matches(details.body) || blacklist.matches(details.title)
       }
 
       def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
