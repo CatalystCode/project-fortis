@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer
 import java.util.UUID.randomUUID
 import java.time.Instant.now
 
-import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
+import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.tadaweb.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
