@@ -11,9 +11,8 @@ import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor, LocationsExtractorFactory, PlaceRecognizer}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractorFactory, PlaceRecognizer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
-import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
