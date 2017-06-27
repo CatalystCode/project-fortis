@@ -20,4 +20,9 @@ class BlacklistSpec extends FlatSpec {
     assert(blacklist.matches("a b pear c"))
     assert(blacklist.matches("bar baz foo"))
   }
+
+  it should "handle the empty string" in {
+    val blacklist = new Blacklist(Seq(Set("foo", "bar"), Set("pear")))
+    assert(!blacklist.matches(""))
+  }
 }
