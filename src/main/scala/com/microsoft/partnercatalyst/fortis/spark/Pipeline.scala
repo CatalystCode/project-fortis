@@ -6,13 +6,14 @@ import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 import scala.reflect.runtime.universe.TypeTag
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Details, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{Geofence, LocationsExtractor, LocationsExtractorFactory, PlaceRecognizer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
+import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
@@ -38,6 +39,7 @@ object Pipeline {
       val featureServiceClient = new FeatureServiceClient(Settings.featureServiceHost)
       val locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, geofence).buildLookup()
       val locationFetcher = locationsExtractorFactory.fetch _
+      val blacklist = Set("Trump", "Hilary")
       val keywordExtractor = new KeywordExtractor(List("Ariana"))
       val imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(Settings.oxfordVisionToken), featureServiceClient)
       val languageDetector = new LanguageDetector(LanguageDetectorAuth(Settings.oxfordLanguageToken))
@@ -70,6 +72,11 @@ object Pipeline {
         analysis.keywords.nonEmpty
       }
 
+      def hasBlacklistedTerms(details: Details): Boolean = {
+        val tokens = Tokenizer(details.body) ++ Tokenizer(details.title)
+        tokens.exists(blacklist.contains)
+      }
+
       def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val entities = analyzer.extractEntities(event.details, new PeopleRecognizer(modelsProvider, event.analysis.language))
         event.copy(analysis = event.analysis.copy(entities = entities))
@@ -90,6 +97,7 @@ object Pipeline {
       // Configure analysis pipeline
       rdd
         .map(convertToSchema)
+        .filter(item => !hasBlacklistedTerms(item.details))
         .map(addLanguage)
         .filter(item => isLanguageSupported(item.analysis))
         .map(addKeywords)
