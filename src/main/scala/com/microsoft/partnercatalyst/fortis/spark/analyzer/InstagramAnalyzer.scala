@@ -12,7 +12,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecogn
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
 class InstagramAnalyzer extends Analyzer[InstagramItem]
-  with AnalysisDefaults.FilterBlacklist[InstagramItem]
+  with AnalysisDefaults.EnableBlacklist[InstagramItem]
   with AnalysisDefaults.EnableKeyword[InstagramItem] {
   override def toSchema(item: InstagramItem, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[InstagramItem] = {
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
