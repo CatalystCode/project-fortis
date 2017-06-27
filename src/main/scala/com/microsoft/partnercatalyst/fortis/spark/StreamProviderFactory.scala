@@ -2,9 +2,9 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import java.io.File
 
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters.TadawebAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
+import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.tadaweb.TadawebAdapter
 
 object StreamProviderFactory {
   def create()(implicit settings: Settings): StreamProvider = {

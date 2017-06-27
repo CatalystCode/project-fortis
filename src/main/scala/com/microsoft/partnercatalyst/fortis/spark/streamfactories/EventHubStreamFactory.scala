@@ -4,14 +4,16 @@ import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfi
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.eventhubs.EventHubsUtils
-
 import java.nio.charset.StandardCharsets
+
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byte]) => Try[A], progressDir: String)
-  extends StreamFactory[A] {
+  extends StreamFactory[A] with Loggable {
 
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[A]] = {
     case ConnectorConfig(`identifier`, params) =>
@@ -33,10 +35,9 @@ class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byt
         ))
       ).map(_.getBytes).flatMap(adapter_(_) match {
         case Success(event) => Some(event)
-        case Failure(ex) => {
-          // TODO: log that we're skipping failed conversion to A
+        case Failure(ex) =>
+          logError("Unable to parse EventHub message", ex)
           None
-        }
       })
   }
 }
