@@ -71,8 +71,8 @@ object Pipeline {
         analysis.keywords.nonEmpty
       }
 
-      def hasBlacklistedTerms(details: Details): Boolean = {
-        blacklist.matches(details.body) || blacklist.matches(details.title)
+      def hasBlacklistedTerms(event: ExtendedFortisEvent[T]): Boolean = {
+        analyzer.hasBlacklistedTerms(event.details, blacklist)
       }
 
       def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
@@ -95,7 +95,7 @@ object Pipeline {
       // Configure analysis pipeline
       rdd
         .map(convertToSchema)
-        .filter(item => !hasBlacklistedTerms(item.details))
+        .filter(item => !hasBlacklistedTerms(item))
         .map(addLanguage)
         .filter(item => isLanguageSupported(item.analysis))
         .map(addKeywords)
