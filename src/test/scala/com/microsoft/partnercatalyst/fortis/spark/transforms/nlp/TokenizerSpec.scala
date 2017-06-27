@@ -14,4 +14,8 @@ class TokenizerSpec extends FlatSpec {
   it should "handle non-standard whitespace" in {
     assert(Tokenizer("foo\u2000bar\u00a0baz") == Seq("foo", "\u2000", "bar", "\u00a0", "baz"))
   }
+
+  it should "handle empty inputs" in {
+    assert(Tokenizer("") == Seq())
+  }
 }
