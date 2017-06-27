@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamfactories.adapters
+package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.tadaweb
 
 import com.microsoft.partnercatalyst.fortis.spark.tadaweb.dto.TadawebEvent
 import net.liftweb.json
