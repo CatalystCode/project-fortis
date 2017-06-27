@@ -1,6 +1,9 @@
 dist:
   trusty
 
+sudo:
+  required
+
 language:
   scala
 
@@ -12,3 +15,6 @@ scala:
 
 script:
   - .travis/ci.sh
+
+after_success:
+  - .travis/publish.sh
