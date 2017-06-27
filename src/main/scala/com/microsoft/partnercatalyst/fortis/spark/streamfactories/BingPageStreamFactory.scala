@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.streamfactories
 
-import com.github.catalystcode.fortis.spark.streaming.bing.{BingAuth, BingUtils}
 import com.github.catalystcode.fortis.spark.streaming.bing.dto.BingPost
+import com.github.catalystcode.fortis.spark.streaming.bing.{BingAuth, BingUtils}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream

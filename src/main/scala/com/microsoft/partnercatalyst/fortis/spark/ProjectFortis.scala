@@ -1,15 +1,15 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-import scala.reflect.runtime.universe.TypeTag
-
 import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSink
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.ConnectorConfig
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
+
+import scala.reflect.runtime.universe.TypeTag
 
 object ProjectFortis extends App {
 

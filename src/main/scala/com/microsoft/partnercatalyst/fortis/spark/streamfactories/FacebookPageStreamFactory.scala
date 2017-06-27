@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.streamfactories
 
-import com.github.catalystcode.fortis.spark.streaming.facebook.{FacebookAuth, FacebookUtils}
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
+import com.github.catalystcode.fortis.spark.streaming.facebook.{FacebookAuth, FacebookUtils}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream

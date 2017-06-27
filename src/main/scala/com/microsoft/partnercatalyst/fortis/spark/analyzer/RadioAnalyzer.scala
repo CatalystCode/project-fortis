@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.util.UUID.randomUUID
 import java.time.Instant.now
+import java.util.UUID.randomUUID
 
 import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio.RadioTranscription
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer

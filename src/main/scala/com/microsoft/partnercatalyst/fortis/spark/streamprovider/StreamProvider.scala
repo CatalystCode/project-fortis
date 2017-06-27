@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.streamprovider
 
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
+
 import scala.collection.immutable.HashMap
 import scala.reflect.runtime.universe._
 
