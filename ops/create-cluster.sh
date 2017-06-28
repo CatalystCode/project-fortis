@@ -7,6 +7,7 @@ k8resource_group="$4"
 storage_account_name="$5"
 app_insights_id="$6"
 site_name="$7"
+eh_conn_str="$8"
 
 chmod 752 -- *.sh
 chmod 752 -- ./deis-apps/fortis-services/*.sh
@@ -56,7 +57,7 @@ echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
 kubectl create -f ./spark-namespace.yaml
 echo "Finished. Deploying environment settings to cluster."
-./setup-environment.sh "${cassandra_host}" "${app_insights_id}" "${site_name}" "${feature_service_host}" "${spark_config_map_name}" "${graphql_service_host}" "${k8resource_group}" "${fortis_interface_host}"
+./setup-environment.sh "${cassandra_host}" "${app_insights_id}" "${site_name}" "${feature_service_host}" "${spark_config_map_name}" "${graphql_service_host}" "${k8resource_group}" "${fortis_interface_host}" "${eh_conn_str}"
 echo "Finished. Installing spark cluster."
 ./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}"
 

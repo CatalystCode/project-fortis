@@ -24,6 +24,7 @@ Arguments
   --site_type|-sty                   [Required] : Fortis Site Type
   --prefix|-pf                       [Required] : Fortis Site Prefix
   --site_name|sn                     [Required] : Fortis Site Name
+  --eh_conn_str|ec                   [Required] : Event Hub Connection String
 EOF
 }
 
@@ -66,6 +67,10 @@ do
       site_name="$1"
       shift
       ;;
+    --eh_conn_str|-ec)
+      eh_conn_str="$1"
+      shift
+      ;;    
     --resource_group|-rg)
       resource_group="$1"
       shift
@@ -205,6 +210,7 @@ throw_if_empty --cassandra_node_count "${cassandra_node_count}"
 throw_if_empty --site_type "${site_type}"
 throw_if_empty --prefix "${prefix}"
 throw_if_empty --site_name "${site_name}"
+throw_if_empty --eh_conn_str "${eh_conn_str}"
 
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
@@ -247,4 +253,4 @@ readonly k8spark_worker_count="${spark_worker_count}"
 readonly k8resource_group="${resource_group}"
 
 chmod 752 create-cluster.sh
-./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}" "${app_insights_id}" "${site_name}"
+./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}" "${app_insights_id}" "${site_name}" "${eh_conn_str}"
