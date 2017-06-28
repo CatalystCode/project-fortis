@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    // ---------------------------------------------------------------------------------- mutations
+  // ---------------------------------------------------------------------------------- mutations
 
   removeKeywords(args, res){ // eslint-disable-line no-unused-vars
   },
@@ -10,12 +10,22 @@ module.exports = {
   },
 
   saveLocations(args, res){ // eslint-disable-line no-unused-vars
+    // this is now handled by spark:
+    // we get the coordinates of the geofence
+    // that is configured in the sitesettings table
+    // and use those to filter the twitter stream
+    return null;
   },
 
   removeLocations(args, res){ // eslint-disable-line no-unused-vars
+    // this is now handled by spark:
+    // we get the coordinates of the geofence
+    // that is configured in the sitesettings table
+    // and use those to filter the twitter stream
+    return null;
   },
 
-    // ------------------------------------------------------------------------------------ queries
+  // ------------------------------------------------------------------------------------ queries
 
   terms(args, res){ // eslint-disable-line no-unused-vars
   },
