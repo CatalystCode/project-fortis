@@ -4,8 +4,6 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.Location
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 
-case class Geofence(north: Double, west: Double, south: Double, east: Double)
-
 @SerialVersionUID(100L)
 class LocationsExtractor private[locations](
   lookup: Map[String, Set[String]],

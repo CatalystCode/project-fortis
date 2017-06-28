@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence
+import com.microsoft.partnercatalyst.fortis.spark.dto.Geofence
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature
 import org.scalatest.FlatSpec
 

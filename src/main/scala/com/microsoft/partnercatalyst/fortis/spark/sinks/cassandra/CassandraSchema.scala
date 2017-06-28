@@ -43,6 +43,36 @@ case class Event(
   sourceurl: String,
   title: String)
 
+case class SiteSetting(
+  id: UUID,
+  sitename: String,
+  geofence: Seq[Double],
+  languages: Set[String],
+  defaultzoom: Int,
+  title: String,
+  logo: String,
+  translationsvctoken: String,
+  cogspeechsvctoken: String,
+  cogvisionsvctoken: String,
+  cogtextsvctoken: String,
+  insertion_time: Long
+)
+
+case class Stream(
+  pipeline: String,
+  streamid: Long,
+  connector: String,
+  params: Map[String, String]
+)
+
+case class TrustedSource(
+  sourceid: String,
+  sourcetype: String,
+  connector: String,
+  rank: Int,
+  insertion_time: Long
+)
+
 object CassandraSchema {
   def apply(item: FortisEvent): Event = {
     Event(
