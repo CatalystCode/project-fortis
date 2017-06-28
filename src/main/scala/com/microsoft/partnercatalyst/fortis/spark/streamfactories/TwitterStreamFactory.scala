@@ -6,9 +6,9 @@ import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfi
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter.TwitterUtils
-import twitter4j.{FilterQuery, Status}
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
+import twitter4j.{FilterQuery, Status}
 
 class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[Status]] = {
