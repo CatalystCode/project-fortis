@@ -2,8 +2,8 @@
     "rules": {
         "no-console": "off",
         "indent": [
-            2,
-            4
+            "error", 
+            2
         ],
         "quotes": [
             2,
