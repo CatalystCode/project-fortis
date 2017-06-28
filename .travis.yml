@@ -1,6 +1,9 @@
 dist:
   trusty
 
+sudo:
+  required
+
 language:
   scala
 
@@ -10,8 +13,8 @@ jdk:
 scala:
   - 2.11.7
 
-env:
-  - TARGET=test
-
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION $TARGET
+  - .travis/ci.sh
+
+after_success:
+  - .travis/publish.sh
