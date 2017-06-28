@@ -10,19 +10,23 @@ module.exports = {
   },
 
   saveLocations(args, res){ // eslint-disable-line no-unused-vars
-    // this is now handled by spark:
-    // we get the coordinates of the geofence
-    // that is configured in the sitesettings table
-    // and use those to filter the twitter stream
-    return null;
+    return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+      reject(
+        'This API call is no longer supported. ' +
+        'We now automatically filter events down to only those ' +
+        'locations defined in the geo-fence for your site'
+      );
+    });
   },
 
   removeLocations(args, res){ // eslint-disable-line no-unused-vars
-    // this is now handled by spark:
-    // we get the coordinates of the geofence
-    // that is configured in the sitesettings table
-    // and use those to filter the twitter stream
-    return null;
+    return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+      reject(
+        'This API call is no longer supported. ' +
+        'We now automatically filter events down to only those ' +
+        'locations defined in the geo-fence for your site'
+      );
+    });
   },
 
   // ------------------------------------------------------------------------------------ queries
