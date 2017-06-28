@@ -24,6 +24,11 @@ object Pipeline {
     val configs = configurationManager.fetchConnectorConfigs(name)
     val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
+
+    val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/opener/opener-$language.zip", Settings.modelsDir)
+    val sentimentModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/sentiment/sentiment-$language.zip", Settings.modelsDir)
+    val featureServiceClient = new FeatureServiceClient(Settings.featureServiceUrlBase)
+
     sourceStream.map(_.transform(rdd => {
 
       // TODO: populate these local variables with values from global update/broadcast wrappers,
@@ -31,10 +36,7 @@ object Pipeline {
       // broadcast changes across the Spark cluster.
 
       val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
-      val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/opener/opener-$language.zip", Settings.modelsDir)
-      val sentimentModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/sentiment/sentiment-$language.zip", Settings.modelsDir)
 
-      val featureServiceClient = new FeatureServiceClient(Settings.featureServiceUrlBase)
       val locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, geofence).buildLookup()
       val locationFetcher = locationsExtractorFactory.fetch _
       val blacklist = new Blacklist(Seq(Set("Trump", "Hilary")))
