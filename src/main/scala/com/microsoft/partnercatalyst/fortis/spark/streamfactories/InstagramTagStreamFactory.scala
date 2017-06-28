@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.streamfactories
 
-import com.github.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
+import com.github.catalystcode.fortis.spark.streaming.instagram.{InstagramAuth, InstagramUtils}
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream

@@ -1,8 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-import scala.util.Properties.{envOrElse, envOrNone}
-
 import org.scalatest.FlatSpec
+
+import scala.util.Properties.{envOrElse, envOrNone}
 
 class IntegrationTestSpec extends FlatSpec {
   protected def checkIfShouldRunWithLocalModels(): Option[String] = {

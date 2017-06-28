@@ -1,9 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
-import scala.util.Properties.envOrElse
-
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.Duration
+
+import scala.util.Properties.envOrElse
 
 object CassandraConfig {
   def init(conf: SparkConf, batchDuration: Duration): SparkConf = {

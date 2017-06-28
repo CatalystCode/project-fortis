@@ -1,12 +1,12 @@
 package com.microsoft.partnercatalyst.fortis.spark.streamfactories
 
+import java.nio.charset.StandardCharsets
+
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.eventhubs.EventHubsUtils
-import java.nio.charset.StandardCharsets
-
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
