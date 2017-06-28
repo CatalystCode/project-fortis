@@ -11,55 +11,55 @@ const eventHubClient = EventHubClient.fromConnectionString(eventHubConnectionStr
 module.exports = {
     // ---------------------------------------------------------------------------------- mutations
 
-    publishEvents(args, res){ // eslint-disable-line no-unused-vars
-        return new Promise((resolve, reject) => {
-            const events = args && args.input && args.input.messages;
-            if (!events) {
-                reject(`No messages to be sent in request: ${JSON.stringify(args)}`);
-            }
+  publishEvents(args, res){ // eslint-disable-line no-unused-vars
+    return new Promise((resolve, reject) => {
+      const events = args && args.input && args.input.messages;
+      if (!events) {
+        reject(`No messages to be sent in request: ${JSON.stringify(args)}`);
+      }
 
-            let messages;
-            try {
-                messages = events.map(event => ({contents: JSON.stringify(event)}));
-            } catch (err) {
-                reject(`Unable to create payloads for EventHub: ${err}`);
-            }
+      let messages;
+      try {
+        messages = events.map(event => ({contents: JSON.stringify(event)}));
+      } catch (err) {
+        reject(`Unable to create payloads for EventHub: ${err}`);
+      }
 
-            eventHubClient.open()
+      eventHubClient.open()
             .then(() => eventHubClient.createSender())
             .then(eventHubSender => {
-                eventHubSender.on('errorReceived', err => reject(`Error talking to EventHub: ${err}`));
-                Promise.all(messages.map(message => eventHubSender.send(message, eventHubPartition)))
+              eventHubSender.on('errorReceived', err => reject(`Error talking to EventHub: ${err}`));
+              Promise.all(messages.map(message => eventHubSender.send(message, eventHubPartition)))
                 .then(() => resolve([]))
                 .catch((err) => reject(`Error sending EventHub message: ${err}`));
             });
-        });
-    },
+    });
+  },
 
     // ------------------------------------------------------------------------------------ queries
 
-    byBbox(args, res){ // eslint-disable-line no-unused-vars
-    },
+  byBbox(args, res){ // eslint-disable-line no-unused-vars
+  },
 
-    byEdges(args, res){ // eslint-disable-line no-unused-vars
-    },
+  byEdges(args, res){ // eslint-disable-line no-unused-vars
+  },
 
-    event(args, res){ // eslint-disable-line no-unused-vars
-    },
+  event(args, res){ // eslint-disable-line no-unused-vars
+  },
 
-    translate(args, res) { // eslint-disable-line no-unused-vars
-        return new Promise((resolve, reject) => {
-            translatorService.translate(args.sentence, args.fromLanguage, args.toLanguage)
+  translate(args, res) { // eslint-disable-line no-unused-vars
+    return new Promise((resolve, reject) => {
+      translatorService.translate(args.sentence, args.fromLanguage, args.toLanguage)
             .then(result => resolve({ translatedSentence: result.translatedSentence, originalSentence: args.sentence }))
             .catch(err => reject(err));
-        });
-    },
+    });
+  },
 
-    translateWords(args, res) { // eslint-disable-line no-unused-vars
-        return new Promise((resolve, reject) => {
-            translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)
+  translateWords(args, res) { // eslint-disable-line no-unused-vars
+    return new Promise((resolve, reject) => {
+      translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)
             .then(result => resolve({ words: result.translatedSentence }))
             .catch(err => reject(err));
-        });
-    }
+    });
+  }
 };
