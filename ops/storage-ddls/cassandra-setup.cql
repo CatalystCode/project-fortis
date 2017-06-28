@@ -46,10 +46,10 @@ CREATE TABLE streams (
 CREATE TABLE trustedsources (
    sourceid text,
    sourcetype text,
-   pipeline text,
+   connector text,
    rank int,
    insertion_time timestamp,
-   PRIMARY KEY ((pipeline), sourceid, sourcetype)
+   PRIMARY KEY ((connector), sourceid, sourcetype)
 );
 
 CREATE INDEX ON trustedsources (rank);
