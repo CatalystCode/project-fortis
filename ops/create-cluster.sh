@@ -20,6 +20,8 @@ git clone https://github.com/CatalystCode/charts.git
 ./install-deis.sh "${k8location}" "${k8resource_group}"
 ./deis-apps/fortis-services/create-app.sh
 ./deis-apps/fortis-services/deploy-app.sh
+./deis-apps/fortis-interface/create-app.sh
+./deis-apps/fortis-interface/deploy-app.sh
 
 sleep 10
 max_retry_count=50
@@ -37,6 +39,7 @@ while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
 done
 
 graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nio.io"
+fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nio.io"
 feature_service_host=1.1.1.1
 spark_config_map_name="spark-master-conf"
 
@@ -44,7 +47,7 @@ chmod 752 ./storage-ddls/*.sh
 
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
 kubectl create -f ./spark-namespace.yaml
-./setup-environment.sh "${cassandra_host}" "${app_insights_id}" "${site_name}" "${feature_service_host}" "${spark_config_map_name}" "${graphql_service_host}"
+./setup-environment.sh "${cassandra_host}" "${app_insights_id}" "${site_name}" "${feature_service_host}" "${spark_config_map_name}" "${graphql_service_host}" "${k8resource_group}" "${fortis_interface_host}"
 ./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}"
 
 #./install-postgis
