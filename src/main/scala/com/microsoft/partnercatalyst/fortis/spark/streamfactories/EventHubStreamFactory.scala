@@ -25,7 +25,7 @@ class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byt
         streamingContext,
         params("namespace"),
         progressDir,
-        Map(params("name") -> Map[String, String] (
+        Map(params("name") -> Map(
           "eventhubs.policyname" -> params("policyName"),
           "eventhubs.policykey" -> params("policyKey"),
           "eventhubs.namespace" -> params("namespace"),
