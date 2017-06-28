@@ -1,6 +1,7 @@
 'use strict';
 
 const EventHubClient = require('azure-event-hubs').Client;
+const translatorService = require('../translatorClient/MsftTranslator');
 
 const eventHubConnectionString = process.env.PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING;
 const eventHubPath = process.env.PUBLISH_EVENTS_EVENTHUB_PATH;
@@ -47,8 +48,18 @@ module.exports = {
     },
 
     translate(args, res) { // eslint-disable-line no-unused-vars
+        return new Promise((resolve, reject) => {
+            translatorService.translate(args.sentence, args.fromLanguage, args.toLanguage)
+            .then(result => resolve({ translatedSentence: result.translatedSentence, originalSentence: args.sentence }))
+            .catch(err => reject(err));
+        });
     },
 
     translateWords(args, res) { // eslint-disable-line no-unused-vars
+        return new Promise((resolve, reject) => {
+            translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)
+            .then(result => resolve({ words: result.translatedSentence }))
+            .catch(err => reject(err));
+        });
     }
 };
