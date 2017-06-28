@@ -4,6 +4,7 @@ import java.io.File
 
 import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
+import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEventsAdapter
 import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.tadaweb.TadawebAdapter
 
 object StreamProviderFactory {
@@ -39,6 +40,12 @@ object StreamProviderFactory {
       .withFactories(
         List(
           new EventHubStreamFactory("Tadaweb", TadawebAdapter.apply,
+            new File(settings.progressDir, Constants.EventHubProgressDir).getPath)
+        )
+      )
+      .withFactories(
+        List(
+          new EventHubStreamFactory("CustomEvents", CustomEventsAdapter.apply,
             new File(settings.progressDir, Constants.EventHubProgressDir).getPath)
         )
       )

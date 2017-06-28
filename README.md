@@ -38,6 +38,11 @@ export TADAWEB_EH_POLICY_KEY="..."
 export TADAWEB_EH_NAMESPACE="..."
 export TADAWEB_EH_NAME="..."
 export TADAWEB_EH_PARTITION_COUNT="..."
+export CUSTOMEVENTS_EH_POLICY_NAME="..."
+export CUSTOMEVENTS_EH_POLICY_KEY="..."
+export CUSTOMEVENTS_EH_NAMESPACE="..."
+export CUSTOMEVENTS_EH_NAME="..."
+export CUSTOMEVENTS_EH_PARTITION_COUNT="..."
 export EH_PROGRESS_DIR="..."
 
 # compile scala, run tests, build fat jar

@@ -63,5 +63,8 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.TwitterAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEvent])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEventFeature])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEventFeatureCollection])
   }
 }

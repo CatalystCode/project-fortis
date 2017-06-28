@@ -11,6 +11,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.reflect.runtime.universe.TypeTag
+import scala.util.Properties.envOrElse
 
 object ProjectFortis extends App {
 
@@ -71,6 +72,7 @@ object ProjectFortis extends App {
       pipeline("facebook", new FacebookAnalyzer),
       pipeline("instagram", new InstagramAnalyzer),
       pipeline("tadaweb", new TadawebAnalyzer),
+      pipeline("customevents", new CustomEventAnalyzer),
       pipeline("bing", new BingAnalyzer),
       pipeline("radio", new RadioAnalyzer)
     ).flatten.reduceOption(_.union(_))
@@ -167,6 +169,19 @@ object ProjectFortis extends App {
               "name" -> System.getenv("TADAWEB_EH_NAME"),
               "partitionCount" -> System.getenv("TADAWEB_EH_PARTITION_COUNT"),
               "consumerGroup" -> "$Default"
+            )
+          )
+        ),
+        "customevents" -> List(
+          ConnectorConfig(
+            "CustomEvents",
+            Map (
+              "policyName" -> envOrElse("CUSTOMEVENTS_EH_POLICY_NAME", "project-fortis-spark"),
+              "policyKey" -> System.getenv("CUSTOMEVENTS_EH_POLICY_KEY"),
+              "namespace" -> envOrElse("CUSTOMEVENTS_EH_NAMESPACE", "fortiscustomevents"),
+              "name" -> envOrElse("CUSTOMEVENTS_EH_NAME", "customevents"),
+              "partitionCount" -> envOrElse("CUSTOMEVENTS_EH_PARTITION_COUNT", "1"),
+              "consumerGroup" -> envOrElse("CUSTOMEVENTS_EH_CONSUMER_GROUP", "$Default")
             )
           )
         )
