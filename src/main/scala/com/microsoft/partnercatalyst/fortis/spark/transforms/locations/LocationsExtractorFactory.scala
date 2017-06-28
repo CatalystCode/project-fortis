@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.Location
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, Location}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 

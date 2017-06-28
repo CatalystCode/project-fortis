@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSink
 import com.microsoft.partnercatalyst.fortis.spark.streamprovider.ConnectorConfig
@@ -91,7 +92,7 @@ object ProjectFortis extends App {
     *
     */
   private object DummyConfigurationManager extends ConfigurationManager {
-    override def fetchStreamConfiguration(pipeline: String): List[ConnectorConfig] = {
+    override def fetchConnectorConfigs(pipeline: String): List[ConnectorConfig] = {
       // The key is the name of the pipeline and the value is a list of connector configs whose streams should comprise it.
       Map[String, List[ConnectorConfig]](
         "instagram" -> List(
@@ -171,5 +172,8 @@ object ProjectFortis extends App {
         )
       )(pipeline)
     }
+
+    override def fetchSiteSettings(): SiteSettings = ???
+    override def fetchTrustedSources(connector: String): List[String] = ???
   }
 }

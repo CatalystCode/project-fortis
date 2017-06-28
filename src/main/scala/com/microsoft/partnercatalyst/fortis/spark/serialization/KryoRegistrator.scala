@@ -11,7 +11,12 @@ class KryoRegistrator extends BaseKryoRegistrator {
     // more information: https://stackoverflow.com/a/32869053/3817588
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent])
-    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Geofence])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.Details])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.Analysis])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.Location])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.Tag])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.dto.Geofence])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient])
@@ -49,6 +54,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramLikes])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramCaption])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.ExtendedFortisEvent[_]])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.ExtendedDetails[_]])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.BingAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.FacebookAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.InstagramAnalyzer])
