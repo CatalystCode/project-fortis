@@ -93,6 +93,7 @@ CREATE TABLE computedtiles (
     topiclangcode text,
     insertion_time timestamp,
     heatmap text,
+    placeids frozen<set<text>>,
     computedfeatures frozen<features>,
     PRIMARY KEY ((tilex, tiley, tilez), periodstartdate, periodenddate, pipeline, sourceid, topic)
 );
