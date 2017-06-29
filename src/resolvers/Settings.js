@@ -1,8 +1,8 @@
 'use strict';
 
-let Promise = require('promise');
-let azureTableService = require('../storageClients/AzureTableStorageManager');
-let postgresMessageService = require('../postgresClients/PostgresLocationManager');
+const Promise = require('promise');
+const azureTableService = require('../clients/storage/AzureTableStorageManager');
+const postgresMessageService = require('../clients/postgres/PostgresLocationManager');
 
 module.exports = {
   sites(args, res){ // eslint-disable-line no-unused-vars

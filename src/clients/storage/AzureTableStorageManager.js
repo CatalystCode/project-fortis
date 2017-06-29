@@ -1,6 +1,7 @@
 'use strict';
 
-let azureStorage = require('azure-storage');
+const azureStorage = require('azure-storage');
+
 const AZURE_TBL_KEYWORD = 'searchTerms';
 const AZURE_TBL_SITES = 'fortisSites';
 const AZURE_TBL_BLACKLIST = 'keywordFilters';
