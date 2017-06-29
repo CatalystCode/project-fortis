@@ -22,7 +22,13 @@
         "es6": true,
         "node": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "plugin:require-path-exists/recommended",
+        "eslint:recommended"
+    ],
+    "plugins": [
+        "require-path-exists"
+    ],
      "globals": {
         "it": false,
         "describe": false
