@@ -29,7 +29,7 @@ const options = {
  * the client should be a singleton.
  * http://docs.datastax.com/en/developer/nodejs-driver/3.2/coding-rules/
  * 
- * cassandra.Client will fail if options value is not set.
+ * cassandra.Client will fail if its client options property, contactPoints, is not set.
  * 
  * TODO: Look into client.shutdown().
  * Does this close all the connections in the connection pool?
