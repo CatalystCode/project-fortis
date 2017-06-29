@@ -6,15 +6,15 @@ import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfi
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
-class RedditStreamFactory extends StreamFactory[RedditObject]{
+class RedditStreamFactory extends StreamFactory[RedditObject] {
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[RedditObject]] = {
     case ConnectorConfig("RedditObject", params) =>
       val auth = RedditAuth(params("applicationId"), params("applicationSecret"))
       val keywords = params("keywords").split('|')
 
-      val subreddit = if (params.contains("subreddit")) Option(params("subreddit")) else None
-      val searchLimit = if (params.contains("searchLimit")) params("searchLimit").toInt else 25
-      val searchResultType = if (params.contains("searchResultType")) Option(params("searchResultType")) else Option("link")
+      val subreddit = params.get("subreddit")
+      val searchLimit = params.getOrElse("searchLimit", "25").toInt
+      val searchResultType = Some(params.getOrElse("searchResultType", "link"))
       RedditUtils.createPageStream(
         auth,
         keywords.toSeq,

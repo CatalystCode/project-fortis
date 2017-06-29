@@ -7,7 +7,8 @@ import com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObject
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 
 @SerialVersionUID(100L)
-class RedditAnalyzer extends Analyzer[RedditObject] with Serializable with AnalysisDefaults.EnableAll[RedditObject] {
+class RedditAnalyzer extends Analyzer[RedditObject] with Serializable
+  with AnalysisDefaults.EnableAll[RedditObject] {
   override def toSchema(item: RedditObject, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RedditObject] = {
     ExtendedDetails(
       id = randomUUID(),
