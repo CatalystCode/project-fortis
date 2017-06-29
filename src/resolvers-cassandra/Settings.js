@@ -1,5 +1,8 @@
 'use strict';
 
+const Promise = require('promise');
+const facebookAnalyticsClient = require('../facebookClient/FacebookAnalyticsClient');
+
 module.exports = {
     // ---------------------------------------------------------------------------------- mutations
 
@@ -44,7 +47,14 @@ module.exports = {
   facebookPages(args, res){ // eslint-disable-line no-unused-vars
   },
 
-  facebookAnalytics(args, res) { // eslint-disable-line no-unused-vars
+  facebookAnalytics(args, res){ // eslint-disable-line no-unused-vars
+    return new Promise((resolve, reject) => {
+      const pageIds = ['aljazeera', 'microsoftvan']; // todo: fetch pages for args.siteId from sitesettings
+
+      Promise.all(pageIds.map(pageId => ({Name: pageId, LastUpdated: facebookAnalyticsClient.fetchPageLastUpdatedAt(pageId), Count: -1})))
+      .then(analytics => resolve({analytics}))
+      .catch(err => reject(err));
+    });
   },
 
   termBlacklist(args, res){ // eslint-disable-line no-unused-vars
