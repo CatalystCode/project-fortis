@@ -1,4 +1,6 @@
 'use strict';
+let moment = require('moment');
+const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
 
 module.exports = {
 
@@ -11,6 +13,7 @@ module.exports = {
    * params: contains the params to be binded to the insert statement
    */
   prepareInsertTopic: topic => {
+
     return {
       query: `INSERT INTO watchlist (
         keyword,
@@ -22,7 +25,7 @@ module.exports = {
         topic.keyword, 
         topic.lang_code, 
         topic.translations,
-        topic.insertion_time
+        moment(Date.now(), DATE_FORMAT, 'en').toISOString()
       ]
     };
   }

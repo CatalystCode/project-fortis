@@ -43,19 +43,21 @@ const client = new cassandra.Client(options);
 module.exports = {
 
   /** Execute a batch of mutations
-   * @param Array<{query, params}> mutations
+   * @param Array<{query, params}> mutations - cassandra prepared statements
    * @return {Promise}
    */
   executeBatchMutations: (mutations) => {
     return new Promise((resolve, reject) => {
-      cassandraTableStorageManager.batch(client, mutations)
-        .then(resolve)
-        .catch(err => {
+      cassandraTableStorageManager.batch(client, mutations, function(err) {
+        if(err) {
           const errMsg = `[${err}] occured while performing a batch of mutations`;
           console.error(errMsg);
           client.shutdown();
           reject(errMsg);
-        });
+        } else {
+          resolve();
+        }
+      });
     });
   }
 
