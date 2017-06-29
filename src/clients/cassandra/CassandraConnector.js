@@ -1,5 +1,6 @@
 'use strict';
-let Promise = require('promise');
+
+const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const cassandraTableStorageManager = require('../storageClients/CassandraTableStorageManager');
 const distance = cassandra.types.distance;
@@ -7,8 +8,11 @@ const distance = cassandra.types.distance;
 /** Cassandra Client Options
  * https://docs.datastax.com/en/developer/nodejs-driver/3.2/api/type.ClientOptions/
  * 
- * pooling:
- * Used to preallocate connections to cassandra rather than wait for an open connection to cassandra.
+ * Since datastax node driver does not have much detail on pooling, the java driver doc will be used:
+ * http://docs.datastax.com/en/developer/java-driver/2.1/manual/pooling/index.html
+ * pooling: Used to preallocate connections to cassandra rather than wait for an open connection to cassandra.
+ * 
+ * 
  * 
  * CORE_CONNECTIONS_PER_HOST: 
  * TODO: 10 is a placeholder for now. Need to find a number that will not drain Cassandra.

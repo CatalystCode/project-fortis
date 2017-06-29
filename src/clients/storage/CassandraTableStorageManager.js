@@ -1,5 +1,5 @@
 'use strict';
-let asyncEachLimit = require('async/eachLimit');
+const asyncEachLimit = require('async/eachLimit');
 
 /** http://docs.datastax.com/en/developer/nodejs-driver/3.2/features/batch/
  * TODO: ASYNC_BATCH_LIMIT will need to be tuned.
