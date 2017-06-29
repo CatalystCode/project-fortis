@@ -9,8 +9,7 @@ app_insights_id="$6"
 site_name="$7"
 eh_conn_str="$8"
 
-chmod 752 -- *.sh
-chmod 752 -- ./deis-apps/fortis-services/*.sh
+chmod 752 -R ./*.sh
 
 ./create-disk.sh "${k8location}" "${storage_account_name}"
 sleep 10
@@ -18,18 +17,18 @@ sleep 10
 git clone https://github.com/CatalystCode/charts.git
 
 echo "Installing Cassandra chart"
-sudo ./install-cassandra.sh "${k8cassandra_node_count}"
+./install-cassandra.sh "${k8cassandra_node_count}"
 
 echo "Finished. Now installing DEIS"
-sudo ./install-deis.sh "${k8location}" "${k8resource_group}"
+./install-deis.sh "${k8location}" "${k8resource_group}"
 echo "Finished. Now installing DEIS fortis graphql service"
-sudo ./deis-apps/fortis-services/create-app.sh
+./deis-apps/fortis-services/create-app.sh
 echo "Finished. Now deploying"
-sudo ./deis-apps/fortis-services/deploy-app.sh
+./deis-apps/fortis-services/deploy-app.sh
 echo "Finished. Now installing DEIS fortis interface"
-sudo ./deis-apps/fortis-interface/create-app.sh
+./deis-apps/fortis-interface/create-app.sh
 echo "Finished. Now deploying"
-sudo ./deis-apps/fortis-interface/deploy-app.sh
+./deis-apps/fortis-interface/deploy-app.sh
 
 sleep 10
 max_retry_count=50
@@ -50,8 +49,6 @@ graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 feature_service_host=1.1.1.1
 spark_config_map_name="spark-master-conf"
-
-chmod 752 ./storage-ddls/*.sh
 
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
