@@ -1,8 +1,9 @@
 'use strict';
 
-let Promise = require('promise');
-let postgresMessageService = require('../postgresClients/PostgresLocationManager');
-let azureTableService = require('../storageClients/AzureTableStorageManager');
+const Promise = require('promise');
+const postgresMessageService = require('../clients/postgres/PostgresLocationManager');
+const azureTableService = require('../clients/storage/AzureTableStorageManager');
+
 let DEFAULT_LANGUAGE='en';
 
 const DEFAULT_LIMIT = 5;

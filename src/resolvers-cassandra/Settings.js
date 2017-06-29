@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
-const facebookAnalyticsClient = require('../facebookClient/FacebookAnalyticsClient');
+const facebookAnalyticsClient = require('../clients/facebook/FacebookAnalyticsClient');
 
 module.exports = {
     // ---------------------------------------------------------------------------------- mutations

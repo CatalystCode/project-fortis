@@ -1,7 +1,10 @@
-let xml2js = require('xml2js');
-let nconf = require('nconf');
-let Promise = require('promise');
-let request = require('request');
+'use strict';
+
+const xml2js = require('xml2js');
+const nconf = require('nconf');
+const Promise = require('promise');
+const request = require('request');
+
 let memoryStore = new nconf.Memory();
 
 const client_id = process.env.TRANSLATION_SERVICE_CLIENT_ID;

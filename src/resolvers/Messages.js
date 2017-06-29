@@ -1,9 +1,9 @@
 'use strict';
 
-let Promise = require('promise');
-let azureQueueManager = require('../storageClients/AzureQueueManager');
-let postgresMessageService = require('../postgresClients/PostgresLocationManager');
-let translatorService = require('../translatorClient/MsftTranslator');
+const Promise = require('promise');
+const azureQueueManager = require('../clients/storage/AzureQueueManager');
+const postgresMessageService = require('../clients/postgres/PostgresLocationManager');
+const translatorService = require('../clients/translator/MsftTranslator');
 
 const DEFAULT_LIMIT = 20;
 const DEFAULT_LANGUAGE = 'en';

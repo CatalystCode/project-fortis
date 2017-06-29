@@ -1,9 +1,9 @@
 'use strict';
 
-let azure = require('azure-storage');
-let moment = require('moment');
-let asyncEachLimit = require('async/eachLimit');
-let TextBase64QueueMessageEncoder = require('azure-storage').QueueMessageEncoder.TextBase64QueueMessageEncoder;
+const azure = require('azure-storage');
+const moment = require('moment');
+const asyncEachLimit = require('async/eachLimit');
+const TextBase64QueueMessageEncoder = require('azure-storage').QueueMessageEncoder.TextBase64QueueMessageEncoder;
 
 const PRE_NLP_QUEUE = process.env.PRE_NLP_QUEUE;
 const DATE_FORMAT = 'MM/DD/YYYY HH:mm';

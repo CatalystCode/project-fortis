@@ -1,7 +1,7 @@
 'use strict';
 
-let Promise = require('promise');
-let blobStorageManager = require('../storageClients/BlobStorageFactsManager');
+const Promise = require('promise');
+const blobStorageManager = require('../clients/storage/BlobStorageFactsManager');
 
 module.exports = {
   list(args, res) { // eslint-disable-line no-unused-vars
