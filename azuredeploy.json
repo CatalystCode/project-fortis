@@ -104,7 +104,7 @@
         "sendPolicy": "SendPolicy",
 	    "agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
-        "ehVersion": "2014-09-01",
+        "ehVersion": "2015-08-01",
 	    "vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
@@ -120,10 +120,13 @@
         "githubClonePath":  "https://github.com/CatalystCode/fortisdeploy.git",
         "eventHubNamespace": "fortiseventhubns",
         "eventHubName": "published-messages",
+        "eventhubAccessClaimType": "RootManageSharedAccessKey",
         "eventHubMessagingUnits": "1",
         "eventHubSku": "2",
-        "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), 'RootManageSharedAccessKey')]",
-        "eventhubConnStr": {"value": "[listkeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString]"},
+        "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), variables('eventhubAccessClaimType'))]",
+        "eventhubConnStr": {
+            "type": "string",
+            "value": "[listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString]"},
 	    "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
 	    "useServicePrincipalDictionary": {
             "DCOS": 0,
@@ -161,8 +164,42 @@
                     "domainNameLabel": "[parameters('siteName')]"
                 }
             }
-        }, 
-	{
+        },
+        { 
+            "apiVersion": "2015-01-01", 
+            "name": "eventhubPrimaryKey", 
+            "type": "Microsoft.Resources/deployments", 
+            "properties": { 
+                "mode": "incremental", 
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            },
+            "parameters": {
+                "seed": {
+                "value": "1"
+                }
+            }
+        },
+        { 
+            "apiVersion": "2015-01-01", 
+            "name": "eventhubSecondaryKey", 
+            "type": "Microsoft.Resources/deployments", 
+            "properties": {
+                "mode": "incremental", 
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            },
+            "parameters": {
+                "seed": {
+                "value": "0"
+                }
+            }
+        },
+	    {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('vmStorageAccountName')]",
             "apiVersion": "2016-01-01",
@@ -174,7 +211,7 @@
             "properties": {}
         },
         {
-            "apiVersion": "2015-08-01",
+            "apiVersion": "[variables('ehVersion')]",
             "name": "[variables('eventHubNamespace')]",
             "type": "Microsoft.EventHub/namespaces",
             "location": "[resourceGroup().location]",
@@ -187,7 +224,7 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2015-08-01",
+                    "apiVersion": "[variables('ehVersion')]",
                     "name": "[variables('eventHubName')]",
                     "location": "[resourceGroup().location]",
                     "type":"eventhubs",
@@ -196,18 +233,27 @@
                     ],
                     "properties": {
                         "path": "[variables('eventHubName')]"
-                    },
-                    "resources": [{
-                        "apiVersion": "2015-08-01",
-                        "name": "[variables('ehConsumerGroupName')]",
-                        "location": "[resourceGroup().location]",
-                        "type": "consumergroups",
-                        "dependsOn": [
-                            "[variables('eventHubName')]"
-                        ],
-                        "properties": {}
-                    }]
-                }]
+                    }
+                },
+                {
+                    "apiVersion": "[variables('ehVersion')]",
+                    "name": "[concat(variables('eventHubNamespace'), '/', variables('eventhubAccessClaimType'))]",
+                    "type": "Microsoft.EventHub/namespaces/authorizationRules",
+                    "dependsOn": [
+                        "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
+                    ],
+                    "location": "[variables('location')]",
+                    "properties": {
+                        "KeyName": "[variables('eventhubAccessClaimType')]",
+                        "ClaimType": "[variables('eventhubAccessClaimType')]",
+                        "ClaimValue": "None",
+                        "PrimaryKey": "[reference('eventhubPrimaryKey').outputs.guid.value]",
+                        "SecondaryKey": "[reference('eventhubSecondaryKey').outputs.guid.value]",
+                        "Rights": [ "Send", "Listen" ],
+                        "Revision": -1
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2015-06-15",
