@@ -5,8 +5,8 @@ const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
 module.exports = {
 
   /** Create an INSERT prepared statement object.
-   * The prepared statement object has two properties, query and params.
-   * query: contains the topic INSERT statement
+   * The prepared statement object has two properties, mutation and params.
+   * mutation: contains the topic INSERT statement
    * params: contains the params to be binded to the INSERT statement
    * 
    * Preparing queries gets the best performance and will ensure that
@@ -16,7 +16,7 @@ module.exports = {
   prepareInsertTopic: topic => {
     if(!topic.keyword || !topic.lang_code) return null;
     else return {
-      query: `INSERT INTO watchlist (
+      mutation: `INSERT INTO watchlist (
         keyword,
         lang_code,
         translations,

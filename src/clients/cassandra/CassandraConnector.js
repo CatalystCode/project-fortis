@@ -41,7 +41,10 @@ const client = new cassandra.Client(options);
 module.exports = {
 
   /** Execute a batch of mutations
-   * @param Array<{query, params}> mutations - cassandra prepared statements
+   * @param Array[preparedMutation] mutations - cassandra preparedMutation array
+   * @param {Object} preparedMutation - cassandra prepared mutation object
+   * @param {String} preparedMutation.mutation - cassandra mutation string
+   * @param {Array}  preparedMutation.params - cassandra params
    * @return {Promise}
    */
   executeBatchMutations: (mutations) => {
@@ -56,6 +59,18 @@ module.exports = {
           resolve();
         }
       });
+    });
+  },
+
+  /** Execute a query
+   * @param {Object} preparedQuery - cassandra prepared query object
+   * @param {String} preparedQuery.query - query string
+   * @param {Array}  preparedQuery.params - query params
+   * @return {Promise}
+   */
+  executeQuery: (query) => { // eslint-disable-line no-unused-vars
+    return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+
     });
   }
 
