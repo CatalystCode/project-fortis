@@ -34,7 +34,7 @@ let processMutation = (client, mutationsIteratee, asyncCB) => {
     if(err) {
       asyncCB(err);
     } else {
-      asyncCB();
+      asyncCB('success');
     }
   });
 };

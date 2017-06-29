@@ -4,13 +4,13 @@ const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
 
 module.exports = {
 
-  /** Create a prepared statement object
+  /** Create an INSERT prepared statement object.
+   * The prepared statement object has two properties, query and params.
+   * query: contains the topic INSERT statement
+   * params: contains the params to be binded to the INSERT statement
    * 
    * Preparing queries gets the best performance and will ensure that
    * the JavaScript parameters are correctly mapped to Cassandra types.
-   * 
-   * query: contains the topic insert statement
-   * params: contains the params to be binded to the insert statement
    */
   prepareInsertTopic: topic => {
 
