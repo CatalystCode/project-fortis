@@ -141,6 +141,10 @@ object ProjectFortis extends App {
           ConnectorConfig(
             "Twitter",
             Map(
+              "keywords" -> "isis|attack",
+              "userIds" -> "4970411|5536782", // al jazeera english and arabic
+              "languages" -> "en|ar",
+              "locations" -> "-122.75,36.8,-121.75,37.8|-74,40,-73,41", // san francisco and new york
               "consumerKey" -> System.getenv("TWITTER_CONSUMER_KEY"),
               "consumerSecret" -> System.getenv("TWITTER_CONSUMER_SECRET"),
               "accessToken" -> System.getenv("TWITTER_ACCESS_TOKEN"),
