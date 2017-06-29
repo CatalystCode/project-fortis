@@ -123,7 +123,7 @@
         "eventhubAccessClaimType": "RootManageSharedAccessKey",
         "eventHubMessagingUnits": "1",
         "eventHubSku": "2",
-        "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), variables('eventhubAccessClaimType'))]",
+        "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), 'fortisAuthRule')]",
 	    "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
 	    "useServicePrincipalDictionary": {
             "DCOS": 0,
@@ -234,20 +234,16 @@
                 },
                 {
                     "apiVersion": "[variables('ehVersion')]",
-                    "name": "[concat(variables('eventHubNamespace'), '/', variables('eventhubAccessClaimType'))]",
+                    "name": "fortisAuthRule",
                     "type": "Microsoft.EventHub/namespaces/authorizationRules",
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
                     ],
                     "location": "[resourceGroup().location]",
                     "properties": {
-                        "KeyName": "[variables('eventhubAccessClaimType')]",
-                        "ClaimType": "[variables('eventhubAccessClaimType')]",
-                        "ClaimValue": "None",
                         "PrimaryKey": "[reference('eventhubPrimaryKey').outputs.guid.value]",
                         "SecondaryKey": "[reference('eventhubSecondaryKey').outputs.guid.value]",
-                        "Rights": [ "Send", "Listen" ],
-                        "Revision": -1
+                        "Rights": [ "Send", "Listen", "Manage" ]
                     }
                 }
             ]
