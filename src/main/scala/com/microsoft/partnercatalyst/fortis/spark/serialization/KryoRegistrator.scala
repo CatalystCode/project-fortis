@@ -66,5 +66,8 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEvent])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEventFeature])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEventFeatureCollection])
+
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObject])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObjectData])
   }
 }
