@@ -239,7 +239,7 @@
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
                     ],
-                    "location": "[variables('location')]",
+                    "location": "[resourceGroup().location]",
                     "properties": {
                         "KeyName": "[variables('eventhubAccessClaimType')]",
                         "ClaimType": "[variables('eventhubAccessClaimType')]",
