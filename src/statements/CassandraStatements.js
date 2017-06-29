@@ -11,10 +11,11 @@ module.exports = {
    * 
    * Preparing queries gets the best performance and will ensure that
    * the JavaScript parameters are correctly mapped to Cassandra types.
+   * 
    */
   prepareInsertTopic: topic => {
-
-    return {
+    if(!topic.keyword || !topic.lang_code) return null;
+    else return {
       query: `INSERT INTO watchlist (
         keyword,
         lang_code,

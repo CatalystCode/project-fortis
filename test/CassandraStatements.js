@@ -27,5 +27,13 @@ describe('Tests for CassandraStatements.js', function() {
       assert.equal(result.params[3], moment(Date.now(), DATE_FORMAT, 'en').toISOString(), 'the fourth param in params is the topic\'s translations');
     });
 
+    it('should return null on a malformed topic', function() {
+      let topic = {
+        keyword: 'hurricane'
+      };
+      let result = cassandraStatements.prepareInsertTopic(topic);
+      assert.equal(result, null, 'the result should equal null');
+    });
+
   });
 });

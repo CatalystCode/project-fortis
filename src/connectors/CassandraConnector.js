@@ -29,10 +29,8 @@ const options = {
  * the client should be a singleton.
  * http://docs.datastax.com/en/developer/nodejs-driver/3.2/coding-rules/
  * 
- * TODO: Do we need to have a check to see if the client is null after
- * cassandra.Client(options)? Look into this more to see if it will
- * ever fail.
- *  
+ * cassandra.Client will fail if options value is not set.
+ * 
  * TODO: Look into client.shutdown().
  * Does this close all the connections in the connection pool?
  * If one of the connections has an exception, I don't 
@@ -48,11 +46,11 @@ module.exports = {
    */
   executeBatchMutations: (mutations) => {
     return new Promise((resolve, reject) => {
+      if(!client) reject('Cassandra client is null');
       cassandraTableStorageManager.batchMutations(client, mutations, function(err) {
         if(err) {
           const errMsg = `[${err}] occured while performing a batch of mutations`;
           console.error(errMsg);
-          client.shutdown();
           reject(errMsg);
         } else {
           resolve();

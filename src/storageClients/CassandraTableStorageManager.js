@@ -15,7 +15,7 @@ module.exports = {
    * @param Array<{query, params}> mutations - cassandra prepared statements 
    */
   batchMutations: (client, mutations, callback) => {
-    asyncEachLimit(mutations, ASYNC_BATCH_LIMIT, (mutationsIteratee, asyncCB) => processMutation(client, mutationsIteratee, asyncCB),
+    asyncEachLimit(mutations, ASYNC_BATCH_LIMIT, (mutationBatch, asyncCB) => processMutation(client, mutationBatch, asyncCB),
       finalCBErr => {
         if(finalCBErr){
           console.error(`Error occured during the batch: ${JSON.stringify(finalCBErr)}`);
@@ -29,12 +29,10 @@ module.exports = {
 
 };
 
-let processMutation = (client, mutationsIteratee, asyncCB) => {
-  client.batch(mutationsIteratee, { prepare: true }, function(err) {
+let processMutation = (client, mutationBatch, asyncCB) => {
+  client.batch(mutationBatch, { prepare: true }, function(err) {
     if(err) {
-      asyncCB(err);
-    } else {
-      asyncCB('success');
+      asyncCB('Failed to process mutation batch');
     }
   });
 };
