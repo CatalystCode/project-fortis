@@ -234,7 +234,7 @@
                 },
                 {
                     "apiVersion": "[variables('ehVersion')]",
-                    "name": "fortisAuthRule",
+                    "name": "[concat(variables('eventHubNamespace'),'/fortisAuthRule')]",
                     "type": "Microsoft.EventHub/namespaces/authorizationRules",
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
