@@ -11,8 +11,8 @@ const ASYNC_BATCH_LIMIT = 10;
 module.exports = {
 
   /** Used to execute multiple INSERT, UPDATE, or DELETE statements
-   * @param Client client - The cassandra client
-   * @param Array<{mutation, params}> mutations - cassandra prepared statements 
+   * @param {Client} client - The cassandra client
+   * @param {Array<{mutation: string, params: Array}>} mutations - cassandra prepared statements 
    */
   batchMutations: (client, mutations, callback) => {
     asyncEachLimit(mutations, ASYNC_BATCH_LIMIT, (mutationBatch, asyncCB) => processMutation(client, mutationBatch, asyncCB),

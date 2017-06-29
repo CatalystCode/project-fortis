@@ -12,6 +12,8 @@ const distance = cassandra.types.distance;
  * 
  * CORE_CONNECTIONS_PER_HOST: 
  * TODO: 10 is a placeholder for now. Need to find a number that will not drain Cassandra.
+ * 
+ * TODO: research other options
  */
 const CORE_CONNECTIONS_PER_HOST = 10;
 const options = {
