@@ -74,7 +74,8 @@ object ProjectFortis extends App {
       pipeline("tadaweb", new TadawebAnalyzer),
       pipeline("customevents", new CustomEventAnalyzer),
       pipeline("bing", new BingAnalyzer),
-      pipeline("radio", new RadioAnalyzer)
+      pipeline("radio", new RadioAnalyzer),
+      pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
     CassandraSink(fortisEvents, "fortistest", "events") // todo: fill in real values
 
@@ -120,6 +121,16 @@ object ProjectFortis extends App {
             Map(
               "accessToken" -> System.getenv("BING_ACCESS_TOKEN"),
               "searchInstanceId" -> System.getenv("BING_SEARCH_INSTANCE_ID"),
+              "keywords" -> "isis|attack"
+            )
+          )
+        ),
+        "reddit" -> List(
+          ConnectorConfig(
+            "RedditObject",
+            Map(
+              "applicationId" -> System.getenv("REDDIT_APPLICATION_ID"),
+              "applicationSecret" -> System.getenv("REDDIT_APPLICATION_SECRET"),
               "keywords" -> "isis|attack"
             )
           )

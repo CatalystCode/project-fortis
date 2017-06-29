@@ -24,6 +24,11 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
+          new RedditStreamFactory
+        )
+      )
+      .withFactories(
+        List(
           new RadioStreamFactory
         )
       )
