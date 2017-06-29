@@ -17,10 +17,6 @@ let executeBatchMutations = (mutations) => { // eslint-disable-line no-unused-va
   });
 };
 
-  /** Execute a query
- * @param {{query: string, params: Array<string|number|map>}} query
- * @returns {Promise.<string>}
- */
 let executeQuery = (query) => { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
 
