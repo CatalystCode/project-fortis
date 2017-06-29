@@ -165,7 +165,7 @@
                 }
             }
         },
-        { 
+        {
             "apiVersion": "2015-01-01", 
             "name": "eventhubPrimaryKey", 
             "type": "Microsoft.Resources/deployments", 
@@ -174,11 +174,11 @@
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
                     "contentVersion": "1.0.0.0"
-                }
-            },
-            "parameters": {
-                "seed": {
-                "value": "1"
+                },
+                "parameters": {
+                    "seed": {
+                        "value": "1"
+                    }
                 }
             }
         },
@@ -191,11 +191,11 @@
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
                     "contentVersion": "1.0.0.0"
-                }
-            },
-            "parameters": {
-                "seed": {
-                "value": "0"
+                },
+                "parameters": {
+                    "seed": {
+                        "value": "0"
+                    }
                 }
             }
         },
