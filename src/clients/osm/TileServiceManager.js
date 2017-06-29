@@ -1,13 +1,14 @@
 'use strict';
 
-let azureTableService = require('../storageClients/AzureTableStorageManager');
-let nconf = require('nconf');
+const azureTableService = require('../storage/AzureTableStorageManager');
+const nconf = require('nconf');
+const request = require('request');
+const async = require('async');
+const turfInside = require('turf-inside');
+const turfBbox = require('turf-bbox-polygon');
+const geotile = require('geotile');
+
 let memoryStore = new nconf.Memory();
-let request = require('request');
-let async = require('async');
-let turfInside = require('turf-inside');
-let turfBbox = require('turf-bbox-polygon');
-let geotile = require('geotile');
 
 const PARALLELISM_LIMIT = 50;
 const TILE_SERVICE = 'http://tile.mapzen.com/mapzen/vector/v1/places';

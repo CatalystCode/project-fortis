@@ -1,7 +1,8 @@
 'use strict';
 
-const translatorService = require('../translatorClient/MsftTranslator');
-const eventHubSender = require('../eventhubClient/EventHubSender');
+const Promise = require('promise');
+const translatorService = require('../clients/translator/MsftTranslator');
+const eventHubSender = require('../clients/eventhub/EventHubSender');
 
 module.exports = {
   // ---------------------------------------------------------------------------------- mutations

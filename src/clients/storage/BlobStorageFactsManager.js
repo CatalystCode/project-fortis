@@ -1,7 +1,8 @@
 'use strict';
 
-let azure = require('azure-storage');
-let Promise = require('promise');
+const azure = require('azure-storage');
+const Promise = require('promise');
+
 const DEFAULT_PAGE_SIZE = 20;
 const DEFAULT_SKIP = 0;
 const FACTS_CONTAINER_NAME = 'factsout';

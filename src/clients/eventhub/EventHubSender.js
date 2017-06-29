@@ -1,4 +1,7 @@
+'use strict';
+
 const EventHubClient = require('azure-event-hubs').Client;
+const Promise = require('promise');
 
 const eventHubConnectionString = process.env.PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING;
 const eventHubPath = process.env.PUBLISH_EVENTS_EVENTHUB_PATH;

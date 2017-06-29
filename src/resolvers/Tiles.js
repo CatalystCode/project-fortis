@@ -1,15 +1,15 @@
 'use strict';
 
+const Promise = require('promise');
+const GeoPoint = require('geopoint');
+const postgresMessageService = require('../clients/postgres/PostgresLocationManager');
+const tileService = require('../clients/osm/TileServiceManager');
+const geotile = require('geotile');
+
 const DEFAULT_LAYER_TYPE = 'associations';
 const DEFAULT_ZOOM_LEVEL = 15;
 const DEFAULT_PLACE_ZOOM_LEVEL = 8;
 const RADIUS_DISTANCE_IN_MILES = 5;
-
-let Promise = require('promise');
-let GeoPoint = require('geopoint');
-let postgresMessageService = require('../postgresClients/PostgresLocationManager');
-let tileService = require('../osmClients/TileServiceManager');
-let geotile = require('geotile');
 
 function CoordinatesToNearbyTiles(multiPointArray){
   let tileSet = new Set();

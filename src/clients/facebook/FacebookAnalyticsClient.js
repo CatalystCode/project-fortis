@@ -1,3 +1,5 @@
+'use strict';
+
 const Promise = require('promise');
 const request = require('request');
 

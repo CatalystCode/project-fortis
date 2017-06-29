@@ -1,12 +1,13 @@
 'use strict';
 
-let azureTableService = require('../storageClients/AzureTableStorageManager');
-let nconf = require('nconf');
+const azureTableService = require('../storage/AzureTableStorageManager');
+const nconf = require('nconf');
+const moment = require('moment');
+const async = require('async');
+const pg = require('pg');
+const PostgresService = require('postgres-client');
+
 let memoryStore = new nconf.Memory();
-let moment = require('moment');
-let async = require('async');
-let pg = require('pg');
-let PostgresService = require('postgres-client');
 
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
