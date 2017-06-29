@@ -48,7 +48,7 @@ module.exports = {
    */
   executeBatchMutations: (mutations) => {
     return new Promise((resolve, reject) => {
-      cassandraTableStorageManager.batch(client, mutations, function(err) {
+      cassandraTableStorageManager.batchMutations(client, mutations, function(err) {
         if(err) {
           const errMsg = `[${err}] occured while performing a batch of mutations`;
           console.error(errMsg);

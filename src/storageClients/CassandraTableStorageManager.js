@@ -14,11 +14,11 @@ module.exports = {
    * @param Client client - The cassandra client
    * @param Array<{query, params}> mutations - cassandra prepared statements 
    */
-  batch: (client, mutations, callback) => {
+  batchMutations: (client, mutations, callback) => {
     asyncEachLimit(mutations, ASYNC_BATCH_LIMIT, (mutationsIteratee, asyncCB) => processMutation(client, mutationsIteratee, asyncCB),
       finalCBErr => {
         if(finalCBErr){
-          console.error(`Error occured publishing events: ${JSON.stringify(finalCBErr)}`);
+          console.error(`Error occured during the batch: ${JSON.stringify(finalCBErr)}`);
         }else{
           console.log('Finished executing cassandra prepared statements');
         }
