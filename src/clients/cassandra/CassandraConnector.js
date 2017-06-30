@@ -12,7 +12,6 @@ const cassandraTableStorageManager = require('../storageClients/CassandraTableSt
  * 
  * Since datastax node driver does not have much detail on pooling, the java driver doc will be used:
  * http://docs.datastax.com/en/developer/java-driver/3.3/manual/pooling/
- * pooling: Used to preallocate connections to cassandra rather than wait for an open connection to cassandra.
  * 
  * Connection pools have a variable size, which gets adjusted automatically depending on the current load. 
  * There will always be at least the core number of connections.
