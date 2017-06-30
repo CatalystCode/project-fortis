@@ -1,6 +1,6 @@
 'use strict';
 
-const eventHubSender = require('../clients/eventhub/EventHubSender');
+const eventHubSender = require('../../clients/eventhub/EventHubSender');
 
 /**
  * @param {{messages: Array<{RowKey: string, created_at: string, featureCollection: Array<{type: string, features: Array<{type: string, coordinates: number[]}>>, message: string, language: string, link: string, source: string, title: string}>}}} args
