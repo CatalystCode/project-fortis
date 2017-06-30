@@ -14,7 +14,7 @@ function formatPointUri(latitude, longitude) {
 }
 
 function formatNameUri(names) {
-  return `http://${apiHost}/features/name/${names.join(',')}`;
+  return `http://${apiHost}/features/name/${names.map(encodeURIComponent).join(',')}`;
 }
 
 function callFeatureService(uri) {
