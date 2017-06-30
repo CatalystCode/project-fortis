@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
-const facebookAnalyticsClient = require('../clients/facebook/FacebookAnalyticsClient');
+const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 
 /**
  * @param {{siteId: string}} args
