@@ -227,14 +227,14 @@ if ! (command -v kubectl >/dev/null); then
   install_kubectl
 fi
 
-echo "Installing Helm"
+echo "Installed Kubectl. Now installing Helm"
 
 # Install and setup Helm for cluster chart setup
 if ! (command -v helm >/dev/null); then
   install_helm
 fi
 
-echo "Installed"
+echo "Installed Helm. Adding premium storage accounts."
 
 #Create the K8 vhds storage container
 echo "creating vhds container"

@@ -9,4 +9,4 @@ pip install cqlsh
 cqlsh --version
 
 echo "Finished. Deploying cassandra ddl objects."
-cqlsh "${cassandra_host}" --cqlversion="3.4.2" -f "${cassandra_ddl_script}"
+cqlsh "${cassandra_host}" -u cassandra -p cassandra --cqlversion="3.4.4" -f "${cassandra_ddl_script}"
