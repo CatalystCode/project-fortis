@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
-const translatorService = require('../clients/translator/MsftTranslator');
+const translatorService = require('../../clients/translator/MsftTranslator');
 
 /**
  * @param {site: string, originalSource: string, coordinates: number[], mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
