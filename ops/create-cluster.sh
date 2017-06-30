@@ -9,7 +9,7 @@ app_insights_id="$6"
 site_name="$7"
 eh_conn_str="$8"
 
-chmod 752 -R ./*.sh
+chmod -R 752 .
 
 ./create-disk.sh "${k8location}" "${storage_account_name}"
 sleep 10

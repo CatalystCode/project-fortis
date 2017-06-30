@@ -14,7 +14,7 @@ eh_conn_str="$9"
 readonly default_language="en"
 readonly checkpoint_directory="HDFS://"
 readonly eh_path="published-messages"
-readonly eh_consumer_group="fortisehconsumergroup"
+readonly eh_consumer_group="\$Default"
 readonly fortis_models_directory="https://fortiscentral.blob.core.windows.net/sentiment/"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 
