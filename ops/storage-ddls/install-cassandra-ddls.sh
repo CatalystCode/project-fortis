@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-cassandra_host="$1"
-cassandra_ddl_script="./storage-ddls/cassandra-setup.cql"
+readonly cassandra_host="$1"
+readonly cassandra_ddl_script="./storage-ddls/cassandra-setup.cql"
 
 echo "Installing CQLSH"
 sudo apt-get install python-pip -y

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CUSTOM_REACT_CREATE_APP_BP="https://github.com/mars/create-react-app-buildpack.git"
+readonly CUSTOM_REACT_CREATE_APP_BP="https://github.com/mars/create-react-app-buildpack.git"
 cd project-fortis-interfaces || exit -2
 
 deis config:set BUILDPACK_URL=${CUSTOM_REACT_CREATE_APP_BP}
