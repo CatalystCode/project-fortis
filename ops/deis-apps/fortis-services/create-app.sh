@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-fortis_service_gh_repo=https://github.com/CatalystCode/project-fortis-services.git
+readonly fortis_service_gh_repo=https://github.com/CatalystCode/project-fortis-services.git
 
 git clone ${fortis_service_gh_repo}
 

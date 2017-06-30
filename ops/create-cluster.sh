@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-k8location="$1"
-k8cassandra_node_count="$2"
-k8spark_worker_count="$3"
-k8resource_group="$4"
-storage_account_name="$5"
-app_insights_id="$6"
-site_name="$7"
-eh_conn_str="$8"
+readonly k8location="$1"
+readonly k8cassandra_node_count="$2"
+readonly k8spark_worker_count="$3"
+readonly k8resource_group="$4"
+readonly storage_account_name="$5"
+readonly app_insights_id="$6"
+readonly site_name="$7"
+readonly eh_conn_str="$8"
 
 chmod -R 752 .
 
@@ -31,8 +31,8 @@ echo "Finished. Now deploying"
 ./deis-apps/fortis-interface/deploy-app.sh
 
 sleep 10
-max_retry_count=50
-retries=0
+readonly max_retry_count=50
+readonly retries=0
 
 while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    cassandra_host=$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
@@ -45,10 +45,10 @@ while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    sleep 3
 done
 
-graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
-fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
-feature_service_host=1.1.1.1
-spark_config_map_name="spark-master-conf"
+readonly graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+readonly fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+readonly feature_service_host=1.1.1.1
+readonly spark_config_map_name="spark-master-conf"
 
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
