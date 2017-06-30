@@ -2,7 +2,7 @@
 
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
-const cassandraTableStorageManager = require('../storageClients/CassandraTableStorageManager');
+const cassandraTableStorageManager = require('../storage/CassandraTableStorageManager');
 
 /** Default Cassandra Client Options
  * https://github.com/datastax/nodejs-driver/blob/master/lib/client-options.js
@@ -22,8 +22,7 @@ const cassandraTableStorageManager = require('../storageClients/CassandraTableSt
  * 
  * CORE_CONNECTIONS_PER_HOST: to tune this option see java-driver 3.3 manual: 'Tuning protocol v3 for very high throughputs'
  * 
- * sslOptions
- * authProvider
+ * TODO: consider sslOptions and authProvider
  */
 const distance = cassandra.types.distance;
 const CORE_CONNECTIONS_PER_HOST = 1;
@@ -35,9 +34,7 @@ const options = {
       [distance.local]: CORE_CONNECTIONS_PER_HOST,
       [distance.remote]: CORE_CONNECTIONS_PER_HOST
     } 
-  } //also set the load balancing policy since it effects this
-  //authProvider:
-  //sslOptions:
+  }
 };
 
 /** Code should share the same Client instance across the application i.e.
@@ -51,19 +48,20 @@ const options = {
 const client = new cassandra.Client(options);
 
 /** Execute a batch of mutations
- * @param {Array<{mutation: string, params: Array<string|number|map}>} mutations
+ * @param {Array<{mutation: string, params: Array<string|map>}>} mutations
  * @returns {Promise}
  */
 function executeBatchMutations(mutations) {
   return new Promise((resolve, reject) => {
     if(!client) reject('Cassandra client is null');
-    cassandraTableStorageManager.batchMutations(client, mutations, function(err) {
+    if(!mutations) reject('Mutations is null');
+    cassandraTableStorageManager.batchMutations(client, mutations, (err, res) => {
       if(err) {
         const errMsg = `[${err}] occured while performing a batch of mutations`;
         console.error(errMsg);
         reject(errMsg);
       } else {
-        resolve();
+        resolve(res);
       }
     });
   });

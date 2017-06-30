@@ -1,33 +1,41 @@
-let chai = require('chai');
-let assert = chai.assert;
-let moment = require('moment');
-let cassandraStatements = require('../src/statements/CassandraStatements');
-const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
+const chai = require('chai');
+const assert = chai.assert;
+const moment = require('moment');
+const cassandraStatements = require('../src/statements/CassandraStatements');
 
 describe('Tests for CassandraStatements.js', function() {
 
   describe('#prepareInsertTopic(topic)', function() {
 
-    it('should create the prepared mutation object correctly', function() {
+    it('should create the prepared mutation object for topic with a defined keyword and lang_code', function() {
       let topic = {
         keyword: 'hurricane',
         lang_code: 'en'
       };
 
       let result = cassandraStatements.prepareInsertTopic(topic);
-      assert.equal(result.mutation, `INSERT INTO watchlist (
-        keyword,
-        lang_code,
-        translations,
-        insertion_time
-      ) VALUES (?, ?, ?, ?)`, 'the prepared object\'s mutation is an INSERT statement');
       assert.equal(result.params[0], topic.keyword, 'the first param in params is the topic\'s keyword');
       assert.equal(result.params[1], topic.lang_code, 'the second param in params is the topic\'s lang_code');
       assert.equal(result.params[2], topic.translations, 'the third param in params is the topic\'s translations');
-      assert.equal(result.params[3], moment(Date.now(), DATE_FORMAT, 'en').toISOString(), 'the fourth param in params is the topic\'s translations');
     });
 
-    it('should return null on a malformed topic', function() {
+    it('should create the prepared mutation object for topic with a defined keyword, lang_code, and translations', function() {
+      let topic = {
+        keyword: 'hurricane',
+        lang_code: 'en',
+        translations: {
+          'fr':'ouragan',
+          'it': 'uragano'
+        }
+      };
+
+      let result = cassandraStatements.prepareInsertTopic(topic);
+      assert.equal(result.params[0], topic.keyword, 'the first param in params is the topic\'s keyword');
+      assert.equal(result.params[1], topic.lang_code, 'the second param in params is the topic\'s lang_code');
+      assert.equal(result.params[2], topic.translations, 'the third param in params is the topic\'s translations');
+    });
+
+    it('should return null on a topic not containing both a defined keyword and lang_code', function() {
       let topic = {
         keyword: 'hurricane'
       };
