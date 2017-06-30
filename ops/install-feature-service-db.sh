@@ -35,15 +35,18 @@ az postgres server firewall-rule create \
   --start-ip-address 0.0.0.0 \
   --end-ip-address 255.255.255.255
 
-echo "Finished. Now populating database"
+echo "Finished. Now downloading database dump"
+dbdump="$(mktemp)"
+curl "${pg_dump}" | gunzip --to-stdout > "${dbdump}"
+
+echo "Finished. Now populating the database"
 pg_host="$(az postgres server show --resource-group "${resource_group}" --name "${pg_name}" | jq -r '.fullyQualifiedDomainName')"
-curl "${pg_dump}" \
-| gunzip --to-stdout \
-| PGPASSWORD="${pg_password}" psql \
+<"${dbdump}" PGPASSWORD="${pg_password}" psql \
   --host "${pg_host}" \
   --port 5432 \
   --username "${pg_admin}@${pg_name}" \
   --dbname "postgres" \
   --quiet
+rm "${dbdump}"
 
 echo "All done installing feature service database"
