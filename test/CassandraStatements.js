@@ -1,6 +1,5 @@
 const chai = require('chai');
 const assert = chai.assert;
-const moment = require('moment');
 const cassandraStatements = require('../src/statements/CassandraStatements');
 
 describe('Tests for CassandraStatements.js', function() {

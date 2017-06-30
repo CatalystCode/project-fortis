@@ -1,6 +1,4 @@
 'use strict';
-const moment = require('moment');
-const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
 
 /** Create an INSERT prepared statement object.
  * 
@@ -17,7 +15,7 @@ const DATE_FORMAT = 'MM/DD/YYYY HH:mm';
 function prepareInsertTopic(topic) {
   if(!topic.keyword || !topic.lang_code) return null;
   else return {
-    query: `INSERT INTO watchlist (keyword,lang_code,translations,insertion_time) VALUES (?, ?, ?, dateof(now()))`,
+    query: 'INSERT INTO watchlist (keyword,lang_code,translations,insertion_time) VALUES (?, ?, ?, dateof(now()))',
     params: [ 
       topic.keyword, 
       topic.lang_code, 
