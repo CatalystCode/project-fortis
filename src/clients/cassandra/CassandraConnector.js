@@ -51,16 +51,11 @@ const options = {
  */
 const client = new cassandra.Client(options);
 
-module.exports = {
-  executeBatchMutations: executeBatchMutations,
-  executeQuery: executeQuery 
-};
-
 /** Execute a batch of mutations
  * @param {Array<{mutation: string, params: Array<string|number|map}>} mutations
  * @returns {Promise}
  */
-let executeBatchMutations = (mutations) => {
+function executeBatchMutations(mutations) {
   return new Promise((resolve, reject) => {
     if(!client) reject('Cassandra client is null');
     cassandraTableStorageManager.batchMutations(client, mutations, function(err) {
@@ -73,13 +68,18 @@ let executeBatchMutations = (mutations) => {
       }
     });
   });
-};
+}
 
 /**
  * http://docs.datastax.com/en/developer/nodejs-driver/3.2/features/udfs/
  */
-let executeQuery = (query) => { // eslint-disable-line no-unused-vars
+function executeQuery(query) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
 
   });
+}
+
+module.exports = {
+  executeBatchMutations: executeBatchMutations,
+  executeQuery: executeQuery 
 };
