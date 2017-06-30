@@ -14,8 +14,6 @@ readonly pg_password="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${PASSWORD_
 if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
 if ! (command -v psql >/dev/null); then sudo apt-get install -y postgresql postgresql-contrib; fi
 
-echo "!!!! Postgres password for ${pg_admin} set to '${pg_password}' !!!!"
-
 echo "Creating postgres server"
 az postgres server create \
   --resource-group "${resource_group}" \
@@ -45,8 +43,10 @@ pg_host="$(az postgres server show --resource-group "${resource_group}" --name "
   --host "${pg_host}" \
   --port 5432 \
   --username "${pg_admin}@${pg_name}" \
-  --dbname "postgres" \
   --quiet
 rm "${dbdump}"
+
+FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${pg_admin}@${pg_name}:${pg_password}@${pg_host}:5432/features?ssl=true"
+export FEATURE_SERVICE_DB_CONNECTION_STRING
 
 echo "All done installing feature service database"
