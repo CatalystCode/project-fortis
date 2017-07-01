@@ -34,10 +34,11 @@ readonly DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly DEIS_TOKEN_FILE="/root/.deis/client.json"
 
 echo "Registering Deis Load Balancer"
-while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
+if [ ! -s "${DEIS_TOKEN_FILE}" ]; then
     deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
+    sleep 100
     deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
-done
+fi
 
 #deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 echo 'Registered deis users'
