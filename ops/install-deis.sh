@@ -21,7 +21,7 @@ echo "Installing Deis on Cluster"
 helm install deis/workflow --name deis --namespace=deis --set global.storage=azure,azure.accountname="${DEIS_STORAGE_ACCOUNT_NAME}",azure.accountkey="${DEIS_STORAGE_ACCOUNT_KEY}",azure.registry_container=registry,azure.database_container=database,azure.builder_container=builder
 
 echo "Looking up DEIS_ROUTER_HOST_ROOT"
-sleep 200
+sleep 250
 
 while [[ -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    DEIS_ROUTER_HOST_ROOT=$(kubectl --namespace=deis get svc deis-router -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
@@ -35,9 +35,9 @@ readonly DEIS_TOKEN_FILE="/root/.deis/client.json"
 
 echo "Registering Deis Load Balancer"
 deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
-sleep 10
 
 while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
+    sleep 10
     deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 done
 
