@@ -8,6 +8,7 @@ curl -sSL http://deis.io/deis-cli/install-v2.sh | bash
 sudo ln -fs "${PWD}/deis" /usr/local/bin/deis
 
 echo "creating deis storage account ${k8location}"
+id
 
 sudo az storage account create -n "${DEIS_STORAGE_ACCOUNT_NAME}" -l "${k8location}" -g "${k8resource_group}" --sku Standard_LRS
 DEIS_STORAGE_ACCOUNT_KEY="$(az storage account keys list -n "${DEIS_STORAGE_ACCOUNT_NAME}" -g "${k8resource_group}" --query [0].value --output tsv)"
