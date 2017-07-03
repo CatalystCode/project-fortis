@@ -19,7 +19,7 @@ function TranslatorAccessTokenExpired() {
   if (translatorToken && translatorToken.expires > Date.now()) {
     console.log('token missing/expired');
     return false;
-  }else{
+  } else {
     return true;
   }
 }
