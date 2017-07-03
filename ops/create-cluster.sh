@@ -30,6 +30,10 @@ echo "Finished. Now installing DEIS fortis interface"
 ./deis-apps/fortis-interface/create-app.sh
 echo "Finished. Now deploying"
 ./deis-apps/fortis-interface/deploy-app.sh
+echo "Finished. Now installing DEIS feature service"
+./deis-apps/feature-service/create-app.sh
+echo "Finished."
+./deis-apps/feature-service/create-app.sh
 
 sleep 10
 readonly max_retry_count=50

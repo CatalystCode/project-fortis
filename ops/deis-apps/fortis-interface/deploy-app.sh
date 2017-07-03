@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-readonly CUSTOM_REACT_CREATE_APP_BP="https://github.com/mars/create-react-app-buildpack.git"
+readonly CUSTOM_REACT_CREATE_APP_BP="https://github.com/heroku/heroku-buildpack-static.git"
 cd project-fortis-interfaces || exit -2
 
 deis config:set BUILDPACK_URL=${CUSTOM_REACT_CREATE_APP_BP}
-deis git:remote --force --remote deis --app fortis-interface
-
-sudo git push deis master
-deis scale web=3
+npm install
+npm run build
+mv build webdeploy
+echo '{"root": "webdeploy/"}' > static.json
+git add -A
+git commit -m "Adding deployment assets"
+git push deis master
+deis autoscale:set web --min=2 --max=5 --cpu-percent=75
 
 cd ..

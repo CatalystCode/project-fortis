@@ -39,12 +39,10 @@ deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --ema
 
 while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
     sleep 10
-    deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
+    timeout 5 deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 done
 
 #deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
-echo 'Registered deis users'
-deis perms:list
 echo 'Deis whoami'
 deis whoami
 
