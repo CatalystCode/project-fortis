@@ -42,7 +42,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
       if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with id '${siteId}'`);
 
       const site = cassandraRowToSite(rows[0]);
-      resolve([site]);
+      resolve({sites:[site]});
     })
     .catch(reject)
     ;
