@@ -2,6 +2,7 @@
 
 const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
+const withRunTime = require('../shared').withRunTime;
 
 /**
  * @param {{siteId: string}} args
@@ -53,10 +54,10 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  sites: sites,
-  twitterAccounts: twitterAccounts,
-  trustedTwitterAccounts: trustedTwitterAccounts,
-  facebookPages: facebookPages,
+  sites: withRunTime(sites),
+  twitterAccounts: withRunTime(twitterAccounts),
+  trustedTwitterAccounts: withRunTime(trustedTwitterAccounts),
+  facebookPages: withRunTime(facebookPages),
   facebookAnalytics: facebookAnalytics,
-  termBlacklist: termBlacklist
+  termBlacklist: withRunTime(termBlacklist)
 };

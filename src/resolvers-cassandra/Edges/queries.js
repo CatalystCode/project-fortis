@@ -1,5 +1,7 @@
 'use strict';
 
+const withRunTime = require('../shared').withRunTime;
+
 /**
  * @param {{site: string, query: string, fromDate: string, toDate: string, sourceFilter: string[]}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
@@ -36,9 +38,9 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  terms: terms,
-  locations: locations,
-  popularLocations: popularLocations,
+  terms: withRunTime(terms),
+  locations: withRunTime(locations),
+  popularLocations: withRunTime(popularLocations),
   timeSeries: timeSeries,
   topSources: topSources
 };
