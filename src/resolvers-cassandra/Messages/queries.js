@@ -147,9 +147,12 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function makeEdgesQuery(args) {
-  let query = 'SELECT * FROM fortis.events WHERE';
+  let query = '';
   let params = [];
-  return appendDefaultFilters(args, query, params);
+  let filters = appendDefaultFilters(args, query, params);
+  filters.query = filters.query.substr(' AND '.length);
+  filters.query = `SELECT * FROM fortis.events WHERE ${filters.query}`;
+  return filters;
 }
 
 /**
