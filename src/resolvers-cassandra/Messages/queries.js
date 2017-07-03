@@ -76,7 +76,7 @@ function appendDefaultFilters(args, query, params) {
     params.push(args.originalSource);
   }
 
-  query += ' AND (pipeline == "Twitter" OR pipeline == "Facebook")';
+  query += ' AND pipeline IN ("Twitter", "Facebook", "Instagram", "Radio", "Reddit")';
 
   return {query: query, params: params};
 }
