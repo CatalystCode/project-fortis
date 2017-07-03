@@ -31,14 +31,15 @@ const ASYNC_BATCH_LIMIT = process.env.ASYNC_BATCH_LIMIT || 10;
  * TODO: consider sslOptions and authProvider
  */
 const distance = cassandra.types.distance;
-const CORE_CONNECTIONS_PER_HOST = 1;
+const CORE_CONNECTIONS_PER_HOST_LOCAL = process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 1;
+const CORE_CONNECTIONS_PER_HOST_REMOTE = process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1;
 const options = {
   contactPoints: [process.env.CASSANDRA_CONTACT_POINTS],
   keyspace: process.env.CASSANDRA_KEYSPACE,
   pooling: {
     coreConnectionsPerHost: {
-      [distance.local]: CORE_CONNECTIONS_PER_HOST,
-      [distance.remote]: CORE_CONNECTIONS_PER_HOST
+      [distance.local]: CORE_CONNECTIONS_PER_HOST_LOCAL,
+      [distance.remote]: CORE_CONNECTIONS_PER_HOST_REMOTE
     } 
   }
 };
