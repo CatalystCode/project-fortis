@@ -163,6 +163,36 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
+  function makeEdgesQuery() {
+    let query = 'SELECT * FROM fortis.events WHERE';
+    let params = [];
+    return appendDefaultFilters(args, query, params);
+  }
+
+  const query = makeEdgesQuery();
+  return new Promise((resolve, reject) => {
+    cassandraConnector.executeQuery(query.query, query.params)
+    .then(rows => {
+      const placeIds = new Set();
+      rows.foreach(row => row.detectedplaceids.foreach(placeId => placeIds.add(placeId)));
+
+      featureServiceClient.fetchById(placeIds)
+      .then(places => {
+        const idToBbox = makeMap(places, place => place.id, place => place.bbox);
+        const features = rows.map(row => {
+          const feature = cassandraRowToFeature(row);
+          feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
+          return feature;
+        });
+
+        resolve({
+          features: features
+        });
+      })
+      .catch(reject);
+    })
+    .catch(reject);
+  });
 }
 
 /**
