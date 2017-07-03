@@ -33,7 +33,7 @@ echo "Finished. Now deploying"
 echo "Finished. Now installing DEIS feature service"
 ./deis-apps/feature-service/create-app.sh
 echo "Finished."
-./deis-apps/feature-service/create-app.sh
+./deis-apps/feature-service/deploy-app.sh
 
 sleep 10
 readonly max_retry_count=50
