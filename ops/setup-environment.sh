@@ -23,7 +23,7 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark --from-lit
 
 deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
 deis config:set FEATURES_CONNECTION_STRING="${feature_service_db_conn_str}"
-deis config:set FEATURE_SERVICE_HOST="${feature_service_host}"
+deis config:set FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}"
 deis config:set CASSANDRA_CONTACT_POINTS="${cassandra_host}"
 deis config:set DEFAULT_SITE_NAME="${site_name}"
 deis config:set FORTIS_SERVICE_HOST="${graphql_service_host}"

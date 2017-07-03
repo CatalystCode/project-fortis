@@ -30,6 +30,10 @@ echo "Finished. Now installing DEIS fortis interface"
 ./deis-apps/fortis-interface/create-app.sh
 echo "Finished. Now deploying"
 ./deis-apps/fortis-interface/deploy-app.sh
+echo "Finished. Now installing DEIS feature service"
+./deis-apps/feature-service/create-app.sh
+echo "Finished."
+./deis-apps/feature-service/deploy-app.sh
 
 sleep 10
 readonly max_retry_count=50
@@ -49,7 +53,7 @@ done
 readonly graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly feature_service_db_conn_str="${FEATURE_SERVICE_DB_CONNECTION_STRING}"
-readonly feature_service_host=1.1.1.1
+readonly feature_service_host="feature-service.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly spark_config_map_name="spark-master-conf"
 
 echo "Finished. Installing cassandra cqlsh cli."
