@@ -84,6 +84,38 @@ function appendDefaultFilters(args, query, params) {
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byLocation(args, res) { // eslint-disable-line no-unused-vars
+  function makeLocationQuery(placeIds) {
+    const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
+    let query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
+    let params = placeIds.slice();
+    return appendDefaultFilters(args, query, params);
+  }
+
+  return new Promise((resolve, reject) => {
+    const coords = args.coordinates;
+    if (!coords || coords.length !== 2) return reject('No valid coordinates specified to fetch');
+
+    featureServiceClient.fetchByPoint({latitude: coords[0], longitude: coords[1]})
+    .then(places => {
+      const idToBbox = makeMap(places, place => place.id, place => place.bbox);
+      const placeIds = Object.keys(idToBbox);
+      const query = makeLocationQuery(placeIds);
+      cassandraConnector.executeQuery(query.query, query.params)
+      .then(rows => {
+        const features = rows.map(row => {
+          const feature = cassandraRowToFeature(row);
+          feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
+          return feature;
+        });
+
+        resolve({
+          features: features
+        });
+      })
+      .catch(reject);
+    })
+    .catch(reject);
+  });
 }
 
 /**
