@@ -15,7 +15,7 @@ module.exports = {
     let blobPrefix = id.split('-')[0] + '/' + id.split('-')[1] + '/' + id.split('-')[2];
     let factIndex = id.split('-')[3];
     blobSvc.listBlobsSegmentedWithPrefix(FACTS_CONTAINER_NAME, blobPrefix, null, null, (error, result, response) => { // eslint-disable-line no-unused-vars
-      if (error || !result || !result.entries || result.entries.length == 0) {
+      if (error || !result || !result.entries || result.entries.length === 0) {
         callback(null, error);
       }
       else {
