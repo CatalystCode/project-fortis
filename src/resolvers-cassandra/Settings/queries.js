@@ -26,8 +26,6 @@ function cassandraRowToSite(row) {
  * @returns {Promise.<{runTime: string, sites: Array<{name: string, properties: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}>}
  */
 function sites(args, res) { // eslint-disable-line no-unused-vars
-  const startTime = Date.now();
-
   return new Promise((resolve, reject) => {
     const siteId = args.siteId;
     if (!siteId) {
