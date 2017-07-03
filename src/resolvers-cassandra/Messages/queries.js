@@ -67,12 +67,12 @@ function appendDefaultFilters(args, query, params) {
   }
 
   if (args.langCode) {
-    query += ' AND eventlangcode == ?';
+    query += ' AND eventlangcode = ?';
     params.push(args.langCode);
   }
 
   if (args.originalSource) {
-    query += ' AND sourceid == ?';
+    query += ' AND sourceid = ?';
     params.push(args.originalSource);
   }
 
