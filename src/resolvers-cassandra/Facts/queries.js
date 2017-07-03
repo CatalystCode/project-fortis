@@ -54,11 +54,29 @@ function list(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function makeGetQuery(args) {
+  let query = 'SELECT * FROM fortis.events WHERE id = ?';
+  let params = [args.id];
+  return appendDefaultFilters(query, params);
+}
+
 /**
  * @param {{id: string}} args
  * @returns {Promise.<Fact>}
  */
 function get(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.id) return reject('No id specified to fetch');
+
+    const query = makeGetQuery(args);
+    return cassandraConnector.executeQuery(query.query, query.params)
+    .then(rows => {
+      if (rows.length > 1) return reject(`Got more ${rows.length} faces with id ${args.id}`);
+
+      resolve(cassandraRowToFact(rows[0]));
+    })
+    .catch(reject);
+  });
 }
 
 module.exports = {
