@@ -2,21 +2,27 @@
 
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
-const cassandraTableStorageManager = require('../storage/CassandraTableStorageManager');
+const asyncEachLimit = require('async/eachLimit');
+
+/** @see http://docs.datastax.com/en/developer/nodejs-driver/3.2/features/batch/
+ * TODO: ASYNC_BATCH_LIMIT will need to be tuned.
+ * It is best to keep the batch size small (in the order of 10s).
+ * If the batch size is greater than 5k, then the server will issue a warning.
+ */
+const ASYNC_BATCH_LIMIT = process.env.ASYNC_BATCH_LIMIT || 10;
 
 /** Default Cassandra Client Options
- * https://github.com/datastax/nodejs-driver/blob/master/lib/client-options.js
+ * @see https://github.com/datastax/nodejs-driver/blob/master/lib/client-options.js
  * 
  * Cassandra Client Configurable Options
- * https://docs.datastax.com/en/developer/nodejs-driver/3.2/api/type.ClientOptions/
+ * @see https://docs.datastax.com/en/developer/nodejs-driver/3.2/api/type.ClientOptions/
  * 
  * Since datastax node driver does not have much detail on pooling, the java driver doc will be used:
- * http://docs.datastax.com/en/developer/java-driver/3.3/manual/pooling/
+ * @see http://docs.datastax.com/en/developer/java-driver/3.3/manual/pooling/
  * 
  * Connection pools have a variable size, which gets adjusted automatically depending on the current load. 
- * There will always be at least the core number of connections.
- * 
- * Connection pool picks the connection with the minimum number of in-flight requests.
+ * There will always be at least the core number of connections. The connection pool will pick 
+ * the connection with the minimum number of in-flight requests.
  * 
  * Cassandra version 2.1 or greater can send up to 32768 requests (stream ids) per connection.
  * 
@@ -37,38 +43,40 @@ const options = {
   }
 };
 
-/** Code should share the same Client instance across the application i.e.
- * the client should be a singleton.
- * http://docs.datastax.com/en/developer/nodejs-driver/3.2/coding-rules/
- * 
- * Creating the cassandra client will fail if its client options property, contactPoints, is not set.
- * 
- * client.shutdown() shuts down all connections to all hosts.
- */
 const client = new cassandra.Client(options);
 
-/** Execute a batch of mutations
+/** Execute mutations
  * @param {Array<{mutation: string, params: Array<string|map>}>} mutations
  * @returns {Promise}
  */
-function executeBatchMutations(mutations) {
+function executeMutations(mutations) {
   return new Promise((resolve, reject) => {
-    if(!client) reject('Cassandra client is null');
-    if(!mutations) reject('Mutations is null');
-    cassandraTableStorageManager.batchMutations(client, mutations, (err, res) => {
-      if(err) {
-        const errMsg = `[${err}] occured while performing a batch of mutations`;
-        console.error(errMsg);
-        reject(errMsg);
-      } else {
-        resolve(res);
+    if(!client) return reject('No Cassandra client defined');
+    if(!mutations || mutations.length == 0) return reject('No mutations defined');
+    asyncEachLimit(mutations, ASYNC_BATCH_LIMIT, (mutation, asyncCallback) => {
+      client.execute(mutation.query, mutation.params, { prepare: true }, (err) => {
+        if(err) {
+          console.log(err, `Mutation failed for ${JSON.stringify(mutation)}`);
+          asyncCallback(err);
+        } else {
+          asyncCallback();
+        }
+      });
+    },
+    (err) => {
+      if(err){
+        console.log(`Error occured during the mutations: ${JSON.stringify(err)}`);
+        reject(err);
+      }else{
+        console.log('Finished executing cassandra mutations');
+        resolve();
       }
     });
   });
 }
 
 /**
- * http://docs.datastax.com/en/developer/nodejs-driver/3.2/features/udfs/
+ * @see http://docs.datastax.com/en/developer/nodejs-driver/3.2/features/udfs/
  */
 function executeQuery(query) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
@@ -77,6 +85,6 @@ function executeQuery(query) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  executeBatchMutations: executeBatchMutations,
+  executeMutations: executeMutations,
   executeQuery: executeQuery 
 };
