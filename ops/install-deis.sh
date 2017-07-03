@@ -30,16 +30,21 @@ done
 
 echo "DEIS_ROUTER_HOST_ROOT is set to ${DEIS_ROUTER_HOST_ROOT}"
 
-readonly DEIS_HOSTNAME_URL="http://deis.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+readonly DEIS_HOSTNAME_URL="http://deis.52.170.201.252.nip.io"
 readonly DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly DEIS_TOKEN_FILE="/root/.deis/client.json"
 
 echo "Registering Deis Load Balancer"
-deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
+deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io --ssl-verify=false
+
+deis logs
+deis apps
 
 while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
+    echo "Attempting to login ${DEIS_HOSTNAME_URL}"
+    host ${DEIS_HOSTNAME_URL}
     sleep 10
-    timeout 5 deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
+    timeout 5 sudo deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 done
 
 #deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
