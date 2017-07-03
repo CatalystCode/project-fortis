@@ -4,7 +4,7 @@ readonly fortis_feature_svc_gh_repo=https://github.com/CatalystCode/featureServi
 
 git clone ${fortis_feature_svc_gh_repo}
 
-cd featureService
+cd featureService || exit -2
 
 deis create feature-service
 deis git:remote --force --remote deis --app feature-service
@@ -12,4 +12,4 @@ deis git:remote --force --remote deis --app feature-service
 deis limits:set web=512M
 deis autoscale:set web --min=2 --max=4 --cpu-percent=75
 
-cd ..
+cd .. || exit -2

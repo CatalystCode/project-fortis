@@ -13,4 +13,4 @@ git commit -m "Adding deployment assets"
 git push deis master
 deis autoscale:set web --min=2 --max=5 --cpu-percent=75
 
-cd ..
+cd .. || exit -2

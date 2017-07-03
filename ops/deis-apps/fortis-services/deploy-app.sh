@@ -5,4 +5,4 @@ ssh-add ../deis_certs
 git push deis master
 deis autoscale:set web --min=2 --max=4 --cpu-percent=75
 
-cd ..
+cd .. || exit -2
