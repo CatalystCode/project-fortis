@@ -92,14 +92,12 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
   }
 
   return new Promise((resolve, reject) => {
-    const coords = args.coordinates;
-    if (!coords || coords.length !== 2) return reject('No valid coordinates specified to fetch');
+    if (!args.coordinates || args.coordinates.length !== 2) return reject('No valid coordinates specified to fetch');
 
-    featureServiceClient.fetchByPoint({latitude: coords[0], longitude: coords[1]})
+    featureServiceClient.fetchByPoint({latitude: args.coordinates[0], longitude: args.coordinates[1]})
     .then(places => {
       const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const placeIds = Object.keys(idToBbox);
-      const query = makeLocationQuery(placeIds);
+      const query = makeLocationQuery(Object.keys(idToBbox));
       cassandraConnector.executeQuery(query.query, query.params)
       .then(rows => {
         const features = rows.map(row => {
@@ -131,12 +129,9 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
   }
 
   return new Promise((resolve, reject) => {
-    const bbox = args.bbox;
-    if (!bbox || bbox.length !== 4) {
-      return reject('Invalid bbox specified');
-    }
+    if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
 
-    featureServiceClient.fetchByBbox({north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]})
+    featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
     .then(places => {
       const idToBbox = makeMap(places, place => place.id, place => place.bbox);
       const query = makeBboxQuery(Object.keys(idToBbox));
@@ -175,7 +170,6 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     .then(rows => {
       const placeIds = new Set();
       rows.foreach(row => row.detectedplaceids.foreach(placeId => placeIds.add(placeId)));
-
       featureServiceClient.fetchById(placeIds)
       .then(places => {
         const idToBbox = makeMap(places, place => place.id, place => place.bbox);
@@ -207,23 +201,19 @@ function event(args, res) { // eslint-disable-line no-unused-vars
   };
 
   return new Promise((resolve, reject) => {
-    const eventId = args && args.messageId;
-    if (!eventId) {
-      return reject('No event id to fetch specified');
-    }
+    if (!args || !args.messageId) return reject('No event id to fetch specified');
 
     const query = makeEventQuery();
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
-      if (rows.length > 1) {
-        return reject(`Got more ${rows.length} events with id ${eventId}`);
-      }
+      if (rows.length > 1) return reject(`Got more ${rows.length} events with id ${args.messageId}`);
 
       const row = rows[0];
       const feature = cassandraRowToFeature(row);
       featureServiceClient.fetchById(row.detectedplaceids || [])
       .then(places => {
         feature.coordinates = places.map(place => place.bbox);
+
         resolve(feature);
       })
       .catch(reject);
