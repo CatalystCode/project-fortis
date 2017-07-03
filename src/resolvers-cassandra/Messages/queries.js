@@ -2,6 +2,8 @@
 
 const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
+const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
+const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 
 /**
  * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
@@ -33,6 +35,49 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<Feature>}
  */
 function event(args, res) { // eslint-disable-line no-unused-vars
+  const eventById = 'SELECT * FROM fortis.events WHERE id = ?';
+
+  return new Promise((resolve, reject) => {
+    const eventId = args && args.messageId;
+    if (!eventId) {
+      reject('No event id to fetch specified');
+      return;
+    }
+
+    cassandraConnector.executeQuery(eventById, [eventId])
+    .then(rows => {
+      if (rows.length > 1) {
+        reject(`Got more ${rows.length} events with id ${eventId}`);
+        return;
+      }
+
+      const ev = rows[0];
+      featureServiceClient.fetchById(ev.detectedplaceids || [])
+      .then(features => {
+        resolve({
+          type: ev.pipeline,
+          coordinates: features.map(feature => feature.bbox),
+          properties: {
+            edges: ev.detectedkeywords,
+            messageid: ev.externalid,
+            createdtime: ev.event_time,
+            sentiment: ev.computedfeatures && ev.computedfeatures.sentiment &&
+              ev.computedfeatures.sentiment.pos_avg > ev.computedfeatures.sentiment.neg_avg
+              ? ev.computedfeatures.sentiment.pos_avg - ev.computedfeatures.sentiment.neg_avg + 0.6
+              : ev.computedfeatures.sentiment.neg_avg - ev.computedfeatures.sentence.pos_avg,
+            title: ev.title,
+            originalSources: ev.pipeline &&
+              [ev.pipeline],
+            language: ev.eventlangcode,
+            source: ev.sourceurl,
+            fullText: ev.messagebody
+          }
+        });
+      })
+      .catch(err => reject(err));
+    })
+    .catch(err => reject(err));
+  });
 }
 
 /**
