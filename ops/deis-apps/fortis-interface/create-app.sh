@@ -10,7 +10,6 @@ cd project-fortis-interfaces || exit -2
 
 deis create fortis-interface
 deis git:remote --force --remote deis --app fortis-interface
-deis domains:add fortis-interface
 #deis certs:attach fortis fortis-services
 deis limits:set web=512M
 
