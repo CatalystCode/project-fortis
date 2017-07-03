@@ -54,7 +54,12 @@ function executeMutations(mutations) {
   });
 }
 
-function executeQuery(query) { // eslint-disable-line no-unused-vars
+/**
+ * @param {string} query
+ * @param {string[]} params
+ * @returns {Promise.<object[]>}
+ */
+function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
 
   });
