@@ -3,6 +3,7 @@
 const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
+const withRunTime = require('../shared').withRunTime;
 
 function cassandraRowToSite(row) {
   // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
@@ -41,8 +42,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
       if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with id '${siteId}'`);
 
       const site = cassandraRowToSite(rows[0]);
-      const siteCollection = Object.assign({}, {runTime: '' + (Date.now() - startTime), sites: [ site ]});
-      resolve(siteCollection);
+      resolve([site]);
     })
     .catch(reject)
     ;
@@ -92,10 +92,10 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  sites: sites,
-  twitterAccounts: twitterAccounts,
-  trustedTwitterAccounts: trustedTwitterAccounts,
-  facebookPages: facebookPages,
+  sites: withRunTime(sites),
+  twitterAccounts: withRunTime(twitterAccounts),
+  trustedTwitterAccounts: withRunTime(trustedTwitterAccounts),
+  facebookPages: withRunTime(facebookPages),
   facebookAnalytics: facebookAnalytics,
-  termBlacklist: termBlacklist
+  termBlacklist: withRunTime(termBlacklist)
 };

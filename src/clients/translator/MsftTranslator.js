@@ -19,7 +19,7 @@ function TranslatorAccessTokenExpired() {
   if (translatorToken && translatorToken.expires > Date.now()) {
     console.log('token missing/expired');
     return false;
-  }else{
+  } else {
     return true;
   }
 }
@@ -43,9 +43,8 @@ function getAccessTokenForTranslation() {
   return new Promise((resolve, reject) => {
     request.post(POST, (err, response, body) => {
       if (response.statusCode !== 200 || err) {
-        reject(err);
-      }
-      else {
+        return reject(err);
+      } else {
         body = JSON.parse(body);
         resolve({
           'token': body.access_token,
@@ -73,15 +72,14 @@ function TranslateSentenceArray(access_token, wordsToTranslate, fromLanguage, to
   return new Promise((resolve, reject) => {
     request.post(POST, (err, response, body) => {
       if (err || !response || response.statusCode !== 200) {
-        reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
-      }
-      else {
+        return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
+      } else {
         xml2js.parseString(body, (err, result) => {
           if (!err & !!result && result.ArrayOfTranslateArrayResponse && result.ArrayOfTranslateArrayResponse.TranslateArrayResponse) {
             const translatedPhrases = result.ArrayOfTranslateArrayResponse.TranslateArrayResponse;
             resolve(wordsToTranslate.map((phrase, index)=>Object.assign({}, {originalSentence: phrase, translatedSentence: translatedPhrases[index].TranslatedText})));
           } else {
-            reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
+            return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
           }
         });
       }
@@ -101,14 +99,13 @@ function TranslateSentence(access_token, sentence, fromLanguage, toLanguage) {
   return new Promise((resolve, reject) => {
     request(options, function (err, response, body) {
       if (err || !response || response.statusCode !== 200) {
-        reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
-      }
-      else {
+        return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
+      } else {
         xml2js.parseString(body, (err, result) => {
           if (!err & !!result && !!result['string'] && !!result['string']['_']) {
             resolve(result['string']['_']);
           } else {
-            reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
+            return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
           }
         });
       }

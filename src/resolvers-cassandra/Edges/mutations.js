@@ -1,5 +1,7 @@
 'use strict';
 
+const withRunTime = require('../shared').withRunTime;
+
 /**
  * @param {{input: {site: string, edges: Array<{name: string}>}}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
@@ -20,7 +22,7 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
  */
 function saveLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    reject(
+    return reject(
       'This API call is no longer supported. ' +
       'We now automatically filter events down to only those ' +
       'locations defined in the geo-fence for your site'
@@ -34,7 +36,7 @@ function saveLocations(args, res) { // eslint-disable-line no-unused-vars
  */
 function removeLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    reject(
+    return reject(
       'This API call is no longer supported. ' +
       'We now automatically filter events down to only those ' +
       'locations defined in the geo-fence for your site'
@@ -43,8 +45,8 @@ function removeLocations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  removeKeywords: removeKeywords,
-  addKeywords: addKeywords,
-  saveLocations: saveLocations,
-  removeLocations: removeLocations
+  removeKeywords: withRunTime(removeKeywords),
+  addKeywords: withRunTime(addKeywords),
+  saveLocations: withRunTime(saveLocations),
+  removeLocations: withRunTime(removeLocations)
 };
