@@ -42,7 +42,7 @@ deis apps
 
 while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
     echo "Attempting to login ${DEIS_HOSTNAME_URL}"
-    host ${DEIS_HOSTNAME_URL}
+    host "${DEIS_HOSTNAME_URL}"
     curl "${DEIS_HOSTNAME_URL}/v2/" && echo
     sleep 10
     timeout 5 sudo deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
