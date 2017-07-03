@@ -33,7 +33,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const siteId = args.siteId;
     if (!siteId) {
-      return reject("No site id to fetch specified");
+      return reject('No site id to fetch specified');
     }
 
     const siteById = 'SELECT * FROM fortis.sitesettings WHERE id = ?';
@@ -48,7 +48,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
       }
 
       const site = cassandraRowToSite(rows[0]);
-      const siteCollection = Object.assign({}, {runTime: "" + (Date.now() - startTime), sites: [ site ]});
+      const siteCollection = Object.assign({}, {runTime: '' + (Date.now() - startTime), sites: [ site ]});
       resolve(siteCollection);
     })
     .catch(err => reject(err))
