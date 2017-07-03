@@ -5,6 +5,10 @@ const request = require('request');
 
 const apiHost = process.env.FORTIS_FEATURE_SERVICE_HOST;
 
+function formatIdsUri(ids) {
+  return `http://${apiHost}/features/id/${ids.map(encodeURIComponent).join(',')}?include=bbox`;
+}
+
 function formatBboxUri(north, west, south, east) {
   return `http://${apiHost}/features/bbox/${north}/${west}/${south}/${east}`;
 }
@@ -69,7 +73,17 @@ function fetchByName(name) {
   return callFeatureService(formatNameUri(names));
 }
 
+/**
+ * @param {string|string[]} id
+ * @returns {Promise.<Array<{id: string, name: string, layer: string, bbox: number[]}>>}
+ */
+function fetchById(id) {
+  const ids = id.constructor === Array ? id : [id];
+  return callFeatureService(formatIdsUri(ids));
+}
+
 module.export = {
+  fetchById: fetchById,
   fetchByBbox: fetchByBbox,
   fetchByPoint: fetchByPoint,
   fetchByName: fetchByName

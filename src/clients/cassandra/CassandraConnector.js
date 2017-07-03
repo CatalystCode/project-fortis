@@ -75,10 +75,11 @@ function executeMutations(mutations) {
   });
 }
 
-/**
- * @see http://docs.datastax.com/en/developer/nodejs-driver/3.2/features/udfs/
+ * @param {string} query
+ * @param {string[]} params
+ * @returns {Promise.<object[]>}
  */
-function executeQuery(query) { // eslint-disable-line no-unused-vars
+function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
 
   });
