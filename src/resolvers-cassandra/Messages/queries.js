@@ -28,6 +28,53 @@ function cassandraRowToFeature(row) {
   };
 }
 
+function makeMap(array, keyFunc, valueFunc) {
+  valueFunc = valueFunc || (x => x);
+
+  const map = {};
+  array.foreach(item => {
+    const key = keyFunc(item);
+    const value = valueFunc(item);
+    map[key] = value;
+  });
+  return map;
+}
+
+function appendDefaultFilters(args, query, params) {
+  if (args.mainTerm) {
+    query += ' AND detectedkeywords CONTAINS ?';
+    params.push(args.mainTerm);
+  }
+
+  if (args.filteredEdges) {
+    const edgesCondition = args.filteredEdges.map(_ => 'detectedkeywords CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
+    query += ` AND (${edgesCondition})`;
+    params = params.concat(args.filteredEdges);
+  }
+
+  if (args.fromDate) {
+    query += ' AND event_time >= ?';
+    params.push(args.fromDate);
+  }
+
+  if (args.toDate) {
+    query += ' AND event_time <= ?';
+    params.push(args.toDate);
+  }
+
+  if (args.langCode) {
+    query += ' AND eventlangcode == ?';
+    params.push(args.langCode);
+  }
+
+  if (args.originalSource) {
+    query += ' AND sourceid == ?';
+    params.push(args.originalSource);
+  }
+
+  return {query: query, params: params};
+}
+
 /**
  * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
  */
@@ -44,6 +91,39 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byBbox(args, res) { // eslint-disable-line no-unused-vars
+  function makeBboxQuery(placeIds) {
+    const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
+    let query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
+    let params = placeIds.slice();
+    return appendDefaultFilters(args, query, params);
+  }
+
+  return new Promise((resolve, reject) => {
+    const bbox = args.bbox;
+    if (!bbox || bbox.length !== 4) {
+      return reject('Invalid bbox specified');
+    }
+
+    featureServiceClient.fetchByBbox({north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]})
+    .then(places => {
+      const idToBbox = makeMap(places, place => place.id, place => place.bbox);
+      const query = makeBboxQuery(Object.keys(idToBbox));
+      cassandraConnector.executeQuery(query.query, query.params)
+      .then(rows => {
+        const features = rows.map(row => {
+          const feature = cassandraRowToFeature(row);
+          feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
+          return feature;
+        });
+
+        resolve({
+          features: features
+        });
+      })
+      .catch(reject);
+    })
+    .catch(reject);
+  });
 }
 
 /**
