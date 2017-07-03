@@ -58,7 +58,11 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<Feature>}
  */
 function event(args, res) { // eslint-disable-line no-unused-vars
-  const eventById = 'SELECT * FROM fortis.events WHERE id = ?';
+  const makeEventQuery = () => {
+    const query = 'SELECT * FROM fortis.events WHERE id = ?';
+    const params = [args.messageId];
+    return {query: query, params: params};
+  };
 
   return new Promise((resolve, reject) => {
     const eventId = args && args.messageId;
@@ -66,7 +70,8 @@ function event(args, res) { // eslint-disable-line no-unused-vars
       return reject('No event id to fetch specified');
     }
 
-    cassandraConnector.executeQuery(eventById, [eventId])
+    const query = makeEventQuery();
+    cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       if (rows.length > 1) {
         return reject(`Got more ${rows.length} events with id ${eventId}`);
