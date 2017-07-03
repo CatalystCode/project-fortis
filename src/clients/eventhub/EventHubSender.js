@@ -11,16 +11,14 @@ const eventHubClient = EventHubClient.fromConnectionString(eventHubConnectionStr
 function sendMessages(messages) {
   return new Promise((resolve, reject) => {
     if (!messages || !messages.length) {
-      reject('No messages to be sent');
-      return;
+      return reject('No messages to be sent');
     }
 
     let payloads;
     try {
       payloads = messages.map(message => ({contents: JSON.stringify(message)}));
     } catch (err) {
-      reject(`Unable to create payloads for EventHub: ${err}`);
-      return;
+      return reject(`Unable to create payloads for EventHub: ${err}`);
     }
 
     eventHubClient.open()

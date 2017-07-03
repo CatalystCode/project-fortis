@@ -55,7 +55,7 @@ module.exports = {
         }
         else {
           console.log(`error [${error}]`);
-          reject(error);
+          return reject(error);
         }
       });
     }).then(blobs => {

@@ -20,7 +20,7 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
  */
 function saveLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    reject(
+    return reject(
       'This API call is no longer supported. ' +
       'We now automatically filter events down to only those ' +
       'locations defined in the geo-fence for your site'
@@ -34,7 +34,7 @@ function saveLocations(args, res) { // eslint-disable-line no-unused-vars
  */
 function removeLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    reject(
+    return reject(
       'This API call is no longer supported. ' +
       'We now automatically filter events down to only those ' +
       'locations defined in the geo-fence for your site'
