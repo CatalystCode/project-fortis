@@ -79,25 +79,25 @@ function appendDefaultFilters(args, query, params) {
  * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
  */
 
+function makePlacesQuery(args, placeIds) {
+  const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
+  let query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
+  let params = placeIds.slice();
+  return appendDefaultFilters(args, query, params);
+}
+
 /**
  * @param {site: string, originalSource: string, coordinates: number[], mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byLocation(args, res) { // eslint-disable-line no-unused-vars
-  function makeLocationQuery(placeIds) {
-    const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
-    let query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
-    let params = placeIds.slice();
-    return appendDefaultFilters(args, query, params);
-  }
-
   return new Promise((resolve, reject) => {
     if (!args.coordinates || args.coordinates.length !== 2) return reject('No valid coordinates specified to fetch');
 
     featureServiceClient.fetchByPoint({latitude: args.coordinates[0], longitude: args.coordinates[1]})
     .then(places => {
       const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const query = makeLocationQuery(Object.keys(idToBbox));
+      const query = makePlacesQuery(args, Object.keys(idToBbox));
       cassandraConnector.executeQuery(query.query, query.params)
       .then(rows => {
         const features = rows.map(row => {
@@ -121,20 +121,13 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byBbox(args, res) { // eslint-disable-line no-unused-vars
-  function makeBboxQuery(placeIds) {
-    const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
-    let query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
-    let params = placeIds.slice();
-    return appendDefaultFilters(args, query, params);
-  }
-
   return new Promise((resolve, reject) => {
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
 
     featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
     .then(places => {
       const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const query = makeBboxQuery(Object.keys(idToBbox));
+      const query = makePlacesQuery(args, Object.keys(idToBbox));
       cassandraConnector.executeQuery(query.query, query.params)
       .then(rows => {
         const features = rows.map(row => {
@@ -153,18 +146,18 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function makeEdgesQuery(args) {
+  let query = 'SELECT * FROM fortis.events WHERE';
+  let params = [];
+  return appendDefaultFilters(args, query, params);
+}
+
 /**
  * @param {site: string, originalSource: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
-  function makeEdgesQuery() {
-    let query = 'SELECT * FROM fortis.events WHERE';
-    let params = [];
-    return appendDefaultFilters(args, query, params);
-  }
-
-  const query = makeEdgesQuery();
+  const query = makeEdgesQuery(args);
   return new Promise((resolve, reject) => {
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
@@ -189,21 +182,21 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function makeEventQuery(args) {
+  const query = 'SELECT * FROM fortis.events WHERE id = ?';
+  const params = [args.messageId];
+  return {query: query, params: params};
+}
+
 /**
  * @param {{site: string, messageId: string, dataSources: string[], langCode: string}} args
  * @returns {Promise.<Feature>}
  */
 function event(args, res) { // eslint-disable-line no-unused-vars
-  const makeEventQuery = () => {
-    const query = 'SELECT * FROM fortis.events WHERE id = ?';
-    const params = [args.messageId];
-    return {query: query, params: params};
-  };
-
   return new Promise((resolve, reject) => {
     if (!args || !args.messageId) return reject('No event id to fetch specified');
 
-    const query = makeEventQuery();
+    const query = makeEventQuery(args);
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       if (rows.length > 1) return reject(`Got more ${rows.length} events with id ${args.messageId}`);
