@@ -25,7 +25,7 @@ const client = new cassandra.Client(options);
  * @param {Array<{mutation: string, params: Array<string|map>}>} mutations
  * @returns {Promise}
  */
-function executeMutations(mutations) {
+function executeBatchMutations(mutations) {
   return new Promise((resolve, reject) => {
     if (!client) return reject('No Cassandra client defined');
     if (!mutations || mutations.length == 0) return reject('No mutations defined');
@@ -65,6 +65,6 @@ function executeQuery(query, params) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  executeMutations: executeMutations,
+  executeBatchMutations: executeBatchMutations,
   executeQuery: executeQuery 
 };
