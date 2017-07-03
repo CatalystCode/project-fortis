@@ -40,15 +40,13 @@ function event(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const eventId = args && args.messageId;
     if (!eventId) {
-      reject('No event id to fetch specified');
-      return;
+      return reject('No event id to fetch specified');
     }
 
     cassandraConnector.executeQuery(eventById, [eventId])
     .then(rows => {
       if (rows.length > 1) {
-        reject(`Got more ${rows.length} events with id ${eventId}`);
-        return;
+        return reject(`Got more ${rows.length} events with id ${eventId}`);
       }
 
       const ev = rows[0];
@@ -74,9 +72,9 @@ function event(args, res) { // eslint-disable-line no-unused-vars
           }
         });
       })
-      .catch(err => reject(err));
+      .catch(reject);
     })
-    .catch(err => reject(err));
+    .catch(reject);
   });
 }
 
@@ -87,8 +85,8 @@ function event(args, res) { // eslint-disable-line no-unused-vars
 function translate(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     translatorService.translate(args.sentence, args.fromLanguage, args.toLanguage)
-          .then(result => resolve({ translatedSentence: result.translatedSentence, originalSentence: args.sentence }))
-          .catch(err => reject(err));
+      .then(result => resolve({ translatedSentence: result.translatedSentence, originalSentence: args.sentence }))
+      .catch(reject);
   });
 }
 
@@ -99,8 +97,8 @@ function translate(args, res) { // eslint-disable-line no-unused-vars
 function translateWords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)
-          .then(result => resolve({ words: result.translatedSentence }))
-          .catch(err => reject(err));
+      .then(result => resolve({ words: result.translatedSentence }))
+      .catch(reject);
   });
 }
 

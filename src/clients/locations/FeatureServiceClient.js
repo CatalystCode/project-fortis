@@ -25,22 +25,19 @@ function callFeatureService(uri) {
   return new Promise((resolve, reject) => {
     request.get(uri, (err, response, body) => {
       if (err || response.statusCode !== 200) {
-        reject(`Unable to call feature service: ${err}`);
-        return;
+        return reject(`Unable to call feature service: ${err}`);
       }
 
       let featuresCollection;
       try {
         featuresCollection = JSON.parse(body);
       } catch (err) {
-        reject(`Unable to parse JSON for feature service response ${body}: ${err}`);
-        return;
+        return reject(`Unable to parse JSON for feature service response ${body}: ${err}`);
       }
 
       const features = featuresCollection && featuresCollection.features;
       if (!features) {
-        reject(`Unable to look up features in feature service response: ${body}`);
-        return;
+        return reject(`Unable to look up features in feature service response: ${body}`);
       }
 
       resolve(features);
