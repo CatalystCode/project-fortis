@@ -5,6 +5,8 @@ const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalytic
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 
 function cassandraRowToSite(row) {
+  // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
+  // storageConnectionString, featuresConnectionString, mapzenApiKey, fbToken.
   return {
     name: row.sitename,
     properties: {
@@ -13,11 +15,6 @@ function cassandraRowToSite(row) {
       logo: row.logo,
       title: row.title,
       defaultLocation: row.geofence,
-      // TODO: Ask what the following commented properties map to:
-    // storageConnectionString: String,
-    // featuresConnectionString: String,
-    // mapzenApiKey: String,
-    // fbToken: String,
       supportedLanguages: row.languages
     }
   };
@@ -38,20 +35,16 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
 
     const siteById = 'SELECT * FROM fortis.sitesettings WHERE id = ?';
     cassandraConnector.executeQuery(siteById, [siteId])
-    // .catch(err => reject(err))
+    .catch(reject)
     .then(rows => {
-      if (rows.length < 1) {
-        return reject(`Could not find site with id ${siteId}`);
-      }
-      if (rows.length > 1) {
-        return reject(`Got more than one (${rows.length}) site with id ${siteId}`);
-      }
+      if (rows.length < 1) return reject(`Could not find site with id ${siteId}`);
+      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with id '${siteId}'`);
 
       const site = cassandraRowToSite(rows[0]);
       const siteCollection = Object.assign({}, {runTime: '' + (Date.now() - startTime), sites: [ site ]});
       resolve(siteCollection);
     })
-    .catch(err => reject(err))
+    .catch(reject)
     ;
   });
 }
