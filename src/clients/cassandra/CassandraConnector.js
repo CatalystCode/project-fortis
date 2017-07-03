@@ -3,7 +3,9 @@
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
-const ASYNC_BATCH_LIMIT = process.env.ASYNC_BATCH_LIMIT || 10;
+const array = require('lodash/array');
+const BATCH_LIMIT = process.env.BATCH_LIMIT || 10;
+const ASYNC_OPERATIONS_LIMIT = process.env.ASYNC_OPERATIONS_LIMIT || 50;
 const distance = cassandra.types.distance;
 const CORE_CONNECTIONS_PER_HOST_LOCAL = process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 1;
 const CORE_CONNECTIONS_PER_HOST_REMOTE = process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1;
@@ -27,10 +29,13 @@ function executeMutations(mutations) {
   return new Promise((resolve, reject) => {
     if (!client) return reject('No Cassandra client defined');
     if (!mutations || mutations.length == 0) return reject('No mutations defined');
-    asyncEachLimit(mutations, ASYNC_BATCH_LIMIT, (mutation, asyncCallback) => {
-      client.execute(mutation.query, mutation.params, { prepare: true }, (err) => {
+  
+    let chunkedMutations = array.chunk(mutations, BATCH_LIMIT);
+
+    asyncEachLimit(chunkedMutations, ASYNC_OPERATIONS_LIMIT, (chunk, asyncCallback) => {
+      client.batch(chunk, { prepare: true }, (err) => {
         if (err) {
-          console.log(err, `Mutation failed for ${JSON.stringify(mutation)}`);
+          console.log(err, `Mutations failed for ${JSON.stringify(chunk)}`);
           asyncCallback(err);
         } else {
           asyncCallback();
