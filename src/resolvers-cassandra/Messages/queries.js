@@ -83,8 +83,8 @@ function appendDefaultFilters(args, query, params) {
 
 function makePlacesQuery(args, placeIds) {
   const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
-  let query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
-  let params = placeIds.slice();
+  const query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
+  const params = placeIds.slice();
   return appendDefaultFilters(args, query, params);
 }
 
@@ -149,9 +149,9 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function makeEdgesQuery(args) {
-  let query = '';
-  let params = [];
-  let filters = appendDefaultFilters(args, query, params);
+  const query = '';
+  const params = [];
+  const filters = appendDefaultFilters(args, query, params);
   filters.query = filters.query.substr(' AND '.length);
   filters.query = `SELECT * FROM fortis.events WHERE ${filters.query}`;
   return filters;
