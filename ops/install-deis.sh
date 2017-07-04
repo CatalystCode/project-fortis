@@ -45,10 +45,10 @@ while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
     host "${DEIS_HOSTNAME_URL}"
     curl "${DEIS_HOSTNAME_URL}/v2/" && echo
     sleep 10
-    timeout 5 deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
+    timeout 5 sudo deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 done
 
-#deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
+deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 echo 'Deis whoami'
 deis whoami
 
