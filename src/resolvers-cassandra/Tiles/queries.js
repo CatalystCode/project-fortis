@@ -65,7 +65,7 @@ function makeDefaultFilters(args) {
   return {clauses: clauses, params: params};
 }
 
-function makeComputedTilesForTilesQuery(args, tiles) {
+function makeTilesQuery(args, tiles) {
   const {clauses, params} = makeDefaultFilters(args);
 
   tiles.forEach(tile => {
@@ -79,7 +79,7 @@ function makeComputedTilesForTilesQuery(args, tiles) {
   return {query: query, params: params};
 }
 
-function makeComputedTilesForLocationIdsQuery(args, locationIds) {
+function makeLocationsQuery(args, locationIds) {
   let {clauses, params} = makeDefaultFilters(args);
 
   clauses.push(`(${locationIds.map(_ => '(placeids CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
@@ -143,7 +143,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    const query = makeComputedTilesForTilesQuery(args, tiles);
+    const query = makeTilesQuery(args, tiles);
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       const features = cassandraRowsToFeatures(rows);
@@ -166,7 +166,7 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
 
     fetchLocationIdsForPoints(args.locations)
     .then(locationIds => {
-      const query = makeComputedTilesForLocationIdsQuery(args, locationIds);
+      const query = makeLocationsQuery(args, locationIds);
       cassandraConnector.executeQuery(query.query, query.params)
       .then(rows => {
         const features = cassandraRowsToFeatures(rows);
@@ -212,7 +212,7 @@ function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-var
 
     fetchLocationIdsForPoints(args.locations)
     .then(locationIds => {
-      const query = makeComputedTilesForLocationIdsQuery(args, locationIds);
+      const query = makeLocationsQuery(args, locationIds);
       cassandraConnector.executeQuery(query.query, query.params)
       .then(rows => {
         const edges = cassandraRowsToEdges(rows);
@@ -237,7 +237,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
 
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    const query = makeComputedTilesForTilesQuery(args, tiles);
+    const query = makeTilesQuery(args, tiles);
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       const edges = cassandraRowsToEdges(rows);
