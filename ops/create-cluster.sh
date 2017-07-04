@@ -37,7 +37,7 @@ echo "Finished."
 
 sleep 10
 readonly max_retry_count=50
-readonly retries=0
+retries=0
 
 while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    cassandra_host=$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
