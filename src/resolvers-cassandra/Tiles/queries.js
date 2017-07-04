@@ -75,7 +75,7 @@ function makeTilesQuery(args, tiles) {
     params.push(tile.tilez);
   });
 
-  const query = `SELECT tileid, computedfeatures FROM computedtiles WHERE ${clauses.join(' AND ')}`;
+  const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')}`;
   return {query: query, params: params};
 }
 
