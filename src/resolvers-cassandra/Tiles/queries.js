@@ -67,6 +67,16 @@ function makeComputedTilesForTilesQuery(args, tiles) {
   return {query: query, params: params};
 }
 
+function tilesForBbox(bbox, zoomLevel) {
+  const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
+  const bboxCornerPoints = [{latitude: fence.north, longitude: fence.west}, {latitude: fence.south, longitude: fence.west}, {latitude: fence.north, longitude: fence.east}, {latitude: fence.south, longitude: fence.east}];
+  return bboxCornerPoints.map(point => deg2num(point.latitude, point.longitude, zoomLevel));
+}
+
+function tilesForLocations(locations, zoomLevel) {
+  return locations.map(points => deg2num(points[0], points[1], zoomLevel));
+}
+
 function fetchTiles(args, tiles, resolve, reject) {
   const query = makeComputedTilesForTilesQuery(args, tiles);
 
@@ -102,10 +112,8 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
-    const fence = {north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]};
-    const bboxCornerPoints = [{latitude: fence.north, longitude: fence.west}, {latitude: fence.south, longitude: fence.west}, {latitude: fence.north, longitude: fence.east}, {latitude: fence.south, longitude: fence.east}];
-    const tilesInBbox = bboxCornerPoints.map(point => deg2num(point.latitude, point.longitude, args.zoomLevel));
-    fetchTiles(args, tilesInBbox, resolve, reject);
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    fetchTiles(args, tiles, resolve, reject);
   });
 }
 
@@ -119,8 +127,8 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
     if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch tiles');
 
-    const tilesForLocations = args.locations.map(points => deg2num(points[0], points[1], args.zoomLevel));
-    fetchTiles(args, tilesForLocations, resolve, reject);
+    const tiles = tilesForLocations(args.locations, args.zoomLevel);
+    fetchTiles(args, tiles, resolve, reject);
   });
 }
 
