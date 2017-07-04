@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 export DEIS_PROFILE="/root/.deis/client.json"
+eval "$(ssh-agent -s)"
+ssh-add ../../deis_certs
 
 cd project-fortis-services || exit -2
 git push deis master

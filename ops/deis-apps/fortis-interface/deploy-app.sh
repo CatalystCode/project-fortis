@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 export DEIS_PROFILE="/root/.deis/client.json"
+eval "$(ssh-agent -s)"
+ssh-add ../../deis_certs
 
 readonly CUSTOM_REACT_CREATE_APP_BP="https://github.com/heroku/heroku-buildpack-static.git"
 cd project-fortis-interfaces || exit -2
