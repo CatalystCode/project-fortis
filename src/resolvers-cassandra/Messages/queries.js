@@ -46,7 +46,7 @@ function makeMap(array, keyFunc, valueFunc) {
 
 function appendDefaultFilters(args, query, params) {
   if (args.mainTerm) {
-    query += ' AND detectedkeywords CONTAINS ?';
+    query += ' AND (detectedkeywords CONTAINS ?)';
     params.push(args.mainTerm);
   }
 
@@ -57,26 +57,26 @@ function appendDefaultFilters(args, query, params) {
   }
 
   if (args.fromDate) {
-    query += ' AND event_time >= ?';
+    query += ' AND (event_time >= ?)';
     params.push(args.fromDate);
   }
 
   if (args.toDate) {
-    query += ' AND event_time <= ?';
+    query += ' AND (event_time <= ?)';
     params.push(args.toDate);
   }
 
   if (args.langCode) {
-    query += ' AND eventlangcode = ?';
+    query += ' AND (eventlangcode = ?)';
     params.push(args.langCode);
   }
 
   if (args.originalSource) {
-    query += ' AND sourceid = ?';
+    query += ' AND (sourceid = ?)';
     params.push(args.originalSource);
   }
 
-  query += ' AND pipeline IN ("Twitter", "Facebook", "Instagram", "Radio", "Reddit")';
+  query += ' AND (pipeline IN ("Twitter", "Facebook", "Instagram", "Radio", "Reddit"))';
 
   return {query: query, params: params};
 }
