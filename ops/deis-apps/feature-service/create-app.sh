@@ -6,6 +6,7 @@ git clone ${fortis_feature_svc_gh_repo}
 
 cd featureService || exit -2
 
+echo "DEIS_PROFILE: ${DEIS_PROFILE}"
 deis create feature-service
 deis git:remote --force --remote deis --app feature-service
 #deis certs:attach fortis fortis-services
