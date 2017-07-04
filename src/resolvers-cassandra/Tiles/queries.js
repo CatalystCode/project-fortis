@@ -231,6 +231,22 @@ function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-var
  * @returns {Promise.<{runTime: string, edges: Array<{type: string, name: string, mentionCount: string}>}>}
  */
 function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.bbox) return reject('No bounding box for which to fetch edges specified');
+    if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch edges specified');
+    if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
+
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const query = makeComputedTilesForTilesQuery(args, tiles);
+    cassandraConnector.executeQuery(query.query, query.params)
+    .then(rows => {
+      const edges = cassandraRowsToEdges(rows);
+      resolve({
+        edges: edges
+      });
+    })
+    .catch(reject);
+  });
 }
 
 module.exports = {
