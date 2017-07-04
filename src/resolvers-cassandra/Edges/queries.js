@@ -2,7 +2,7 @@
 
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const featureServiceClient = require('../../clients/locations/featureServiceClient');
+const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
 
 function makeSiteBboxQuery(args) {
