@@ -26,6 +26,12 @@ function makeMap(iterable, keyFunc, valueFunc) {
   return map;
 }
 
+function makeSet(iterable, func) {
+  const set = new Set();
+  iterable.forEach(item => set.add(func(item)));
+  return set;
+}
+
 function makeDefaultFilters(args) {
   let params = [];
   let clauses = [];
@@ -73,14 +79,31 @@ function makeComputedTilesForTilesQuery(args, tiles) {
   return {query: query, params: params};
 }
 
+function makeComputedTilesForLocationIdsQuery(args, locationIds) {
+  let {clauses, params} = makeDefaultFilters(args);
+
+  clauses.push(`(${locationIds.map(_ => '(placeids CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+  params = params.concat(locationIds);
+
+  const query = `SELECT tileid, computedfeatures FROM computedtiles WHERE ${clauses.join(' AND ')}`;
+  return {query: query, params: params};
+}
+
 function tilesForBbox(bbox, zoomLevel) {
   const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
   const bboxCornerPoints = [{latitude: fence.north, longitude: fence.west}, {latitude: fence.south, longitude: fence.west}, {latitude: fence.north, longitude: fence.east}, {latitude: fence.south, longitude: fence.east}];
   return bboxCornerPoints.map(point => deg2num(point.latitude, point.longitude, zoomLevel));
 }
 
-function tilesForLocations(locations, zoomLevel) {
-  return locations.map(points => deg2num(points[0], points[1], zoomLevel));
+function fetchLocationIdsForPoints(points) {
+  return new Promise((resolve, reject) => {
+    Promise.all(points.map(point => featureServiceClient.fetchByPoint({latitude: point[0], longitude: point[1]})))
+    .then(locations => {
+      const locationIds = makeSet(locations, location => location.id);
+      resolve(locationIds);
+    })
+    .catch(reject);
+  });
 }
 
 function cassandraRowsToFeatures(rows) {
@@ -128,17 +151,19 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
 function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch tiles');
-    if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
     if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch tiles');
 
-    const tiles = tilesForLocations(args.locations, args.zoomLevel);
-    const query = makeComputedTilesForTilesQuery(args, tiles);
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
-      const features = cassandraRowsToFeatures(rows);
-      resolve({
-        features: features
-      });
+    fetchLocationIdsForPoints(args.locations)
+    .then(locationIds => {
+      const query = makeComputedTilesForLocationIdsQuery(args, locationIds);
+      cassandraConnector.executeQuery(query.query, query.params)
+      .then(rows => {
+        const features = cassandraRowsToFeatures(rows);
+        resolve({
+          features: features
+        });
+      })
+      .catch(reject);
     })
     .catch(reject);
   });
