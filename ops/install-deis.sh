@@ -55,7 +55,7 @@ deis whoami
 
 echo "Adding deis public key"
 ssh-keygen -t rsa -N "" -f "./deis_certs" -V "+365d"
-eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan -t rsa -p 2222 "${DEIS_BUILDER_HOSTNAME}" >> ~/.ssh/known_hosts
+eval "$(ssh-agent -s)" && ssh-add ./deis_certs && ssh-keyscan -t rsa -p 2222 "http://deis.13.92.93.24.nip.io" >> ~/.ssh/known_hosts
 deis keys:add deis_certs.pub
 deis keys:list
 

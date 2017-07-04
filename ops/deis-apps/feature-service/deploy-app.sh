@@ -2,6 +2,7 @@
 export DEIS_PROFILE="/root/.deis/client.json"
 eval "$(ssh-agent -s)"
 ssh-add ./deis_certs
+deis keys:add deis_certs.pub
 
 cd featureService || exit -2
 
