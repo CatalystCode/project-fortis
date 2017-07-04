@@ -26,16 +26,9 @@ function makeMap(iterable, keyFunc, valueFunc) {
   return map;
 }
 
-function makeComputedTilesForTilesQuery(args, tiles) {
+function makeDefaultFilters(args) {
   let params = [];
   let clauses = [];
-
-  tiles.forEach(tile => {
-    clauses.push('(tilex = ? AND tiley = ? AND tilez = ?)');
-    params.push(tile.tilex);
-    params.push(tile.tiley);
-    params.push(tile.tilez);
-  });
 
   const keywords = (args.filteredEdges || []).concat(args.mainEdge ? [args.mainEdge] : []);
   if (keywords.length) {
@@ -62,6 +55,19 @@ function makeComputedTilesForTilesQuery(args, tiles) {
     clauses.push('(periodtype = ?)');
     params.push(args.timespan);
   }
+
+  return {clauses: clauses, params: params};
+}
+
+function makeComputedTilesForTilesQuery(args, tiles) {
+  const {clauses, params} = makeDefaultFilters(args);
+
+  tiles.forEach(tile => {
+    clauses.push('(tilex = ? AND tiley = ? AND tilez = ?)');
+    params.push(tile.tilex);
+    params.push(tile.tiley);
+    params.push(tile.tilez);
+  });
 
   const query = `SELECT tileid, computedfeatures FROM computedtiles WHERE ${clauses.join(' AND ')}`;
   return {query: query, params: params};
