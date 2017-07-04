@@ -3,6 +3,7 @@
 readonly fortis_interface_gh_repo=https://github.com/CatalystCode/project-fortis-interfaces
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install -y nodejs
+export DEIS_PROFILE="/root/.deis/client.json"
 
 git clone ${fortis_interface_gh_repo}
 

@@ -3,6 +3,7 @@
 readonly fortis_feature_svc_gh_repo=https://github.com/CatalystCode/featureService.git
 
 git clone ${fortis_feature_svc_gh_repo}
+export DEIS_PROFILE="/root/.deis/client.json"
 
 cd featureService || exit -2
 
