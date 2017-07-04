@@ -77,29 +77,19 @@ function tilesForLocations(locations, zoomLevel) {
   return locations.map(points => deg2num(points[0], points[1], zoomLevel));
 }
 
-function fetchTiles(args, tiles, resolve, reject) {
-  const query = makeComputedTilesForTilesQuery(args, tiles);
-
-  cassandraConnector.executeQuery(query.query, query.params)
-  .then(rows => {
-    const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
-    const features = Object.keys(rowsByTileId).map(tileId => {
-      const row = rowsByTileId[tileId];
-      return {
-        properties: {
-          pos_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.pos_avg,
-          neg_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.neg_avg,
-          mentionCount: row.computedfeatures && row.computedfeatures.mentions,
-          tileId: tileId
-        }
-      };
-    });
-
-    resolve({
-      features: features
-    });
-  })
-  .catch(reject);
+function cassandraRowsToFeatures(rows) {
+  const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
+  return Object.keys(rowsByTileId).map(tileId => {
+    const row = rowsByTileId[tileId];
+    return {
+      properties: {
+        pos_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.pos_avg,
+        neg_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.neg_avg,
+        mentionCount: row.computedfeatures && row.computedfeatures.mentions,
+        tileId: tileId
+      }
+    };
+  });
 }
 
 /**
@@ -113,7 +103,15 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    fetchTiles(args, tiles, resolve, reject);
+    const query = makeComputedTilesForTilesQuery(args, tiles);
+    cassandraConnector.executeQuery(query.query, query.params)
+    .then(rows => {
+      const features = cassandraRowsToFeatures(rows);
+      resolve({
+        features: features
+      });
+    })
+    .catch(reject);
   });
 }
 
@@ -128,7 +126,15 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
     if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch tiles');
 
     const tiles = tilesForLocations(args.locations, args.zoomLevel);
-    fetchTiles(args, tiles, resolve, reject);
+    const query = makeComputedTilesForTilesQuery(args, tiles);
+    cassandraConnector.executeQuery(query.query, query.params)
+    .then(rows => {
+      const features = cassandraRowsToFeatures(rows);
+      resolve({
+        features: features
+      });
+    })
+    .catch(reject);
   });
 }
 
