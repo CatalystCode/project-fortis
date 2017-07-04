@@ -35,7 +35,7 @@ readonly DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly DEIS_TOKEN_FILE="/root/.deis/client.json"
 
 echo "Registering Deis Load Balancer"
-deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io --ssl-verify=false
+sudo deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
 
 deis logs
 deis apps
@@ -45,7 +45,7 @@ while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
     host "${DEIS_HOSTNAME_URL}"
     curl "${DEIS_HOSTNAME_URL}/v2/" && echo
     sleep 10
-    timeout 5 sudo deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
+    deis auth:login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 done
 
 deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
