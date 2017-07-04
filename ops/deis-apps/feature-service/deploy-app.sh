@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 export DEIS_PROFILE="/root/.deis/client.json"
+eval "$(ssh-agent -s)"
+ssh-add ../../deis_certs
 
 cd featureService || exit -2
 
