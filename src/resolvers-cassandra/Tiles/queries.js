@@ -67,6 +67,31 @@ function makeComputedTilesForTilesQuery(args, tiles) {
   return {query: query, params: params};
 }
 
+function fetchTiles(args, tiles, resolve, reject) {
+  const query = makeComputedTilesForTilesQuery(args, tiles);
+
+  cassandraConnector.executeQuery(query.query, query.params)
+  .then(rows => {
+    const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
+    const features = Object.keys(rowsByTileId).map(tileId => {
+      const row = rowsByTileId[tileId];
+      return {
+        properties: {
+          pos_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.pos_avg,
+          neg_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.neg_avg,
+          mentionCount: row.computedfeatures && row.computedfeatures.mentions,
+          tileId: tileId
+        }
+      };
+    });
+
+    resolve({
+      features: features
+    });
+  })
+  .catch(reject);
+}
+
 /**
  * @param {{site: string, bbox: number[], mainEdge: string, filteredEdges: string[], timespan: string, zoomLevel: number, layertype: string, sourceFilter: string[], fromDate: string, toDate: string}} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Array<{type: string, coordinates: number[], properties: {mentionCount: number, location: string, population: number, neg_sentiment: number, pos_sentiment: number, tileId: string}}>}>}
@@ -80,28 +105,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     const fence = {north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]};
     const bboxCornerPoints = [{latitude: fence.north, longitude: fence.west}, {latitude: fence.south, longitude: fence.west}, {latitude: fence.north, longitude: fence.east}, {latitude: fence.south, longitude: fence.east}];
     const tilesInBbox = bboxCornerPoints.map(point => deg2num(point.latitude, point.longitude, args.zoomLevel));
-    const query = makeComputedTilesForTilesQuery(args, tilesInBbox);
-
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
-      const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
-      const features = Object.keys(rowsByTileId).map(tileId => {
-        const row = rowsByTileId[tileId];
-        return {
-          properties: {
-            pos_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.pos_avg,
-            neg_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.neg_avg,
-            mentionCount: row.computedfeatures && row.computedfeatures.mentions,
-            tileId: tileId
-          }
-        };
-      });
-
-      resolve({
-        features: features
-      });
-    })
-    .catch(reject);
+    fetchTiles(args, tilesInBbox, resolve, reject);
   });
 }
 
