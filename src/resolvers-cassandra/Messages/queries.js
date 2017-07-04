@@ -44,48 +44,55 @@ function makeMap(array, keyFunc, valueFunc) {
   return map;
 }
 
-function appendDefaultFilters(args, query, params) {
+function makeDefaultClauses(args) {
+  let params = [];
+  const clauses = [];
+
   if (args.mainTerm) {
-    query += ' AND (detectedkeywords CONTAINS ?)';
+    clauses.push('(detectedkeywords CONTAINS ?)');
     params.push(args.mainTerm);
   }
 
   if (args.filteredEdges) {
-    const edgesCondition = args.filteredEdges.map(_ => 'detectedkeywords CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
-    query += ` AND (${edgesCondition})`;
+    clauses.push(`(${args.filteredEdges.map(_ => '(detectedkeywords CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
     params = params.concat(args.filteredEdges);
   }
 
   if (args.fromDate) {
-    query += ' AND (event_time >= ?)';
+    clauses.push('(event_time >= ?)');
     params.push(args.fromDate);
   }
 
   if (args.toDate) {
-    query += ' AND (event_time <= ?)';
+    clauses.push('(event_time <= ?)');
     params.push(args.toDate);
   }
 
   if (args.langCode) {
-    query += ' AND (eventlangcode = ?)';
+    clauses.push('(eventlangcode = ?)');
     params.push(args.langCode);
   }
 
   if (args.originalSource) {
-    query += ' AND (sourceid = ?)';
+    clauses.push('(sourceid = ?)');
     params.push(args.originalSource);
   }
 
-  query += ' AND (pipeline IN ("Twitter", "Facebook", "Instagram", "Radio", "Reddit"))';
+  clauses.push('(pipeline IN ("Twitter", "Facebook", "Instagram", "Radio", "Reddit"))');
 
-  return {query: query, params: params};
+  return {clauses: clauses, params: params};
 }
 
 function makePlacesQuery(args, placeIds) {
-  const placesCondition = placeIds.map(_ => 'detectedplaceids CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
-  const query = `SELECT * FROM fortis.events WHERE (${placesCondition})`;
-  const params = placeIds.slice();
-  return appendDefaultFilters(args, query, params);
+  const defaults = makeDefaultClauses(args);
+  const clauses = defaults.clauses;
+  let params = defaults.params;
+
+  clauses.push(`(${placeIds.map(_ => '(detectedplaceids CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+  params = params.concat(placeIds);
+
+  const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+  return {query: query, params: params};
 }
 
 /**
@@ -149,12 +156,12 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function makeEdgesQuery(args) {
-  const query = '';
-  const params = [];
-  const filters = appendDefaultFilters(args, query, params);
-  filters.query = filters.query.substr(' AND '.length);
-  filters.query = `SELECT * FROM fortis.events WHERE ${filters.query}`;
-  return filters;
+  const defaults = makeDefaultClauses(args);
+  const clauses = defaults.clauses;
+  const params = defaults.params;
+
+  const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+  return {query: query, params: params};
 }
 
 /**
