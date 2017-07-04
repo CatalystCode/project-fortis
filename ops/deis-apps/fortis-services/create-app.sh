@@ -3,6 +3,7 @@
 readonly fortis_service_gh_repo=https://github.com/CatalystCode/project-fortis-services.git
 
 git clone ${fortis_service_gh_repo}
+export DEIS_PROFILE="/root/.deis/client.json"
 
 cd project-fortis-services || exit -2
 deis create fortis-services

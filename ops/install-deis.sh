@@ -13,7 +13,6 @@ id
 sudo az storage account create -n "${DEIS_STORAGE_ACCOUNT_NAME}" -l "${k8location}" -g "${k8resource_group}" --sku Standard_LRS
 DEIS_STORAGE_ACCOUNT_KEY="$(az storage account keys list -n "${DEIS_STORAGE_ACCOUNT_NAME}" -g "${k8resource_group}" --query [0].value --output tsv)"
 export DEIS_STORAGE_ACCOUNT_KEY
-export DEIS_PROFILE="/root/.deis/client.json"
 
 echo "starting deis installation using helm"
 helm repo add deis https://charts.deis.com/workflow
