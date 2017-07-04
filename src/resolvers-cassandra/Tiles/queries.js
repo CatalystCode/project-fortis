@@ -114,6 +114,14 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Array<{type: string, coordinates: number[], properties: {mentionCount: number, location: string, population: number, neg_sentiment: number, pos_sentiment: number, tileId: string}}>}>}
  */
 function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch tiles');
+    if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
+    if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch tiles');
+
+    const tilesForLocations = args.locations.map(points => deg2num(points[0], points[1], args.zoomLevel));
+    fetchTiles(args, tilesForLocations, resolve, reject);
+  });
 }
 
 /**
