@@ -1,5 +1,7 @@
 'use strict';
 
+const Promise = require('promise');
+const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
 
 /**
@@ -21,6 +23,20 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Array<{coordinate: number[], name: string, id: string, population: number, kind: string, tileId: string, source: string>}>}
  */
 function fetchPlacesByBBox(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.bbox) return reject('No bounding box for which to fetch places specified');
+    if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch places specified');
+
+    featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
+    .then(places => {
+      const features = places.map(place => ({coordinate: place.bbox, name: place.name, id: place.id}));
+      resolve({
+        features: features,
+        bbox: args.bbox
+      });
+    })
+    .catch(reject);
+  });
 }
 
 /**
