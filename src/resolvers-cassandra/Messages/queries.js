@@ -36,7 +36,7 @@ function makeMap(array, keyFunc, valueFunc) {
   valueFunc = valueFunc || (x => x);
 
   const map = {};
-  array.foreach(item => {
+  array.forEach(item => {
     const key = keyFunc(item);
     const value = valueFunc(item);
     map[key] = value;
@@ -167,7 +167,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       const placeIds = new Set();
-      rows.foreach(row => row.detectedplaceids.foreach(placeId => placeIds.add(placeId)));
+      rows.forEach(row => row.detectedplaceids.forEach(placeId => placeIds.add(placeId)));
       featureServiceClient.fetchById(placeIds)
       .then(places => {
         const idToBbox = makeMap(places, place => place.id, place => place.bbox);
