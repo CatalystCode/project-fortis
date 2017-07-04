@@ -85,7 +85,7 @@ function makeComputedTilesForLocationIdsQuery(args, locationIds) {
   clauses.push(`(${locationIds.map(_ => '(placeids CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
   params = params.concat(locationIds);
 
-  const query = `SELECT tileid, computedfeatures FROM computedtiles WHERE ${clauses.join(' AND ')}`;
+  const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')}`;
   return {query: query, params: params};
 }
 
@@ -103,6 +103,17 @@ function fetchLocationIdsForPoints(points) {
       resolve(locationIds);
     })
     .catch(reject);
+  });
+}
+
+function cassandraRowsToEdges(rows) {
+  const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
+  return Object.keys(rowsByTileId).map(tileId => {
+    const row = rowsByTileId[tileId];
+    return {
+      mentionCount: row.computedfeatures && row.computedfeatures.mentions,
+      name: row.topic
+    };
   });
 }
 
@@ -195,6 +206,24 @@ function fetchPlacesByBBox(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, edges: Array<{type: string, name: string, mentionCount: string}>}>}
  */
 function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch edges');
+    if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch edges');
+
+    fetchLocationIdsForPoints(args.locations)
+    .then(locationIds => {
+      const query = makeComputedTilesForLocationIdsQuery(args, locationIds);
+      cassandraConnector.executeQuery(query.query, query.params)
+      .then(rows => {
+        const edges = cassandraRowsToEdges(rows);
+        resolve({
+          edges: edges
+        });
+      })
+      .catch(reject);
+    })
+    .catch(reject);
+  });
 }
 
 /**
