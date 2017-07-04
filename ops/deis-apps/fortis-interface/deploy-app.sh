@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DEIS_PROFILE="/root/.deis/client.json"
+
 readonly CUSTOM_REACT_CREATE_APP_BP="https://github.com/heroku/heroku-buildpack-static.git"
 cd project-fortis-interfaces || exit -2
 
