@@ -9,6 +9,7 @@ sudo ln -fs "${PWD}/deis" /usr/local/bin/deis
 
 echo "creating deis storage account ${k8location}"
 id
+export HOME="/root/"
 echo "Home dir: ${HOME}"
 
 sudo az storage account create -n "${DEIS_STORAGE_ACCOUNT_NAME}" -l "${k8location}" -g "${k8resource_group}" --sku Standard_LRS
@@ -34,9 +35,11 @@ echo "DEIS_ROUTER_HOST_ROOT is set to ${DEIS_ROUTER_HOST_ROOT}"
 readonly DEIS_HOSTNAME_URL="http://deis.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly DEIS_TOKEN_FILE="/root/.deis/client.json"
+readonly DEIS_USERNAME="deis-admin"
+readonly DEIS_PWD="hercules123"
 
 echo "Registering Deis Load Balancer"
-deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
+sudo deis register "${DEIS_HOSTNAME_URL}" --username="${DEIS_USERNAME}" --password="${DEIS_PWD}" --email="newuser@deis.io"
 
 deis logs
 deis apps
@@ -46,10 +49,9 @@ while [ ! -s "${DEIS_TOKEN_FILE}" ]; do
     host "${DEIS_HOSTNAME_URL}"
     curl "${DEIS_HOSTNAME_URL}/v2/" && echo
     sleep 10
-    deis auth:login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
+    deis auth:login "${DEIS_HOSTNAME_URL}" --username="${DEIS_USERNAME}" --password="${DEIS_PWD}"
 done
 
-deis login "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test
 echo 'Deis whoami'
 deis whoami
 
