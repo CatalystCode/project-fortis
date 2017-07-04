@@ -35,7 +35,7 @@ readonly DEIS_BUILDER_HOSTNAME="deis-builder.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly DEIS_TOKEN_FILE="/root/.deis/client.json"
 
 echo "Registering Deis Load Balancer"
-sudo deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
+deis register "${DEIS_HOSTNAME_URL}" --username=deis-admin --password=test --email=newuser@deis.io
 
 deis logs
 deis apps
