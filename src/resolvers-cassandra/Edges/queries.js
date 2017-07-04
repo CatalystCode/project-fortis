@@ -12,11 +12,49 @@ function makeSiteBboxQuery(args) {
   };
 }
 
+function makeTermsQuery(args) {
+  let clauses = [];
+  let params = [];
+
+  if (args.fromDate) {
+    clauses.push('(event_time >= ?)');
+    params.push(args.fromDate);
+  }
+
+  if (args.toDate) {
+    clauses.push('(event_time <= ?)');
+    params.push(args.toDate);
+  }
+
+  if (args.sourceFilter && args.sourceFilter.length) {
+    clauses.push(`(${args.sourceFilter.map(_ => '(pipeline = ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+    params = params.concat(args.sourceFilter);
+  }
+
+  let query = `SELECT detectedkeywords FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+  return {query: query, params: params};
+}
+
 /**
  * @param {{site: string, query: string, fromDate: string, toDate: string, sourceFilter: string[]}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
  */
 function terms(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args) return reject('No args specified');
+
+    const query = makeTermsQuery(args);
+    cassandraConnector.executeQuery(query.query, query.params)
+    .then(rows => {
+      const keywords = new Set();
+      rows.forEach(row => row.detectedkeywords.forEach(keyword => keywords.add(keyword)));
+
+      return {
+        keywords: Array.from(keywords)
+      };
+    })
+    .catch(reject);
+  });
 }
 
 /**
@@ -27,8 +65,8 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.site) return reject('No site specified for which to lookup locations');
 
-    const siteQuery = makeSiteBboxQuery(args);
-    cassandraConnector.executeQuery(siteQuery.query, siteQuery.params)
+    const query = makeSiteBboxQuery(args);
+    cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       if (!rows || !rows.length) return reject(`No geofence configured for site ${args.site}`);
       if (rows.length > 1) return reject(`More than one geofence configured for site ${args.site}`);
