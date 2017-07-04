@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+export DEIS_PROFILE="/root/.deis/client.json"
 
 cd featureService || exit -2
 
