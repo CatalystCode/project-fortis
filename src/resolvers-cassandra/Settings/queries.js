@@ -54,11 +54,29 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
 function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
 }
 
+function cassandraRowToTrustedTwitterAccount(row) {
+  return {
+    RowKey: `${row.connector},${row.sourceid},${row.sourcetype}`,
+    acctUrl: row.sourceid
+  };
+}
+
 /**
  * @param {{siteId: string}} args
  * @returns {Promise.<{runTime: string, accounts: Array<{RowKey: string, acctUrl: string}>}>}
  */
 function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const sourcesByConnector = 'SELECT * FROM fortis.trustedsources WHERE connector = ?';
+    cassandraConnector.executeQuery(sourcesByConnector, ['twitter'])
+    .catch(reject)
+    .then(rows => {
+      const accounts = rows.map(cassandraRowToTrustedTwitterAccount);
+      resolve({accounts:accounts});
+    })
+    .catch(reject)
+    ;
+  });
 }
 
 /**
