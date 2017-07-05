@@ -1,5 +1,6 @@
 'use strict';
 
+const Promise = require('promise');
 const request = require('request');
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 
