@@ -43,7 +43,7 @@ curl "${pg_dump}" | gunzip --to-stdout > "${dbdump}"
 echo "Finished. Now populating the database"
 pg_host="$(az postgres server show --resource-group "${resource_group}" --name "${pg_name}" | jq -r '.fullyQualifiedDomainName')"
 
-echo "CREATE DATABASE ${pg_dbname}; CREATE USER ${pg_user} PASSWORD '${pg_user_password}';" | \
+echo "CREATE DATABASE ${pg_dbname}; CREATE USER ${pg_user} WITH login PASSWORD '${pg_user_password}';" | \
 PGPASSWORD="${pg_admin_password}" psql \
   --host "${pg_host}" \
   --port 5432 \
