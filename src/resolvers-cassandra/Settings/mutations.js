@@ -1,5 +1,7 @@
 'use strict';
 
+const withRunTime = require('../shared').withRunTime;
+
 /**
  * @param {{input: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
  * @returns {Promise.<{name: string, properties: {targetBBox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}
@@ -65,12 +67,12 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 module.exports = {
   createOrReplaceSite: createOrReplaceSite,
-  modifyFacebookPages: modifyFacebookPages,
-  removeFacebookPages: removeFacebookPages,
-  modifyTrustedTwitterAccounts: modifyTrustedTwitterAccounts,
-  removeTrustedTwitterAccounts: removeTrustedTwitterAccounts,
-  modifyTwitterAccounts: modifyTwitterAccounts,
-  removeTwitterAccounts: removeTwitterAccounts,
-  modifyBlacklist: modifyBlacklist,
-  removeBlacklist: removeBlacklist
+  modifyFacebookPages: withRunTime(modifyFacebookPages),
+  removeFacebookPages: withRunTime(removeFacebookPages),
+  modifyTrustedTwitterAccounts: withRunTime(modifyTrustedTwitterAccounts),
+  removeTrustedTwitterAccounts: withRunTime(removeTrustedTwitterAccounts),
+  modifyTwitterAccounts: withRunTime(modifyTwitterAccounts),
+  removeTwitterAccounts: withRunTime(removeTwitterAccounts),
+  modifyBlacklist: withRunTime(modifyBlacklist),
+  removeBlacklist: withRunTime(removeBlacklist)
 };

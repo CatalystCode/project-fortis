@@ -1,5 +1,7 @@
 'use strict';
 
+const withRunTime = require('../shared').withRunTime;
+
 /**
  * @param {{site: string, bbox: number[], mainEdge: string, filteredEdges: string[], timespan: string, zoomLevel: number, layertype: string, sourceFilter: string[], fromDate: string, toDate: string}} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Array<{type: string, coordinates: number[], properties: {mentionCount: number, location: string, population: number, neg_sentiment: number, pos_sentiment: number, tileId: string}}>}>}
@@ -36,9 +38,9 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  fetchTilesByBBox: fetchTilesByBBox,
-  fetchTilesByLocations: fetchTilesByLocations,
-  fetchPlacesByBBox: fetchPlacesByBBox,
-  fetchEdgesByLocations: fetchEdgesByLocations,
-  fetchEdgesByBBox: fetchEdgesByBBox
+  fetchTilesByBBox: withRunTime(fetchTilesByBBox),
+  fetchTilesByLocations: withRunTime(fetchTilesByLocations),
+  fetchPlacesByBBox: withRunTime(fetchPlacesByBBox),
+  fetchEdgesByLocations: withRunTime(fetchEdgesByLocations),
+  fetchEdgesByBBox: withRunTime(fetchEdgesByBBox)
 };

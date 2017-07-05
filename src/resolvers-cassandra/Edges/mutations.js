@@ -1,5 +1,7 @@
 'use strict';
 
+const withRunTime = require('../shared').withRunTime;
+
 /**
  * @param {{input: {site: string, edges: Array<{name: string}>}}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
@@ -43,8 +45,8 @@ function removeLocations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  removeKeywords: removeKeywords,
-  addKeywords: addKeywords,
-  saveLocations: saveLocations,
-  removeLocations: removeLocations
+  removeKeywords: withRunTime(removeKeywords),
+  addKeywords: withRunTime(addKeywords),
+  saveLocations: withRunTime(saveLocations),
+  removeLocations: withRunTime(removeLocations)
 };
