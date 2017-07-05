@@ -2,6 +2,7 @@
 
 const Promise = require('promise');
 const request = require('request');
+const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 const accessToken = process.env.FACEBOOK_AUTH_TOKEN;
 const apiUrlBase = process.env.FACEBOOK_API_HOST || 'https://graph.facebook.com';
@@ -37,5 +38,5 @@ function fetchPageLastUpdatedAt(pageId) {
 }
 
 module.exports = {
-  fetchPageLastUpdatedAt: fetchPageLastUpdatedAt
+  fetchPageLastUpdatedAt: trackDependency(fetchPageLastUpdatedAt, 'Facebook', 'pageLastUpdatedAt')
 };

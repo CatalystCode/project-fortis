@@ -2,6 +2,7 @@
 
 const Promise = require('promise');
 const request = require('request');
+const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 const apiUrlBase = process.env.FORTIS_FEATURE_SERVICE_HOST;
 
@@ -80,8 +81,8 @@ function fetchById(id) {
 }
 
 module.export = {
-  fetchById: fetchById,
-  fetchByBbox: fetchByBbox,
-  fetchByPoint: fetchByPoint,
-  fetchByName: fetchByName
+  fetchById: trackDependency(fetchById, 'FeatureService', 'fetchById'),
+  fetchByBbox: trackDependency(fetchByBbox, 'FeatureService', 'fetchByBbox'),
+  fetchByPoint: trackDependency(fetchByPoint, 'FeatureService', 'fetchByPoint'),
+  fetchByName: trackDependency(fetchByName, 'FeatureService', 'fetchByName')
 };
