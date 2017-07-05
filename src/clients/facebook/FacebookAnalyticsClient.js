@@ -4,10 +4,10 @@ const Promise = require('promise');
 const request = require('request');
 
 const accessToken = process.env.FACEBOOK_AUTH_TOKEN;
-const apiHost = process.env.FACEBOOK_API_HOST || 'https://graph.facebook.com';
+const apiUrlBase = process.env.FACEBOOK_API_HOST || 'https://graph.facebook.com';
 
 function buildFeedUri(pageId) {
-  return `${apiHost}/v2.9/${pageId}/feed`
+  return `${apiUrlBase}/v2.9/${pageId}/feed`
     + `?access_token=${accessToken}`
     + '&format=json';
 }
