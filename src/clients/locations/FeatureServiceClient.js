@@ -10,7 +10,7 @@ function formatIdsUri(ids) {
 }
 
 function formatBboxUri(north, west, south, east) {
-  return `${apiUrlBase}/features/bbox/${north}/${west}/${south}/${east}`;
+  return `${apiUrlBase}/features/bbox/${north}/${west}/${south}/${east}?include=bbox`;
 }
 
 function formatPointUri(latitude, longitude) {
