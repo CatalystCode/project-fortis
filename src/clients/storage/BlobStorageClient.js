@@ -1,10 +1,10 @@
 'use strict';
 
 const request = require('request');
-const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net/';
+const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 
 function buildTopicsSiteTypeUri(siteType) {
-  return `${apiUrlBase}settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+  return `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
 }
 
 /**
