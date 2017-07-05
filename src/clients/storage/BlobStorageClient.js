@@ -11,7 +11,7 @@ function buildTopicsSiteTypeUri(siteType) {
  * @param {string} siteType
  * @returns {Promise.<Array<{keyword: string, lang_code: string, insertion_time: timestamp, translations: Map<string, string>}>>}
 */
-function getTopicsBySiteType(siteType) {
+function fetchTopicsBySiteType(siteType) {
   return new Promise((resolve, reject) => {
     request.get(buildTopicsSiteTypeUri(siteType), (err, response, body) => {
       if(err || response.statusCode !== 200) {
@@ -31,5 +31,5 @@ function getTopicsBySiteType(siteType) {
 }
 
 module.exports = {
-  getTopicsBySiteType: getTopicsBySiteType
+  fetchTopicsBySiteType: fetchTopicsBySiteType
 };

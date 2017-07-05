@@ -10,7 +10,7 @@ chai.use(chaiAsPromised);
 
 describe('Tests for BlobStorageClient.js', function() {
 
-  describe('#getTopicsBySiteType(siteType)', function() {
+  describe('#fetchTopicsBySiteType(siteType)', function() {
     let response = {statusCode: 200};
     let body = [
       {keyword: 'aid', lang_code: 'en'},
@@ -29,7 +29,7 @@ describe('Tests for BlobStorageClient.js', function() {
 
     it('should return an array of topics', function() {
       let siteType = 'humanitarian';
-      return blobStorageClient.getTopicsBySiteType(siteType).should.eventually.deep.equal(body);
+      return blobStorageClient.fetchTopicsBySiteType(siteType).should.eventually.deep.equal(body);
     });
   });
 
