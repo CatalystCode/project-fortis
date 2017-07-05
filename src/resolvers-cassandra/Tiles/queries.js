@@ -4,17 +4,7 @@ const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
-
-/**
- * @see http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python
- */
-function deg2num(lat_deg, lon_deg, zoom) {
-  const lat_rad = lat_deg * Math.PI / 180;
-  const n = Math.pow(2, zoom);
-  const xtile = Math.floor((lon_deg + 180) / 360 * n);
-  const ytile = Math.floor((1 - Math.log(Math.tan(lat_rad) + (1 / Math.cos(lat_rad))) / Math.PI) / 2 * n);
-  return {tilex: xtile, tiley: ytile, tilez: zoom};
-}
+const geotile = require('geotile');
 
 function makeMap(iterable, keyFunc, valueFunc) {
   const map = {};
@@ -65,14 +55,12 @@ function makeDefaultFilters(args) {
   return {clauses: clauses, params: params};
 }
 
-function makeTilesQuery(args, tiles) {
+function makeTilesQuery(args, tileIds) {
   const {clauses, params} = makeDefaultFilters(args);
 
-  tiles.forEach(tile => {
-    clauses.push('(tilex = ? AND tiley = ? AND tilez = ?)');
-    params.push(tile.tilex);
-    params.push(tile.tiley);
-    params.push(tile.tilez);
+  tileIds.forEach(tileId => {
+    clauses.push('(tileid = ?)');
+    params.push(tileId);
   });
 
   const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')}`;
@@ -89,10 +77,9 @@ function makeLocationsQuery(args, locationIds) {
   return {query: query, params: params};
 }
 
-function tilesForBbox(bbox, zoomLevel) {
+function tileIdsForBbox(bbox, zoomLevel) {
   const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
-  const bboxCornerPoints = [{latitude: fence.north, longitude: fence.west}, {latitude: fence.south, longitude: fence.west}, {latitude: fence.north, longitude: fence.east}, {latitude: fence.south, longitude: fence.east}];
-  return bboxCornerPoints.map(point => deg2num(point.latitude, point.longitude, zoomLevel));
+  return geotile.tileIdsForBoundingBox(fence, zoomLevel);
 }
 
 function fetchLocationIdsForPoints(points) {
@@ -142,8 +129,8 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
-    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    const query = makeTilesQuery(args, tiles);
+    const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
+    const query = makeTilesQuery(args, tileIds);
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       const features = cassandraRowsToFeatures(rows);
@@ -236,8 +223,8 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch edges specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
 
-    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    const query = makeTilesQuery(args, tiles);
+    const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
+    const query = makeTilesQuery(args, tileIds);
     cassandraConnector.executeQuery(query.query, query.params)
     .then(rows => {
       const edges = cassandraRowsToEdges(rows);
