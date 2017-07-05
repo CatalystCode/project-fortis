@@ -1,5 +1,7 @@
 'use strict';
 
+const Promise = require('promise');
+const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
 
 /**
@@ -63,6 +65,20 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, filters: Array<{filteredTerms: string[], lang: string, RowKey: string}>}>}
  */
 function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args.input) return reject('No input specified');
+    if (!args.input.terms) return reject('No terms specified');
+    if (!args.input.terms.length) return reject('No terms specified');
+    const terms = args.input.terms;
+    const params = [terms.map( t => { return t.RowKey; } )];
+    const update = "delete from fortis.blacklist where id in ?";
+    cassandraConnector.executeQuery(update, params)
+    .then(rows => {
+      resolve({ filters: args.input.terms });
+    })
+    .catch(reject)
+    ;
+  });
 }
 
 module.exports = {
