@@ -3,9 +3,9 @@
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
-const array = require('lodash/array');
-const BATCH_LIMIT = process.env.BATCH_LIMIT || 10;
-const ASYNC_OPERATIONS_LIMIT = process.env.ASYNC_OPERATIONS_LIMIT || 50;
+const _ = require('lodash/array');
+const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
+const MAX_CONCURRENT_BATCHES = process.env.MAX_CONCURRENT_BATCHES || 50;
 const distance = cassandra.types.distance;
 const CORE_CONNECTIONS_PER_HOST_LOCAL = process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 1;
 const CORE_CONNECTIONS_PER_HOST_REMOTE = process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1;
@@ -28,9 +28,9 @@ const client = new cassandra.Client(options);
 function executeBatchMutations(mutations) {
   return new Promise((resolve, reject) => {
     if (!client) return reject('No Cassandra client defined');
-    if (!mutations || mutations.length == 0) return reject('No mutations defined');
+    if (!mutations || !mutations.length) return reject('No mutations defined');
   
-    let chunkedMutations = array.chunk(mutations, BATCH_LIMIT);
+    let chunkedMutations = _.chunk(mutations, BATCH_LIMIT);
 
     asyncEachLimit(chunkedMutations, ASYNC_OPERATIONS_LIMIT, (chunk, asyncCallback) => {
       client.batch(chunk, { prepare: true }, (err) => {
