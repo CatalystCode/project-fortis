@@ -55,7 +55,7 @@ function getAccessTokenForTranslation() {
   });
 }
 
-function TranslateSentenceArray(access_token, wordsToTranslate, fromLanguage, toLanguage) {
+function TranslateSentenceArrayWithToken(access_token, wordsToTranslate, fromLanguage, toLanguage) {
   const headers = {
     'Authorization': 'Bearer ' + access_token,
     'Content-Type':'text/xml; charset=utf-8'
@@ -87,7 +87,7 @@ function TranslateSentenceArray(access_token, wordsToTranslate, fromLanguage, to
   });
 }
 
-function TranslateSentence(access_token, sentence, fromLanguage, toLanguage) {
+function TranslateWithToken(access_token, sentence, fromLanguage, toLanguage) {
   var payload = { text: sentence, to: toLanguage, from: fromLanguage };
   var headers = { Authorization: 'Bearer ' + access_token };
 
@@ -113,33 +113,45 @@ function TranslateSentence(access_token, sentence, fromLanguage, toLanguage) {
   });
 }
 
+function translateSentenceArray(wordsToTranslate, fromLanguage, toLanguage) {
+  return new Promise((resolve, reject) => {
+    if (!TranslatorAccessTokenExpired()) {
+      TranslateSentenceArrayWithToken(memoryStore.get('translatorToken').token, wordsToTranslate, fromLanguage, toLanguage)
+      .then(result => resolve({ translatedSentence: result }))
+      .catch(reject);
+    } else {
+      getAccessTokenForTranslation()
+      .then(authBody => {
+        memoryStore.set('translatorToken', authBody);
+        TranslateSentenceArrayWithToken(authBody.token, wordsToTranslate, fromLanguage, toLanguage)
+        .then(result => resolve({ translatedSentence: result }))
+        .catch(reject);
+      })
+      .catch(reject);
+    }
+  });
+}
+
+function translate(sentence, fromLanguage, toLanguage) {
+  return new Promise((resolve, reject) => {
+    if (!TranslatorAccessTokenExpired()) {
+      TranslateWithToken(memoryStore.get('translatorToken').token, sentence, fromLanguage, toLanguage)
+      .then(result => resolve({ translatedSentence: result }))
+      .catch(reject);
+    } else {
+      getAccessTokenForTranslation()
+      .then(authBody => {
+        memoryStore.set('translatorToken', authBody);
+        TranslateWithToken(authBody.token, sentence, fromLanguage, toLanguage)
+        .then(result => resolve({ translatedSentence: result }))
+        .catch(reject);
+      })
+      .catch(reject);
+    }
+  });
+}
+
 module.exports = {
-  translateSentenceArray: function(wordsToTranslate, fromLanguage, toLanguage) {
-    return new Promise((resolve, reject) => {
-      if (!TranslatorAccessTokenExpired()) {
-        TranslateSentenceArray(memoryStore.get('translatorToken').token, wordsToTranslate, fromLanguage, toLanguage).then(
-                    result => resolve({ translatedSentence: result }), error => reject(error));
-      } else {
-        getAccessTokenForTranslation().then(authBody => {
-          memoryStore.set('translatorToken', authBody);
-          TranslateSentenceArray(authBody.token, wordsToTranslate, fromLanguage, toLanguage).then(
-                        result => resolve({ translatedSentence: result }), error => reject(error));
-        }, error => reject(error));
-      }
-    });
-  },
-  translate: function(sentence, fromLanguage, toLanguage) {
-    return new Promise((resolve, reject) => {
-      if (!TranslatorAccessTokenExpired()) {
-        TranslateSentence(memoryStore.get('translatorToken').token, sentence, fromLanguage, toLanguage).then(
-                    result => resolve({ translatedSentence: result }), error => reject(error));
-      } else {
-        getAccessTokenForTranslation().then(authBody => {
-          memoryStore.set('translatorToken', authBody);
-          TranslateSentence(authBody.token, sentence, fromLanguage, toLanguage).then(
-                        result => resolve({ translatedSentence: result }), error => reject(error));
-        }, error => reject(error));
-      }
-    });
-  }
+  translateSentenceArray: translateSentenceArray,
+  translate: translate
 };
