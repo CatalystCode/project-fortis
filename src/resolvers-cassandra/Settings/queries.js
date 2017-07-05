@@ -34,7 +34,6 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
 
     const siteById = 'SELECT * FROM fortis.sitesettings WHERE id = ?';
     cassandraConnector.executeQuery(siteById, [siteId])
-    .catch(reject)
     .then(rows => {
       if (rows.length < 1) return reject(`Could not find site with id ${siteId}`);
       if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with id '${siteId}'`);
@@ -42,8 +41,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
       const site = cassandraRowToSite(rows[0]);
       resolve({sites:[site]});
     })
-    .catch(reject)
-    ;
+    .catch(reject);
   });
 }
 
