@@ -20,7 +20,8 @@
     },
     "env": {
         "es6": true,
-        "node": true
+        "node": true,
+        "mocha": true
     },
     "extends": [
         "plugin:require-path-exists/recommended",
@@ -28,11 +29,5 @@
     ],
     "plugins": [
         "require-path-exists"
-    ],
-     "globals": {
-        "it": false,
-        "describe": false,
-        "before": false,
-        "after": false
-     }
+    ]
 }
