@@ -38,8 +38,9 @@ function executeBatchMutations(mutations) { // eslint-disable-line no-unused-var
  */
 function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    client.execute(query, params, {prepare:true}, (err, result)=>{
+    client.execute(query, params, { prepare: true }, (err, result) => {
       if (err) {
+        console.log(`Error occured during executeQuery: ${JSON.stringify(err)}`);
         return reject(err);
       }
       else {
