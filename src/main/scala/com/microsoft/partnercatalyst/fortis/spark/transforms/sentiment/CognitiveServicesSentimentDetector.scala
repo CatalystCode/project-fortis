@@ -4,7 +4,7 @@ import net.liftweb.json
 
 import scalaj.http.Http
 
-case class SentimentDetectorAuth(key: String, apiHost: String = "westus.api.cognitive.microsoft.com")
+case class SentimentDetectorAuth(key: String, apiHost: String = "https://westus.api.cognitive.microsoft.com")
 
 @SerialVersionUID(100L)
 class CognitiveServicesSentimentDetector(
@@ -20,7 +20,7 @@ class CognitiveServicesSentimentDetector(
   }
 
   protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"https://${auth.apiHost}/text/analytics/v2.0/sentiment")
+    Http(s"${auth.apiHost}/text/analytics/v2.0/sentiment")
       .headers(
         "Content-Type" -> "application/json",
         "Ocp-Apim-Subscription-Key" -> auth.key)

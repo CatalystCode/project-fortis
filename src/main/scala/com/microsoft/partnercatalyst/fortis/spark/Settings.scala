@@ -5,6 +5,7 @@ trait Settings {
   val featureServiceHost: String
   val oxfordLanguageToken: String
   val oxfordVisionToken: String
+  val blobHost: String
   val appInsightsKey: Option[String]
   val modelsDir: Option[String]
 }

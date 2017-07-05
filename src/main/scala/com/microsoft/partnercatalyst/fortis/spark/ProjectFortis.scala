@@ -24,6 +24,7 @@ object ProjectFortis extends App {
     val featureServiceHost = envOrFail(Constants.Env.FeatureServiceHost)
     val oxfordLanguageToken = envOrFail(Constants.Env.OxfordLanguageToken)
     val oxfordVisionToken = envOrFail(Constants.Env.OxfordVisionToken)
+    val blobHost = envOrElse(Constants.Env.BlobHost, "https://fortiscentral.blob.core.windows.net")
 
     val appInsightsKey = envOrNone(Constants.Env.AppInsightsKey)
     val modelsDir = envOrNone(Constants.Env.LanguageModelDir)
