@@ -21,10 +21,10 @@ object ProjectFortis extends App {
     import scala.util.Properties.envOrNone
 
     val progressDir = envOrFail(Constants.Env.HighlyAvailableProgressDir)
-    val featureServiceHost = envOrFail(Constants.Env.FeatureServiceHost)
+    val featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase)
     val oxfordLanguageToken = envOrFail(Constants.Env.OxfordLanguageToken)
     val oxfordVisionToken = envOrFail(Constants.Env.OxfordVisionToken)
-    val blobHost = envOrElse(Constants.Env.BlobHost, "https://fortiscentral.blob.core.windows.net")
+    val blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net")
 
     val appInsightsKey = envOrNone(Constants.Env.AppInsightsKey)
     val modelsDir = envOrNone(Constants.Env.LanguageModelDir)

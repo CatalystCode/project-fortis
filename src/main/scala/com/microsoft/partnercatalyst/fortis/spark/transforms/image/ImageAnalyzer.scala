@@ -6,7 +6,7 @@ import net.liftweb.json
 
 import scalaj.http.Http
 
-case class ImageAnalysisAuth(key: String, apiHost: String = "https://westus.api.cognitive.microsoft.com")
+case class ImageAnalysisAuth(key: String, apiUrlBase: String = "https://westus.api.cognitive.microsoft.com")
 
 @SerialVersionUID(100L)
 class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServiceClient) extends Serializable {
@@ -17,7 +17,7 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
   }
 
   protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"${auth.apiHost}/vision/v1.0/analyze")
+    Http(s"${auth.apiUrlBase}/vision/v1.0/analyze")
       .params(
         "details" -> "Celebrities,Landmarks",
         "visualFeatures" -> "Categories,Tags,Description,Faces")
