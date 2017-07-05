@@ -1,6 +1,9 @@
 const appInsightsKey = process.env.FORTIS_SERVICES_APPINSIGHTS_KEY;
 
 let client;
+let consoleLog = console.log;
+let consoleError = console.error;
+let consoleWarn = console.warn;
 
 function setup() {
   if (appInsightsKey) {
@@ -8,14 +11,23 @@ function setup() {
     appInsights.setup(appInsightsKey);
     appInsights.start();
     client = appInsights.getClient(appInsightsKey);
+    console.log = trackTrace(/* INFO */ 1, consoleLog);
+    console.error = trackTrace(/* ERROR */ 3, consoleError);
+    console.warn = trackTrace(/* WARNING */ 2, consoleWarn);
   }
 }
 
+function trackTrace(level, localLogger) {
+  return (message) => {
+    if (client) {
+      client.trackTrace(message, level);
+    }
+    localLogger(message);
+  };
+}
+
 function trackDependency(promiseFunc, dependencyName, callName) {
-  if (!client) {
-    console.log('Application insights not enabled');
-    return promiseFunc;
-  }
+  if (!client) return promiseFunc;
 
   function dependencyTracker(...args) {
     return new Promise((resolve, reject) => {
