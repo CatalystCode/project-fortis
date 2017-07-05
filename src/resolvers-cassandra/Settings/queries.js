@@ -46,12 +46,40 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
+ * @param {*} row 
+ * @returns { accountName: string, consumerKey: string, consumerSecret: string, token: string, tokenSecret: string }
+ */
+function cassandraRowToTwitterAccount(row) {
+  return {
+    accountName: row.params.accountName,
+    consumerKey: row.params.consumerKey,
+    consumerSecret: row.params.consumerSecret,
+    token: row.params.token,
+    tokenSecret: row.params.tokenSecret
+  };
+}
+
+/**
  * @param {{siteId: string}} args
  * @returns {Promise.<{runTime: string, accounts: Array<{accountName: string, consumerKey: string, consumerSecret: string, token: string, tokenSecret: string}>}>}
  */
 function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const sourcesByConnector = 'SELECT * FROM fortis.streams WHERE connector = ? ALLOW FILTERING';
+    cassandraConnector.executeQuery(sourcesByConnector, ['twitter'])
+    .then(rows => {
+      const accounts = rows.map(cassandraRowToTwitterAccount);
+      resolve({accounts:accounts});
+    })
+    .catch(reject)
+    ;
+  });
 }
 
+/**
+ * @param {*} row 
+ * @return { RowKey: string, acctUrl: string }
+ */
 function cassandraRowToTrustedTwitterAccount(row) {
   return {
     RowKey: `${row.connector},${row.sourceid},${row.sourcetype}`,
@@ -65,9 +93,8 @@ function cassandraRowToTrustedTwitterAccount(row) {
  */
 function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const sourcesByConnector = 'SELECT * FROM fortis.trustedsources WHERE connector = ?';
+    const sourcesByConnector = 'SELECT * FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
     cassandraConnector.executeQuery(sourcesByConnector, ['twitter'])
-    .catch(reject)
     .then(rows => {
       const accounts = rows.map(cassandraRowToTrustedTwitterAccount);
       resolve({accounts:accounts});
@@ -78,10 +105,31 @@ function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-va
 }
 
 /**
+ * @param {*} row 
+ * @return { RowKey: string, pageUrl: string }
+ */
+function cassandraRowToFacebookPage(row) {
+  return {
+    RowKey: `${row.connector},${row.sourceid},${row.sourcetype}`,
+    pageUrl: row.sourceid
+  };
+}
+
+/**
  * @param {{siteId: string}} args
  * @returns {Promise.<{runTime: string, pages: Array<{RowKey: string, pageUrl: string}>}>}
  */
 function facebookPages(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const sourcesByConnector = 'SELECT * FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
+    cassandraConnector.executeQuery(sourcesByConnector, ['facebook'])
+    .then(rows => {
+      const pages = rows.map(cassandraRowToFacebookPage);
+      resolve({pages:pages});
+    })
+    .catch(reject)
+    ;
+  });
 }
 
 /**
@@ -99,10 +147,32 @@ function facebookAnalytics(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
+ * @param {*} row 
+ * @return { filteredTerms: [string], lang: string, RowKey: string }
+ */
+function cassandraRowToTermFilter(row) {
+  return {
+    filteredTerms: row.conjunctivefilter,
+    lang: null,
+    RowKey: row.id
+  };
+}
+
+/**
  * @param {{siteId: string}} args
  * @returns {Promise.<{runTime: string, filters: Array<{filteredTerms: string[], lang: string, RowKey: string}>}>}
  */
 function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const blacklistQuery = 'SELECT * FROM fortis.blacklist';
+    cassandraConnector.executeQuery(blacklistQuery, [])
+    .then(rows => {
+      const filters = rows.map(cassandraRowToTermFilter);
+      resolve({ filters: filters });
+    })
+    .catch(reject)
+    ;
+  });
 }
 
 module.exports = {
