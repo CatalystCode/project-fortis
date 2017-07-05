@@ -3,10 +3,6 @@
 let request = require('request');
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net/';
 
-/**
- * @param {string} siteType
- * @returns {string}
- */
 function buildTopicsSiteTypeUri(siteType) {
   return `${apiUrlBase}settings/siteTypes/${siteType}/topics/defaultTopics.json`;
 }
