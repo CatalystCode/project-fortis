@@ -5,8 +5,6 @@ const sinon = require('sinon');
 const chai = require('chai');
 const blobStorageClient = require('../src/clients/storage/BlobStorageClient');
 chai.should();
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 
 describe('Tests for BlobStorageClient.js', function() {
@@ -28,10 +26,16 @@ describe('Tests for BlobStorageClient.js', function() {
       request.get.restore();
     });
 
-    it('should return an array of topics', function() {
+    it('should return a json array', function() {
       let siteType = 'humanitarian';
       let uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
-      return blobStorageClient.fetchJson(uri).should.eventually.deep.equal(body);
+      return blobStorageClient.fetchJson(uri)
+        .then(response => {
+          response.should.deep.equal(body);
+        })
+        .catch(err => {
+          Boolean(err).should.be.false;
+        });
     });
   });
 
