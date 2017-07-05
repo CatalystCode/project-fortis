@@ -11,9 +11,11 @@ chai.use(chaiAsPromised);
 describe('Tests for BlobStorageClient.js', function() {
 
   describe('#getTopicsBySiteType(siteType)', function() {
-
     let response = {statusCode: 200};
-    let body = [{keyword: 'aid', lang_code: 'en'},{keyword: 'donate', lang_code: 'en'}];
+    let body = [
+      {keyword: 'aid', lang_code: 'en'},
+      {keyword: 'donate', lang_code: 'en'}
+    ];
 
     before(function(){
       sinon
@@ -26,10 +28,8 @@ describe('Tests for BlobStorageClient.js', function() {
     });
 
     it('should return an array of topics', function() {
-
       let siteType = 'humanitarian';
-
-      return blobStorageClient.getTopicsBySiteType(siteType).should.eventually.equal(body);
+      return blobStorageClient.getTopicsBySiteType(siteType).should.eventually.deep.equal(body);
     });
   });
 
