@@ -56,5 +56,5 @@ After installing a fresh copy of Cassandra, you will need to run the DDL initial
 
 ```sh
 curl -O https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master/ops/storage-ddls/cassandra-setup.cql
-cat cassandra-setup.cql | cqlsh
+cqlsh < cassandra-setup.cql
 ```
