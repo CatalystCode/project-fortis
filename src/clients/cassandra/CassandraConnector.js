@@ -30,9 +30,9 @@ function executeBatchMutations(mutations) {
     if (!client) return reject('No Cassandra client defined');
     if (!mutations || !mutations.length) return reject('No mutations defined');
   
-    let chunkedMutations = _.chunk(mutations, BATCH_LIMIT);
+    let chunkedMutations = _.chunk(mutations, MAX_OPERATIONS_PER_BATCH);
 
-    asyncEachLimit(chunkedMutations, ASYNC_OPERATIONS_LIMIT, (chunk, asyncCallback) => {
+    asyncEachLimit(chunkedMutations, MAX_CONCURRENT_BATCHES, (chunk, asyncCallback) => {
       client.batch(chunk, { prepare: true }, (err) => {
         if (err) {
           console.log(err, `Mutations failed for ${JSON.stringify(chunk)}`);
