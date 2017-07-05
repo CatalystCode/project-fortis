@@ -1,26 +1,11 @@
 'use strict';
 
 const Promise = require('promise');
+const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const withRunTime = require('../shared').withRunTime;
-const geotile = require('geotile');
-
-function makeMap(iterable, keyFunc, valueFunc) {
-  const map = {};
-  iterable.forEach(item => {
-    const key = keyFunc(item);
-    const value = valueFunc(item);
-    map[key] = value;
-  });
-  return map;
-}
-
-function makeSet(iterable, func) {
-  const set = new Set();
-  iterable.forEach(item => set.add(func(item)));
-  return set;
-}
+const { withRunTime } = require('../shared');
+const { makeMap, makeSet } = require('../../utils/collections');
 
 function makeDefaultFilters(args) {
   let params = [];
