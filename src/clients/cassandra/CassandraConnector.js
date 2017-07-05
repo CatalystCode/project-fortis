@@ -1,24 +1,5 @@
 'use strict';
 
-const cassandra = require('cassandra-driver');
-
-const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
-const MAX_CONCURRENT_BATCHES = process.env.MAX_CONCURRENT_BATCHES || 50;
-const distance = cassandra.types.distance;
-const CORE_CONNECTIONS_PER_HOST_LOCAL = process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 1;
-const CORE_CONNECTIONS_PER_HOST_REMOTE = process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1;
-const options = {
-  contactPoints: [process.env.CASSANDRA_CONTACT_POINTS],
-  keyspace: process.env.CASSANDRA_KEYSPACE,
-  pooling: {
-    coreConnectionsPerHost: {
-      [distance.local]: CORE_CONNECTIONS_PER_HOST_LOCAL,
-      [distance.remote]: CORE_CONNECTIONS_PER_HOST_REMOTE
-    } 
-  }
-};
-const client = new cassandra.Client(options);
-
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
