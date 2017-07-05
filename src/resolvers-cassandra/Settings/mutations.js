@@ -66,14 +66,13 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
  */
 function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args.input) return reject('No input specified');
-    if (!args.input.terms) return reject('No terms specified');
-    if (!args.input.terms.length) return reject('No terms specified');
-    const terms = args.input.terms;
+    const terms = args && args.input && args.input.terms;
+    if (!terms || !terms.length) return reject('No terms specified');
+    
     const params = [terms.map( t => { return t.RowKey; } )];
-    const update = 'delete from fortis.blacklist where id in ?';
+    const update = 'DELETE FROM fortis.blacklist WHERE id IN ?';
     cassandraConnector.executeQuery(update, params)
-    .then(() => { resolve({ filters: args.input.terms }); })
+    .then(() => { resolve({ filters: terms }); })
     .catch(reject)
     ;
   });
