@@ -31,9 +31,8 @@ object Pipeline {
       // broadcast changes across the Spark cluster.
 
       val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
-      val modelsProvider = new ZipModelsProvider(
-        language => s"https://fortiscentral.blob.core.windows.net/opener/opener-$language.zip",
-        Settings.modelsDir)
+      val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobHost}/opener/opener-$language.zip", Settings.modelsDir)
+      val sentimentModelsProvider = new ZipModelsProvider(language => s"${Settings.blobHost}/sentiment/sentiment-$language.zip", Settings.modelsDir)
 
       val featureServiceClient = new FeatureServiceClient(Settings.featureServiceHost)
       val locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, geofence).buildLookup()
@@ -76,19 +75,19 @@ object Pipeline {
       }
 
       def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
-        val entities = analyzer.extractEntities(event.details, new PeopleRecognizer(modelsProvider, event.analysis.language))
+        val entities = analyzer.extractEntities(event.details, new PeopleRecognizer(entityModelsProvider, event.analysis.language))
         event.copy(analysis = event.analysis.copy(entities = entities))
       }
 
       def addSentiments(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val sentiments = analyzer.detectSentiment(event.details,
-          new SentimentDetector(modelsProvider, event.analysis.language, sentimentDetectorAuth))
+          new SentimentDetector(sentimentModelsProvider, event.analysis.language, sentimentDetectorAuth))
         event.copy(analysis = event.analysis.copy(sentiments = sentiments))
       }
 
       def addLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val locations = analyzer.extractLocations(event.details,
-          locationsExtractorFactory.create(Some(new PlaceRecognizer(modelsProvider, event.analysis.language))))
+          locationsExtractorFactory.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))))
         event.copy(analysis = event.analysis.copy(locations = locations))
       }
 
