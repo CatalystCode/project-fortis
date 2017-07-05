@@ -6,19 +6,19 @@ const request = require('request');
 const apiHost = process.env.FORTIS_FEATURE_SERVICE_HOST;
 
 function formatIdsUri(ids) {
-  return `http://${apiHost}/features/id/${ids.map(encodeURIComponent).join(',')}?include=bbox`;
+  return `${apiHost}/features/id/${ids.map(encodeURIComponent).join(',')}?include=bbox`;
 }
 
 function formatBboxUri(north, west, south, east) {
-  return `http://${apiHost}/features/bbox/${north}/${west}/${south}/${east}`;
+  return `${apiHost}/features/bbox/${north}/${west}/${south}/${east}`;
 }
 
 function formatPointUri(latitude, longitude) {
-  return `http://${apiHost}/features/point/${latitude}/${longitude}`;
+  return `${apiHost}/features/point/${latitude}/${longitude}`;
 }
 
 function formatNameUri(names) {
-  return `http://${apiHost}/features/name/${names.map(encodeURIComponent).join(',')}`;
+  return `${apiHost}/features/name/${names.map(encodeURIComponent).join(',')}`;
 }
 
 function callFeatureService(uri) {
