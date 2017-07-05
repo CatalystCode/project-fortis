@@ -30,7 +30,7 @@ As a prerequisite to setting up Cassandra, you will need to make sure you have J
 Then follow these commands to dowloand and run your local Cassandra instance:
 
 ```sh
-curl http://www-eu.apache.org/dist/cassandra/3.11.0/apache-cassandra-3.11.0-bin.tar.gz > apache-cassandra-3.11.0-bin.tar.gz
+curl -O http://www-eu.apache.org/dist/cassandra/3.11.0/apache-cassandra-3.11.0-bin.tar.gz
 tar xfz apache-cassandra-3.11.0-bin.tar.gz
 sudo mv apache-cassandra-3.11.0 /opt/apache-cassandra-3.11.0
 
@@ -55,6 +55,6 @@ brew services start cassandra
 After installing a fresh copy of Cassandra, you will need to run the DDL initialization statements in:
 
 ```sh
-curl https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master/ops/storage-ddls/cassandra-setup.cql > cassandra-setup.cql
+curl -O https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master/ops/storage-ddls/cassandra-setup.cql
 cat cassandra-setup.cql | cqlsh
 ```
