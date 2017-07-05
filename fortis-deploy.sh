@@ -70,7 +70,7 @@ do
     --eh_conn_str|-ec)
       eh_conn_str="$1"
       shift
-      ;;    
+      ;;
     --resource_group|-rg)
       resource_group="$1"
       shift
