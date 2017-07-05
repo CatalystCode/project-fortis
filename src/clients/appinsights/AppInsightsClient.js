@@ -51,7 +51,33 @@ function trackDependency(promiseFunc, dependencyName, callName) {
   return dependencyTracker;
 }
 
+function trackEvent(promiseFunc, eventName) {
+  if (!client) return promiseFunc;
+
+  function eventTracker(...args) {
+    return new Promise((resolve, reject) => {
+      const start = new Date();
+      promiseFunc(...args)
+      .then(returnValue => {
+        const duration = new Date() - start;
+        const success = true;
+        client.trackEvent(eventName, { duration: duration, success: success });
+        resolve(returnValue);
+      })
+      .catch(err => {
+        const duration = new Date() - start;
+        const success = false;
+        client.trackEvent(eventName, { duration: duration, success: success });
+        reject(err);
+      });
+    });
+  }
+
+  return eventTracker;
+}
+
 module.exports = {
   trackDependency: trackDependency,
+  trackEvent: trackEvent,
   setup: setup
 };

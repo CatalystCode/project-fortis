@@ -1,6 +1,7 @@
 'use strict';
 
 const withRunTime = require('../shared').withRunTime;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @param {{pageSize: number, skip: number, tagFilter: string[]}} args
@@ -17,6 +18,6 @@ function get(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  list: withRunTime(list),
-  get: get
+  list: trackEvent(withRunTime(list), 'listFacts'),
+  get: trackEvent(get, 'getFact')
 };

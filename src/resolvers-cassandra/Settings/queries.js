@@ -4,6 +4,7 @@ const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 function cassandraRowToSite(row) {
   // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
@@ -160,10 +161,10 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  sites: withRunTime(sites),
-  twitterAccounts: withRunTime(twitterAccounts),
-  trustedTwitterAccounts: withRunTime(trustedTwitterAccounts),
-  facebookPages: withRunTime(facebookPages),
-  facebookAnalytics: facebookAnalytics,
-  termBlacklist: withRunTime(termBlacklist)
+  sites: trackEvent(withRunTime(sites), 'sites'),
+  twitterAccounts: trackEvent(withRunTime(twitterAccounts), 'twitterAccounts'),
+  trustedTwitterAccounts: trackEvent(withRunTime(trustedTwitterAccounts), 'trustedTwitterAccounts'),
+  facebookPages: trackEvent(withRunTime(facebookPages), 'facebookPages'),
+  facebookAnalytics: trackEvent(facebookAnalytics, 'facebookAnalytics'),
+  termBlacklist: trackEvent(withRunTime(termBlacklist), 'termBlacklist')
 };

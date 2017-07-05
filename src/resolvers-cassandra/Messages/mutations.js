@@ -1,6 +1,7 @@
 'use strict';
 
 const eventHubSender = require('../../clients/eventhub/EventHubSender');
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @param {{messages: Array<{RowKey: string, created_at: string, featureCollection: Array<{type: string, features: Array<{type: string, coordinates: number[]}>>, message: string, language: string, link: string, source: string, title: string}>}}} args
@@ -11,5 +12,5 @@ function publishEvents(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  publishEvents: publishEvents
+  publishEvents: trackEvent(publishEvents, 'publishEvents')
 };

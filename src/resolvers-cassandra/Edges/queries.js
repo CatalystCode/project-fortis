@@ -1,6 +1,7 @@
 'use strict';
 
 const withRunTime = require('../shared').withRunTime;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @param {{site: string, query: string, fromDate: string, toDate: string, sourceFilter: string[]}} args
@@ -38,9 +39,9 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  terms: withRunTime(terms),
-  locations: withRunTime(locations),
-  popularLocations: withRunTime(popularLocations),
-  timeSeries: timeSeries,
-  topSources: topSources
+  terms: trackEvent(withRunTime(terms), 'terms'),
+  locations: trackEvent(withRunTime(locations), 'locations'),
+  popularLocations: trackEvent(withRunTime(popularLocations), 'popularLocations'),
+  timeSeries: trackEvent(timeSeries, 'timeSeries'),
+  topSources: trackEvent(topSources, 'topSources')
 };
