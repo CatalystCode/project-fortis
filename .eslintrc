@@ -31,6 +31,8 @@
     ],
      "globals": {
         "it": false,
-        "describe": false
+        "describe": false,
+        "before": false,
+        "after": false
      }
 }
