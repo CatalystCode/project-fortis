@@ -5,6 +5,7 @@ const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
+const makeMap = require('../../utils/collections').makeMap;
 
 /**
  * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
@@ -30,18 +31,6 @@ function cassandraRowToFeature(row) {
       fullText: row.messagebody
     }
   };
-}
-
-function makeMap(array, keyFunc, valueFunc) {
-  valueFunc = valueFunc || (x => x);
-
-  const map = {};
-  array.forEach(item => {
-    const key = keyFunc(item);
-    const value = valueFunc(item);
-    map[key] = value;
-  });
-  return map;
 }
 
 function makeDefaultClauses(args) {
