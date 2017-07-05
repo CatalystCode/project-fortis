@@ -38,11 +38,15 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
+    "chai": "^4.0.2",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^2",
     "eslint-plugin-require-path-exists": "^1.1.7",
     "is-my-json-valid": "^2.13.1",
     "istanbul": "~0.4.3",
     "js-yaml": "^3.2.6",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.6",
     "supertest": "^1.2.0",
     "tape": "^4"
   },
