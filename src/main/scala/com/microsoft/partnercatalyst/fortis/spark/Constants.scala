@@ -11,9 +11,9 @@ object Constants {
     val HighlyAvailableProgressDir = "HA_PROGRESS_DIR"
     val AppInsightsKey = "FORTIS_APPINSIGHTS_IKEY"
     val LanguageModelDir = "FORTIS_MODELS_DIRECTORY"
-    val FeatureServiceHost = "FORTIS_FEATURE_SERVICE_HOST"
+    val FeatureServiceUrlBase = "FORTIS_FEATURE_SERVICE_HOST"
     val OxfordVisionToken= "OXFORD_VISION_TOKEN"
     val OxfordLanguageToken = "OXFORD_LANGUAGE_TOKEN"
-    val BlobHost = "FORTIS_BLOB_HOST"
+    val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
   }
 }

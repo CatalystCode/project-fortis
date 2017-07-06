@@ -4,7 +4,7 @@ import net.liftweb.json
 
 import scalaj.http.Http
 
-case class LanguageDetectorAuth(key: String, apiHost: String = "https://westus.api.cognitive.microsoft.com")
+case class LanguageDetectorAuth(key: String, apiUrlBase: String = "https://westus.api.cognitive.microsoft.com")
 
 @SerialVersionUID(100L)
 class LanguageDetector(
@@ -24,7 +24,7 @@ class LanguageDetector(
   }
 
   protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"${auth.apiHost}/text/analytics/v2.0/languages")
+    Http(s"${auth.apiUrlBase}/text/analytics/v2.0/languages")
       .params(
         "numberOfLanguagesToDetect" -> "1")
       .headers(

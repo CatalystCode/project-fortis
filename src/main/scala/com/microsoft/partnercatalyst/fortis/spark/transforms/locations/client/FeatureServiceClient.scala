@@ -9,7 +9,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
-class FeatureServiceClient(host: String) extends Serializable with Loggable {
+class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggable {
   def bbox(geofence: Geofence): Iterable[FeatureServiceFeature] = {
     unpack(fetchBboxResponse(geofence), "bbox")
   }
@@ -40,17 +40,17 @@ class FeatureServiceClient(host: String) extends Serializable with Loggable {
   }
 
   protected def fetchBboxResponse(geofence: Geofence): Try[String] = {
-    val fetch = s"$host/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
+    val fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
     fetchResponse(fetch)
   }
 
   protected def fetchPointResponse(latitude: Double, longitude: Double): Try[String] = {
-    val fetch = s"$host/features/point/$latitude/$longitude"
+    val fetch = s"$apiUrlBase/features/point/$latitude/$longitude"
     fetchResponse(fetch)
   }
 
   protected def fetchNameResponse(names: Iterable[String]): Try[String] = {
-    val fetch = s"$host/features/name/${names.mkString(",")}"
+    val fetch = s"$apiUrlBase/features/name/${names.mkString(",")}"
     fetchResponse(fetch)
   }
 
