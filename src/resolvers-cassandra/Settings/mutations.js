@@ -22,7 +22,7 @@ function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
  */
 function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    reject("Modification not yet supported.");
+    reject('Modification not yet supported.');
   });
 }
 
@@ -32,14 +32,14 @@ function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
  */
 function removeFacebookPages(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    reject("Removal not yet supported.");
+    reject('Removal not yet supported.');
   });
 }
 
 function trustedTwitterAccountRowKeyToPrimaryKey(account) {
   const params = account.RowKey.split(/,/);
   if (params.length != 3) {
-    throw("Expecting three element comma-delimited RowKey representing (connector, sourceid, sourcetype).");
+    throw('Expecting three element comma-delimited RowKey representing (connector, sourceid, sourcetype).');
   }
   return params;
 }
@@ -49,7 +49,7 @@ function normalizedTrustedTwitterAccount(account) {
   return {
     RowKey: account.RowKey,
     acctUrl: keyValues[1]
-  }
+  };
 }
 
 /**
@@ -70,7 +70,7 @@ function modifyTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unu
     });
 
     cassandraConnector.executeBatchMutations(queries)
-    .then(() => { resolve({ accounts: accounts.map(normalizedTrustedTwitterAccount) }) })
+    .then(() => { resolve({ accounts: accounts.map(normalizedTrustedTwitterAccount) }); })
     .catch(reject)
     ;
   });
@@ -144,7 +144,7 @@ function removeTwitterAccounts(args, res) { // eslint-disable-line no-unused-var
  */
 function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    reject("Modification not yet supported.");
+    reject('Modification not yet supported.');
   });
 }
 
