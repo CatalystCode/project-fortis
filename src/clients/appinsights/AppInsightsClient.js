@@ -5,15 +5,19 @@ let consoleLog = console.log;
 let consoleError = console.error;
 let consoleWarn = console.warn;
 
+const TRACE_LEVEL_INFO = 1;
+const TRACE_LEVEL_WARNING = 2;
+const TRACE_LEVEL_ERROR = 3;
+
 function setup() {
   if (appInsightsKey) {
     const appInsights = require('applicationinsights');
     appInsights.setup(appInsightsKey);
     appInsights.start();
     client = appInsights.getClient(appInsightsKey);
-    console.log = trackTrace(/* INFO */ 1, consoleLog);
-    console.error = trackTrace(/* ERROR */ 3, consoleError);
-    console.warn = trackTrace(/* WARNING */ 2, consoleWarn);
+    console.log = trackTrace(TRACE_LEVEL_INFO, consoleLog);
+    console.warn = trackTrace(TRACE_LEVEL_WARNING, consoleWarn);
+    console.error = trackTrace(TRACE_LEVEL_ERROR, consoleError);
   }
 }
 
