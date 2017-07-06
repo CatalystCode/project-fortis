@@ -1,12 +1,14 @@
 'use strict';
 
 const Promise = require('promise');
+const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
 
 const STREAM_PIPELINE_TWITTER = 'twitter';
 const STREAM_CONNECTOR_TWITTER = 'twitter';
 
+const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
 /**
@@ -37,17 +39,21 @@ function removeFacebookPages(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function trustedTwitterAccountRowKeyToPrimaryKey(account) {
-  const params = account.RowKey.split(/,/);
+  const params = account.RowKey.split(',');
   if (params.length != 3) {
     throw('Expecting three element comma-delimited RowKey representing (connector, sourceid, sourcetype).');
   }
-  return params;
+  return trustedTwitterAccountPrimaryKeyValuesToRowKey(params);
+}
+
+function trustedTwitterAccountPrimaryKeyValuesToRowKey(values) {
+  return [ TRUSTED_SOURCES_CONNECTOR_TWITTER, values[1], values[2] ];
 }
 
 function normalizedTrustedTwitterAccount(account) {
   const keyValues = trustedTwitterAccountRowKeyToPrimaryKey(account);
   return {
-    RowKey: account.RowKey,
+    RowKey: trustedTwitterAccountPrimaryKeyValuesToRowKey(keyValues),
     acctUrl: keyValues[1]
   };
 }
@@ -107,11 +113,25 @@ function modifyTwitterAccounts(args, res) { // eslint-disable-line no-unused-var
     const accounts = args && args.input && args.input.accounts;
     if (!accounts || !accounts.length) return reject('No accounts specified');
 
-    const statement = 'INSERT INTO fortis.streams (pipeline, connector, params) values (?, ?, ?)';
-    const queries = accounts.map( account => { return { query: statement, params: [STREAM_PIPELINE_TWITTER, STREAM_CONNECTOR_TWITTER, account]}; } );
+    const updateStatement = 'UPDATE fortis.streams set connector = ?, params = ? WHERE pipeline= ? AND streamid = ?';
+    const insertStatement = 'INSERT INTO fortis.streams (pipeline, streamid, connector, params) VALUES (?, ?, ?, ?)';
+    const queries = [];
+    const expectedRecords = [];
+    accounts.forEach( account => {
+      // TODO: Arrive at a consensus as to what a canonical account should be in order to create a proper copy of the incoming record.
+      const updatedAccount = account;
+      if (account.RowKey) {
+        queries.push({ query: updateStatement, params: [STREAM_CONNECTOR_TWITTER, account, STREAM_PIPELINE_TWITTER, account.RowKey] });
+      }
+      else {
+        updatedAccount.RowKey = uuid();
+        queries.push({ query: insertStatement, params: [STREAM_PIPELINE_TWITTER, updatedAccount.RowKey, STREAM_CONNECTOR_TWITTER, account] });
+      }
+      expectedRecords.push(updatedAccount);
+    });
 
     cassandraConnector.executeBatchMutations(queries)
-    .then(() => { resolve({ accounts: accounts }); })
+    .then(() => { resolve({ accounts: expectedRecords }); })
     .catch(reject)
     ;
 
@@ -127,8 +147,14 @@ function removeTwitterAccounts(args, res) { // eslint-disable-line no-unused-var
     const accounts = args && args.input && args.input.accounts;
     if (!accounts || !accounts.length) return reject('No accounts specified');
 
-    const statement = 'DELETE FROM fortis.streams WHERE pipeline = ? AND connector = ? AND params = ?';
-    const queries = accounts.map( account => { return { query: statement, params: [STREAM_PIPELINE_TWITTER, STREAM_CONNECTOR_TWITTER, account]}; } );
+    const invalidAccounts = accounts.filter(account=>!account.RowKey);
+    if (invalidAccounts.length > 0) {
+      reject(`RowKey required for ${JSON.stringify(invalidAccounts)}`);
+      return;
+    }
+
+    const statement = 'DELETE FROM fortis.streams WHERE streamid = ?';
+    const queries = accounts.map( account => { return { query: statement, params: [ account.RowKey ] }; } );
 
     cassandraConnector.executeBatchMutations(queries)
     .then(() => { resolve({ accounts: accounts }); })

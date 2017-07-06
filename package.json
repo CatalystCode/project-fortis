@@ -37,6 +37,7 @@
     "request": "^2.79.0",
     "turf-bbox-polygon": "^3.0.12",
     "turf-inside": "^3.0.12",
+    "uuid": "^3.1.0",
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
