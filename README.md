@@ -33,7 +33,7 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
   * Health
 
 ## Post Deployment Instructions
-* Expect the deployment to run for about an hour, so grab a cup of coffee once you kickoff the deployment. 
+* Grab a large cup of coffee as the deployment can take north of an hour to complete. 
 * Once the deployment has finished, click on the `Manage your resources`(highlighted below). 
 ![image](https://user-images.githubusercontent.com/7635865/27893300-7a5d32c2-61ca-11e7-9413-50a3b125f9f1.png)
 * Select the Deployment tab in the Azure Portal, then the `fortis-containers###` deployment and copy the Fortis Admin Interface URL in the output section of the deployment summary. 
