@@ -6,6 +6,7 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
 const makeMap = require('../../utils/collections').makeMap;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
@@ -241,10 +242,10 @@ function translateWords(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  byLocation: withRunTime(byLocation),
-  byBbox: withRunTime(byBbox),
-  byEdges: withRunTime(byEdges),
-  event: event,
-  translate: translate,
-  translateWords: translateWords
+  byLocation: trackEvent(withRunTime(byLocation), 'messagesForLocation'),
+  byBbox: trackEvent(withRunTime(byBbox), 'messagesForBbox'),
+  byEdges: trackEvent(withRunTime(byEdges), 'messagesForEdges'),
+  event: trackEvent(event, 'messageForEven'),
+  translate: trackEvent(translate, 'translate'),
+  translateWords: trackEvent(translateWords, 'translateWords')
 };

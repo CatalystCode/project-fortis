@@ -4,7 +4,8 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { withRunTime } = require('../shared');
+const withRunTime = require('../shared').withRunTime;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const { makeMap, makeSet } = require('../../utils/collections');
 
 function makeDefaultFilters(args) {
@@ -222,9 +223,9 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  fetchTilesByBBox: withRunTime(fetchTilesByBBox),
-  fetchTilesByLocations: withRunTime(fetchTilesByLocations),
-  fetchPlacesByBBox: withRunTime(fetchPlacesByBBox),
-  fetchEdgesByLocations: withRunTime(fetchEdgesByLocations),
-  fetchEdgesByBBox: withRunTime(fetchEdgesByBBox)
+  fetchTilesByBBox: trackEvent(withRunTime(fetchTilesByBBox), 'fetchTilesByBBox'),
+  fetchTilesByLocations: trackEvent(withRunTime(fetchTilesByLocations), 'fetchTilesByLocations'),
+  fetchPlacesByBBox: trackEvent(withRunTime(fetchPlacesByBBox), 'fetchPlacesByBBox'),
+  fetchEdgesByLocations: trackEvent(withRunTime(fetchEdgesByLocations), 'fetchEdgesByLocations'),
+  fetchEdgesByBBox: trackEvent(withRunTime(fetchEdgesByBBox, 'fetchEdgesByBBox'))
 };

@@ -1,6 +1,7 @@
 'use strict';
 
 const withRunTime = require('../shared').withRunTime;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @param {{input: {site: string, edges: Array<{name: string}>}}} args
@@ -45,8 +46,8 @@ function removeLocations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  removeKeywords: withRunTime(removeKeywords),
-  addKeywords: withRunTime(addKeywords),
-  saveLocations: withRunTime(saveLocations),
-  removeLocations: withRunTime(removeLocations)
+  removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords'),
+  addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords'),
+  saveLocations: trackEvent(withRunTime(saveLocations), 'saveLocations'),
+  removeLocations: trackEvent(withRunTime(removeLocations), 'removeLocations')
 };

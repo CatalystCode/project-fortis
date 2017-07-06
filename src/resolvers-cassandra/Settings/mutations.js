@@ -3,6 +3,7 @@
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
+const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @param {{input: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
@@ -94,13 +95,13 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  createOrReplaceSite: createOrReplaceSite,
-  modifyFacebookPages: withRunTime(modifyFacebookPages),
-  removeFacebookPages: withRunTime(removeFacebookPages),
-  modifyTrustedTwitterAccounts: withRunTime(modifyTrustedTwitterAccounts),
-  removeTrustedTwitterAccounts: withRunTime(removeTrustedTwitterAccounts),
-  modifyTwitterAccounts: withRunTime(modifyTwitterAccounts),
-  removeTwitterAccounts: withRunTime(removeTwitterAccounts),
-  modifyBlacklist: withRunTime(modifyBlacklist),
-  removeBlacklist: withRunTime(removeBlacklist)
+  createOrReplaceSite: trackEvent(createOrReplaceSite, 'createOrReplaceSite'),
+  modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
+  removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
+  modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
+  removeTrustedTwitterAccounts: trackEvent(withRunTime(removeTrustedTwitterAccounts), 'removeTrustedTwitterAccounts'),
+  modifyTwitterAccounts: trackEvent(withRunTime(modifyTwitterAccounts), 'modifyTwitterAccounts'),
+  removeTwitterAccounts: trackEvent(withRunTime(removeTwitterAccounts), 'removeTwitterAccounts'),
+  modifyBlacklist: trackEvent(withRunTime(modifyBlacklist), 'modifyBlacklist'),
+  removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist')
 };

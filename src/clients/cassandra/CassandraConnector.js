@@ -4,6 +4,8 @@ const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
+const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+
 const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
 const MAX_CONCURRENT_BATCHES = process.env.MAX_CONCURRENT_BATCHES || 50;
 const distance = cassandra.types.distance;
@@ -78,6 +80,6 @@ function executeQuery(query, params) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  executeBatchMutations: executeBatchMutations,
-  executeQuery: executeQuery 
+  executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
+  executeQuery: trackDependency(executeQuery, 'Cassandra', 'executeQuery')
 };

@@ -2,6 +2,7 @@
 
 var port = process.env.PORT || 8000;  
 
+require('./src/clients/appinsights/AppInsightsClient').setup();
 var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
