@@ -37,6 +37,21 @@ function modifyTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unu
  * @returns {Promise.<{runTime: string, accounts: Array<{pageUrl: string, RowKey: string}>}>}
  */
 function removeTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const accounts = args && args.input && args.input.accounts;
+    if (!accounts || !accounts.length) return reject('No accounts specified');
+    
+    const deleteByPrimaryKey = 'DELETE FROM fortis.trustedsources WHERE connector = ? AND sourceid = ? AND sourcetype = ?';
+    const queries = accounts.map(account => {
+      const params = account.RowKey.split(/,/);
+      return {query: deleteByPrimaryKey, params: params};
+    });
+
+    cassandraConnector.executeBatchMutations(queries)
+    .then(() => { resolve({ accounts: accounts }); })
+    .catch(reject)
+    ;
+  });
 }
 
 /**
