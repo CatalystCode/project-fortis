@@ -97,6 +97,7 @@
         "deploymentVmSize": "Standard_D2_v2",
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
         "imagePublisher": "Canonical",
+        "deisStorageAcctName": "k8deisstorage",
         "imageOffer": "UbuntuServer",
 	    "vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
@@ -110,6 +111,7 @@
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
         "subnetName": "Subnet",
+        "sbVersion": "2017-04-01",
         "subnetPrefix": "10.0.0.0/24",
         "publicIPAddressType": "Dynamic",
         "virtualNetworkName": "FortisVNet",
@@ -118,9 +120,14 @@
         "postDeploymentGithubRepoPath": "https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master",
         "postDeploymentExtensionScript": "fortis-deploy.sh",
         "githubClonePath":  "https://github.com/CatalystCode/fortisdeploy.git",
+        "sbNamespace": "fortisservicebusns",
+        "sbQueueNameSiteSettings": "siteMutations",
+        "sbQueueNameStreams": "streamMutations",
+        "sbAuthRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('sbNamespace'), variables('defaultSASKeyName'))]",
+        "defaultSASKeyName": "RootManageSharedAccessKey",
+        "sbAuthRuleName": "[concat(variables('sbNamespace'),'/fortisAuthRule')]",
         "eventHubNamespace": "fortiseventhubns",
         "eventHubName": "published-messages",
-        "eventhubAccessClaimType": "RootManageSharedAccessKey",
         "eventHubMessagingUnits": "1",
         "eventHubSku": "2",
         "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), 'fortisAuthRule')]",
@@ -206,6 +213,42 @@
             },
             "kind": "Storage",
             "properties": {}
+        },
+        {
+        "apiVersion": "[variables('sbVersion')]",
+        "name": "[parameters('sbNamespace')]",
+        "type": "Microsoft.ServiceBus/namespaces",
+        "location": "[resourceGroup().location]",
+        "resources": [
+            {
+                "apiVersion": "[variables('sbVersion')]",
+                "name": "[parameters('sbQueueNameStreams')]",
+                "type": "Queues",
+                "dependsOn": [
+                    "[concat('Microsoft.ServiceBus/namespaces/', parameters('sbNamespace'))]"
+                ]
+            },
+            {
+                "apiVersion": "[variables('sbVersion')]",
+                "name": "[parameters('sbQueueNameSiteSettings')]",
+                "type": "Queues",
+                "dependsOn": [
+                    "[concat('Microsoft.ServiceBus/namespaces/', parameters('sbNamespace'))]"
+                ]
+            },
+            {
+                "apiVersion": "[variables('sbVersion')]",
+                "name": "[variables('sbAuthRuleName')]",
+                "type": "Microsoft.ServiceBus/namespaces/authorizationRules",
+                    "dependsOn": [
+                        "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "Rights": [ "Send", "Listen", "Manage" ]
+                    }
+            }
+        ]
         },
         {
             "apiVersion": "[variables('ehVersion')]",
@@ -422,7 +465,7 @@
                     "fileUris": [
                         "[concat(variables('postDeploymentGithubRepoPath'),'/', variables('postDeploymentExtensionScript'))]"
                     ],
-                    "commandToExecute": "[concat('./', variables('postDeploymentExtensionScript'), ' -lo \"', resourceGroup().location, '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -kn \"', variables('kubernetesName'), '\" -pf \"', parameters('dnsNamePrefix'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -gc \"', variables('githubClonePath'), '\"')]"
+                    "commandToExecute": "[concat('./', variables('postDeploymentExtensionScript'), ' -lo \"', resourceGroup().location, '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -kn \"', variables('kubernetesName'), '\" -pf \"', parameters('dnsNamePrefix'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -gc \"', variables('githubClonePath'), '\"')]"
                 }
             }
         }
@@ -431,6 +474,10 @@
         "kubernetesMasterFQDN": {
             "type": "string",
             "value": "[reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn]"
+        },
+        "fortisAdminSiteURL": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('deisStorageAcctName'))).tags.FORTIS_ADMIN_INTERFACE_HOST]"
         },
         "agentFQDN": {
             "type": "string",
