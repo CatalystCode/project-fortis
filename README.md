@@ -13,7 +13,7 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
 ## Deployment Prerequisites
 * First and foremost, you'll need an existing azure subscription. You can create one for free [here](https://azure.microsoft.com/en-us/free/). 
 * Generate a Public / Private ssh key pair following [these](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) instructions. The contents from the generated `MyKey.pub` file will be used for the `SSh Public Key` field. 
-* An existing azure service principal. You can create one following these [instructions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal). Your service principles `Application ID` will be used for the `Service Principal App ID` field, and the `Authentication Key` will be used for the `Service Principal App Key`. 
+* You'll need an existing azure service principal. You can follow these [instructions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal) if you need to generate a new service principal. Your service principles `Application ID` will be used for the `Service Principal App ID` field, and the `Authentication Key` will be used for the `Service Principal App Key`. 
 
 ## Fortis Monitored Data Sources
 

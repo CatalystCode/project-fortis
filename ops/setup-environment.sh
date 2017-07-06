@@ -25,8 +25,22 @@ readonly sb_queue_site="siteMutations"
 readonly sb_queue_streams="streamMutations"
 readonly fortis_models_directory="${fortis_central_directory}/sentiment/"
 
-kubectl create configmap "${spark_config_map_name}" --namespace spark --from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" --from-literal=FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" --from-literal=DEFAULT_SITE_NAME="${site_name}" --from-literal=FORTIS_APPINSIGHTS_IKEY="${app_insights_id}" --from-literal=SPARK_DAEMON_MEMORY="${SPARK_DAEMON_MEMORY}" --from-literal=HA_PROGRESS_DIR="${checkpoint_directory}" --from-literal=DEFAULT_LANGUAGE="${default_language}" --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" --from-literal=SERVICE_BUS_CONNECTION_STRING="${sb_conn_str}" --from-literal=SERVICE_BUS_QUEUE_SITE="${sb_queue_site}" --from-literal=SERVICE_BUS_QUEUE_STREAM="${sb_queue_streams}"
---from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
+kubectl create configmap "${spark_config_map_name}" --namespace spark \
+--from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" \
+--from-literal=FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" \
+--from-literal=DEFAULT_SITE_NAME="${site_name}" \
+--from-literal=FORTIS_APPINSIGHTS_IKEY="${app_insights_id}" \
+--from-literal=SPARK_DAEMON_MEMORY="${SPARK_DAEMON_MEMORY}" \
+--from-literal=HA_PROGRESS_DIR="${checkpoint_directory}" \
+--from-literal=DEFAULT_LANGUAGE="${default_language}" \
+--from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
+--from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
+--from-literal=SERVICE_BUS_CONNECTION_STRING="${sb_conn_str}" \
+--from-literal=SERVICE_BUS_QUEUE_SITE="${sb_queue_site}" \
+--from-literal=SERVICE_BUS_QUEUE_STREAM="${sb_queue_streams}"
+--from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
+--from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
+--from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
 
 cd deis-apps/feature-service || exit 2
 deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
