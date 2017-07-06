@@ -13,7 +13,7 @@ readonly pg_name="${FEATUREDB_NAME:-fortis-feature-service-db-$(randomId 8)}"
 readonly pg_tier="${FEATUREDB_TIER:-Basic}"
 readonly pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
 readonly pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
-readonly pg_dbname="${FEATUREDB_DBNAME:geofeatures}"
+readonly pg_dbname="${FEATUREDB_DBNAME:-geofeatures}"
 readonly pg_user_password="$(randomString 32)"
 readonly pg_admin_password="$(randomString 32)"
 
