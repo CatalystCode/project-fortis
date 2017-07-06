@@ -1,24 +1,26 @@
 'use strict';
 
-var port = process.env.PORT || 8000;  
+const port = process.env.PORT || 8000;
 
 require('./src/clients/appinsights/AppInsightsClient').setup();
-var http = require('http');
-var express = require('express');
-var bodyParser = require('body-parser');
-var graphqlHTTP = require('express-graphql');
-var SpatialMessageSchema = require('./src/schemas/MessageSchema');
-var SpatialMessageResolver = require('./src/resolvers/Messages');
-var FactsSchema = require('./src/schemas/FactSchema');
-var FactsResolver = require('./src/resolvers/Facts');
-var TileSchema = require('./src/schemas/TilesSchema');
-var TileResolver = require('./src/resolvers/Tiles');
-var EdgesSchema = require('./src/schemas/EdgesSchema');
-var EdgesResolver = require('./src/resolvers/Edges');
-var SettingsResolver = require('./src/resolvers/Settings');
-var SettingsSchema = require('./src/schemas/SettingsSchema');
+const http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
+const graphqlHTTP = require('express-graphql');
 
-var app = express();
+const EdgesSchema = require('./src/schemas/EdgesSchema');
+const FactsSchema = require('./src/schemas/FactSchema');
+const MessageSchema = require('./src/schemas/MessageSchema');
+const SettingsSchema = require('./src/schemas/SettingsSchema');
+const TileSchema = require('./src/schemas/TilesSchema');
+
+const EdgesResolver = require('./src/resolvers/Edges');
+const FactsResolver = require('./src/resolvers/Facts');
+const MessageResolver = require('./src/resolvers/Messages');
+const SettingsResolver = require('./src/resolvers/Settings');
+const TileResolver = require('./src/resolvers/Tiles');
+
+const app = express();
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -40,8 +42,8 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.use('/api/messages', graphqlHTTP({
-  schema: SpatialMessageSchema,
-  rootValue: SpatialMessageResolver,
+  schema: MessageSchema,
+  rootValue: MessageResolver,
   graphiql: true
 }));
 
@@ -69,6 +71,6 @@ app.use('/api/settings', graphqlHTTP({
   graphiql: true
 }));
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 server.listen(port, function () {});
