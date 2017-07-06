@@ -2,7 +2,8 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.topic
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 
-class Blacklist(blacklist: Seq[Set[String]]) {
+@SerialVersionUID(100L)
+class Blacklist(blacklist: Seq[Set[String]]) extends Serializable {
   def matches(text: String): Boolean = {
     if (text.isEmpty) {
       return false
