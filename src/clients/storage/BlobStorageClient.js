@@ -2,35 +2,30 @@
 
 const Promise = require('promise');
 const request = require('request');
-const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
-
-function buildTopicsSiteTypeUri(siteType) {
-  return `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
-}
 
 /**
- * @param {string} siteType
- * @returns {Promise.<Array<{keyword: string, lang_code: string, insertion_time: timestamp, translations: Map<string, string>}>>}
+ * @param {string} uri
+ * @returns {Promise.<Array<Object>>}
 */
-function fetchTopicsBySiteType(siteType) {
+function fetchJson(uri) {
   return new Promise((resolve, reject) => {
-    request.get(buildTopicsSiteTypeUri(siteType), (err, response, body) => {
+    request.get(uri, (err, response, body) => {
       if(err || response.statusCode !== 200) {
-        return reject(`Unable to get topics for siteType ${siteType}: ${err}`);
+        return reject(`Unable to get json for uri ${uri}: ${err}`);
       }
 
-      let topics;
+      let json;
       try {
-        topics = JSON.parse(body);
+        json = JSON.parse(body);
       } catch (err) {
-        return reject(`Unable to parse JSON for topics response ${body}: ${err}`);
+        return reject(`Unable to parse JSON for response ${body}: ${err}`);
       }
 
-      resolve(topics);
+      resolve(json);
     });
   });
 }
 
 module.exports = {
-  fetchTopicsBySiteType: fetchTopicsBySiteType
+  fetchJson: fetchJson
 };
