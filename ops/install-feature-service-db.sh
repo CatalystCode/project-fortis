@@ -62,7 +62,7 @@ PGPASSWORD="${pg_admin_password}" psql \
   --quiet
 rm "${dbdump}"
 
-FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${pg_user}@${pg_name}:${pg_admin_password}@${pg_host}:5432/${pg_dbname}?ssl=true"
+FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${pg_user}@${pg_name}:${pg_user_password}@${pg_host}:5432/${pg_dbname}?ssl=true"
 export FEATURE_SERVICE_DB_CONNECTION_STRING
 
 echo "All done installing feature service database"
