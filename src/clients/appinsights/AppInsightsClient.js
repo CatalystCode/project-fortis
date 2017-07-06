@@ -55,23 +55,26 @@ function trackDependency(promiseFunc, dependencyName, callName) {
   return dependencyTracker;
 }
 
-function trackEvent(promiseFunc, eventName) {
+function trackEvent(promiseFunc, eventName, extraPropsFunc) {
   if (!client) return promiseFunc;
+  extraPropsFunc = extraPropsFunc || ((returnValue, err) => ({})); // eslint-disable-line no-unused-vars
 
   function eventTracker(...args) {
     return new Promise((resolve, reject) => {
       const start = new Date();
       promiseFunc(...args)
       .then(returnValue => {
-        const duration = new Date() - start;
-        const success = true;
-        client.trackEvent(eventName, { duration: duration, success: success });
+        const props = extraPropsFunc(returnValue, null);
+        props.duration = new Date() - start;
+        props.success = true;
+        client.trackEvent(eventName, props);
         resolve(returnValue);
       })
       .catch(err => {
-        const duration = new Date() - start;
-        const success = false;
-        client.trackEvent(eventName, { duration: duration, success: success });
+        const props = extraPropsFunc(null, err);
+        props.duration = new Date() - start;
+        props.success = false;
+        client.trackEvent(eventName, props);
         reject(err);
       });
     });
