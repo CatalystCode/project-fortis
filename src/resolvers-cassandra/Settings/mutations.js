@@ -6,7 +6,7 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const withRunTime = require('../shared').withRunTime;
 
 const STREAM_PIPELINE_TWITTER = 'twitter';
-const STREAM_CONNECTOR_TWITTER = 'twitter';
+const STREAM_CONNECTOR_TWITTER = 'Twitter';
 
 const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
