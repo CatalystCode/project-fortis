@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -e
 
 readonly pg_conn_str="$1"
 readonly blob_account_key="$2"
