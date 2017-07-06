@@ -39,12 +39,12 @@ az postgres server firewall-rule create \
   --start-ip-address 0.0.0.0 \
   --end-ip-address 255.255.255.255
 
-echo "Finished. Now downloading database dump"
 dbdump="$(mktemp)"
+echo "Finished. Now downloading database dump to ${dbdump}"
 curl "${pg_dump}" | gunzip --to-stdout > "${dbdump}"
 
-echo "Finished. Now populating the database"
 pg_host="$(az postgres server show --resource-group "${resource_group}" --name "${pg_name}" | jq -r '.fullyQualifiedDomainName')"
+echo "Finished. Now populating the database hosted at ${pg_host}"
 
 echo "CREATE DATABASE ${pg_dbname}; CREATE USER ${pg_user} WITH login PASSWORD '${pg_user_password}';" | \
 psql "postgresql://${pg_host}:${pg_port}/postgres?user=${pg_admin}@${pg_name}&password=${pg_admin_password}&ssl=true"
