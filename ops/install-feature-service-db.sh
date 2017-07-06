@@ -47,18 +47,10 @@ echo "Finished. Now populating the database"
 pg_host="$(az postgres server show --resource-group "${resource_group}" --name "${pg_name}" | jq -r '.fullyQualifiedDomainName')"
 
 echo "CREATE DATABASE ${pg_dbname}; CREATE USER ${pg_user} WITH login PASSWORD '${pg_user_password}';" | \
-PGPASSWORD="${pg_admin_password}" psql \
-  --host "${pg_host}" \
-  --port 5432 \
-  --username "${pg_admin}@${pg_name}" \
-  --quiet
+psql "postgresql://${pg_host}:${pg_port}/postgres?user=${pg_admin}@${pg_name}&password=${pg_admin_password}&ssl=true"
 
-<"${dbdump}" \
-PGPASSWORD="${pg_admin_password}" psql \
-  --host "${pg_host}" \
-  --port 5432 \
-  --username "${pg_admin}@${pg_name}" \
-  --dbname "${pg_dbname}" \
+< "${dbdump}" \
+psql "postgresql://${pg_host}:${pg_port}/${pg_dbname}?user=${pg_admin}@${pg_name}&password=${pg_admin_password}&ssl=true" \
   --quiet
 rm "${dbdump}"
 
