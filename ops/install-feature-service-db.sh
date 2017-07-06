@@ -3,6 +3,7 @@
 readonly location="$1"
 readonly resource_group="$2"
 
+randomString() { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"$1"; }
 randomId() {  < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
 
 readonly pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
@@ -13,8 +14,8 @@ readonly pg_tier="${FEATUREDB_TIER:-Basic}"
 readonly pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
 readonly pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
 readonly pg_dbname="${FEATUREDB_DBNAME:geofeatures}"
-readonly pg_user_password="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${PASSWORD_COMPLEXITY:-32}")"
-readonly pg_admin_password="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${PASSWORD_COMPLEXITY:-32}")"
+readonly pg_user_password="$(randomString 32)"
+readonly pg_admin_password="$(randomString 32)"
 
 if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
 if ! (command -v psql >/dev/null); then sudo apt-get install -y postgresql postgresql-contrib; fi
