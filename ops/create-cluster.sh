@@ -20,6 +20,7 @@ git clone https://github.com/CatalystCode/charts.git
 echo "Installing Cassandra chart"
 ./install-cassandra.sh "${k8cassandra_node_count}"
 echo "Finished. Now installing feature service DB"
+# shellcheck disable=SC1091
 . ./install-feature-service-db.sh "${k8location}" "${k8resource_group}"
 echo "Finished. Now installing DEIS"
 ./install-deis.sh "${k8location}" "${k8resource_group}"
