@@ -50,8 +50,7 @@ echo "CREATE DATABASE ${pg_dbname}; CREATE USER ${pg_user} WITH login PASSWORD '
 psql "postgresql://${pg_host}:${pg_port}/postgres?user=${pg_admin}@${pg_name}&password=${pg_admin_password}&ssl=true"
 
 < "${dbdump}" \
-psql "postgresql://${pg_host}:${pg_port}/${pg_dbname}?user=${pg_admin}@${pg_name}&password=${pg_admin_password}&ssl=true" \
-  --quiet
+psql "postgresql://${pg_host}:${pg_port}/${pg_dbname}?user=${pg_admin}@${pg_name}&password=${pg_admin_password}&ssl=true" --quiet
 rm "${dbdump}"
 
 FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${pg_user}@${pg_name}:${pg_user_password}@${pg_host}:5432/${pg_dbname}?ssl=true"
