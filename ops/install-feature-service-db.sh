@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-readonly location="$1"
-readonly resource_group="$2"
+location="$1"
+resource_group="$2"
 
 randomString() { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"$1"; }
 randomId() {  < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
 
-readonly pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
-readonly pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
-readonly pg_user="${FEATUREDB_USER:-frontend}"
-readonly pg_name="${FEATUREDB_NAME:-fortis-feature-service-db-$(randomId 8)}"
-readonly pg_tier="${FEATUREDB_TIER:-Basic}"
-readonly pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
-readonly pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
-readonly pg_dbname="${FEATUREDB_DBNAME:-geofeatures}"
-readonly pg_user_password="$(randomString 32)"
-readonly pg_admin_password="$(randomString 32)"
+pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
+pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
+pg_user="${FEATUREDB_USER:-frontend}"
+pg_name="${FEATUREDB_NAME:-fortis-feature-service-db-$(randomId 8)}"
+pg_tier="${FEATUREDB_TIER:-Basic}"
+pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
+pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
+pg_dbname="${FEATUREDB_DBNAME:-geofeatures}"
+pg_user_password="$(randomString 32)"
+pg_admin_password="$(randomString 32)"
 
 if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
 if ! (command -v psql >/dev/null); then sudo apt-get install -y postgresql postgresql-contrib; fi
