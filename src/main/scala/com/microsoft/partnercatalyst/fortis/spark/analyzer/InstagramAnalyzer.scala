@@ -11,7 +11,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.Locations
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 
-class InstagramAnalyzer extends Analyzer[InstagramItem]
+@SerialVersionUID(100L)
+class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
   with AnalysisDefaults.EnableBlacklist[InstagramItem]
   with AnalysisDefaults.EnableKeyword[InstagramItem] {
   override def toSchema(item: InstagramItem, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[InstagramItem] = {
