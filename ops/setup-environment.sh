@@ -43,7 +43,7 @@ deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
 deis config:set FORTIS_SERVICE_HOST="${graphql_service_host}"
 deis config:set DEFAULT_SITE_NAME="${site_name}"
 
-cd ../../
+cd ../../ || exit 2
 
 #Set the deployed service host url tag so we can output that on the deployment console to the user
 sudo az resource tag --tags FORTIS_SERVICE_HOST="${graphql_service_host}" -g "${k8resource_group}" -n k8deisstorage --resource-type "Microsoft.Storage/storageAccounts"
