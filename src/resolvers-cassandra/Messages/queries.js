@@ -5,7 +5,8 @@ const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
-const makeMap = require('../../utils/collections').makeMap;
+const flatten = require('lodash/flatten');
+const { cross, makeMap } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
@@ -35,14 +36,8 @@ function cassandraRowToFeature(row) {
 }
 
 function makeDefaultClauses(args) {
-  let params = [];
+  const params = [];
   const clauses = [];
-
-  const keywords = (args.filteredEdges || []).concat(args.mainTerm ? [args.mainTerm] : []);
-  if (keywords.length) {
-    clauses.push(`(${keywords.map(_ => '(detectedkeywords CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
-    params = params.concat(keywords);
-  }
 
   if (args.fromDate) {
     clauses.push('(event_time >= ?)');
@@ -66,19 +61,29 @@ function makeDefaultClauses(args) {
 
   clauses.push('(pipeline IN (\'Twitter\', \'Facebook\', \'Instagram\', \'Radio\', \'Reddit\'))');
 
-  return {clauses: clauses, params: params};
+  const keywords = (args.filteredEdges || []).concat(args.mainTerm ? [args.mainTerm] : []);
+  return {clauses: clauses, params: params, keywords};
 }
 
-function makePlacesQuery(args, placeIds) {
+function makePlacesQueries(args, placeIds) {
   const defaults = makeDefaultClauses(args);
-  const clauses = defaults.clauses;
-  let params = defaults.params;
 
-  clauses.push(`(${placeIds.map(_ => '(detectedplaceids CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
-  params = params.concat(placeIds);
+  return cross(placeIds, defaults.keywords).map(placeIdAndKeyword => {
+    const clauses = defaults.clauses.slice();
+    const params = defaults.params.slice();
 
-  const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
-  return {query: query, params: params};
+    if (placeIdAndKeyword.left) {
+      clauses.push('(detectedplaceids CONTAINS ?)');
+      params.push(placeIdAndKeyword.left);
+    }
+    if (placeIdAndKeyword.right) {
+      clauses.push('(detectedkeywords CONTAINS ?)');
+      params.push(placeIdAndKeyword.right);
+    }
+
+    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+    return {query: query, params: params};
+  });
 }
 
 /**
@@ -92,9 +97,11 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
     featureServiceClient.fetchByPoint({latitude: args.coordinates[0], longitude: args.coordinates[1]})
     .then(places => {
       const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const query = makePlacesQuery(args, Object.keys(idToBbox));
-      cassandraConnector.executeQuery(query.query, query.params)
-      .then(rows => {
+      const placeIds = Object.keys(idToBbox);
+      const queries = makePlacesQueries(args, placeIds);
+      Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+      .then(nestedRows => {
+        const rows = flatten(nestedRows);
         const features = rows.map(row => {
           const feature = cassandraRowToFeature(row);
           feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
@@ -122,9 +129,11 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
     .then(places => {
       const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const query = makePlacesQuery(args, Object.keys(idToBbox));
-      cassandraConnector.executeQuery(query.query, query.params)
-      .then(rows => {
+      const placeIds = Object.keys(idToBbox);
+      const queries = makePlacesQueries(args, placeIds);
+      Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+      .then(nestedRows => {
+        const rows = flatten(nestedRows);
         const features = rows.map(row => {
           const feature = cassandraRowToFeature(row);
           feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
@@ -141,13 +150,19 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-function makeEdgesQuery(args) {
+function makeEdgesQueries(args) {
   const defaults = makeDefaultClauses(args);
-  const clauses = defaults.clauses;
-  const params = defaults.params;
 
-  const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
-  return {query: query, params: params};
+  return defaults.keywords.map(keyword => {
+    const clauses = defaults.clauses.slice();
+    const params = defaults.params.slice();
+
+    clauses.push('(detectedkeywords CONTAINS ?)');
+    params.push(keyword);
+
+    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+    return {query: query, params: params};
+  });
 }
 
 /**
@@ -155,10 +170,11 @@ function makeEdgesQuery(args) {
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
-  const query = makeEdgesQuery(args);
+  const queries = makeEdgesQueries(args);
   return new Promise((resolve, reject) => {
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
+    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows);
       const placeIds = new Set();
       rows.forEach(row => row.detectedplaceids.forEach(placeId => placeIds.add(placeId)));
       featureServiceClient.fetchById(placeIds)
