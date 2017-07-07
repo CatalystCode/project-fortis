@@ -58,7 +58,7 @@ function list(args, res) { // eslint-disable-line no-unused-vars
     const queries = makeListQueries(args);
     Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
     .then(nestedRows => {
-      const rows = flatten(nestedRows);
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
       const facts = rows.map(cassandraRowToFact);
 
       resolve({
