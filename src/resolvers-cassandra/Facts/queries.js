@@ -23,7 +23,7 @@ function cassandraRowToFact(row) {
 }
 
 function appendDefaultFilters(query, params) {
-  query += ' AND pipeline IN ("TadaWeb", "Bing", "CustomEvent")';
+  query += ' AND pipeline IN (\'TadaWeb", \'Bing\', \'CustomEvent\')';
   return {query: query, params: params};
 }
 

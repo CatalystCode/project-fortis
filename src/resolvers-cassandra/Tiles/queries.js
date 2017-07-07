@@ -14,12 +14,12 @@ function makeDefaultFilters(args) {
 
   const keywords = (args.filteredEdges || []).concat(args.mainEdge ? [args.mainEdge] : []);
   if (keywords.length) {
-    clauses.push(`(${keywords.map(_ => '(keyword = ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+    clauses.push(`(keyword IN (${keywords.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
     params = params.concat(keywords);
   }
 
   if (args.sourceFilter && args.sourceFilter.length) {
-    clauses.push(`(${args.sourceFilter.map(_ => '(pipeline = ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+    clauses.push(`(pipeline IN (${args.sourceFilter.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
     params = params.concat(args.sourceFilter);
   }
 

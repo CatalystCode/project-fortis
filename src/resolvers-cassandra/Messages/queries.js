@@ -68,7 +68,7 @@ function makeDefaultClauses(args) {
     params.push(args.originalSource);
   }
 
-  clauses.push('(pipeline IN ("Twitter", "Facebook", "Instagram", "Radio", "Reddit"))');
+  clauses.push('(pipeline IN (\'Twitter\', \'Facebook\', \'Instagram\', \'Radio\', \'Reddit\'))');
 
   return {clauses: clauses, params: params};
 }
