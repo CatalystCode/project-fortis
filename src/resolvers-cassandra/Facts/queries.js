@@ -3,6 +3,7 @@
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
+const flatten = require('lodash/flatten');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
@@ -31,14 +32,19 @@ function makeDefaultClauses() {
   return {clauses: clauses, params: params};
 }
 
-function makeListQuery(args) {
-  let {clauses, params} = makeDefaultClauses();
+function makeListQueries(args) {
+  const defaults = makeDefaultClauses();
 
-  clauses.push(`(${args.tagFilter.map(_ => 'detectedkeywords CONTAINS ?').join(' OR ')})`); // eslint-disable-line no-unused-vars
-  params = params.concat(args.tagFilter);
+  return args.tagFilter.map(keyword => {
+    const clauses = defaults.clauses.slice();
+    const params = defaults.params.slice();
 
-  const query = `SELECT * FROM fortis.events WHERE (${clauses.join(' AND ')})`;
-  return {query: query, params: params};
+    clauses.push('(detectedkeywords CONTAINS ?)');
+    params.push(keyword);
+
+    const query = `SELECT * FROM fortis.events WHERE (${clauses.join(' AND ')})`;
+    return {query: query, params: params};
+  });
 }
 
 /**
@@ -49,9 +55,10 @@ function list(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.tagFilter || !args.tagFilter.length) return reject('No tags specified to fetch');
 
-    const query = makeListQuery(args);
-    return cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
+    const queries = makeListQueries(args);
+    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows);
       const facts = rows.map(cassandraRowToFact);
 
       resolve({
