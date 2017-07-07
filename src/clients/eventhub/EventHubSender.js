@@ -2,6 +2,7 @@
 
 const EventHubClient = require('azure-event-hubs').Client;
 const Promise = require('promise');
+const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 const eventHubConnectionString = process.env.PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING;
 const eventHubPath = process.env.PUBLISH_EVENTS_EVENTHUB_PATH;
@@ -33,5 +34,5 @@ function sendMessages(messages) {
 }
 
 module.exports = {
-  sendMessages: sendMessages
+  sendMessages: trackDependency(sendMessages, 'EventHub', 'send')
 };

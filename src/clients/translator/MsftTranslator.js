@@ -4,6 +4,7 @@ const xml2js = require('xml2js');
 const nconf = require('nconf');
 const Promise = require('promise');
 const request = require('request');
+const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 let memoryStore = new nconf.Memory();
 
@@ -152,6 +153,6 @@ function translate(sentence, fromLanguage, toLanguage) {
 }
 
 module.exports = {
-  translateSentenceArray: translateSentenceArray,
-  translate: translate
+  translateSentenceArray: trackDependency(translateSentenceArray, 'MsftTranslator', 'translateSentenceArray'),
+  translate: trackDependency(translate, 'MsftTranslator', 'translate')
 };

@@ -92,6 +92,7 @@ module.exports = graphql.buildSchema(`
   }
 
   type TwitterAccount {
+    RowKey: String,
     accountName: String,
     consumerKey: String,
     consumerSecret: String,
@@ -129,6 +130,7 @@ module.exports = graphql.buildSchema(`
   }
 
   input TwitterAccountInput {
+    RowKey: String,
     accountName: String!,
     consumerKey: String!,
     consumerSecret: String!,
