@@ -24,6 +24,7 @@ module.exports = graphql.buildSchema(`
 
   type SiteProperties {
     RowKey: String,
+    siteType: String,
     targetBbox: [Float],
     defaultZoomLevel: Int,
     logo: String,
@@ -103,6 +104,7 @@ module.exports = graphql.buildSchema(`
 
   input SiteDefinition {
     RowKey: String,
+    siteType: String,
     targetBbox: [Float],
     defaultZoomLevel: Int,
     logo: String,
