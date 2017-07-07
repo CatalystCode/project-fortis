@@ -171,7 +171,6 @@ function removeTwitterAccounts(args, res) { // eslint-disable-line no-unused-var
  */
 function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-<<<<<<< HEAD
     const terms = args && args.input && args.input.terms;
     if (!terms || !terms.length) return reject('No terms specified');
 
@@ -198,9 +197,6 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
     .catch(reject)
     ;
     
-=======
-    reject('Modification not yet supported.');
->>>>>>> upstream/master
   });
 }
 
