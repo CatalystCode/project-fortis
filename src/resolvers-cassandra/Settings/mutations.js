@@ -171,7 +171,32 @@ function removeTwitterAccounts(args, res) { // eslint-disable-line no-unused-var
  */
 function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    reject('Modification not yet supported.');
+    const terms = args && args.input && args.input.terms;
+    if (!terms || !terms.length) return reject('No terms specified');
+
+    const mutations = [];
+    const filterRecords = [];
+    terms.forEach(term => {
+      if (term.RowKey) {
+        mutations.push({
+          query:'UPDATE blacklist SET conjunctivefilter = ? WHERE id = ?',
+          params:[term.filteredTerms, term.RowKey]
+        });
+      } else {
+        term.RowKey = uuid();
+        mutations.push({
+          query:'INSERT INTO blacklist (id, conjunctivefilter) VALUES(?, ?)',
+          params:[term.RowKey, term.filteredTerms]
+        });
+      }
+      filterRecords.push(term);
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(() => { resolve({ filters: filterRecords }); })
+    .catch(reject)
+    ;
+    
   });
 }
 
@@ -183,6 +208,12 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const terms = args && args.input && args.input.terms;
     if (!terms || !terms.length) return reject('No terms specified');
+    
+    const invalidTerms = terms.filter(terms=>!terms.RowKey);
+    if (invalidTerms.length > 0) {
+      reject(`RowKey required for ${JSON.stringify(invalidTerms)}`);
+      return;
+    }
     
     const params = [terms.map( t => { return t.RowKey; } )];
     const update = 'DELETE FROM fortis.blacklist WHERE id IN ?';
