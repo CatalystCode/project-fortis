@@ -8,7 +8,7 @@ const withRunTime = require('../shared').withRunTime;
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const { makeMap, makeSet } = require('../../utils/collections');
 
-function makeDefaultFilters(args) {
+function makeDefaultClauses(args) {
   let params = [];
   let clauses = [];
 
@@ -42,7 +42,7 @@ function makeDefaultFilters(args) {
 }
 
 function makeTilesQuery(args, tileIds) {
-  const {clauses, params} = makeDefaultFilters(args);
+  const {clauses, params} = makeDefaultClauses(args);
 
   tileIds.forEach(tileId => {
     clauses.push('(tileid = ?)');
@@ -54,7 +54,7 @@ function makeTilesQuery(args, tileIds) {
 }
 
 function makeLocationsQuery(args, locationIds) {
-  let {clauses, params} = makeDefaultFilters(args);
+  let {clauses, params} = makeDefaultClauses(args);
 
   clauses.push(`(${locationIds.map(_ => '(placeids CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
   params = params.concat(locationIds);

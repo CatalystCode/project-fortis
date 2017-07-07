@@ -22,16 +22,23 @@ function cassandraRowToFact(row) {
   };
 }
 
-function appendDefaultFilters(query, params) {
-  query += ' AND pipeline IN (\'TadaWeb", \'Bing\', \'CustomEvent\')';
-  return {query: query, params: params};
+function makeDefaultClauses() {
+  const clauses = [];
+  const params = [];
+
+  clauses.push('(pipeline IN (\'TadaWeb\', \'Bing\', \'CustomEvent\'))');
+
+  return {clauses: clauses, params: params};
 }
 
 function makeListQuery(args) {
-  const tagsCondition = args.tagFilter.map(_ => 'detectedkeywords CONTAINS ?').join(' OR '); // eslint-disable-line no-unused-vars
-  const query = `SELECT * FROM fortis.events WHERE (${tagsCondition})`;
-  const params = args.tagFilter.slice();
-  return appendDefaultFilters(query, params);
+  let {clauses, params} = makeDefaultClauses();
+
+  clauses.push(`(${args.tagFilter.map(_ => 'detectedkeywords CONTAINS ?').join(' OR ')})`); // eslint-disable-line no-unused-vars
+  params = params.concat(args.tagFilter);
+
+  const query = `SELECT * FROM fortis.events WHERE (${clauses.join(' AND ')})`;
+  return {query: query, params: params};
 }
 
 /**
@@ -56,9 +63,13 @@ function list(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function makeGetQuery(args) {
-  let query = 'SELECT * FROM fortis.events WHERE id = ?';
-  let params = [args.id];
-  return appendDefaultFilters(query, params);
+  let {clauses, params} = makeDefaultClauses();
+
+  clauses.push('(id = ?)');
+  params.push(args.id);
+
+  let query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+  return {query: query, params: params};
 }
 
 /**
