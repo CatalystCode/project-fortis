@@ -86,7 +86,7 @@
     "variables": {
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
         "storageSku": "Premium_LRS",
-	    "vmStorageAccountType": "Standard_LRS",
+        "vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
         "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
@@ -99,14 +99,14 @@
         "imagePublisher": "Canonical",
         "deisStorageAcctName": "k8deisstorage",
         "imageOffer": "UbuntuServer",
-	    "vmStorageAccountContainerName": "vhds",
+        "vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
         "managePolicy": "ManagePolicy",
         "sendPolicy": "SendPolicy",
-	    "agentOsType": "Linux",
+        "agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
-	    "vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
+        "vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
@@ -131,13 +131,13 @@
         "eventHubMessagingUnits": "1",
         "eventHubSku": "2",
         "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), 'fortisAuthRule')]",
-	    "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
-	    "useServicePrincipalDictionary": {
+        "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
+        "useServicePrincipalDictionary": {
             "DCOS": 0,
             "Swarm": 0,
             "Kubernetes": 1
         },
-	    "servicePrincipalFields": [
+        "servicePrincipalFields": [
             null,
             {
                 "ClientId": "[parameters('servicePrincipalAppId')]",
@@ -203,7 +203,7 @@
                 }
             }
         },
-	    {
+        {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('vmStorageAccountName')]",
             "apiVersion": "2016-01-01",
@@ -347,7 +347,7 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
                 "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
-		        "[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
                 "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
             ],
             "properties": {
@@ -444,7 +444,7 @@
                         ]
                     }
                 },
-		"servicePrincipalProfile": "[variables('servicePrincipalFields')[variables('useServicePrincipal')]]"
+        "servicePrincipalProfile": "[variables('servicePrincipalFields')[variables('useServicePrincipal')]]"
             }
         },
         {
@@ -458,9 +458,9 @@
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
-				"type": "CustomScript",
-				"typeHandlerVersion": "2.0",
-				"autoUpgradeMinorVersion": true,
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
                         "[concat(variables('postDeploymentGithubRepoPath'),'/', variables('postDeploymentExtensionScript'))]"
