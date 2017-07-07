@@ -10,6 +10,7 @@ const STREAM_PIPELINE_TWITTER = 'twitter';
 const STREAM_CONNECTOR_TWITTER = 'Twitter';
 
 const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
+const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
 /**
@@ -19,13 +20,64 @@ const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
 }
 
+function facebookPagePrimaryKeyValuesToRowKey(values) {
+  return [ TRUSTED_SOURCES_CONNECTOR_FACEBOOK, values[1], values[2] ];
+}
+
+function facebookPageRowKeyToPrimaryKey(page) {
+  const params = page.RowKey.split(',');
+  if (params.length != 3) {
+    throw('Expecting three element comma-delimited RowKey representing (connector, sourceid, sourcetype).');
+  }
+  return facebookPagePrimaryKeyValuesToRowKey(params);
+}
+
+function normalizedFacebookPage(primaryKeyValues) {
+  return {
+    RowKey: facebookPagePrimaryKeyValuesToRowKey(primaryKeyValues),
+    pageUrl: primaryKeyValues[1]
+  };
+}
+
 /**
  * @param {{input: {site: string, pages: Array<{pageUrl: string, RowKey: string}>}}} args
  * @returns {Promise.<{runTime: string, pages: Array<{pageUrl: string, RowKey: string}>}>}
  */
 function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    reject('Modification not yet supported.');
+    const pages = args && args.input && args.input.pages;
+    if (!pages || !pages.length) return reject('No pages specified');
+    
+    const invalidPages = pages.filter(page=>!page.pageUrl);
+    if (invalidPages.length > 0) {
+      reject(`pageUrl required for ${JSON.stringify(invalidPages)}`);
+      return;
+    }
+
+    const mutations = [];
+    const expectedRecords = [];
+    pages.forEach(page => {
+      const isUpdate = page.RowKey && page.pageUrl != facebookPageRowKeyToPrimaryKey(page)[1];
+      if (isUpdate) {
+        mutations.push({
+          query: 'DELETE FROM fortis.trustedsources WHERE connector = ? AND sourceid = ? AND sourcetype = ?',
+          params: facebookPageRowKeyToPrimaryKey(page)
+        });
+      }
+      
+      const params = facebookPagePrimaryKeyValuesToRowKey([TRUSTED_SOURCES_CONNECTOR_FACEBOOK, page.pageUrl, 'FacebookPost']);
+      params.push(TRUSTED_SOURCES_RANK_DEFAULT);
+      mutations.push({
+        query: 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertion_time, rank) VALUES (?, ?, ?, dateof(now()), ?)',
+        params: params
+      });
+      expectedRecords.push(normalizedFacebookPage(params));
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(() => { resolve({ pages: expectedRecords }); })
+    .catch(reject)
+    ;
   });
 }
 
@@ -35,7 +87,26 @@ function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
  */
 function removeFacebookPages(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    reject('Removal not yet supported.');
+    const pages = args && args.input && args.input.pages;
+    if (!pages || !pages.length) return reject('No pages specified');
+    
+    const invalidPages = pages.filter(page=>!page.RowKey);
+    if (invalidPages.length > 0) {
+      reject(`RowKey required for ${JSON.stringify(invalidPages)}`);
+      return;
+    }
+
+    const mutations = pages.map(page => {
+      return {
+        query: 'DELETE FROM fortis.trustedsources WHERE connector = ? AND sourceid = ? AND sourcetype = ?',
+        params: facebookPageRowKeyToPrimaryKey(page)
+      };
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(() => { resolve({ pages: pages }); })
+    .catch(reject)
+    ;
   });
 }
 
