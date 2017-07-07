@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
+import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, Geofence, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.sinks.kafka.KafkaSink
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
@@ -64,10 +64,11 @@ object ProjectFortis extends App {
       Seconds(Constants.SparkStreamingBatchSizeDefault))
 
     val streamProvider = StreamProviderFactory.create()
+    val transformManager: TransformManager = new TransformManager
     val configManager: ConfigurationManager = DummyConfigurationManager
 
     def pipeline[T: TypeTag](name: String, analyzer: Analyzer[T]) =
-      Pipeline(name, analyzer, ssc, streamProvider, configManager)
+      Pipeline(name, analyzer, ssc, streamProvider, transformManager, configManager)
 
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
@@ -98,7 +99,7 @@ object ProjectFortis extends App {
     * Build connector config registry from hard-coded values for demo.
     *
     */
-  private object DummyConfigurationManager extends ConfigurationManager {
+  private object DummyConfigurationManager extends ConfigurationManager with Serializable {
     override def fetchConnectorConfigs(pipeline: String): List[ConnectorConfig] = {
       // The key is the name of the pipeline and the value is a list of connector configs whose streams should comprise it.
       Map[String, List[ConnectorConfig]](
@@ -207,7 +208,31 @@ object ProjectFortis extends App {
       )(pipeline)
     }
 
-    override def fetchSiteSettings(): SiteSettings = ???
+    override def fetchSiteSettings(): SiteSettings = SiteSettings(
+      id = null,
+      siteName = "",
+      geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053),
+      languages = Set("en", "fr", "de"),
+      defaultZoom = 0,
+      title = "",
+      logo = "",
+      translationSvcToken = Settings.oxfordLanguageToken,
+      cogSpeechSvcToken = System.getenv("OXFORD_SPEECH_TOKEN"),
+      cogTextSvcToken = Settings.oxfordLanguageToken,
+      cogVisionSvcToken = Settings.oxfordVisionToken,
+      insertionTime = ""
+    )
+
     override def fetchTrustedSources(connector: String): List[String] = ???
+
+    override def fetchWatchlist(): Map[String, List[String]] =
+      Map(
+        "en" -> List("Ariana")
+      )
+
+    override def fetchBlacklist(): List[BlacklistedTerm] =
+      List(
+        BlacklistedTerm(conjunctiveFilter = Set("Trump", "Hilary"))
+      )
   }
 }

@@ -4,15 +4,13 @@ package com.microsoft.partnercatalyst.fortis.spark
 import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent, Geofence}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
-import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.{LocationsExtractorFactory, PlaceRecognizer}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
-import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.{SentimentDetector, SentimentDetectorAuth}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
@@ -20,31 +18,43 @@ import org.apache.spark.streaming.dstream.DStream
 import scala.reflect.runtime.universe.TypeTag
 
 object Pipeline {
-  def apply[T: TypeTag](name: String, analyzer: Analyzer[T], ssc: StreamingContext, streamProvider: StreamProvider, configurationManager: ConfigurationManager): Option[DStream[FortisEvent]] = {
+  def apply[T: TypeTag](
+    name: String,
+    analyzer: Analyzer[T],
+    ssc: StreamingContext,
+    streamProvider: StreamProvider,
+    transformManager: TransformManager,
+    configurationManager: ConfigurationManager
+  ): Option[DStream[FortisEvent]] = {
     val configs = configurationManager.fetchConnectorConfigs(name)
     val sourceStream = streamProvider.buildStream[T](ssc, configs)
-
 
     val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/opener/opener-$language.zip", Settings.modelsDir)
     val sentimentModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/sentiment/sentiment-$language.zip", Settings.modelsDir)
     val featureServiceClient = new FeatureServiceClient(Settings.featureServiceUrlBase)
 
     sourceStream.map(_.transform(rdd => {
+      // Note: this block executes on the driver, whereas the operations applied to 'rdd' (i.e. rdd.map(_))
+      // will execute on workers.
 
-      // TODO: populate these local variables with values from global update/broadcast wrappers,
-      // which will use the ConfigurationManager (cassandra) to update themselves and (where applicable)
-      // broadcast changes across the Spark cluster.
+      // Get the shared transform context, updating it only if needed.
+      val transformContext = transformManager.getOrUpdateContext(rdd.sparkContext, configurationManager, featureServiceClient)
 
-      val geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053)
+      // Copy TransformContext fields locally to avoid serializing everything to each task. In this way, each task's
+      // serialization will only include the fields that it accesses (Spark's closure cleaner will remove the others)
+      val geofence = transformContext.siteSettings.geofence
+      val supportedLanguages = transformContext.siteSettings.languages
 
-      val locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, geofence).buildLookup()
+      val locationsExtractorFactory = transformContext.locationsExtractorFactory
       val locationFetcher = locationsExtractorFactory.fetch _
-      val blacklist = new Blacklist(Seq(Set("Trump", "Hilary")))
-      val keywordExtractor = new KeywordExtractor(List("Ariana"))
-      val imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(Settings.oxfordVisionToken), featureServiceClient)
-      val languageDetector = new LanguageDetector(LanguageDetectorAuth(Settings.oxfordLanguageToken))
-      val sentimentDetectorAuth = SentimentDetectorAuth(Settings.oxfordLanguageToken)
-      val supportedLanguages = Set("en", "fr", "de")
+
+      val imageAnalyzer = transformContext.imageAnalyzer
+      val languageDetector = transformContext.languageDetector
+      val sentimentDetectorAuth = transformContext.sentimentDetectorAuth
+
+      // Broadcast variables
+      val langToWatchlist = transformContext.langToWatchlist
+      val blacklist = transformContext.blacklist
 
       def convertToSchema(original: T): ExtendedFortisEvent[T] = {
         val message = analyzer.toSchema(original, locationFetcher, imageAnalyzer)
@@ -64,8 +74,16 @@ object Pipeline {
       }
 
       def addKeywords(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
-        val keywords = analyzer.extractKeywords(event.details, keywordExtractor)
-        event.copy(analysis = event.analysis.copy(keywords = keywords))
+        event.analysis.language match {
+          case Some(lang) =>
+            langToWatchlist.value.get(lang) match {
+              case Some(watchlist) => event.copy(
+                analysis = event.analysis.copy(keywords = analyzer.extractKeywords(event.details, new KeywordExtractor(watchlist)))
+              )
+              case None => event
+            }
+          case None => event
+        }
       }
 
       def hasKeywords(analysis: Analysis): Boolean = {
@@ -73,7 +91,7 @@ object Pipeline {
       }
 
       def hasBlacklistedTerms(event: ExtendedFortisEvent[T]): Boolean = {
-        analyzer.hasBlacklistedTerms(event.details, blacklist)
+        analyzer.hasBlacklistedTerms(event.details, new Blacklist(blacklist.value))
       }
 
       def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {

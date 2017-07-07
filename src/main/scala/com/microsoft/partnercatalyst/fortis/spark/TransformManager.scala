@@ -5,33 +5,33 @@ import java.util.concurrent.{CompletableFuture, SynchronousQueue, TimeUnit}
 
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.azure.servicebus._
-import com.microsoft.partnercatalyst.fortis.spark.TransformManager.TransformContext
+import com.microsoft.partnercatalyst.fortis.spark.TransformManager._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
+import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
-import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
 import org.apache.spark.SparkContext
-import org.apache.spark.broadcast.Broadcast
 
 import scala.util.{Failure, Properties, Success, Try}
 
-
 class TransformManager extends Serializable with Loggable {
   private val UpdateSettings = 1
-  private val UpdateWhitelist = 2
+  private val UpdateWatchlist = 2
   private val UpdateBlacklist = 4
+
+  private val shouldUpdate: SynchronousQueue[Int] = new SynchronousQueue[Int]()
 
   // These will be serialized with their initialization values, since Spark should only serialize this class once when
   // building the DStream graph that's saved to the checkpoint.
   // Thus, when recovering from a checkpoint, they will be initialized to these values as well.
-  @volatile private var shouldUpdate: SynchronousQueue[Int] = new SynchronousQueue[Int]()
   @volatile private var transformContext: TransformContext = null
   @volatile private var siteSettings: SiteSettings = null
+  @volatile private var langToWatchlist: Map[String, List[String]] = null
+  @volatile private var blacklist: List[BlacklistedTerm] = null
 
   @volatile private var queueClient: QueueClient = null
 
@@ -44,7 +44,12 @@ class TransformManager extends Serializable with Loggable {
         if (transformContext == null) {
           // Initialization
           queueClient = new QueueClient(
-            new ConnectionStringBuilder(Properties.envOrElse("FORTIS_SERVICEBUS_CONN_STR", "")), ReceiveMode.PeekLock)
+            new ConnectionStringBuilder(
+              Properties.envOrElse("FORTIS_SERVICEBUS_NAMESPACE", ""),
+              Properties.envOrElse("FORTIS_SERVICEBUS_CONFIG_QUEUE", ""),
+              Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_NAME", ""),
+              Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_KEY", "")
+            ), ReceiveMode.PeekLock)
 
           queueClient.registerMessageHandler(
             new MessageHandler(configManager),
@@ -55,12 +60,13 @@ class TransformManager extends Serializable with Loggable {
 
           // Fetch all data synchronously for init
           siteSettings = configManager.fetchSiteSettings()
-          // TODO: fetch whitelist and blacklist
+          langToWatchlist = configManager.fetchWatchlist()
+          blacklist = configManager.fetchBlacklist()
 
           // Update transformContext and broadcast as needed
           transformContext = TransformContext()
           publishSettings(sparkContext, featureServiceClient)
-          publishWhitelist(sparkContext, featureServiceClient)
+          publishWatchlist(sparkContext, featureServiceClient)
           publishBlacklist(sparkContext, featureServiceClient)
 
           return transformContext
@@ -71,21 +77,21 @@ class TransformManager extends Serializable with Loggable {
     synchronized {
       val dirtyFlags: Option[Int] = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
 
-      // The updates to siteSettings, whitelist, blacklist etc. happens-before the corresponding poll returns, so their
+      // The updates to siteSettings, watchlist, blacklist etc. happens-before the corresponding poll returns, so their
       // values used by publish functions will be as new or newer than they were when set by the client lib thread
-      // that enqueued 'flags' (but aren't necessarily from the same iteration). In other words, it's possible publish
+      // that enqueued 'flags' (but aren't necessarily from the same iteration). In other words, it's possible 'publish'
       // functions will publish data that's newer than it was at the time the producer thread notified us through the
-      // sync queue. This is intended.
+      // sync queue. This is an acceptable guarantee and allows the producer code to be lock-free.
       dirtyFlags.foreach(flags => {
-        if ((flags & UpdateSettings) != 0) {
+        if (isSet(flags, UpdateSettings)) {
           publishSettings(sparkContext, featureServiceClient)
         }
 
-        if ((flags & UpdateWhitelist) != 0) {
-          publishWhitelist(sparkContext, featureServiceClient)
+        if (isSet(flags, UpdateWatchlist)) {
+          publishWatchlist(sparkContext, featureServiceClient)
         }
 
-        if ((flags & UpdateBlacklist) != 0) {
+        if (isSet(flags, UpdateBlacklist)) {
           publishBlacklist(sparkContext, featureServiceClient)
         }
       })
@@ -104,24 +110,24 @@ class TransformManager extends Serializable with Loggable {
         case Some(value) => Try(value.toInt) match {
           case Success(parsed) => parsed
           case Failure(ex) =>
-            logError(s"Could not parse 'dirty' property to an integer.", ex)
+            logError(s"Could not parse 'dirty' property to an integer. Ignoring.", ex)
             0
         }
         case None =>
-          logError(s"Service Bus client received unexpected message: ${message.toString}")
+          logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
           0
       }
 
-      if ((flags & UpdateSettings) != 0) {
+      if (isSet(flags, UpdateSettings)) {
         siteSettings = configurationManager.fetchSiteSettings()
       }
 
-      if ((flags & UpdateWhitelist) != 0) {
-        // TODO: fetch whitelist from cassandra
+      if (isSet(flags, UpdateWatchlist)) {
+        langToWatchlist = configurationManager.fetchWatchlist()
       }
 
-      if ((flags & UpdateBlacklist) != 0) {
-        // TODO: fetch blacklist from cassandra
+      if (isSet(flags, UpdateBlacklist)) {
+        blacklist = configurationManager.fetchBlacklist()
       }
 
       // Block for up to two minutes for a Spark thread to acknowledge the updated
@@ -142,36 +148,29 @@ class TransformManager extends Serializable with Loggable {
   }
 
   private def publishSettings(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
+    val settings = siteSettings.copy()
     transformContext = transformContext.copy(
-      locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, siteSettings.geofence).buildLookup(),
-      imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(siteSettings.cogVisionSvcToken), featureServiceClient),
-      languageDetector = new LanguageDetector(LanguageDetectorAuth(siteSettings.translationSvcToken)),
-      sentimentDetectorAuth = SentimentDetectorAuth(siteSettings.translationSvcToken),
-      supportedLanguages = siteSettings.languages
+      siteSettings = settings,
+      locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, settings.geofence).buildLookup(),
+      imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(settings.cogVisionSvcToken), featureServiceClient),
+      languageDetector = new LanguageDetector(LanguageDetectorAuth(settings.translationSvcToken)),
+      sentimentDetectorAuth = SentimentDetectorAuth(settings.translationSvcToken)
     )
   }
 
-  private def publishWhitelist(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
+  private def publishWatchlist(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
     transformContext = transformContext.copy(
-      keywordExtractor = sparkContext.broadcast(new KeywordExtractor(List("Ariana")))
+      langToWatchlist = sparkContext.broadcast(langToWatchlist)
     )
   }
 
   private def publishBlacklist(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
     transformContext = transformContext.copy(
-      blacklist = sparkContext.broadcast(new Blacklist(Seq(Set("Trump", "Hilary"))))
+      blacklist = sparkContext.broadcast(blacklist)
     )
   }
 }
 
-object TransformManager {
-  case class TransformContext private(
-    locationsExtractorFactory: LocationsExtractorFactory = null,
-    blacklist: Broadcast[Blacklist] = null,
-    keywordExtractor: Broadcast[KeywordExtractor] = null,
-    imageAnalyzer: ImageAnalyzer = null,
-    languageDetector: LanguageDetector = null,
-    sentimentDetectorAuth: SentimentDetectorAuth = null,
-    supportedLanguages: Set[String] = null
-  )
+private object TransformManager {
+  @inline def isSet(bitField: Int, test: Int): Boolean = (bitField & test) == test
 }
