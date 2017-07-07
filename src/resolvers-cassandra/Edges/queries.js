@@ -28,7 +28,7 @@ function makeTermsQuery(args) {
   }
 
   if (args.sourceFilter && args.sourceFilter.length) {
-    clauses.push(`(${args.sourceFilter.map(_ => '(pipeline = ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+    clauses.push(`(pipeline IN (${args.sourceFilter.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
     params = params.concat(args.sourceFilter);
   }
 
