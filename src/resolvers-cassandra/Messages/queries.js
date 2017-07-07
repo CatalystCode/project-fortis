@@ -101,7 +101,7 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
       const queries = makePlacesQueries(args, placeIds);
       Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
       .then(nestedRows => {
-        const rows = flatten(nestedRows);
+        const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
         const features = rows.map(row => {
           const feature = cassandraRowToFeature(row);
           feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
@@ -133,7 +133,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       const queries = makePlacesQueries(args, placeIds);
       Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
       .then(nestedRows => {
-        const rows = flatten(nestedRows);
+        const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
         const features = rows.map(row => {
           const feature = cassandraRowToFeature(row);
           feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
@@ -174,7 +174,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
     .then(nestedRows => {
-      const rows = flatten(nestedRows);
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
       const placeIds = new Set();
       rows.forEach(row => row.detectedplaceids.forEach(placeId => placeIds.add(placeId)));
       featureServiceClient.fetchById(placeIds)

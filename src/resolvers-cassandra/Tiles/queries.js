@@ -148,7 +148,7 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
       const queries = makeLocationsQueries(args, locationIds);
       Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
       .then(nestedRows => {
-        const rows = flatten(nestedRows);
+        const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
         const features = cassandraRowsToFeatures(rows);
         resolve({
           features: features
@@ -195,7 +195,7 @@ function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-var
       const queries = makeLocationsQueries(args, locationIds);
       Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
       .then(nestedRows => {
-        const rows = flatten(nestedRows);
+        const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
         const edges = cassandraRowsToEdges(rows);
         resolve({
           edges: edges
