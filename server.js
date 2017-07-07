@@ -14,11 +14,12 @@ const MessageSchema = require('./src/schemas/MessageSchema');
 const SettingsSchema = require('./src/schemas/SettingsSchema');
 const TileSchema = require('./src/schemas/TilesSchema');
 
-const EdgesResolver = require('./src/resolvers/Edges');
-const FactsResolver = require('./src/resolvers/Facts');
-const MessageResolver = require('./src/resolvers/Messages');
-const SettingsResolver = require('./src/resolvers/Settings');
-const TileResolver = require('./src/resolvers/Tiles');
+const resolversDirectory = process.env.ENABLE_V2 ? './src/resolvers-cassandra' : './src/resolvers';
+const EdgesResolver = require(`${resolversDirectory}/Edges`);
+const FactsResolver = require(`${resolversDirectory}/Facts`);
+const MessageResolver = require(`${resolversDirectory}/Messages`);
+const SettingsResolver = require(`${resolversDirectory}/Settings`);
+const TileResolver = require(`${resolversDirectory}/Tiles`);
 
 const app = express();
 
