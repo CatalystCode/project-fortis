@@ -38,14 +38,10 @@ function makeDefaultClauses(args) {
   let params = [];
   const clauses = [];
 
-  if (args.mainTerm) {
-    clauses.push('(detectedkeywords CONTAINS ?)');
-    params.push(args.mainTerm);
-  }
-
-  if (args.filteredEdges) {
-    clauses.push(`(${args.filteredEdges.map(_ => '(detectedkeywords CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
-    params = params.concat(args.filteredEdges);
+  const keywords = (args.filteredEdges || []).concat(args.mainTerm ? [args.mainTerm] : []);
+  if (keywords.length) {
+    clauses.push(`(${keywords.map(_ => '(detectedkeywords CONTAINS ?)').join(' OR ')})`); // eslint-disable-line no-unused-vars
+    params = params.concat(keywords);
   }
 
   if (args.fromDate) {
