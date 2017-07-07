@@ -58,7 +58,6 @@ function createSite(args) {
         return insertTopics(siteType);
       })
       .then(() => {
-        //create site - insert the record in site settings table
         return cassandraConnector.executeBatchMutations([{
           query: `INSERT INTO fortis.sitesettings (
             id,
@@ -76,14 +75,14 @@ function createSite(args) {
             insertion_time
           ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,dateof(now()))`,
           params: [
-            `${args.RowKey}`,
-            `${args.siteType}`,
-            `${args.name}`,
-            `${args.targetBbox}`,
-            `${args.supportedLanguages}`,
-            `${args.defaultZoomLevel}`,
-            `${args.title}`,
-            `${args.logo}`,
+            args.RowKey,
+            args.siteType,
+            args.name,
+            args.targetBbox,
+            args.supportedLanguages,
+            args.defaultZoomLevel,
+            args.title,
+            args.logo,
             'translation-token', //TODO: Get actual values for these
             'cogspeech-token',
             'cogvision-token',
@@ -101,10 +100,7 @@ function replaceSite(args) {
     //TODO: sitetype is not in sitesettings table yet
     cassandraConnector.executeBatchMutations([{
       query: `UPDATE fortis.sitesettings 
-      SET id = ?,
-      sitetype = ?, 
-      sitename = ?,
-      geofence = ?,
+      SET geofence = ?,
       languages = ?,
       defaultzoom = ?,
       title = ?,
@@ -116,19 +112,16 @@ function replaceSite(args) {
       insertion_time = dateof(now()), 
       WHERE WHERE id = ? AND sitename = ?`,
       params: [
-        `${args.RowKey}`,
-        `${args.siteType}`,
-        `${args.name}`,
-        `${args.targetBbox}`,
-        `${args.supportedLanguages}`,
-        `${args.defaultZoomLevel}`,
-        `${args.title}`,
-        `${args.logo}`,
+        args.targetBbox,
+        args.supportedLanguages,
+        args.defaultZoomLevel,
+        args.title,
+        args.logo,
         'translation-token', //TODO: Get actual values for these
         'cogspeech-token',
         'cogvision-token',
         'cogtext-token',
-        `${args.RowKey}`,`${args.name}`
+        args.RowKey,args.name
       ]
     }])
       .then(resolve)
