@@ -63,7 +63,19 @@ echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
 kubectl create -f ./spark-namespace.yaml
 echo "Finished. Deploying environment settings to cluster."
-./setup-environment.sh "${cassandra_host}" "${app_insights_id}" "${site_name}" "${feature_service_host}" "${spark_config_map_name}" "${graphql_service_host}" "${k8resource_group}" "${fortis_interface_host}" "${eh_conn_str}" "${feature_service_db_conn_str}" "${fortis_central_directory}" "${sb_conn_str}"
+./setup-environment.sh \
+    "${cassandra_host}" \
+    "${app_insights_id}" \
+    "${site_name}" \
+    "${feature_service_host}" \
+    "${spark_config_map_name}" \
+    "${graphql_service_host}" \
+    "${k8resource_group}" \
+    "${fortis_interface_host}" \
+    "${eh_conn_str}" \
+    "${feature_service_db_conn_str}" \
+    "${fortis_central_directory}" \
+    "${sb_conn_str}"
 
 echo "Finished. Installing spark cluster."
 ./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}" "${fortis_central_directory}"
