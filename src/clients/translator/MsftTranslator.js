@@ -5,6 +5,7 @@ const nconf = require('nconf');
 const Promise = require('promise');
 const request = require('request');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+const deprecated = require('./deprecated');
 
 const ACCOUNT_KEY = process.env.TRANSLATION_SERVICE_ACCOUNT_KEY;
 const TOKEN_URL_BASE = process.env.TRANSLATION_SERVICE_TOKEN_HOST || 'https://api.cognitive.microsoft.com';
@@ -26,6 +27,10 @@ function TranslatorAccessTokenExpired() {
 }
 
 function getAccessTokenForTranslation() {
+  if (!ACCOUNT_KEY && deprecated.client_id && deprecated.client_secret) {
+    return deprecated.getAccessTokenForTranslation();
+  }
+
   const POST = {
     url: `${TOKEN_URL_BASE}/sts/v1.0/issueToken`,
     data: '',
