@@ -16,7 +16,7 @@ const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
 function deleteTopics() {
   return new Promise((resolve, reject) => {
-    let mutations = [{
+    const mutations = [{
       mutation: 'TRUNCATE fortis.watchlist',
       params: []
     }];
@@ -29,16 +29,16 @@ function deleteTopics() {
 
 function insertTopics(siteType) {
   return new Promise((resolve, reject) => {
-    let uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+    const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
     blobStorageClient.fetchJson(uri)
       .then(response => {
-        let mutations = [];
-        response.forEach( topic => {
-          mutations.push({
+        const mutations = [];
+        response.map( topic => {
+          return {
             mutation: `INSERT INTO fortis.watchlist (keyword,lang_code,translations,insertion_time) 
                       VALUES (?, ?, ?, dateof(now()));`,
             params: [topic.keyword, topic.lang_code, topic.translations]
-          });
+          };
         });
         return mutations;
       })
