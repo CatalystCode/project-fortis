@@ -68,12 +68,8 @@ function createSite(args) {
             defaultzoom,
             title,
             logo,
-            translationsvctoken,
-            cogspeechsvctoken,
-            cogvisionsvctoken,
-            cogtextsvctoken,
             insertion_time
-          ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,dateof(now()))`,
+          ) VALUES (?,?,?,?,?,?,?,?,dateof(now()))`,
           params: [
             args.RowKey,
             args.siteType,
@@ -82,11 +78,7 @@ function createSite(args) {
             args.supportedLanguages,
             args.defaultZoomLevel,
             args.title,
-            args.logo,
-            'translation-token', //TODO: Get actual values for these
-            'cogspeech-token',
-            'cogvision-token',
-            'cogtext-token'
+            args.logo
           ]
         }]);
       })
@@ -105,10 +97,6 @@ function replaceSite(args) {
       defaultzoom = ?,
       title = ?,
       logo = ?,
-      translationsvctoken = ?,
-      cogspeechsvctoken = ?,
-      cogvisionsvctoken = ?,
-      cogtextsvctoken = ?,
       insertion_time = dateof(now()) 
       WHERE id = ? AND sitename = ?`,
       params: [
@@ -117,11 +105,8 @@ function replaceSite(args) {
         args.defaultZoomLevel,
         args.title,
         args.logo,
-        'translation-token', //TODO: Get actual values for these
-        'cogspeech-token',
-        'cogvision-token',
-        'cogtext-token',
-        args.RowKey,args.name
+        args.RowKey,
+        args.name
       ]
     }])
       .then(resolve)
