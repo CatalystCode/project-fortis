@@ -97,7 +97,7 @@ function createSite(args) {
 
 function replaceSite(args) {
   return new Promise((resolve, reject) => {
-    //TODO: sitetype is not in sitesettings table yet
+    //TODO: sitetype is not in sitesettings table yet - should it also be part of the PK?
     cassandraConnector.executeBatchMutations([{
       query: `UPDATE fortis.sitesettings 
       SET geofence = ?,
@@ -109,8 +109,8 @@ function replaceSite(args) {
       cogspeechsvctoken = ?,
       cogvisionsvctoken = ?,
       cogtextsvctoken = ?,
-      insertion_time = dateof(now()), 
-      WHERE WHERE id = ? AND sitename = ?`,
+      insertion_time = dateof(now()) 
+      WHERE id = ? AND sitename = ?`,
       params: [
         args.targetBbox,
         args.supportedLanguages,
