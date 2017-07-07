@@ -14,14 +14,17 @@ function makeSet(iterable, func) {
   return set;
 }
 
-function cross(a, b) {
-  if (!a || !a.length) return b.map(item => ({right: item}));
-  if (!b || !b.length) return a.map(item => ({left: item}));
+function cross(A, B, C) {
+  A = A && A.length ? A : [undefined];
+  B = B && B.length ? B : [undefined];
+  C = C && C.length ? C : [undefined];
 
   const crossProduct = [];
-  for (let i = 0; i < a.length; i++) {
-    for (let j = 0; j < b.length; j++) {
-      crossProduct.push({left: a[i], right: b[j]});
+  for (let iA = 0; iA < A.length; iA++) {
+    for (let iB = 0; iB < B.length; iB++) {
+      for (let iC = 0; iC < C.length; iC++) {
+        crossProduct.push({a: A[iA], b: B[iB], c: C[iC]});
+      }
     }
   }
   return crossProduct;
