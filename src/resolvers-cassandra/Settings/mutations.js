@@ -48,7 +48,7 @@ function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
     const pages = args && args.input && args.input.pages;
     if (!pages || !pages.length) return reject('No pages specified');
     
-    const invalidPages = pages.filter(pages=>!pages.pageUrl);
+    const invalidPages = pages.filter(page=>!page.pageUrl);
     if (invalidPages.length > 0) {
       reject(`pageUrl required for ${JSON.stringify(invalidPages)}`);
       return;
@@ -90,7 +90,7 @@ function removeFacebookPages(args, res) { // eslint-disable-line no-unused-vars
     const pages = args && args.input && args.input.pages;
     if (!pages || !pages.length) return reject('No pages specified');
     
-    const invalidPages = pages.filter(pages=>!pages.RowKey);
+    const invalidPages = pages.filter(page=>!page.RowKey);
     if (invalidPages.length > 0) {
       reject(`RowKey required for ${JSON.stringify(invalidPages)}`);
       return;
