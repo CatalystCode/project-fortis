@@ -3,20 +3,164 @@
 const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
+const blobStorageClient = require('../../clients/storage/BlobStorageClient');
 const withRunTime = require('../shared').withRunTime;
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
-
+const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 const STREAM_PIPELINE_TWITTER = 'twitter';
 const STREAM_CONNECTOR_TWITTER = 'Twitter';
 
 const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
+function deleteTopics() {
+  return new Promise((resolve, reject) => {
+    let mutations = [{
+      mutation: 'TRUNCATE fortis.watchlist',
+      params: []
+    }];
+
+    cassandraConnector.executeBatchMutations(mutations)
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+function insertTopics(siteType) {
+  return new Promise((resolve, reject) => {
+    let uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+    blobStorageClient.fetchJson(uri)
+      .then(response => {
+        let mutations = [];
+        response.forEach( topic => {
+          mutations.push({
+            mutation: `INSERT INTO fortis.watchlist (keyword,lang_code,translations,insertion_time) 
+                      VALUES (?, ?, ?, dateof(now()));`,
+            params: [topic.keyword, topic.lang_code, topic.translations]
+          });
+        });
+        return mutations;
+      })
+      .then(mutations => {
+        return cassandraConnector.executeBatchMutations(mutations);
+      })
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+function createSite(args) {
+  return new Promise((resolve, reject) => {
+    const siteType = args.input.siteType;
+    deleteTopics()
+      .then(() => {
+        return insertTopics(siteType);
+      })
+      .then(() => {
+        //create site - insert the record in site settings table
+        return cassandraConnector.executeBatchMutations([{
+          query: `INSERT INTO fortis.sitesettings (
+            id,
+            sitetype, 
+            sitename,
+            geofence,
+            languages,
+            defaultzoom,
+            title,
+            logo,
+            translationsvctoken,
+            cogspeechsvctoken,
+            cogvisionsvctoken,
+            cogtextsvctoken,
+            insertion_time
+          ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,dateof(now()))`,
+          params: [
+            `${args.RowKey}`,
+            `${args.siteType}`,
+            `${args.name}`,
+            `${args.targetBbox}`,
+            `${args.supportedLanguages}`,
+            `${args.defaultZoomLevel}`,
+            `${args.title}`,
+            `${args.logo}`,
+            'translation-token', //TODO: Get actual values for these
+            'cogspeech-token',
+            'cogvision-token',
+            'cogtext-token'
+          ]
+        }]);
+      })
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+function replaceSite(args) {
+  return new Promise((resolve, reject) => {
+    //TODO: sitetype is not in sitesettings table yet
+    cassandraConnector.executeBatchMutations([{
+      query: `UPDATE fortis.sitesettings 
+      SET id = ?,
+      sitetype = ?, 
+      sitename = ?,
+      geofence = ?,
+      languages = ?,
+      defaultzoom = ?,
+      title = ?,
+      logo = ?,
+      translationsvctoken = ?,
+      cogspeechsvctoken = ?,
+      cogvisionsvctoken = ?,
+      cogtextsvctoken = ?,
+      insertion_time = dateof(now()), 
+      WHERE WHERE id = ? AND sitename = ?`,
+      params: [
+        `${args.RowKey}`,
+        `${args.siteType}`,
+        `${args.name}`,
+        `${args.targetBbox}`,
+        `${args.supportedLanguages}`,
+        `${args.defaultZoomLevel}`,
+        `${args.title}`,
+        `${args.logo}`,
+        'translation-token', //TODO: Get actual values for these
+        'cogspeech-token',
+        'cogvision-token',
+        'cogtext-token',
+        `${args.RowKey}`,`${args.name}`
+      ]
+    }])
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
 /**
- * @param {{input: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
- * @returns {Promise.<{name: string, properties: {targetBBox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}
+ * @param {{input: {RowKey: string, siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
+ * @returns {Promise.<{name: string, properties: {RowKey: string, targetBBox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}
  */
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+
+    const siteType = args && args.input && args.input.siteType;
+    if (!siteType) return reject(`siteType for ${args.name} is not defined`);
+    
+    const rowKey = args && args.input && args.input.RowKey;
+    if(!rowKey) return reject(`RowKey required for ${JSON.stringify(args)}`);
+
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE id = ? AND sitename = ?', [`${args.RowKey}`,`${args.name}`])
+      .then(rows => {
+        if(!rows || !rows.length) {
+          return createSite(args);
+        }
+        else if(rows.length == 1) {
+          return replaceSite(args);
+        }
+        else return reject(`More than one site with sitename: ${args.name}`);
+      })
+      .then(resolve)
+      .catch(reject);
+  });
 }
 
 /**
