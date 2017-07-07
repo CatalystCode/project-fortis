@@ -80,7 +80,7 @@ function fetchById(id) {
   return callFeatureService(formatIdsUri(ids));
 }
 
-module.export = {
+module.exports = {
   fetchById: trackDependency(fetchById, 'FeatureService', 'fetchById'),
   fetchByBbox: trackDependency(fetchByBbox, 'FeatureService', 'fetchByBbox'),
   fetchByPoint: trackDependency(fetchByPoint, 'FeatureService', 'fetchByPoint'),

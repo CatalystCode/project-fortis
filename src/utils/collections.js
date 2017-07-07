@@ -14,7 +14,24 @@ function makeSet(iterable, func) {
   return set;
 }
 
+function cross(A, B, C) {
+  A = A && A.length ? A : [undefined];
+  B = B && B.length ? B : [undefined];
+  C = C && C.length ? C : [undefined];
+
+  const crossProduct = [];
+  for (let iA = 0; iA < A.length; iA++) {
+    for (let iB = 0; iB < B.length; iB++) {
+      for (let iC = 0; iC < C.length; iC++) {
+        crossProduct.push({a: A[iA], b: B[iB], c: C[iC]});
+      }
+    }
+  }
+  return crossProduct;
+}
+
 module.exports = {
+  cross: cross,
   makeMap: makeMap,
   makeSet: makeSet
 };
