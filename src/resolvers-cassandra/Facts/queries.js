@@ -3,6 +3,7 @@
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
+const cross = require('../../utils/collections').cross;
 const flatten = require('lodash/flatten');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
@@ -23,26 +24,24 @@ function cassandraRowToFact(row) {
   };
 }
 
-function makeDefaultClauses() {
-  const clauses = [];
-  const params = [];
-
-  clauses.push('(pipeline IN (\'TadaWeb\', \'Bing\', \'CustomEvent\'))');
-
-  return {clauses: clauses, params: params};
-}
+const SUPPORTED_PIPELINES = ['TadaWeb', 'Bing', 'CustomEvent'];
 
 function makeListQueries(args) {
-  const defaults = makeDefaultClauses();
+  return cross(args.tagFilter, SUPPORTED_PIPELINES).map(keywordAndPipeline => {
+    const clauses = [];
+    const params = [];
 
-  return args.tagFilter.map(keyword => {
-    const clauses = defaults.clauses.slice();
-    const params = defaults.params.slice();
+    if (keywordAndPipeline.a) {
+      clauses.push('(detectedkeywords CONTAINS ?)');
+      params.push(keywordAndPipeline.a);
+    }
 
-    clauses.push('(detectedkeywords CONTAINS ?)');
-    params.push(keyword);
+    if (keywordAndPipeline.b) {
+      clauses.push('(pipeline = ?)');
+      params.push(keywordAndPipeline.b);
+    }
 
-    const query = `SELECT * FROM fortis.events WHERE (${clauses.join(' AND ')})`;
+    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
     return {query: query, params: params};
   });
 }
@@ -69,14 +68,20 @@ function list(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-function makeGetQuery(args) {
-  let {clauses, params} = makeDefaultClauses();
+function makeGetQueries(args) {
+  return SUPPORTED_PIPELINES.map(pipeline => {
+    const clauses = [];
+    const params = [];
 
-  clauses.push('(id = ?)');
-  params.push(args.id);
+    clauses.push('(id = ?)');
+    params.push(args.id);
 
-  let query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
-  return {query: query, params: params};
+    clauses.push('(pipeline = ?)');
+    params.push(pipeline);
+
+    let query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
+    return {query: query, params: params};
+  });
 }
 
 /**
@@ -87,11 +92,12 @@ function get(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.id) return reject('No id specified to fetch');
 
-    const query = makeGetQuery(args);
-    return cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
-      if (rows.length > 1) return reject(`Got more ${rows.length} faces with id ${args.id}`);
+    const queries = makeGetQueries(args);
+    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
 
+      if (rows.length > 1) return reject(`Got more ${rows.length} faces with id ${args.id}`);
       resolve(cassandraRowToFact(rows[0]));
     })
     .catch(reject);

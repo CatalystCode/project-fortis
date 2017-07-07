@@ -7,17 +7,11 @@ const featureServiceClient = require('../../clients/locations/FeatureServiceClie
 const withRunTime = require('../shared').withRunTime;
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const flatten = require('lodash/flatten');
-const { makeMap, makeSet } = require('../../utils/collections');
+const { cross, makeMap, makeSet } = require('../../utils/collections');
 
 function makeDefaultClauses(args) {
   let params = [];
   let clauses = [];
-
-  const keywords = (args.filteredEdges || []).concat(args.mainEdge ? [args.mainEdge] : []);
-  if (keywords.length) {
-    clauses.push(`(keyword IN (${keywords.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
-    params = params.concat(keywords);
-  }
 
   if (args.sourceFilter && args.sourceFilter.length) {
     clauses.push(`(pipeline IN (${args.sourceFilter.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
@@ -39,19 +33,30 @@ function makeDefaultClauses(args) {
     params.push(args.timespan);
   }
 
-  return {clauses: clauses, params: params};
+  const keywords = (args.filteredEdges || []).concat(args.mainEdge ? [args.mainEdge] : []);
+  return {clauses: clauses, params: params, keywords: keywords};
 }
 
-function makeTilesQuery(args, tileIds) {
-  const {clauses, params} = makeDefaultClauses(args);
+function makeTilesQueries(args, tileIds) {
+  const defaults = makeDefaultClauses(args);
 
-  tileIds.forEach(tileId => {
-    clauses.push('(tileid = ?)');
-    params.push(tileId);
+  return cross(tileIds, defaults.keywords).map(tileIdAndKeyword => {
+    const params = defaults.params.slice();
+    const clauses = defaults.clauses.slice();
+
+    if (tileIdAndKeyword.a) {
+      clauses.push('(tileid = ?)');
+      params.push(tileIdAndKeyword.a);
+    }
+
+    if (tileIdAndKeyword.b) {
+      clauses.push('(topic = ?)');
+      params.push(tileIdAndKeyword.b);
+    }
+
+    const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
+    return {query: query, params: params};
   });
-
-  const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')}`;
-  return {query: query, params: params};
 }
 
 function makeLocationsQueries(args, locationIds) {
@@ -64,7 +69,7 @@ function makeLocationsQueries(args, locationIds) {
     clauses.push('(placeids CONTAINS ?)');
     params.push(locationId);
 
-    const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')}`;
+    const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
     return {query: query, params: params};
   });
 }
@@ -122,9 +127,10 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
     const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
-    const query = makeTilesQuery(args, tileIds);
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
+    const queries = makeTilesQueries(args, tileIds);
+    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
       const features = cassandraRowsToFeatures(rows);
       resolve({
         features: features
@@ -218,9 +224,10 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
 
     const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
-    const query = makeTilesQuery(args, tileIds);
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
+    const queries = makeTilesQueries(args, tileIds);
+    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
       const edges = cassandraRowsToEdges(rows);
       resolve({
         edges: edges

@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
+const flatten = require('lodash/flatten');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const withRunTime = require('../shared').withRunTime;
@@ -8,32 +9,35 @@ const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackE
 
 function makeSiteBboxQuery(args) {
   return {
-    query: 'SELECT geofence FROM sitesettings WHERE sitename = ?',
+    query: 'SELECT geofence FROM sitesettings WHERE sitename = ? ALLOW FILTERING',
     params: [args.site]
   };
 }
 
-function makeTermsQuery(args) {
-  let clauses = [];
-  let params = [];
+function makeTermsQueries(args) {
+  const supportedPipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : [null];
+  return supportedPipelines.map(pipeline => {
+    const clauses = [];
+    const params = [];
 
-  if (args.fromDate) {
-    clauses.push('(event_time >= ?)');
-    params.push(args.fromDate);
-  }
+    if (args.fromDate) {
+      clauses.push('(event_time >= ?)');
+      params.push(args.fromDate);
+    }
 
-  if (args.toDate) {
-    clauses.push('(event_time <= ?)');
-    params.push(args.toDate);
-  }
+    if (args.toDate) {
+      clauses.push('(event_time <= ?)');
+      params.push(args.toDate);
+    }
 
-  if (args.sourceFilter && args.sourceFilter.length) {
-    clauses.push(`(pipeline IN (${args.sourceFilter.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
-    params = params.concat(args.sourceFilter);
-  }
+    if (pipeline) {
+      clauses.push('(pipeline = ?)');
+      params.push(pipeline);
+    }
 
-  let query = `SELECT detectedkeywords FROM fortis.events WHERE ${clauses.join(' AND ')}`;
-  return {query: query, params: params};
+    let query = `SELECT detectedkeywords FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
+    return {query: query, params: params};
+  });
 }
 
 /**
@@ -44,9 +48,10 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args) return reject('No args specified');
 
-    const query = makeTermsQuery(args);
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
+    const queries = makeTermsQueries(args);
+    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
       const keywords = new Set();
       rows.forEach(row => row.detectedkeywords.forEach(keyword => keywords.add(keyword)));
 
