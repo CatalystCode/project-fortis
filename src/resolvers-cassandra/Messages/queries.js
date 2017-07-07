@@ -35,6 +35,8 @@ function cassandraRowToFeature(row) {
   };
 }
 
+const SUPPORTED_PIPELINES = ['Twitter', 'Facebook', 'Instagram', 'Radio', 'Reddit'];
+
 function makeDefaultClauses(args) {
   const params = [];
   const clauses = [];
@@ -59,8 +61,6 @@ function makeDefaultClauses(args) {
     params.push(args.originalSource);
   }
 
-  clauses.push('(pipeline IN (\'Twitter\', \'Facebook\', \'Instagram\', \'Radio\', \'Reddit\'))');
-
   const keywords = (args.filteredEdges || []).concat(args.mainTerm ? [args.mainTerm] : []);
   return {clauses: clauses, params: params, keywords};
 }
@@ -68,21 +68,26 @@ function makeDefaultClauses(args) {
 function makePlacesQueries(args, placeIds) {
   const defaults = makeDefaultClauses(args);
 
-  return cross(placeIds, defaults.keywords).map(placeIdAndKeyword => {
+  return cross(placeIds, defaults.keywords, SUPPORTED_PIPELINES).map(placeIdAndKeywordAndPipeline => {
     const clauses = defaults.clauses.slice();
     const params = defaults.params.slice();
 
-    if (placeIdAndKeyword.a) {
+    if (placeIdAndKeywordAndPipeline.a) {
       clauses.push('(detectedplaceids CONTAINS ?)');
-      params.push(placeIdAndKeyword.a);
+      params.push(placeIdAndKeywordAndPipeline.a);
     }
 
-    if (placeIdAndKeyword.b) {
+    if (placeIdAndKeywordAndPipeline.b) {
       clauses.push('(detectedkeywords CONTAINS ?)');
-      params.push(placeIdAndKeyword.b);
+      params.push(placeIdAndKeywordAndPipeline.b);
     }
 
-    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+    if (placeIdAndKeywordAndPipeline.c) {
+      clauses.push('(pipeline = ?)');
+      params.push(placeIdAndKeywordAndPipeline.c);
+    }
+
+    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
     return {query: query, params: params};
   });
 }
@@ -154,14 +159,21 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 function makeEdgesQueries(args) {
   const defaults = makeDefaultClauses(args);
 
-  return defaults.keywords.map(keyword => {
+  return cross(defaults.keywords, SUPPORTED_PIPELINES).map(keywordAndPipeline => {
     const clauses = defaults.clauses.slice();
     const params = defaults.params.slice();
 
-    clauses.push('(detectedkeywords CONTAINS ?)');
-    params.push(keyword);
+    if (keywordAndPipeline.a) {
+      clauses.push('(detectedkeywords CONTAINS ?)');
+      params.push(keywordAndPipeline.a);
+    }
 
-    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
+    if (keywordAndPipeline.b) {
+      clauses.push('(pipeline = ?)');
+      params.push(keywordAndPipeline.b);
+    }
+
+    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
     return {query: query, params: params};
   });
 }
@@ -198,7 +210,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function makeEventQuery(args) {
-  const query = 'SELECT * FROM fortis.events WHERE id = ?';
+  const query = 'SELECT * FROM fortis.events WHERE id = ? ALLOW FILTERING';
   const params = [args.messageId];
   return {query: query, params: params};
 }
