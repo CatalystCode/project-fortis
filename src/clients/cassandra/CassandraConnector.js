@@ -24,7 +24,7 @@ const options = {
 const client = new cassandra.Client(options);
 
 /**
- * @param {Array<{mutation: string, params: Array<string|map>}>} mutations
+ * @param {Array<{query: string, params: Array<string|map>}>} mutations
  * @returns {Promise}
  */
 function executeBatchMutations(mutations) {
