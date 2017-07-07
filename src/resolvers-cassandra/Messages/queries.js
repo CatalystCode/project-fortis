@@ -72,13 +72,14 @@ function makePlacesQueries(args, placeIds) {
     const clauses = defaults.clauses.slice();
     const params = defaults.params.slice();
 
-    if (placeIdAndKeyword.left) {
+    if (placeIdAndKeyword.a) {
       clauses.push('(detectedplaceids CONTAINS ?)');
-      params.push(placeIdAndKeyword.left);
+      params.push(placeIdAndKeyword.a);
     }
-    if (placeIdAndKeyword.right) {
+
+    if (placeIdAndKeyword.b) {
       clauses.push('(detectedkeywords CONTAINS ?)');
-      params.push(placeIdAndKeyword.right);
+      params.push(placeIdAndKeyword.b);
     }
 
     const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')}`;
