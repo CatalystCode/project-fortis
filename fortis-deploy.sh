@@ -23,9 +23,9 @@ Arguments
   --location|-lo                     [Required] : Container cluster location
   --site_type|-sty                   [Required] : Fortis Site Type
   --prefix|-pf                       [Required] : Fortis Site Prefix
-  --site_name|sn                     [Required] : Fortis Site Name
-  --eh_conn_str|ec                   [Required] : Event Hub Connection String
-  --sb_conn_str|sb                   [Required] : Service Bus Connection String
+  --site_name|-sn                    [Required] : Fortis Site Name
+  --eh_conn_str|-ec                  [Required] : Event Hub Connection String
+  --sb_conn_str|-sb                  [Required] : Service Bus Connection String
 EOF
 }
 
