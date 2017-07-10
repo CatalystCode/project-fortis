@@ -228,7 +228,7 @@
         },
         {
             "apiVersion": "[variables('sbVersion')]",
-            "name": "[parameters('sbNamespace')]",
+            "name": "[variables('sbNamespace')]",
             "type": "Microsoft.ServiceBus/namespaces",
             "location": "[resourceGroup().location]",
             "resources": [
@@ -237,7 +237,7 @@
                     "name": "[parameters('sbQueueNameStreams')]",
                     "type": "Queues",
                     "dependsOn": [
-                        "[concat('Microsoft.ServiceBus/namespaces/', parameters('sbNamespace'))]"
+                        "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
                     ]
                 },
                 {
@@ -245,7 +245,7 @@
                     "name": "[parameters('sbQueueNameSiteSettings')]",
                     "type": "Queues",
                     "dependsOn": [
-                        "[concat('Microsoft.ServiceBus/namespaces/', parameters('sbNamespace'))]"
+                        "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
                     ]
                 },
                 {
