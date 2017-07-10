@@ -16,6 +16,9 @@ const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
 function _insertTopics(siteType) {
   return new Promise((resolve, reject) => {
+    if(!siteType || !siteType.length) {
+      return reject('insertTopics: siteType is not defined');
+    }
     const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
     blobStorageClient.fetchJson(uri)
       .then(response => {
