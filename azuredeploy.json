@@ -97,7 +97,7 @@
     },
     "variables": {
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
-        "storageSku": "Premium_LRS",
+        "premStorageSku": "Premium_LRS",
         "vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
@@ -164,7 +164,18 @@
             "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
             "sku": {
-                "name": "[variables('storageSku')]"
+                "name": "[variables('premStorageSku')]"
+            },
+            "kind": "Storage",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('deisStorageAcctName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('vmStorageAccountType')]"
             },
             "kind": "Storage",
             "properties": {}
