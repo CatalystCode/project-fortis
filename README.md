@@ -14,16 +14,20 @@ This project contains demos of the various Spark Streaming data processing metho
 Run it via:
 
 ```sh
-# set up all the requisite environment variables
+# set up variables from deployment environment
 export FORTIS_APPINSIGHTS_IKEY="..."
 export FORTIS_FEATURE_SERVICE_HOST="..."
 export FORTIS_CASSANDRA_HOST="..."
 export FORTIS_CASSANDRA_USER="..."
 export FORTIS_CASSANDRA_PASSWORD="..."
-export INSTAGRAM_AUTH_TOKEN="..."
 export OXFORD_VISION_TOKEN="..."
 export OXFORD_SPEECH_TOKEN="..."
 export OXFORD_LANGUAGE_TOKEN="..."
+export EH_PROGRESS_DIR="..."
+
+# set up variables for local development environment
+# in production, these will come from the settings data-store
+export INSTAGRAM_AUTH_TOKEN="..."
 export BING_ACCESS_TOKEN="..."
 export BING_SEARCH_INSTANCE_ID="..."
 export REDDIT_APPLICATION_ID="..."
@@ -45,7 +49,6 @@ export CUSTOMEVENTS_EH_POLICY_KEY="..."
 export CUSTOMEVENTS_EH_NAMESPACE="..."
 export CUSTOMEVENTS_EH_NAME="..."
 export CUSTOMEVENTS_EH_PARTITION_COUNT="..."
-export EH_PROGRESS_DIR="..."
 
 # compile scala, run tests, build fat jar
 export JAVA_OPTS="-Xmx2048M"
