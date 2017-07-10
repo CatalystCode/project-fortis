@@ -54,7 +54,7 @@ function makeTilesQueries(args, tileIds) {
       params.push(tileIdAndKeyword.b);
     }
 
-    const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
+    const query = `SELECT tileid, computedfeatures, topic FROM fortis.computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
     return {query: query, params: params};
   });
 }
@@ -69,7 +69,7 @@ function makeLocationsQueries(args, locationIds) {
     clauses.push('(placeids CONTAINS ?)');
     params.push(locationId);
 
-    const query = `SELECT tileid, computedfeatures, topic FROM computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
+    const query = `SELECT tileid, computedfeatures, topic FROM fortis.computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
     return {query: query, params: params};
   });
 }

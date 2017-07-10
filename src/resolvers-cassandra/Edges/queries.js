@@ -9,7 +9,7 @@ const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackE
 
 function makeSiteBboxQuery(args) {
   return {
-    query: 'SELECT geofence FROM sitesettings WHERE sitename = ? ALLOW FILTERING',
+    query: 'SELECT geofence FROM fortis.sitesettings WHERE sitename = ? ALLOW FILTERING',
     params: [args.site]
   };
 }
