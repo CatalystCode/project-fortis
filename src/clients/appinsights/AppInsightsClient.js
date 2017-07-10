@@ -41,7 +41,7 @@ function trackDependency(promiseFunc, dependencyName, callName) {
         if (client) {
           client.trackDependency(dependencyName, callName, duration, success);
         }
-        consoleLog(JSON.stringify({dependency: dependencyName, call: callName, duration: duration, success: success}));
+        console.log(JSON.stringify({dependency: dependencyName, call: callName, duration, success, args}));
         resolve(returnValue);
       })
       .catch(err => {
@@ -50,7 +50,7 @@ function trackDependency(promiseFunc, dependencyName, callName) {
         if (client) {
           client.trackDependency(dependencyName, callName, duration, success);
         }
-        consoleLog(JSON.stringify({dependency: dependencyName, call: callName, duration: duration, success: success}));
+        console.error(JSON.stringify({dependency: dependencyName, call: callName, duration, success, err, args}));
         reject(err);
       });
     });
@@ -73,7 +73,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc) {
         if (client) {
           client.trackEvent(eventName, props);
         }
-        consoleLog(JSON.stringify({event: eventName, properties: props}));
+        console.log(JSON.stringify({event: eventName, properties: props, args}));
         resolve(returnValue);
       })
       .catch(err => {
@@ -83,7 +83,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc) {
         if (client) {
           client.trackEvent(eventName, props);
         }
-        consoleLog(JSON.stringify({event: eventName, properties: props}));
+        console.error(JSON.stringify({event: eventName, properties: props, err, args}));
         reject(err);
       });
     });
