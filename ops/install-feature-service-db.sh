@@ -1,52 +1,59 @@
 #!/usr/bin/env bash
 
-readonly location="$1"
-readonly resource_group="$2"
+fs__location="$1"
+fs__resource_group="$2"
 
-readonly pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
-readonly pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
-readonly pg_name="${FEATUREDB_NAME:-fortis-feature-service-db}"
-readonly pg_tier="${FEATUREDB_TIER:-Basic}"
-readonly pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
-readonly pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
-readonly pg_password="$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"${PASSWORD_COMPLEXITY:-32}")"
+fs__randomString() { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"$1"; }
+fs__randomId() {  < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
+
+fs__pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
+fs__pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
+fs__pg_user="${FEATUREDB_USER:-frontend}"
+fs__pg_name="${FEATUREDB_NAME:-fortis-feature-service-db-$(fs__randomId 8)}"
+fs__pg_tier="${FEATUREDB_TIER:-Basic}"
+fs__pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
+fs__pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
+fs__pg_dbname="${FEATUREDB_DBNAME:-geofeatures}"
+fs__pg_user_password="$(fs__randomString 32)"
+fs__pg_admin_password="$(fs__randomString 32)"
 
 if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
 if ! (command -v psql >/dev/null); then sudo apt-get install -y postgresql postgresql-contrib; fi
 
-echo "Creating postgres server"
+echo "Creating postgres server ${fs__pg_name}"
 az postgres server create \
-  --resource-group "${resource_group}" \
-  --name "${pg_name}" \
-  --location "${location}" \
-  --admin-user "${pg_admin}" \
-  --admin-password "${pg_password}" \
-  --performance-tier "${pg_tier}" \
-  --compute-units "${pg_compute}" \
-  --version "${pg_version}"
+  --resource-group "${fs__resource_group}" \
+  --name "${fs__pg_name}" \
+  --location "${fs__location}" \
+  --admin-user "${fs__pg_admin}" \
+  --admin-password "${fs__pg_admin_password}" \
+  --performance-tier "${fs__pg_tier}" \
+  --compute-units "${fs__pg_compute}" \
+  --version "${fs__pg_version}"
 
 echo "Finished. Now opening up database server firewall"
 az postgres server firewall-rule create \
-  --resource-group "${resource_group}" \
-  --server "${pg_name}" \
+  --resource-group "${fs__resource_group}" \
+  --server "${fs__pg_name}" \
   --name AllowAllIps \
   --start-ip-address 0.0.0.0 \
   --end-ip-address 255.255.255.255
 
-echo "Finished. Now downloading database dump"
-dbdump="$(mktemp)"
-curl "${pg_dump}" | gunzip --to-stdout > "${dbdump}"
+fs__dbdump="$(mktemp)"
+echo "Finished. Now downloading database dump to ${fs__dbdump}"
+curl "${fs__pg_dump}" | gunzip --to-stdout > "${fs__dbdump}"
 
-echo "Finished. Now populating the database"
-pg_host="$(az postgres server show --resource-group "${resource_group}" --name "${pg_name}" | jq -r '.fullyQualifiedDomainName')"
-<"${dbdump}" PGPASSWORD="${pg_password}" psql \
-  --host "${pg_host}" \
-  --port 5432 \
-  --username "${pg_admin}@${pg_name}" \
-  --quiet
-rm "${dbdump}"
+fs__pg_host="$(az postgres server show --resource-group "${fs__resource_group}" --name "${fs__pg_name}" | jq -r '.fullyQualifiedDomainName')"
+echo "Finished. Now populating the database hosted at ${fs__pg_host}"
 
-FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${pg_admin}@${pg_name}:${pg_password}@${pg_host}:5432/features?ssl=true"
+echo "CREATE DATABASE ${fs__pg_dbname}; CREATE USER ${fs__pg_user} WITH login PASSWORD '${fs__pg_user_password}';" | \
+psql "postgresql://${fs__pg_host}:5432/postgres?user=${fs__pg_admin}@${fs__pg_name}&password=${fs__pg_admin_password}&ssl=true"
+
+< "${fs__dbdump}" \
+psql "postgresql://${fs__pg_host}:5432/${fs__pg_dbname}?user=${fs__pg_admin}@${fs__pg_name}&password=${fs__pg_admin_password}&ssl=true" --quiet
+rm "${fs__dbdump}"
+
+FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${fs__pg_user}@${fs__pg_name}:${fs__pg_user_password}@${fs__pg_host}:5432/${fs__pg_dbname}?ssl=true"
 export FEATURE_SERVICE_DB_CONNECTION_STRING
 
 echo "All done installing feature service database"

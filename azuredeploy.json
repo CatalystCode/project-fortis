@@ -1,4 +1,4 @@
-    {
+{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
@@ -23,7 +23,19 @@
         "agentVMSize": {
             "type": "string",
             "allowedValues": [
-                    "Standard_DS1", "Standard_DS2", "Standard_DS3", "Standard_DS4", "Standard_DS11", "Standard_DS12", "Standard_DS13", "Standard_DS14", "Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5"
+                "Standard_DS1",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14",
+                "Standard_GS1",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_GS5"
             ],
             "metadata": {
                 "description": "The size of the Virtual Machine."
@@ -86,7 +98,7 @@
     "variables": {
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
         "storageSku": "Premium_LRS",
-	    "vmStorageAccountType": "Standard_LRS",
+        "vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
         "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
@@ -99,14 +111,14 @@
         "imagePublisher": "Canonical",
         "deisStorageAcctName": "k8deisstorage",
         "imageOffer": "UbuntuServer",
-	    "vmStorageAccountContainerName": "vhds",
+        "vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
         "managePolicy": "ManagePolicy",
         "sendPolicy": "SendPolicy",
-	    "agentOsType": "Linux",
+        "agentOsType": "Linux",
         "listenPolicy": "ListenPolicy",
         "ehVersion": "2015-08-01",
-	    "vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
+        "vmStorageAccountName": "[concat(uniquestring(resourceGroup().id), 'ststrg')]",
         "ehConsumerGroupName": "fortisEHConsumerGroup",
         "addressPrefix": "10.0.0.0/16",
         "publicIPAddressName": "fortisDeployPublicIP",
@@ -119,7 +131,7 @@
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
         "postDeploymentGithubRepoPath": "https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master",
         "postDeploymentExtensionScript": "fortis-deploy.sh",
-        "githubClonePath":  "https://github.com/CatalystCode/fortisdeploy.git",
+        "githubClonePath": "https://github.com/CatalystCode/fortisdeploy.git",
         "sbNamespace": "fortisservicebusns",
         "sbQueueNameSiteSettings": "siteMutations",
         "sbQueueNameStreams": "streamMutations",
@@ -131,13 +143,13 @@
         "eventHubMessagingUnits": "1",
         "eventHubSku": "2",
         "eventhubResource": "[resourceId('Microsoft.Eventhub/namespaces/authorizationRules', variables('eventHubNamespace'), 'fortisAuthRule')]",
-	    "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
-	    "useServicePrincipalDictionary": {
+        "useServicePrincipal": "[variables('useServicePrincipalDictionary')[variables('orchestratorType')]]",
+        "useServicePrincipalDictionary": {
             "DCOS": 0,
             "Swarm": 0,
             "Kubernetes": 1
         },
-	    "servicePrincipalFields": [
+        "servicePrincipalFields": [
             null,
             {
                 "ClientId": "[parameters('servicePrincipalAppId')]",
@@ -170,11 +182,11 @@
             }
         },
         {
-            "apiVersion": "2015-01-01", 
-            "name": "eventhubPrimaryKey", 
-            "type": "Microsoft.Resources/deployments", 
-            "properties": { 
-                "mode": "incremental", 
+            "apiVersion": "2015-01-01",
+            "name": "eventhubPrimaryKey",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "incremental",
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
                     "contentVersion": "1.0.0.0"
@@ -186,12 +198,12 @@
                 }
             }
         },
-        { 
-            "apiVersion": "2015-01-01", 
-            "name": "eventhubSecondaryKey", 
-            "type": "Microsoft.Resources/deployments", 
+        {
+            "apiVersion": "2015-01-01",
+            "name": "eventhubSecondaryKey",
+            "type": "Microsoft.Resources/deployments",
             "properties": {
-                "mode": "incremental", 
+                "mode": "incremental",
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/davidjrh/azurerm-newguid/master/NewGuid.json",
                     "contentVersion": "1.0.0.0"
@@ -203,7 +215,7 @@
                 }
             }
         },
-	    {
+        {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('vmStorageAccountName')]",
             "apiVersion": "2016-01-01",
@@ -215,40 +227,44 @@
             "properties": {}
         },
         {
-        "apiVersion": "[variables('sbVersion')]",
-        "name": "[variables('sbNamespace')]",
-        "type": "Microsoft.ServiceBus/namespaces",
-        "location": "[resourceGroup().location]",
-        "resources": [
-            {
-                "apiVersion": "[variables('sbVersion')]",
-                "name": "[parameters('sbQueueNameStreams')]",
-                "type": "Queues",
-                "dependsOn": [
-                    "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
-                ]
-            },
-            {
-                "apiVersion": "[variables('sbVersion')]",
-                "name": "[parameters('sbQueueNameSiteSettings')]",
-                "type": "Queues",
-                "dependsOn": [
-                    "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
-                ]
-            },
-            {
-                "apiVersion": "[variables('sbVersion')]",
-                "name": "[variables('sbAuthRuleName')]",
-                "type": "Microsoft.ServiceBus/namespaces/authorizationRules",
+            "apiVersion": "[variables('sbVersion')]",
+            "name": "[variables('sbNamespace')]",
+            "type": "Microsoft.ServiceBus/namespaces",
+            "location": "[resourceGroup().location]",
+            "resources": [
+                {
+                    "apiVersion": "[variables('sbVersion')]",
+                    "name": "[parameters('sbQueueNameStreams')]",
+                    "type": "Queues",
+                    "dependsOn": [
+                        "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
+                    ]
+                },
+                {
+                    "apiVersion": "[variables('sbVersion')]",
+                    "name": "[parameters('sbQueueNameSiteSettings')]",
+                    "type": "Queues",
+                    "dependsOn": [
+                        "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
+                    ]
+                },
+                {
+                    "apiVersion": "[variables('sbVersion')]",
+                    "name": "[variables('sbAuthRuleName')]",
+                    "type": "Microsoft.ServiceBus/namespaces/authorizationRules",
                     "dependsOn": [
                         "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
                     ],
                     "location": "[resourceGroup().location]",
                     "properties": {
-                        "Rights": [ "Send", "Listen", "Manage" ]
+                        "Rights": [
+                            "Send",
+                            "Listen",
+                            "Manage"
+                        ]
                     }
-            }
-        ]
+                }
+            ]
         },
         {
             "apiVersion": "[variables('ehVersion')]",
@@ -267,7 +283,7 @@
                     "apiVersion": "[variables('ehVersion')]",
                     "name": "[variables('eventHubName')]",
                     "location": "[resourceGroup().location]",
-                    "type":"eventhubs",
+                    "type": "eventhubs",
                     "dependsOn": [
                         "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
                     ],
@@ -286,7 +302,11 @@
                     "properties": {
                         "PrimaryKey": "[reference('eventhubPrimaryKey').outputs.guid.value]",
                         "SecondaryKey": "[reference('eventhubSecondaryKey').outputs.guid.value]",
-                        "Rights": [ "Send", "Listen", "Manage" ]
+                        "Rights": [
+                            "Send",
+                            "Listen",
+                            "Manage"
+                        ]
                     }
                 }
             ]
@@ -347,7 +367,7 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
                 "[concat('Microsoft.Insights/components/', variables('applicationInsightServiceName'))]",
-		        "[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('vmStorageAccountName'))]",
                 "[concat('Microsoft.EventHub/namespaces/', variables('eventHubNamespace'))]"
             ],
             "properties": {
@@ -444,7 +464,7 @@
                         ]
                     }
                 },
-		"servicePrincipalProfile": "[variables('servicePrincipalFields')[variables('useServicePrincipal')]]"
+                "servicePrincipalProfile": "[variables('servicePrincipalFields')[variables('useServicePrincipal')]]"
             }
         },
         {
@@ -458,9 +478,9 @@
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
-				"type": "CustomScript",
-				"typeHandlerVersion": "2.0",
-				"autoUpgradeMinorVersion": true,
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
                         "[concat(variables('postDeploymentGithubRepoPath'),'/', variables('postDeploymentExtensionScript'))]"

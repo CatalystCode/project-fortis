@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
-
 readonly pg_conn_str="$1"
 readonly blob_account_key="$2"
 readonly blob_account_name="${3:-fortiscentral}"

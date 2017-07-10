@@ -23,9 +23,9 @@ Arguments
   --location|-lo                     [Required] : Container cluster location
   --site_type|-sty                   [Required] : Fortis Site Type
   --prefix|-pf                       [Required] : Fortis Site Prefix
-  --site_name|sn                     [Required] : Fortis Site Name
-  --eh_conn_str|ec                   [Required] : Event Hub Connection String
-  --sb_conn_str|sb                   [Required] : Service Bus Connection String
+  --site_name|-sn                    [Required] : Fortis Site Name
+  --eh_conn_str|-ec                  [Required] : Event Hub Connection String
+  --sb_conn_str|-sb                  [Required] : Service Bus Connection String
 EOF
 }
 
@@ -259,4 +259,13 @@ readonly k8spark_worker_count="${spark_worker_count}"
 readonly k8resource_group="${resource_group}"
 
 chmod 752 create-cluster.sh
-./create-cluster.sh "${k8location}" "${k8cassandra_node_count}" "${k8spark_worker_count}" "${k8resource_group}" "${storage_account_name}" "${app_insights_id}" "${site_name}" "${eh_conn_str}" "${sb_conn_str}"
+./create-cluster.sh \
+    "${k8location}" \
+    "${k8cassandra_node_count}" \
+    "${k8spark_worker_count}" \
+    "${k8resource_group}" \
+    "${storage_account_name}" \
+    "${app_insights_id}" \
+    "${site_name}" \
+    "${eh_conn_str}" \
+    "${sb_conn_str}"

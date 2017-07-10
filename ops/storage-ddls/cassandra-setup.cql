@@ -98,6 +98,7 @@ CREATE TABLE computedtiles (
     PRIMARY KEY ((tilex, tiley, tilez), periodstartdate, periodenddate, pipeline, sourceid, topic)
 );
 
+CREATE INDEX ON computedtiles (tileid);
 CREATE INDEX ON computedtiles (period);
 CREATE INDEX ON computedtiles (computedfeatures);
 CREATE INDEX ON computedtiles (periodtype);
