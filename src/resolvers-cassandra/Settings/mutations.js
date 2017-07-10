@@ -14,8 +14,7 @@ const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
-//TODO: add number of topicsInserted as event
-function insertTopics(siteType) {
+function _insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
     blobStorageClient.fetchJson(uri)
@@ -31,12 +30,17 @@ function insertTopics(siteType) {
         return mutations;
       })
       .then(mutations => {
-        return cassandraConnector.executeBatchMutations(mutations);
+        cassandraConnector.executeBatchMutations(mutations)
+        .then(() => {
+          resolve({numTopicsInserted: mutations.length});
+        })
+        .catch(reject);
       })
-      .then(resolve)
       .catch(reject);
   });
 }
+
+const insertTopics = trackEvent(_insertTopics, 'Settings.Topics.Insert', (response, err) => ({numTopicsInserted: err ? 0 : response.numTopicsInserted}));
 
 /**
  * @param {{input: {siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
@@ -45,7 +49,9 @@ function insertTopics(siteType) {
 function createSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const siteType = args && args.input && args.input.siteType;
-    if(!siteType || !siteType.length) return reject(`siteType for sitename ${args.name} is not defined`);
+    if(!siteType || !siteType.length) {
+      return reject(`siteType for sitename ${args.name} is not defined`);
+    }
     cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?', [args.name])
       .then(rows => {
         if(!rows || !rows.length) {

@@ -50,13 +50,8 @@ function executeBatchMutations(mutations) {
       }
     },
     (err) => {
-      if (err) {
-        console.log(`Error occured during the mutations: ${JSON.stringify(err)}`);
-        reject(err);
-      } else {
-        console.log('Finished executing cassandra mutations');
-        resolve();
-      }
+      if (err) reject(err);
+      else resolve();
     });
   });
 }
@@ -68,13 +63,8 @@ function executeBatchMutations(mutations) {
 function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
     client.execute(query, params, { prepare: true }, (err, result) => {
-      if (err) {
-        console.log(`Error occured during executeQuery: ${JSON.stringify(err)}`);
-        return reject(err);
-      }
-      else {
-        return resolve(result.rows);
-      }
+      if (err) return reject(err);
+      else return resolve(result.rows);
     });
   });
 }
