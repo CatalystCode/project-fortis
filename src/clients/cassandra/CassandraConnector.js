@@ -51,7 +51,7 @@ function executeBatchMutations(mutations) {
     },
     (err) => {
       if (err) reject(err);
-      else resolve();
+      else resolve({numBatchMutations: chunkedMutations.length});
     });
   });
 }
