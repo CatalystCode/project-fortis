@@ -14,19 +14,7 @@ const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
-function deleteTopics() {
-  return new Promise((resolve, reject) => {
-    const mutations = [{
-      mutation: 'TRUNCATE fortis.watchlist',
-      params: []
-    }];
-
-    cassandraConnector.executeBatchMutations(mutations)
-      .then(resolve)
-      .catch(reject);
-  });
-}
-
+//TODO: add number of topicsInserted as event
 function insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
@@ -50,17 +38,25 @@ function insertTopics(siteType) {
   });
 }
 
-function createSite(args) {
+/**
+ * @param {{input: {siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
+ * @returns {Promise}
+ */
+function createSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const siteType = args.input.siteType;
-    deleteTopics()
-      .then(() => {
-        return insertTopics(siteType);
+    const siteType = args && args.input && args.input.siteType;
+    if(!siteType || !siteType.length) return reject(`siteType for sitename ${args.name} is not defined`);
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?', [args.name])
+      .then(rows => {
+        if(!rows || !rows.length) {
+          return insertTopics(siteType);          
+        } else {
+          return reject(`Site with sitename ${args.name} already exists.`);
+        }
       })
       .then(() => {
         return cassandraConnector.executeBatchMutations([{
           query: `INSERT INTO fortis.sitesettings (
-            id,
             sitetype, 
             sitename,
             geofence,
@@ -71,7 +67,6 @@ function createSite(args) {
             insertion_time
           ) VALUES (?,?,?,?,?,?,?,?,dateof(now()))`,
           params: [
-            args.RowKey,
             args.siteType,
             args.name,
             args.targetBbox,
@@ -82,61 +77,20 @@ function createSite(args) {
           ]
         }]);
       })
-      .then(resolve)
-      .catch(reject);
-  });
-}
-
-function replaceSite(args) {
-  return new Promise((resolve, reject) => {
-    //TODO: sitetype is not in sitesettings table yet - should it also be part of the PK?
-    cassandraConnector.executeBatchMutations([{
-      query: `UPDATE fortis.sitesettings 
-      SET geofence = ?,
-      languages = ?,
-      defaultzoom = ?,
-      title = ?,
-      logo = ?,
-      insertion_time = dateof(now()) 
-      WHERE id = ? AND sitename = ?`,
-      params: [
-        args.targetBbox,
-        args.supportedLanguages,
-        args.defaultZoomLevel,
-        args.title,
-        args.logo,
-        args.RowKey,
-        args.name
-      ]
-    }])
-      .then(resolve)
       .catch(reject);
   });
 }
 
 /**
- * @param {{input: {RowKey: string, siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
- * @returns {Promise.<{name: string, properties: {RowKey: string, siteType: string, targetBBox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}
+ * @param {{input: {siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
+ * @returns {Promise}
  */
-function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
+function removeSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-
-    const siteType = args && args.input && args.input.siteType;
-    if (!siteType) return reject(`siteType for ${args.name} is not defined`);
-    
-    const rowKey = args && args.input && args.input.RowKey;
-    if(!rowKey) return reject(`RowKey required for ${JSON.stringify(args)}`);
-
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE id = ? AND sitename = ?', [`${args.RowKey}`,`${args.name}`])
-      .then(rows => {
-        if(!rows || !rows.length) {
-          return createSite(args);
-        }
-        else if(rows.length == 1) {
-          return replaceSite(args);
-        }
-        else return reject(`More than one site with sitename: ${args.name}`);
-      })
+    cassandraConnector.executeBatchMutations([{
+      query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?',
+      params: [args.name]
+    }])
       .then(resolve)
       .catch(reject);
   });
@@ -418,7 +372,8 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  createOrReplaceSite: trackEvent(createOrReplaceSite, 'createOrReplaceSite'),
+  createSite: trackEvent(createSite, 'createSite'),
+  removeSite: trackEvent(removeSite, 'removeSite'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
   modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
