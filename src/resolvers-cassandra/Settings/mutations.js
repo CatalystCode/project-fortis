@@ -95,14 +95,10 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise}
  */
 function removeSite(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    cassandraConnector.executeBatchMutations([{
-      query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?',
-      params: [args.name]
-    }])
-      .then(resolve)
-      .catch(reject);
-  });
+  return cassandraConnector.executeBatchMutations([{
+    query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?',
+    params: [args.name]
+  }]);
 }
 
 function facebookPagePrimaryKeyValuesToRowKey(values) {
