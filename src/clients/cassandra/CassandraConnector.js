@@ -61,7 +61,8 @@ function executeBatchMutations(mutations) {
   });
 }
 
-/** @param {string} query
+/**
+ * @param {string} query
  * @param {string[]} params
  * @returns {Promise.<object[]>}
  */
