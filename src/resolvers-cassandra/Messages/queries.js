@@ -35,7 +35,7 @@ function cassandraRowToFeature(row) {
   };
 }
 
-const SUPPORTED_PIPELINES = ['Twitter', 'Facebook', 'Instagram', 'Radio', 'Reddit'];
+const SUPPORTED_PIPELINES = ['twitter', 'facebook', 'instagram', 'radio', 'reddit'];
 
 function makeDefaultClauses(args) {
   const params = [];
