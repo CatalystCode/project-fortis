@@ -5,15 +5,16 @@ const nconf = require('nconf');
 const Promise = require('promise');
 const request = require('request');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+const deprecated = require('./deprecated');
 
-let memoryStore = new nconf.Memory();
+const ACCOUNT_KEY = process.env.TRANSLATION_SERVICE_ACCOUNT_KEY;
+const TOKEN_URL_BASE = process.env.TRANSLATION_SERVICE_TOKEN_HOST || 'https://api.cognitive.microsoft.com';
+const TRANSLATOR_URL_BASE = process.env.TRANSLATION_SERVICE_TRANSLATOR_HOST || 'https://api.microsofttranslator.com';
+const TOKEN_REFETCH_SECONDS = (10 - 2) * 60; // 10 minutes validity minus 2 minutes to always avoid expiry
 
-const client_id = process.env.TRANSLATION_SERVICE_CLIENT_ID;
-const client_secret = process.env.TRANSLATION_SERVICE_CLIENT_SECRET;
-const datamarket_auth_uri = 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13';
-const translator_scope = 'http://api.microsofttranslator.com/';
-const translator_uri = 'http://api.microsofttranslator.com/V2/Http.svc/Translate';
-const translator_array_uri = 'http://api.microsofttranslator.com/V2/Http.svc/TranslateArray';
+const translator_uri = `${TRANSLATOR_URL_BASE}/V2/Http.svc/Translate`;
+const translator_array_uri = `${TRANSLATOR_URL_BASE}/V2/Http.svc/TranslateArray`;
+const memoryStore = new nconf.Memory();
 
 function TranslatorAccessTokenExpired() {
   let translatorToken = memoryStore.get('translatorToken');
@@ -26,30 +27,28 @@ function TranslatorAccessTokenExpired() {
 }
 
 function getAccessTokenForTranslation() {
-  const grant_type = 'client_credentials';
-  const now = new Date();
-
-  const payload = {
-    client_id: client_id,
-    client_secret: client_secret,
-    scope: translator_scope,
-    grant_type: grant_type
-  };
+  if (!ACCOUNT_KEY && deprecated.client_id && deprecated.client_secret) {
+    return deprecated.getAccessTokenForTranslation();
+  }
 
   const POST = {
-    url: datamarket_auth_uri,
-    form: payload
+    url: `${TOKEN_URL_BASE}/sts/v1.0/issueToken`,
+    data: '',
+    headers: {
+      'Ocp-Apim-Subscription-Key': ACCOUNT_KEY
+    }
   };
 
   return new Promise((resolve, reject) => {
+    const now = new Date();
+
     request.post(POST, (err, response, body) => {
       if (response.statusCode !== 200 || err) {
         return reject(err);
       } else {
-        body = JSON.parse(body);
         resolve({
-          'token': body.access_token,
-          'expires': new Date(now.getTime() + parseInt(body.expires_in - 1) * 1000)
+          'token': body,
+          'expires': new Date(now.getTime() + TOKEN_REFETCH_SECONDS * 1000)
         });
       }
     });
