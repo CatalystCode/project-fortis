@@ -31,22 +31,18 @@ object Pipeline {
 
     val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/opener/opener-$language.zip", Settings.modelsDir)
     val sentimentModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/sentiment/sentiment-$language.zip", Settings.modelsDir)
-    val featureServiceClient = new FeatureServiceClient(Settings.featureServiceUrlBase)
 
     sourceStream.map(_.transform(rdd => {
       // Note: this block executes on the driver, whereas the operations applied to 'rdd' (i.e. rdd.map(_))
       // will execute on workers.
 
       // Get the shared transform context, updating it only if needed.
-      val transformContext = transformManager.getOrUpdateContext(rdd.sparkContext, configurationManager, featureServiceClient)
+      val transformContext = transformManager.getOrUpdateContext(rdd.sparkContext)
 
       // Copy TransformContext fields locally to avoid serializing everything to each task. In this way, each task's
       // serialization will only include the fields that it accesses (Spark's closure cleaner will remove the others)
       val geofence = transformContext.siteSettings.geofence
       val supportedLanguages = transformContext.siteSettings.languages
-
-      val locationsExtractorFactory = transformContext.locationsExtractorFactory
-      val locationFetcher = locationsExtractorFactory.fetch _
 
       val imageAnalyzer = transformContext.imageAnalyzer
       val languageDetector = transformContext.languageDetector
@@ -55,9 +51,10 @@ object Pipeline {
       // Broadcast variables
       val langToWatchlist = transformContext.langToWatchlist
       val blacklist = transformContext.blacklist
+      val locationsExtractorFactory = transformContext.locationsExtractorFactory
 
       def convertToSchema(original: T): ExtendedFortisEvent[T] = {
-        val message = analyzer.toSchema(original, locationFetcher, imageAnalyzer)
+        val message = analyzer.toSchema(original, locationsExtractorFactory.value.fetch _, imageAnalyzer)
         ExtendedFortisEvent(message, Analysis())
       }
 
@@ -107,7 +104,7 @@ object Pipeline {
 
       def addLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val locations = analyzer.extractLocations(event.details,
-          locationsExtractorFactory.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))))
+          locationsExtractorFactory.value.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))))
         event.copy(analysis = event.analysis.copy(locations = locations))
       }
 

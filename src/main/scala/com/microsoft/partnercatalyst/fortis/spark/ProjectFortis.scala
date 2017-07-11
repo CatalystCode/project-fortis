@@ -7,6 +7,7 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.sinks.kafka.KafkaSink
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
@@ -64,8 +65,10 @@ object ProjectFortis extends App {
       Seconds(Constants.SparkStreamingBatchSizeDefault))
 
     val streamProvider = StreamProviderFactory.create()
-    val transformManager: TransformManager = new TransformManager
+
     val configManager: ConfigurationManager = DummyConfigurationManager
+    val featureServiceClient = new FeatureServiceClient(Settings.featureServiceUrlBase)
+    val transformManager: TransformManager = new TransformManager(configManager, featureServiceClient)
 
     def pipeline[T: TypeTag](name: String, analyzer: Analyzer[T]) =
       Pipeline(name, analyzer, ssc, streamProvider, transformManager, configManager)

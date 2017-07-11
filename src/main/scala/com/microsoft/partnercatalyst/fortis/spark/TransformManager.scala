@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
+import java.io.{IOException, ObjectInputStream, ObjectOutputStream}
 import java.time.Duration
 import java.util.concurrent.{CompletableFuture, SynchronousQueue, TimeUnit}
 
@@ -16,58 +17,37 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.Fe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
 import org.apache.spark.SparkContext
 
-import scala.util.{Failure, Properties, Success, Try}
+import scala.util.Properties
 
-class TransformManager extends Serializable with Loggable {
-  private val UpdateSettings = 1
-  private val UpdateWatchlist = 2
-  private val UpdateBlacklist = 4
+class TransformManager(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
+  private val shouldUpdate: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
 
-  private val shouldUpdate: SynchronousQueue[Int] = new SynchronousQueue[Int]()
+  // Do not serialize these values. The transformContext would otherwise contain stale Broadcast
+  // instances, so we rebuild it on recovery from checkpoint.
+  @volatile @transient private var transformContext: TransformContext = null
+  @volatile @transient private var queueClient: QueueClient = null
 
-  // These will be serialized with their initialization values, since Spark should only serialize this class once when
-  // building the DStream graph that's saved to the checkpoint.
-  // Thus, when recovering from a checkpoint, they will be initialized to these values as well.
-  @volatile private var transformContext: TransformContext = null
-  @volatile private var siteSettings: SiteSettings = null
-  @volatile private var langToWatchlist: Map[String, List[String]] = null
-  @volatile private var blacklist: List[BlacklistedTerm] = null
-
-  @volatile private var queueClient: QueueClient = null
-
-  def getOrUpdateContext(sparkContext: SparkContext, configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient): TransformContext = {
-
+  def getOrUpdateContext(sparkContext: SparkContext): TransformContext = {
     if (transformContext == null) {
       // Blocking init of transform context and queue client used for non-blocking updates.
       // Initialization has not yet occurred since construction/deserialization.
       synchronized {
         if (transformContext == null) {
-          // Initialization
-          queueClient = new QueueClient(
-            new ConnectionStringBuilder(
-              Properties.envOrElse("FORTIS_SERVICEBUS_NAMESPACE", ""),
-              Properties.envOrElse("FORTIS_SERVICEBUS_CONFIG_QUEUE", ""),
-              Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_NAME", ""),
-              Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_KEY", "")
-            ), ReceiveMode.PeekLock)
 
-          queueClient.registerMessageHandler(
-            new MessageHandler(configManager),
-            new MessageHandlerOptions(
-              1, // Max concurrent calls
-              true,
-              Duration.ofMinutes(5)))
+          // Fetch data synchronously
+          val siteSettings = configManager.fetchSiteSettings()
+          val langToWatchlist = configManager.fetchWatchlist()
+          val blacklist = configManager.fetchBlacklist()
 
-          // Fetch all data synchronously for init
-          siteSettings = configManager.fetchSiteSettings()
-          langToWatchlist = configManager.fetchWatchlist()
-          blacklist = configManager.fetchBlacklist()
+          var delta = deltaWithSettings(siteSettings)
+          delta = deltaWithWatchlist(langToWatchlist, delta)
+          delta = deltaWithBlacklist(blacklist, delta)
 
-          // Update transformContext and broadcast as needed
-          transformContext = TransformContext()
-          publishSettings(sparkContext, featureServiceClient)
-          publishWatchlist(sparkContext, featureServiceClient)
-          publishBlacklist(sparkContext, featureServiceClient)
+          // Create transformContext and broadcast
+          updateTransformContext(delta, sparkContext)
+
+          // Start async update listener
+          startQueueClient()
 
           return transformContext
         }
@@ -75,66 +55,177 @@ class TransformManager extends Serializable with Loggable {
     }
 
     synchronized {
-      val dirtyFlags: Option[Int] = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
+      // Grab delta from hand-off only if it's available *now*
+      val delta = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
 
-      // The updates to siteSettings, watchlist, blacklist etc. happens-before the corresponding poll returns, so their
-      // values used by publish functions will be as new or newer than they were when set by the client lib thread
-      // that enqueued 'flags' (but aren't necessarily from the same iteration). In other words, it's possible 'publish'
-      // functions will publish data that's newer than it was at the time the producer thread notified us through the
-      // sync queue. This is an acceptable guarantee and allows the producer code to be lock-free.
-      dirtyFlags.foreach(flags => {
-        if (isSet(flags, UpdateSettings)) {
-          publishSettings(sparkContext, featureServiceClient)
-        }
-
-        if (isSet(flags, UpdateWatchlist)) {
-          publishWatchlist(sparkContext, featureServiceClient)
-        }
-
-        if (isSet(flags, UpdateBlacklist)) {
-          publishBlacklist(sparkContext, featureServiceClient)
-        }
-      })
+      // Update transform context with delta
+      delta.foreach(updateTransformContext(_, sparkContext))
     }
 
     transformContext
   }
 
-  private class MessageHandler(configurationManager: ConfigurationManager) extends IMessageHandler {
+  private def startQueueClient(): Unit = {
+    queueClient = new QueueClient(
+      new ConnectionStringBuilder(
+        Properties.envOrElse("FORTIS_SERVICEBUS_NAMESPACE", ""),
+        Properties.envOrElse("FORTIS_SERVICEBUS_CONFIG_QUEUE", ""),
+        Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_NAME", ""),
+        Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_KEY", "")
+      ), ReceiveMode.PeekLock)
+
+    queueClient.registerMessageHandler(
+      new MessageHandler(),
+      new MessageHandlerOptions(
+        1, // Max concurrent calls
+        true,
+        Duration.ofMinutes(5)))
+  }
+
+  /**
+    * Creates a new transform context by copying the current one, overwriting any corresponding fields that are
+    * non-empty in the provided delta. Broadcast fields are broadcasted here as well as needed.
+    *
+    * Note: this is only called by Spark threads.
+    */
+  private def updateTransformContext(delta: Delta, sparkContext: SparkContext): Unit = {
+    if (transformContext == null) {
+      transformContext = TransformContext()
+    }
+
+    transformContext = transformContext.copy(
+      siteSettings = delta.siteSettings.getOrElse(transformContext.siteSettings),
+      langToWatchlist = delta.langToWatchlist match {
+        case Some(list) => sparkContext.broadcast(list)
+        case None => transformContext.langToWatchlist
+      },
+      blacklist = delta.blacklist match {
+        case Some(list) => sparkContext.broadcast(list)
+        case None => transformContext.blacklist
+      },
+      locationsExtractorFactory = delta.locationsExtractorFactory match {
+        case Some(factory) => sparkContext.broadcast(factory)
+        case None => transformContext.locationsExtractorFactory
+      },
+      imageAnalyzer = delta.imageAnalyzer.getOrElse(transformContext.imageAnalyzer),
+      languageDetector = delta.languageDetector.getOrElse(transformContext.languageDetector),
+      sentimentDetectorAuth = delta.sentimentDetectorAuth.getOrElse(transformContext.sentimentDetectorAuth)
+    )
+  }
+
+  /**
+    * Builds a delta against the current transform context using the provided site settings.
+    * @param delta An existing delta to be used as a base.
+    * @return
+    */
+  private def deltaWithSettings(siteSettings: SiteSettings, delta: Delta = Delta()): Delta = {
+    // Note that parameters are call-by-name
+    def updatedField[T](isDirty: => Boolean, newVal: => T): Option[T] = {
+      // Invoke 'isDirty' only if transform context is not null
+      if (transformContext == null || isDirty)
+        Some(newVal)
+      else
+        None
+    }
+
+    delta.copy(
+      siteSettings = Some(siteSettings),
+      locationsExtractorFactory = updatedField(
+        siteSettings.geofence != transformContext.siteSettings.geofence,
+        new LocationsExtractorFactory(featureServiceClient, siteSettings.geofence).buildLookup()
+      ),
+      imageAnalyzer = updatedField(
+        siteSettings.cogVisionSvcToken != transformContext.siteSettings.cogVisionSvcToken,
+        new ImageAnalyzer(ImageAnalysisAuth(siteSettings.cogVisionSvcToken), featureServiceClient)
+      ),
+      languageDetector = updatedField(
+        siteSettings.translationSvcToken != transformContext.siteSettings.translationSvcToken,
+        new LanguageDetector(LanguageDetectorAuth(siteSettings.translationSvcToken))
+      ),
+      sentimentDetectorAuth = updatedField(
+        siteSettings.translationSvcToken != transformContext.siteSettings.translationSvcToken,
+        SentimentDetectorAuth(siteSettings.translationSvcToken)
+      )
+    )
+  }
+
+  /**
+    * Builds a delta against the current transform context using the provided watchlist.
+    * @param delta An existing delta to be used as a base.
+    * @return
+    */
+  private def deltaWithWatchlist(langToWatchlist: Map[String, List[String]], delta: Delta = Delta()) = {
+    delta.copy(
+      langToWatchlist = Some(langToWatchlist)
+    )
+  }
+
+  /**
+    * Builds a delta against the current transform context using the provided blacklist.
+    * @param delta An existing delta to be used as a base.
+    * @return
+    */
+  private def deltaWithBlacklist(blacklist: List[BlacklistedTerm], delta: Delta = Delta()) = {
+    delta.copy(
+      blacklist = Some(blacklist)
+    )
+  }
+
+  // TODO: remove. Here for serialization debugging.
+  @throws(classOf[IOException])
+  private def writeObject(out: ObjectOutputStream): Unit = {
+    out.defaultWriteObject()
+  }
+
+  // TODO: remove. Here for serialization debugging.
+  @throws(classOf[IOException])
+  private def readObject(in: ObjectInputStream): Unit = {
+    in.defaultReadObject()
+  }
+
+  private class MessageHandler extends IMessageHandler {
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
       logError("Service Bus client threw error while processing message.", exception)
     }
 
+    /**
+      * Called by the QueueClient thread when a message arrives on the Service Bus.
+      *
+      * Note: this is configured in [[TransformManager.startQueueClient]] such that it's called serially (only 1 thread
+      *       will execute it at a time) which is necessary for the concurrency correctness of this module.
+      */
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      val flags = Option(message.getProperties.getOrDefault("dirty", null)) match {
-        case Some(value) => Try(value.toInt) match {
-          case Success(parsed) => parsed
-          case Failure(ex) =>
-            logError(s"Could not parse 'dirty' property to an integer. Ignoring.", ex)
-            0
+      TransformManager.this.synchronized {
+        // Wait for the previous update of transform context to settle
+        // to ensure we're calculating the delta against the latest context
+      }
+
+      // Read the service bus message and build delta using data store.
+      val delta = Option(message.getProperties.getOrDefault("dirty", null)) match {
+        case Some(value) => value match {
+          case "settings" =>
+            val siteSettings = configManager.fetchSiteSettings()
+            deltaWithSettings(siteSettings)
+          case "watchlist" =>
+            val langToWatchlist = configManager.fetchWatchlist()
+            deltaWithWatchlist(langToWatchlist)
+          case "blacklist" =>
+            val blacklist = configManager.fetchBlacklist()
+            deltaWithBlacklist(blacklist)
+          case unknown =>
+            logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
+            Delta()
         }
         case None =>
           logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
-          0
-      }
-
-      if (isSet(flags, UpdateSettings)) {
-        siteSettings = configurationManager.fetchSiteSettings()
-      }
-
-      if (isSet(flags, UpdateWatchlist)) {
-        langToWatchlist = configurationManager.fetchWatchlist()
-      }
-
-      if (isSet(flags, UpdateBlacklist)) {
-        blacklist = configurationManager.fetchBlacklist()
+          Delta()
       }
 
       // Block for up to two minutes for a Spark thread to acknowledge the updated
       // state. If we time out, assume that this TransformManager instance has been
-      // replaced (Spark context restart / checkpoint discard), and shut down to
+      // replaced (Spark context restarted & checkpoint was discarded), and shut down to
       // allow our successor to handle the message instead.
-      if (!shouldUpdate.offer(flags, 2, TimeUnit.MINUTES)) {
+      if (!shouldUpdate.offer(delta, 2, TimeUnit.MINUTES)) {
         logDebug("Shutting down Service Bus client: timeout exceeded.")
 
         // Shut down client
@@ -146,31 +237,21 @@ class TransformManager extends Serializable with Loggable {
       CompletableFuture.completedFuture(null)
     }
   }
-
-  private def publishSettings(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
-    val settings = siteSettings.copy()
-    transformContext = transformContext.copy(
-      siteSettings = settings,
-      locationsExtractorFactory = new LocationsExtractorFactory(featureServiceClient, settings.geofence).buildLookup(),
-      imageAnalyzer = new ImageAnalyzer(ImageAnalysisAuth(settings.cogVisionSvcToken), featureServiceClient),
-      languageDetector = new LanguageDetector(LanguageDetectorAuth(settings.translationSvcToken)),
-      sentimentDetectorAuth = SentimentDetectorAuth(settings.translationSvcToken)
-    )
-  }
-
-  private def publishWatchlist(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
-    transformContext = transformContext.copy(
-      langToWatchlist = sparkContext.broadcast(langToWatchlist)
-    )
-  }
-
-  private def publishBlacklist(sparkContext: SparkContext, featureServiceClient: FeatureServiceClient): Unit = {
-    transformContext = transformContext.copy(
-      blacklist = sparkContext.broadcast(blacklist)
-    )
-  }
 }
 
 private object TransformManager {
-  @inline def isSet(bitField: Int, test: Int): Boolean = (bitField & test) == test
+
+  /**
+    * Holds the next set of values for the fields of the current transform context. If the value of a field here is
+    * empty, then the corresponding field of the transform context during update will be left as is.
+    */
+  private case class Delta(
+    siteSettings: Option[SiteSettings] = None,
+    langToWatchlist: Option[Map[String, List[String]]] = None,
+    blacklist: Option[List[BlacklistedTerm]] = None,
+    locationsExtractorFactory: Option[LocationsExtractorFactory] = None,
+    imageAnalyzer: Option[ImageAnalyzer] = None,
+    languageDetector: Option[LanguageDetector] = None,
+    sentimentDetectorAuth: Option[SentimentDetectorAuth] = None
+  )
 }

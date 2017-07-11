@@ -11,7 +11,7 @@ case class TransformContext(
   siteSettings: SiteSettings = null,
   langToWatchlist: Broadcast[Map[String, List[String]]] = null,
   blacklist: Broadcast[List[BlacklistedTerm]] = null,
-  locationsExtractorFactory: LocationsExtractorFactory = null,
+  locationsExtractorFactory: Broadcast[LocationsExtractorFactory] = null,
   imageAnalyzer: ImageAnalyzer = null,
   languageDetector: LanguageDetector = null,
   sentimentDetectorAuth: SentimentDetectorAuth = null
