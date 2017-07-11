@@ -11,6 +11,8 @@ module.exports = graphql.buildSchema(`
   }
 
   type Mutation {
+    createSite(input: SiteDefinition!): Site
+    removeSite(input: SiteDefinition!): Site
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     createOrReplaceSite(input: SiteDefinition!): Site

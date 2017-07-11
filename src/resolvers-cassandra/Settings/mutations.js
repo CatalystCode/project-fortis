@@ -14,6 +14,15 @@ const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
+function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+    return reject(
+      'This API call is no longer supported. ' +
+      'We separated this functionality into createSite and removeSite '
+    );
+  });
+}
+
 function _insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     if(!siteType || !siteType.length) {
@@ -377,6 +386,7 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
+  createOrReplaceSite: createOrReplaceSite,
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
