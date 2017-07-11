@@ -121,17 +121,24 @@ function facebookPages(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function facebookPageToId(page) {
+  const match = page && page.pageUrl && page.pageUrl.match(/facebook.com\/([^/]+)/);
+  return match && match.length >= 1 && match[1];
+}
+
 /**
  * @param {{siteId: string, days: number}} args
  * @returns {Promise.<{analytics: Array<{Name: string, Count: number, LastUpdated: string}>}>}
  */
 function facebookAnalytics(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const pageIds = ['aljazeera', 'microsoftvan']; // todo: fetch pages for args.siteId from sitesettings
-
-    Promise.all(pageIds.map(pageId => ({Name: pageId, LastUpdated: facebookAnalyticsClient.fetchPageLastUpdatedAt(pageId), Count: -1})))
-    .then(analytics => resolve({analytics}))
-    .catch(err => reject(err));
+    facebookPages({siteId: args.siteId})
+    .then(response => {
+      const pageIds = response.pages.map(facebookPageToId).filter(pageId => !!pageId);
+      Promise.all(pageIds.map(pageId => ({Name: pageId, LastUpdated: facebookAnalyticsClient.fetchPageLastUpdatedAt(pageId), Count: -1})))
+      .then(analytics => resolve({analytics}))
+      .catch(reject);
+    });
   });
 }
 
