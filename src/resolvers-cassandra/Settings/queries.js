@@ -6,8 +6,8 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const withRunTime = require('../shared').withRunTime;
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
-const CONNECTOR_TWITTER = 'Twitter'
-const CONNECTOR_FACEBOOK = 'Facebook'
+const CONNECTOR_TWITTER = 'Twitter';
+const CONNECTOR_FACEBOOK = 'Facebook';
 
 function cassandraRowToSite(row) {
   // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
