@@ -6,7 +6,6 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { allSources, withRunTime } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
-const flatten = require('lodash/flatten');
 const { cross, makeMap, makeSet } = require('../../utils/collections');
 
 function makeDefaultClauses(args) {
