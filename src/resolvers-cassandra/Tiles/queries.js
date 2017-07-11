@@ -4,7 +4,7 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const withRunTime = require('../shared').withRunTime;
+const { allSources, withRunTime } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const flatten = require('lodash/flatten');
 const { cross, makeMap, makeSet } = require('../../utils/collections');
@@ -12,11 +12,6 @@ const { cross, makeMap, makeSet } = require('../../utils/collections');
 function makeDefaultClauses(args) {
   let params = [];
   let clauses = [];
-
-  if (args.sourceFilter && args.sourceFilter.length) {
-    clauses.push(`(pipeline IN (${args.sourceFilter.map(_ => '?').join(', ')}))`); // eslint-disable-line no-unused-vars
-    params = params.concat(args.sourceFilter);
-  }
 
   if (args.fromDate) {
     clauses.push('(periodstartdate >= ?)');
@@ -33,25 +28,31 @@ function makeDefaultClauses(args) {
     params.push(args.timespan);
   }
 
+  const pipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : allSources;
   const keywords = (args.filteredEdges || []).concat(args.mainEdge ? [args.mainEdge] : []);
-  return {clauses: clauses, params: params, keywords: keywords};
+  return {clauses, params, keywords, pipelines};
 }
 
 function makeTilesQueries(args, tileIds) {
   const defaults = makeDefaultClauses(args);
 
-  return cross(tileIds, defaults.keywords).map(tileIdAndKeyword => {
+  return cross(tileIds, defaults.keywords, defaults.pipelines).map(tileIdAndKeywordAndPipeline => {
     const params = defaults.params.slice();
     const clauses = defaults.clauses.slice();
 
-    if (tileIdAndKeyword.a) {
+    if (tileIdAndKeywordAndPipeline.a) {
       clauses.push('(tileid = ?)');
-      params.push(tileIdAndKeyword.a);
+      params.push(tileIdAndKeywordAndPipeline.a);
     }
 
-    if (tileIdAndKeyword.b) {
+    if (tileIdAndKeywordAndPipeline.b) {
       clauses.push('(topic = ?)');
-      params.push(tileIdAndKeyword.b);
+      params.push(tileIdAndKeywordAndPipeline.b);
+    }
+
+    if (tileIdAndKeywordAndPipeline.c) {
+      clauses.push('(pipeline = ?)');
+      params.push(tileIdAndKeywordAndPipeline.c);
     }
 
     const query = `SELECT tileid, computedfeatures, topic FROM fortis.computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;

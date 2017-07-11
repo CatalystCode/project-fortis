@@ -4,7 +4,7 @@ const Promise = require('promise');
 const flatten = require('lodash/flatten');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const withRunTime = require('../shared').withRunTime;
+const { allSources, withRunTime } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 function makeSiteBboxQuery(args) {
@@ -15,7 +15,8 @@ function makeSiteBboxQuery(args) {
 }
 
 function makeTermsQueries(args) {
-  const supportedPipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : [null];
+  const supportedPipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : allSources;
+
   return supportedPipelines.map(pipeline => {
     const clauses = [];
     const params = [];
