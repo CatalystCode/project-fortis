@@ -1,7 +1,6 @@
 'use strict';
 
 const Promise = require('promise');
-const flatten = require('lodash/flatten');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { allSources, withRunTime } = require('../shared');
@@ -50,9 +49,8 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     if (!args) return reject('No args specified');
 
     const queries = makeTermsQueries(args);
-    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+    cassandraConnector.executeQueries(queries)
+    .then(rows => {
       const keywords = new Set();
       rows.forEach(row => row.detectedkeywords.forEach(keyword => keywords.add(keyword)));
 
