@@ -24,7 +24,7 @@ function cassandraRowToFact(row) {
   };
 }
 
-const SUPPORTED_PIPELINES = ['TadaWeb', 'Bing', 'CustomEvent'];
+const SUPPORTED_PIPELINES = ['tadaweb', 'bing', 'customevent'];
 
 function makeListQueries(args) {
   return cross(args.tagFilter, SUPPORTED_PIPELINES).map(keywordAndPipeline => {
