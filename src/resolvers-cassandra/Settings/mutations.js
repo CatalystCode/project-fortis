@@ -66,7 +66,7 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
       return reject(`siteType for sitename ${args.input.name} is not defined`);
     }
 
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ? ALLOW FILTERING;', [args.input.name])
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?;', [args.input.name])
       .then(rows => {
         if (!rows || !rows.length) {
           insertTopics(siteType)
