@@ -18,7 +18,7 @@ function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
     return reject(
       'This API call is no longer supported. ' +
-      'We separated this functionality into createSite and removeSite '
+      'Its functionality has been separated into createSite and removeSite.'
     );
   });
 }
@@ -80,7 +80,7 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
                   sitename,
                   languages,
                   insertion_time
-                ) VALUES (?,?,?,?,?,?,?,toTimestamp(now()))`,
+                ) VALUES (?,?,?,?,?,?,toTimestamp(now()))`,
                 params: [
                   args.input.targetBbox,
                   args.input.defaultZoomLevel,
@@ -132,23 +132,11 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
       console.log('resolve remove site');
       resolve({
         name: args.input.name,
-        properties: {
-          targetBbox: args.input.targetBbox,
-          defaultZoomLevel: args.input.defaultZoomLevel,
-          logo: args.input.logo,
-          title: args.input.title,
-          defaultLocation: [],
-          storageConnectionString: '',
-          featuresConnectionString: '',
-          mapzenApiKey: '',
-          fbToken: '',
-          supportedLanguages:args.input.supportedLanguages,
-          name: args.input.name
-        }
+        properties: {}
       });
     })
     .catch((err) => {
-      console.log('removeSite err');
+      console.log(`removeSite err ${err}`);
       reject(err);
     });
   });
