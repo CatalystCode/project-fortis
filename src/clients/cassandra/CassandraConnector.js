@@ -4,6 +4,7 @@ const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
+const flatten = require('lodash/flatten');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
@@ -38,30 +39,27 @@ function executeBatchMutations(mutations) {
       try {
         client.batch(chunk, { prepare: true }, (err) => {
           if (err) {
-            console.log(err, `Mutations failed for ${JSON.stringify(chunk)}`);
             asyncCallback(err);
           } else {
             asyncCallback();
           }
         });
       } catch (exception) {
-        console.log(`Exception occured during the mutations: ${JSON.stringify(exception)}`);
         asyncCallback(exception);
       }
     },
     (err) => {
       if (err) {
-        console.log(`Error occured during the mutations: ${JSON.stringify(err)}`);
         reject(err);
       } else {
-        console.log('Finished executing cassandra mutations');
         resolve();
       }
     });
   });
 }
 
-/** @param {string} query
+/**
+ * @param {string} query
  * @param {string[]} params
  * @returns {Promise.<object[]>}
  */
@@ -69,17 +67,31 @@ function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
     client.execute(query, params, { prepare: true }, (err, result) => {
       if (err) {
-        console.log(`Error occured during executeQuery: ${JSON.stringify(err)}`);
         return reject(err);
-      }
-      else {
+      } else {
         return resolve(result.rows);
       }
     });
   });
 }
 
+/**
+ * @param {Array<{query: string, params: string[]}} queries
+ * @returns {Promise.<object[]>}
+ */
+function executeQueries(queries) {
+  return new Promise((resolve, reject) => {
+    Promise.all(queries.map(query => executeQuery(query.query, query.params)))
+    .then(nestedRows => {
+      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+      resolve(rows);
+    })
+    .catch(reject);
+  });
+}
+
 module.exports = {
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
+  executeQueries: trackDependency(executeQueries, 'Cassandra', 'executeQueries'),
   executeQuery: trackDependency(executeQuery, 'Cassandra', 'executeQuery')
 };

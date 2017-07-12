@@ -19,6 +19,18 @@ function withRunTime(promiseFunc) {
   return runTimer;
 }
 
+const allSources = [
+  'bing',
+  'customevents',
+  'tadaweb',
+  'facebook',
+  'twitter',
+  'radio',
+  'reddit',
+  'instagram'
+];
+
 module.exports = {
+  allSources: allSources,
   withRunTime: withRunTime
 };

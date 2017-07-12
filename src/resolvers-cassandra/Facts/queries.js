@@ -4,7 +4,6 @@ const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const withRunTime = require('../shared').withRunTime;
 const cross = require('../../utils/collections').cross;
-const flatten = require('lodash/flatten');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
@@ -24,7 +23,7 @@ function cassandraRowToFact(row) {
   };
 }
 
-const SUPPORTED_PIPELINES = ['TadaWeb', 'Bing', 'CustomEvent'];
+const SUPPORTED_PIPELINES = ['tadaweb', 'bing', 'customevent'];
 
 function makeListQueries(args) {
   return cross(args.tagFilter, SUPPORTED_PIPELINES).map(keywordAndPipeline => {
@@ -55,9 +54,8 @@ function list(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.tagFilter || !args.tagFilter.length) return reject('No tags specified to fetch');
 
     const queries = makeListQueries(args);
-    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+    cassandraConnector.executeQueries(queries)
+    .then(rows => {
       const facts = rows.map(cassandraRowToFact);
 
       resolve({
@@ -93,10 +91,8 @@ function get(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.id) return reject('No id specified to fetch');
 
     const queries = makeGetQueries(args);
-    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
-
+    cassandraConnector.executeQueries(queries)
+    .then(rows => {
       if (rows.length > 1) return reject(`Got more ${rows.length} faces with id ${args.id}`);
       resolve(cassandraRowToFact(rows[0]));
     })

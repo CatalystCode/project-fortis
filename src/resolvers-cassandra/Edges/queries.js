@@ -1,21 +1,21 @@
 'use strict';
 
 const Promise = require('promise');
-const flatten = require('lodash/flatten');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const withRunTime = require('../shared').withRunTime;
+const { allSources, withRunTime } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 function makeSiteBboxQuery(args) {
   return {
-    query: 'SELECT geofence FROM sitesettings WHERE sitename = ? ALLOW FILTERING',
+    query: 'SELECT geofence FROM fortis.sitesettings WHERE sitename = ? ALLOW FILTERING',
     params: [args.site]
   };
 }
 
 function makeTermsQueries(args) {
-  const supportedPipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : [null];
+  const supportedPipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : allSources;
+
   return supportedPipelines.map(pipeline => {
     const clauses = [];
     const params = [];
@@ -49,9 +49,8 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     if (!args) return reject('No args specified');
 
     const queries = makeTermsQueries(args);
-    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+    cassandraConnector.executeQueries(queries)
+    .then(rows => {
       const keywords = new Set();
       rows.forEach(row => row.detectedkeywords.forEach(keyword => keywords.add(keyword)));
 
