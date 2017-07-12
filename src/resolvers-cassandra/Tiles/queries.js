@@ -6,7 +6,6 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { allSources, withRunTime } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
-const flatten = require('lodash/flatten');
 const { cross, makeMap, makeSet } = require('../../utils/collections');
 
 function makeDefaultClauses(args) {
@@ -129,9 +128,8 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
     const queries = makeTilesQueries(args, tileIds);
-    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+    cassandraConnector.executeQueries(queries)
+    .then(rows => {
       const features = cassandraRowsToFeatures(rows);
       resolve({
         features: features
@@ -153,9 +151,8 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
     fetchLocationIdsForPoints(args.locations)
     .then(locationIds => {
       const queries = makeLocationsQueries(args, locationIds);
-      Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-      .then(nestedRows => {
-        const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+      cassandraConnector.executeQueries(queries)
+      .then(rows => {
         const features = cassandraRowsToFeatures(rows);
         resolve({
           features: features
@@ -200,9 +197,8 @@ function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-var
     fetchLocationIdsForPoints(args.locations)
     .then(locationIds => {
       const queries = makeLocationsQueries(args, locationIds);
-      Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-      .then(nestedRows => {
-        const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+      cassandraConnector.executeQueries(queries)
+      .then(rows => {
         const edges = cassandraRowsToEdges(rows);
         resolve({
           edges: edges
@@ -226,9 +222,8 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
     const queries = makeTilesQueries(args, tileIds);
-    Promise.all(queries.map(query => cassandraConnector.executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
+    cassandraConnector.executeQueries(queries)
+    .then(rows => {
       const edges = cassandraRowsToEdges(rows);
       resolve({
         edges: edges
