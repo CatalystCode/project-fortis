@@ -129,16 +129,12 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
       params: [args.input.name]
     }])
     .then(() => { 
-      console.log('resolve remove site');
       resolve({
-        name: args.input.name,
+        name: 'test',
         properties: {}
       });
     })
-    .catch((err) => {
-      console.log(`removeSite err ${err}`);
-      reject(err);
-    });
+    .catch(reject);
   });
 }
 

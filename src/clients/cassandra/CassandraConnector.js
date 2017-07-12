@@ -38,22 +38,17 @@ function executeBatchMutations(mutations) {
       try {
         client.batch(chunk, { prepare: true }, (err) => {
           if (err) {
-            console.log('async each limit err' + err);
             asyncCallback(err);
           } else {
             asyncCallback();
           }
         });
       } catch (exception) {
-        console.log('async exception' + exception);
         asyncCallback(exception);
       }
     },
     (err) => {
-      if (err) {
-        console.log('executeBatchMutations err');
-        reject(err);
-      }
+      if (err) reject(err);
       else resolve({numBatchMutations: chunkedMutations.length});
     });
   });
