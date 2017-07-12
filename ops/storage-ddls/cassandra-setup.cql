@@ -93,14 +93,14 @@ CREATE TABLE computedtiles (
     PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid), externalsourceid, tilez, tilex, tiley, periodstartdate, periodenddate)
 );
 
-create table topiconjunctions(
+create table topicconjunctions(
     topic text,
-    topiconjunctionid uuid,
+    topicconjunctionid uuid,
     conjunctivekeywordcombination map<text, int>,//map value is representative of the aggregated mention count displayed in the dashboard
-    PRIMARY KEY ((topic, topiconjunctionid))
+    PRIMARY KEY (topic)
 );
 
-CREATE INDEX ON topiconjunctions ( KEYS (conjunctivekeywordcombination) );
+CREATE INDEX ON topicconjunctions ( KEYS (conjunctivekeywordcombination) );
 
 CREATE TABLE computedplaces (
     placeid text,
