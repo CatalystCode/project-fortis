@@ -30,29 +30,25 @@ CREATE TABLE sitesettings(
     cogvisionsvctoken text,
     cogtextsvctoken text,
     insertion_time timestamp,
-    PRIMARY KEY (id, sitename)
+    PRIMARY KEY (sitename)
 );
 
-CREATE INDEX ON sitesettings (sitename);
-
 CREATE TABLE streams (
-  pipeline text,
-  streamid uuid,
-  connector text,
+  pipelinekey text,
+  pipelinelabel text,
+  connectorid uuid,
   params frozen<map<text, text>>,
-  PRIMARY KEY ((pipeline), streamid)
+  PRIMARY KEY (pipelinekey, connectorid)
 );
 
 CREATE TABLE trustedsources (
-   sourceid text,
+   externalsourceid text,
    sourcetype text,
-   connector text,
+   pipelinekey text,
    rank int,
    insertion_time timestamp,
-   PRIMARY KEY ((connector), sourceid, sourcetype)
+   PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
-
-CREATE INDEX ON trustedsources (rank);
 
 CREATE TYPE computedsentiment (
     pos_avg float,
@@ -76,90 +72,112 @@ CREATE TYPE features (
     sentiment frozen<computedsentiment>,
     gender frozen<computedgender>,
     entities frozen<set<computedentities>>
-);
+);  
 
 CREATE TABLE computedtiles (
+    tileid text,
     tilex int,
     tiley int,
     tilez int,
-    tileid text,
     periodstartdate timestamp,
     periodenddate timestamp,
     periodtype text,
     period text,
-    pipeline text,
-    sourceid text,
-    topic text,
-    topiclangcode text,
+    pipelinekey text,
+    externalsourceid text,
+    topiconjunctionid uuid,
     insertion_time timestamp,
     heatmap text,
     placeids frozen<set<text>>,
     computedfeatures frozen<features>,
-    PRIMARY KEY ((tilex, tiley, tilez), periodstartdate, periodenddate, pipeline, sourceid, topic)
+    PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid), externalsourceid, tilez, tilex, tiley, periodstartdate, periodenddate)
 );
 
-CREATE INDEX ON computedtiles (tileid);
-CREATE INDEX ON computedtiles (period);
-CREATE INDEX ON computedtiles (computedfeatures);
-CREATE INDEX ON computedtiles (periodtype);
+create table topiconjunctions(
+    topic text,
+    topiconjunctionid uuid,
+    conjunctivekeywordcombination map<text, int>,//map value is representative of the aggregated mention count displayed in the dashboard
+    PRIMARY KEY ((topic, topiconjunctionid))
+);
+
+CREATE INDEX ON topiconjunctions ( KEYS (conjunctivekeywordcombination) );
 
 CREATE TABLE computedplaces (
     placeid text,
-    placename text,
     periodstartdate timestamp,
     periodenddate timestamp,
     periodtype text,
     period text,
-    pipeline text,
-    sourceid text,
-    topic text,
-    topiclangcode text,
+    pipelinekey text,
+    externalsourceid text,
+    topiconjunctionid uuid,
     insertion_time timestamp,
     computedfeatures frozen<features>,
-    PRIMARY KEY ((placeid), periodstartdate, periodenddate, pipeline, sourceid, topic)
+    PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid, placeid), externalsourceid, periodstartdate, periodenddate)
 );
 
-CREATE INDEX ON computedplaces (period);
-CREATE INDEX ON computedplaces (computedfeatures);
-CREATE INDEX ON computedplaces (periodtype);
-
-CREATE TABLE computedtopics (
+CREATE TABLE populartopics (
     periodstartdate timestamp,
     periodenddate timestamp,
     periodtype text,
     period text,
-    pipeline text,
-    sourceid text,
+    pipelinekey text,
+    externalsourceid text,
     topic text,
     topiclangcode text,
+    mentionCount int,
     insertion_time timestamp,
-    computedfeatures frozen<features>,
-    PRIMARY KEY ((topic), pipeline, periodstartdate, periodenddate, sourceid)
-);
+    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, topiclangcode), mentionCount, periodstartdate, periodenddate, topic)
+) WITH CLUSTERING ORDER BY (mentionCount DESC, periodstartdate DESC, periodenddate DESC, topic ASC);
 
-CREATE INDEX ON computedtopics (period);
-CREATE INDEX ON computedtopics (computedfeatures);
-CREATE INDEX ON computedtopics (periodtype);
+CREATE TABLE popularsources (
+    periodstartdate timestamp,
+    periodenddate timestamp,
+    periodtype text,
+    period text,
+    pipelinekey text,
+    externalsourceid text,
+    topiconjunctionid uuid,
+    mentionCount int,
+    insertion_time timestamp,
+    PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid), mentionCount, periodstartdate, periodenddate, externalsourceid)
+) WITH CLUSTERING ORDER BY (mentionCount DESC, periodstartdate DESC, periodenddate DESC, externalsourceid ASC);
 
 CREATE TABLE events(
     id uuid,
     externalid text,
-    pipeline text,
+    pipelinekey text,
     title text,
     sourceurl text,
     detectedplaceids frozen<set<text>>,
-    sourceid text,
-    detectedkeywords frozen<set<text>>,
+    externalsourceid text,
+    topiconjunctionid uuid,
     eventlangcode text,
     messagebody text,
     computedfeatures frozen<features>,
     insertion_time timestamp,
     event_time timestamp,
-    PRIMARY KEY (pipeline, externalid)
+    PRIMARY KEY ((pipelinekey, topiconjunctionid, eventlangcode), externalid)
 );
 
-CREATE INDEX ON events (FULL(detectedplaceids));
-CREATE INDEX ON events (FULL(detectedkeywords));
-CREATE INDEX ON events (computedfeatures);
-CREATE INDEX ON events (eventlangcode);
-CREATE INDEX ON events (event_time);
+CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+'mode': 'CONTAINS',
+'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
+'analyzed': 'true',
+'tokenization_skip_stop_words': 'and, the, or',
+'tokenization_enable_stemming': 'true',
+'tokenization_normalize_lowercase': 'true',
+'tokenization_locale': 'en'
+};
+
+CREATE CUSTOM INDEX ON events (title) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+'mode': 'CONTAINS',
+'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
+'analyzed': 'true',
+'tokenization_skip_stop_words': 'and, the, or',
+'tokenization_enable_stemming': 'true',
+'tokenization_normalize_lowercase': 'true',
+'tokenization_locale': 'en'
+};

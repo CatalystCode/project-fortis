@@ -11,7 +11,6 @@ echo "creating deis storage account ${k8location}"
 id
 
 DEIS_STORAGE_ACCOUNT_KEY="$(az storage account keys list -n "${DEIS_STORAGE_ACCOUNT_NAME}" -g "${k8resource_group}" --query [0].value --output tsv)"
-export DEIS_STORAGE_ACCOUNT_KEY
 
 echo "starting deis installation using helm"
 helm repo add deis https://charts.deis.com/workflow

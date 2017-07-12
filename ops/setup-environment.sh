@@ -37,7 +37,7 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
 --from-literal=SERVICE_BUS_CONNECTION_STRING="${sb_conn_str}" \
 --from-literal=SERVICE_BUS_QUEUE_SITE="${sb_queue_site}" \
---from-literal=SERVICE_BUS_QUEUE_STREAM="${sb_queue_streams}"
+--from-literal=SERVICE_BUS_QUEUE_STREAM="${sb_queue_streams}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
