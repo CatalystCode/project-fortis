@@ -6,6 +6,9 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const withRunTime = require('../shared').withRunTime;
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
+const CONNECTOR_TWITTER = 'Twitter';
+const CONNECTOR_FACEBOOK = 'Facebook';
+
 function cassandraRowToSite(row) {
   // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
   // storageConnectionString, featuresConnectionString, mapzenApiKey, fbToken.
@@ -63,7 +66,7 @@ function cassandraRowToTwitterAccount(row) {
 function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT params FROM fortis.streams WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, ['twitter'])
+    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
     .then(rows => {
       const accounts = rows.map(cassandraRowToTwitterAccount);
       resolve({accounts: accounts});
@@ -87,7 +90,7 @@ function cassandraRowToTrustedTwitterAccount(row) {
 function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, ['twitter'])
+    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
     .then(rows => {
       const accounts = rows.map(cassandraRowToTrustedTwitterAccount);
       resolve({accounts: accounts});
@@ -111,7 +114,7 @@ function cassandraRowToFacebookPage(row) {
 function facebookPages(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT connector, sourceid, sourcetype FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, ['facebook'])
+    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_FACEBOOK])
     .then(rows => {
       const pages = rows.map(cassandraRowToFacebookPage);
       resolve({pages: pages});
