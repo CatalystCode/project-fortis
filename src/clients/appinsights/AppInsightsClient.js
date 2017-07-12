@@ -73,7 +73,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc) {
         if (client) {
           client.trackEvent(eventName, props);
         }
-        console.log(JSON.stringify({event: eventName, properties: props, args}));
+        console.log(JSON.stringify({event: eventName, properties: props, args: args && args.length && args[0]}));
         resolve(returnValue);
       })
       .catch(err => {
@@ -83,7 +83,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc) {
         if (client) {
           client.trackEvent(eventName, props);
         }
-        console.error(JSON.stringify({event: eventName, properties: props, err, args}));
+        console.error(JSON.stringify({event: eventName, properties: props, err, args: args && args.length && args[0]}));
         reject(err);
       });
     });
