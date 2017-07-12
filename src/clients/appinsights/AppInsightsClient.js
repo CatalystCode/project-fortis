@@ -52,7 +52,8 @@ function trackDependency(promiseFunc, dependencyName, callName) {
         }
         console.error(JSON.stringify({dependency: dependencyName, call: callName, duration, success, err, args}));
         reject(err);
-      });
+      })
+      .catch(reject);
     });
   }
 
@@ -86,8 +87,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc) {
         console.error(JSON.stringify({event: eventName, properties: props, err, args: args && args.length && args[0]}));
         reject(err);
       })
-      .catch(reject)
-      ;
+      .catch(reject);
     });
   }
 
