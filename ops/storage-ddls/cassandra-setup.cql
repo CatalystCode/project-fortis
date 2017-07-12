@@ -18,7 +18,6 @@ CREATE TABLE blacklist(
 );
 
 CREATE TABLE sitesettings(
-    id uuid,
     sitename text,
     geofence list<double>,
     languages set<text>,
@@ -34,17 +33,19 @@ CREATE TABLE sitesettings(
 );
 
 CREATE TABLE streams (
+  streamid uuid,
   pipelinekey text,
   pipelinelabel text,
-  connectorid uuid,
+  pipelineicon text,
+  streamfactory text,
   params frozen<map<text, text>>,
-  PRIMARY KEY (pipelinekey, connectorid)
+  PRIMARY KEY (pipelinekey, streamid)
 );
 
 CREATE TABLE trustedsources (
    externalsourceid text,
    sourcetype text,
-   pipelinekey text,
+   streamfactory text,
    rank int,
    insertion_time timestamp,
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
@@ -85,19 +86,19 @@ CREATE TABLE computedtiles (
     period text,
     pipelinekey text,
     externalsourceid text,
-    topiconjunctionid uuid,
+    topicconjunctionid uuid,
     insertion_time timestamp,
     heatmap text,
     placeids frozen<set<text>>,
     computedfeatures frozen<features>,
-    PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid), externalsourceid, tilez, tilex, tiley, periodstartdate, periodenddate)
+    PRIMARY KEY ((period, periodtype, pipelinekey, topicconjunctionid), externalsourceid, tilez, tilex, tiley, periodstartdate, periodenddate)
 );
 
 create table topicconjunctions(
     topic text,
     topicconjunctionid uuid,
     conjunctivekeywordcombination map<text, int>,//map value is representative of the aggregated mention count displayed in the dashboard
-    PRIMARY KEY (topic)
+    PRIMARY KEY (topic, topicconjunctionid)
 );
 
 CREATE INDEX ON topicconjunctions ( KEYS (conjunctivekeywordcombination) );
@@ -110,10 +111,10 @@ CREATE TABLE computedplaces (
     period text,
     pipelinekey text,
     externalsourceid text,
-    topiconjunctionid uuid,
+    topicconjunctionid uuid,
     insertion_time timestamp,
     computedfeatures frozen<features>,
-    PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid, placeid), externalsourceid, periodstartdate, periodenddate)
+    PRIMARY KEY ((period, periodtype, pipelinekey, topicconjunctionid, placeid), externalsourceid, periodstartdate, periodenddate)
 );
 
 CREATE TABLE populartopics (
@@ -137,11 +138,26 @@ CREATE TABLE popularsources (
     period text,
     pipelinekey text,
     externalsourceid text,
-    topiconjunctionid uuid,
+    topicconjunctionid uuid,
     mentionCount int,
     insertion_time timestamp,
-    PRIMARY KEY ((period, periodtype, pipelinekey, topiconjunctionid), mentionCount, periodstartdate, periodenddate, externalsourceid)
+    PRIMARY KEY ((period, periodtype, pipelinekey, topicconjunctionid), mentionCount, periodstartdate, periodenddate, externalsourceid)
 ) WITH CLUSTERING ORDER BY (mentionCount DESC, periodstartdate DESC, periodenddate DESC, externalsourceid ASC);
+
+CREATE TABLE popularplaces (
+    periodstartdate timestamp,
+    periodenddate timestamp,
+    periodtype text,
+    period text,
+    pipelinekey text,
+    externalsourceid text,
+    placename text,
+    placeid int,
+    topicconjunctionid uuid,
+    mentionCount int,
+    insertion_time timestamp,
+    PRIMARY KEY ((period, periodtype, pipelinekey, topicconjunctionid, externalsourceid), mentionCount, periodstartdate, periodenddate, placename)
+) WITH CLUSTERING ORDER BY (mentionCount DESC, periodstartdate DESC, periodenddate DESC, placename ASC);
 
 CREATE TABLE events(
     id uuid,
@@ -151,13 +167,13 @@ CREATE TABLE events(
     sourceurl text,
     detectedplaceids frozen<set<text>>,
     externalsourceid text,
-    topiconjunctionid uuid,
+    topicconjunctionids set<text>,
     eventlangcode text,
     messagebody text,
     computedfeatures frozen<features>,
     insertion_time timestamp,
     event_time timestamp,
-    PRIMARY KEY ((pipelinekey, topiconjunctionid, eventlangcode), externalid)
+    PRIMARY KEY ((pipelinekey, eventlangcode), externalid)
 );
 
 CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
@@ -181,3 +197,5 @@ WITH OPTIONS = {
 'tokenization_normalize_lowercase': 'true',
 'tokenization_locale': 'en'
 };
+
+CREATE INDEX ON events (topicconjunctionids);
