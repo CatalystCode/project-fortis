@@ -38,14 +38,12 @@ function executeBatchMutations(mutations) {
       try {
         client.batch(chunk, { prepare: true }, (err) => {
           if (err) {
-            console.log(err, `Mutations failed for ${JSON.stringify(chunk)}`);
             asyncCallback(err);
           } else {
             asyncCallback();
           }
         });
       } catch (exception) {
-        console.log(`Exception occured during the mutations: ${JSON.stringify(exception)}`);
         asyncCallback(exception);
       }
     },
@@ -62,10 +60,14 @@ function executeBatchMutations(mutations) {
  */
 function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    client.execute(query, params, { prepare: true }, (err, result) => {
-      if (err) return reject(err);
-      else return resolve(result.rows);
-    });
+    try {
+      client.execute(query, params, { prepare: true }, (err, result) => {
+        if (err) return reject(err);
+        else return resolve(result.rows);
+      });
+    } catch (exception) {
+      return reject(exception);
+    }
   });
 }
 

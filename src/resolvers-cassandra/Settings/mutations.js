@@ -31,11 +31,10 @@ function _insertTopics(siteType) {
     const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
     blobStorageClient.fetchJson(uri)
       .then(response => {
-        const mutations = [];
-        response.map( topic => {
+        const mutations = response.map(topic => {
           return {
-            mutation: `INSERT INTO fortis.watchlist (keyword,lang_code,translations,insertion_time) 
-                      VALUES (?, ?, ?, dateof(now()));`,
+            query: `INSERT INTO fortis.watchlist (keyword,lang_code,translations,insertion_time) 
+                    VALUES (?, ?, ?, toTimestamp(now()));`,
             params: [topic.keyword, topic.lang_code, topic.translations]
           };
         });
@@ -44,7 +43,9 @@ function _insertTopics(siteType) {
       .then(mutations => {
         cassandraConnector.executeBatchMutations(mutations)
         .then(() => {
-          resolve({numTopicsInserted: mutations.length});
+          resolve({
+            numTopicsInserted: mutations.length
+          });
         })
         .catch(reject);
       })
@@ -62,38 +63,56 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const siteType = args && args.input && args.input.siteType;
     if(!siteType || !siteType.length) {
-      return reject(`siteType for sitename ${args.name} is not defined`);
+      return reject(`siteType for sitename ${args.input.name} is not defined`);
     }
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?', [args.name])
+
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ? ALLOW FILTERING;', [args.input.name])
       .then(rows => {
-        if(!rows || !rows.length) {
-          return insertTopics(siteType);          
-        } else {
-          return reject(`Site with sitename ${args.name} already exists.`);
-        }
-      })
-      .then(() => {
-        return cassandraConnector.executeBatchMutations([{
-          query: `INSERT INTO fortis.sitesettings (
-            sitetype, 
-            sitename,
-            geofence,
-            languages,
-            defaultzoom,
-            title,
-            logo,
-            insertion_time
-          ) VALUES (?,?,?,?,?,?,?,?,dateof(now()))`,
-          params: [
-            args.siteType,
-            args.name,
-            args.targetBbox,
-            args.supportedLanguages,
-            args.defaultZoomLevel,
-            args.title,
-            args.logo
-          ]
-        }]);
+        if (!rows || !rows.length) {
+          insertTopics(siteType)
+            .then(() => {
+              return cassandraConnector.executeBatchMutations([{
+                query: `INSERT INTO fortis.sitesettings (
+                  geofence,
+                  defaultzoom,
+                  logo,
+                  title,
+                  sitename,
+                  languages,
+                  insertion_time
+                ) VALUES (?,?,?,?,?,?,?,toTimestamp(now()))`,
+                params: [
+                  args.input.targetBbox,
+                  args.input.defaultZoomLevel,
+                  args.input.logo,
+                  args.input.title,
+                  args.input.name,
+                  args.input.supportedLanguages
+                ]
+              }]);
+            })
+            .then(() => { 
+              resolve({ //TODO: finalize these property values
+                name: args.input.name,
+                properties: {
+                  targetBbox: args.input.targetBbox,
+                  defaultZoomLevel: args.input.defaultZoomLevel,
+                  logo: args.input.logo,
+                  title: args.input.title,
+                  defaultLocation: [],
+                  storageConnectionString: '',
+                  featuresConnectionString: '',
+                  mapzenApiKey: '',
+                  fbToken: '',
+                  supportedLanguages:args.input.supportedLanguages,
+                  name: args.input.name
+                }
+              });
+            })
+            .catch(reject);
+        } 
+        if (rows.length == 1) return reject(`Site with sitename ${args.input.name} already exists.`);
+        else return reject(`(${rows.length}) number of sites with sitename ${args.input.name} already exist.`);
       })
       .catch(reject);
   });
@@ -104,10 +123,31 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise}
  */
 function removeSite(args, res) { // eslint-disable-line no-unused-vars
-  return cassandraConnector.executeBatchMutations([{
-    query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?',
-    params: [args.name]
-  }]);
+  return new Promise((resolve, reject) => {
+    cassandraConnector.executeBatchMutations([{
+      query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?;',
+      params: [args.input.name]
+    }])
+    .then(() => { 
+      resolve({
+        name: args.input.name,
+        properties: {
+          targetBbox: args.input.targetBbox,
+          defaultZoomLevel: args.input.defaultZoomLevel,
+          logo: args.input.logo,
+          title: args.input.title,
+          defaultLocation: [],
+          storageConnectionString: '',
+          featuresConnectionString: '',
+          mapzenApiKey: '',
+          fbToken: '',
+          supportedLanguages:args.input.supportedLanguages,
+          name: args.input.name
+        }
+      });
+    })
+    .catch(reject);
+  });
 }
 
 function facebookPagePrimaryKeyValuesToRowKey(values) {
