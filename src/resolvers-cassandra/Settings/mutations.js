@@ -111,7 +111,7 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
             })
             .catch(reject);
         } 
-        if (rows.length == 1) return reject(`Site with sitename ${args.input.name} already exists.`);
+        else if (rows.length == 1) return reject(`Site with sitename ${args.input.name} already exists.`);
         else return reject(`(${rows.length}) number of sites with sitename ${args.input.name} already exist.`);
       })
       .catch(reject);
@@ -129,6 +129,7 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
       params: [args.input.name]
     }])
     .then(() => { 
+      console.log('resolve remove site');
       resolve({
         name: args.input.name,
         properties: {
@@ -146,7 +147,10 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
         }
       });
     })
-    .catch(reject);
+    .catch((err) => {
+      console.log('removeSite err');
+      reject(err);
+    });
   });
 }
 

@@ -12,6 +12,7 @@ function fetchJson(uri) {
   return new Promise((resolve, reject) => {
     request.get(uri, (err, response, body) => {
       if(err || response.statusCode !== 200) {
+        console.log('fetch json err');
         return reject(`Unable to get json for uri ${uri}: ${err}`);
       }
 

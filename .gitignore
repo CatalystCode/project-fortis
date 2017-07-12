@@ -38,3 +38,6 @@ jspm_packages
 
 # IDEA config files
 .idea/
+
+# VS code config
+.vscode
