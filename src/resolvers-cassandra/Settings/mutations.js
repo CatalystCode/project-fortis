@@ -92,20 +92,15 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
               }]);
             })
             .then(() => { 
-              resolve({ //TODO: finalize these property values
+              resolve({
                 name: args.input.name,
                 properties: {
                   targetBbox: args.input.targetBbox,
                   defaultZoomLevel: args.input.defaultZoomLevel,
                   logo: args.input.logo,
                   title: args.input.title,
-                  defaultLocation: [],
-                  storageConnectionString: '',
-                  featuresConnectionString: '',
-                  mapzenApiKey: '',
-                  fbToken: '',
-                  supportedLanguages:args.input.supportedLanguages,
-                  name: args.input.name
+                  defaultLocation: args.input.defaultLocation,
+                  supportedLanguages:args.input.supportedLanguages
                 }
               });
             })
@@ -130,8 +125,15 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
     }])
     .then(() => { 
       resolve({
-        name: 'test',
-        properties: {}
+        name: args.input.name,
+        properties: {
+          targetBbox: args.input.targetBbox,
+          defaultZoomLevel: args.input.defaultZoomLevel,
+          logo: args.input.logo,
+          title: args.input.title,
+          defaultLocation: args.input.defaultLocation,
+          supportedLanguages: args.input.supportedLanguages
+        }
       });
     })
     .catch(reject);

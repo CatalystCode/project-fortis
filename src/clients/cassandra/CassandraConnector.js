@@ -48,16 +48,8 @@ function executeBatchMutations(mutations) {
       }
     },
     (err) => {
-<<<<<<< HEAD
       if (err) reject(err);
       else resolve({numBatchMutations: chunkedMutations.length});
-=======
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
->>>>>>> a2c8d30724b5346fc4d7310de81b9865cfc5b0ee
     });
   });
 }
@@ -68,7 +60,6 @@ function executeBatchMutations(mutations) {
  */
 function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-<<<<<<< HEAD
     try {
       client.execute(query, params, { prepare: true }, (err, result) => {
         if (err) return reject(err);
@@ -77,15 +68,6 @@ function executeQuery(query, params) { // eslint-disable-line no-unused-vars
     } catch (exception) {
       return reject(exception);
     }
-=======
-    client.execute(query, params, { prepare: true }, (err, result) => {
-      if (err) {
-        return reject(err);
-      } else {
-        return resolve(result.rows);
-      }
-    });
->>>>>>> a2c8d30724b5346fc4d7310de81b9865cfc5b0ee
   });
 }
 
