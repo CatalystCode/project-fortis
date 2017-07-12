@@ -85,7 +85,9 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc) {
         }
         consoleLog(JSON.stringify({event: eventName, properties: props}));
         reject(err);
-      });
+      })
+      .catch(reject)
+      ;
     });
   }
 
