@@ -73,7 +73,7 @@ CREATE TYPE features (
     sentiment frozen<computedsentiment>,
     gender frozen<computedgender>,
     entities frozen<set<computedentities>>
-);  
+);
 
 CREATE TABLE computedtiles (
     tileid text,
