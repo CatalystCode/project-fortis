@@ -38,23 +38,19 @@ function executeBatchMutations(mutations) {
       try {
         client.batch(chunk, { prepare: true }, (err) => {
           if (err) {
-            console.log(err, `Mutations failed for ${JSON.stringify(chunk)}`);
             asyncCallback(err);
           } else {
             asyncCallback();
           }
         });
       } catch (exception) {
-        console.log(`Exception occured during the mutations: ${JSON.stringify(exception)}`);
         asyncCallback(exception);
       }
     },
     (err) => {
       if (err) {
-        console.log(`Error occured during the mutations: ${JSON.stringify(err)}`);
         reject(err);
       } else {
-        console.log('Finished executing cassandra mutations');
         resolve();
       }
     });
@@ -69,10 +65,8 @@ function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
     client.execute(query, params, { prepare: true }, (err, result) => {
       if (err) {
-        console.log(`Error occured during executeQuery: ${JSON.stringify(err)}`);
         return reject(err);
-      }
-      else {
+      } else {
         return resolve(result.rows);
       }
     });
