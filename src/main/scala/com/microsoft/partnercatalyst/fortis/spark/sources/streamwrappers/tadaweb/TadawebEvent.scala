@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.tadaweb
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.tadaweb
 
 case class TadawebEvent(
   language: String,

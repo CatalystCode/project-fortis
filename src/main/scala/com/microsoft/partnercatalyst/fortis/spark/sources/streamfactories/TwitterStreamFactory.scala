@@ -1,8 +1,8 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamfactories
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories.TwitterStreamFactory._
-import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories.TwitterStreamFactory._
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter.TwitterUtils

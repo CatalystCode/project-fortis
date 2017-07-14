@@ -1,7 +1,7 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamfactories
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
-import com.microsoft.partnercatalyst.fortis.spark.streamprovider.{ConnectorConfig, StreamFactory}
-import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio.{RadioStreamUtils, RadioTranscription}
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.radio.{RadioStreamUtils, RadioTranscription}
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 

@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamprovider
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider
 
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream

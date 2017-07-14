@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.radio
 
 import java.io.InputStream
 import java.net.URL
