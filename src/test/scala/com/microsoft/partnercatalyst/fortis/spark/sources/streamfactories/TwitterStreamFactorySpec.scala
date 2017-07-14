@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamfactories
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import org.scalatest.FlatSpec
 

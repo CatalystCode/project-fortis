@@ -1,11 +1,12 @@
-package com.microsoft.partnercatalyst.fortis.spark
+package com.microsoft.partnercatalyst.fortis.spark.sources
 
 import java.io.File
 
-import com.microsoft.partnercatalyst.fortis.spark.streamfactories._
-import com.microsoft.partnercatalyst.fortis.spark.streamprovider.StreamProvider
-import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents.CustomEventsAdapter
-import com.microsoft.partnercatalyst.fortis.spark.streamwrappers.tadaweb.TadawebAdapter
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories._
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.customevents.CustomEventsAdapter
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.tadaweb.TadawebAdapter
+import com.microsoft.partnercatalyst.fortis.spark.{Constants, Settings}
 
 object StreamProviderFactory {
   def create()(implicit settings: Settings): StreamProvider = {

@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.radio
 
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.StreamingContext

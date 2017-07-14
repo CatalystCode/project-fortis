@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.customevents
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.customevents
 
 case class CustomEventFeature(
   `type`: String,

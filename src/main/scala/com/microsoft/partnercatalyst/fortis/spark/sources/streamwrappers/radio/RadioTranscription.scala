@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.streamwrappers.radio
+package com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.radio
 
 case class RadioTranscription(
   text: String,

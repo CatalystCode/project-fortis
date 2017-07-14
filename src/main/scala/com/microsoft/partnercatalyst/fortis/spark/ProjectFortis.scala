@@ -5,7 +5,8 @@ import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSink
-import com.microsoft.partnercatalyst.fortis.spark.streamprovider.ConnectorConfig
+import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
