@@ -17,9 +17,8 @@ Run it via:
 # set up variables from deployment environment
 export FORTIS_APPINSIGHTS_IKEY="..."
 export FORTIS_FEATURE_SERVICE_HOST="..."
-export FORTIS_CASSANDRA_HOST="..."
-export FORTIS_CASSANDRA_USER="..."
-export FORTIS_CASSANDRA_PASSWORD="..."
+export FORTIS_KAFKA_HOST="..."
+export FORTIS_KAFKA_TOPIC="..."
 export OXFORD_VISION_TOKEN="..."
 export OXFORD_SPEECH_TOKEN="..."
 export OXFORD_LANGUAGE_TOKEN="..."

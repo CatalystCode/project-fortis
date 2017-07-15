@@ -1,11 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-import java.time.Instant
-import java.util.UUID.randomUUID
-
-import com.datastax.spark.connector._
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraSink}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory, StreamProvider, UnsupportedConnectorConfigException}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
@@ -46,7 +40,6 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
     conf = new SparkConf()
       .setMaster(master)
       .setAppName(appName)
-    CassandraConfig.init(conf, batchDuration)
 
     ssc = new StreamingContext(conf, batchDuration)
     sc = ssc.sparkContext
@@ -119,57 +112,5 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
         ConnectorConfig(TestStreamFactory.Name, Map())
       ))
     }
-  }
-
-  "The cassandra sink" should "write to cassandra" in {
-    if (conf.get("spark.cassandra.connection.host").isEmpty) {
-      cancel("No cassandra connection defined, skipping test")
-    }
-
-    val rdds = mutable.Queue[RDD[FortisEvent]]()
-    rdds += sc.makeRDD(Seq(
-      TestFortisEvent(
-        details = TestFortisDetails(
-          id = randomUUID(),
-          createdAtEpoch = Instant.now.getEpochSecond,
-          body = "body-1",
-          title = "title-1",
-          publisher = "publisher-1",
-          sourceUrl = "sourceUrl-1"
-        ),
-        analysis = Analysis())))
-    rdds += sc.makeRDD(Seq(
-      TestFortisEvent(
-        details = TestFortisDetails(
-          id = randomUUID(),
-          createdAtEpoch = Instant.now.getEpochSecond,
-          body = "body-2",
-          title = "title-2",
-          publisher = "publisher-2",
-          sourceUrl = "sourceUrl-2"
-        ),
-        analysis = Analysis()),
-      TestFortisEvent(
-        details = TestFortisDetails(
-          id = randomUUID(),
-          createdAtEpoch = Instant.now.getEpochSecond,
-          body = "body-3",
-          title = "title-3",
-          publisher = "publisher-3",
-          sourceUrl = "sourceUrl-3"
-        ),
-        analysis = Analysis())))
-    val stream = Some(ssc.queueStream(rdds))
-
-    val keyspaceName = "fortistest"
-    val tableName = "events"
-    sc.cassandraTable(keyspaceName, tableName).deleteFromCassandra(keyspaceName, tableName)
-
-    CassandraSink(stream, keyspaceName, tableName)
-    ssc.start()
-    ssc.awaitTerminationOrTimeout(Seconds(5).milliseconds)
-
-    val numRows = sc.cassandraTable(keyspaceName, tableName).count()
-    assert(numRows == 3)
   }
 }

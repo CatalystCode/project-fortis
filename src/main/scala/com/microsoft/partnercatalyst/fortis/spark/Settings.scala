@@ -8,4 +8,6 @@ trait Settings {
   val blobUrlBase: String
   val appInsightsKey: Option[String]
   val modelsDir: Option[String]
+  val kafkaHost: String
+  val kafkaTopic: String
 }
