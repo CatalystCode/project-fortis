@@ -1,17 +1,96 @@
 [![Travis CI status](https://api.travis-ci.org/CatalystCode/project-fortis-spark.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis-spark)
 
-# project-fortis-spark
+# project-fortis-ingestion
 
-A repository for all spark jobs running on fortis
+A repository for Project Fortis' data ingestion Spark jobs.
 
 ## What's this? ##
 
-This project contains demos of the various Spark Streaming data processing methods for Project Fortis:
+This project contains a Spark job that ingests data into the Fortis system. Specifically, we:
 
-- Ingesting Instagram pictures and analyzing them using Cognitive Services.
-- Ingesting Twitter tweets and extracting locations using Open Street Map.
+1. Ingest data in real time from sources such as Twitter, Facebook, Online Radio, Newspapers, Instagram, TadaWeb, and so forth
+2. Analyze and augment the raw data with intelligence like sentiment analysis, entity extraction, place recognition, or image understanding
+3. Narrow down the stream of events based on user-defined geo-areas, target keywords and blacklisted terms
 
-Run it via:
+At the end of the ingestion pipeline, we publish the events to Kafka from where any downstream processors or aggregators
+can consume the data. The schema of the data in Kafka is as follows:
+
+```json
+{
+    "title": "FortisEvent",
+    "type": "object",
+    "properties": {
+        "language": {
+          "type": "string"
+        },
+        "locations": {
+          "description": "The ids of all places mentioned in the event",
+          "type": "array",
+          "items": {
+            "description": "A Who's-On-First id",
+            "type": "string"
+          }
+        },
+        "sentimens": {
+          "type": "array",
+          "items": {
+            "description": "Neutral sentiment is 0.6, 0 is most negative, 1 is most positive.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "summary": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "createdAtEpoch": {
+          "type": "number"
+        },
+        "body": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "publisher": {
+          "type": "string"
+        },
+        "sourceUrl": {
+          "type": "string"
+        },
+        "sharedLocations": {
+          "description": "The ids of all places explicitly tagged in the event",
+          "type": "array",
+          "items": {
+            "description": "A Who's-On-First id",
+            "type": "string"
+          }
+        }
+    },
+    "required": [
+      "id",
+      "createdAtEpoch"
+    ]
+}
+```
+
+
+## Development setup ##
 
 ```sh
 # set up variables from deployment environment
@@ -55,5 +134,4 @@ sbt assembly
 
 # run on spark
 spark-submit --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar
-```
 ```
