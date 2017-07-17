@@ -14,6 +14,8 @@ object Constants {
     val FeatureServiceUrlBase = "FORTIS_FEATURE_SERVICE_HOST"
     val OxfordVisionToken= "OXFORD_VISION_TOKEN"
     val OxfordLanguageToken = "OXFORD_LANGUAGE_TOKEN"
+    val KafkaHost = "FORTIS_KAFKA_HOST"
+    val KafkaTopic = "FORTIS_KAFKA_TOPIC"
     val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
   }
 }

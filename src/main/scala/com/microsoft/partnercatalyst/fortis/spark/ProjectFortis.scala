@@ -4,7 +4,7 @@ import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraSink
+import com.microsoft.partnercatalyst.fortis.spark.sinks.kafka.KafkaSink
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.log4j.{Level, Logger}
@@ -25,6 +25,8 @@ object ProjectFortis extends App {
     val featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase)
     val oxfordLanguageToken = envOrFail(Constants.Env.OxfordLanguageToken)
     val oxfordVisionToken = envOrFail(Constants.Env.OxfordVisionToken)
+    val kafkaHost = envOrFail(Constants.Env.KafkaHost)
+    val kafkaTopic = envOrElse(Constants.Env.KafkaTopic, "fortisevents")
     val blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net")
 
     val appInsightsKey = envOrNone(Constants.Env.AppInsightsKey)
@@ -79,7 +81,7 @@ object ProjectFortis extends App {
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
-    CassandraSink(fortisEvents, "fortistest", "events") // todo: fill in real values
+    KafkaSink(fortisEvents, Settings.kafkaHost, Settings.kafkaTopic)
 
     ssc.checkpoint(Settings.progressDir)
     ssc
