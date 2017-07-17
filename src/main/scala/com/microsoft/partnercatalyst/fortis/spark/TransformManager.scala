@@ -29,6 +29,24 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
   @volatile @transient private var queueClient: QueueClient = null
 
   def getOrUpdateContext(sparkContext: SparkContext): TransformContext = {
+    ensureInitialized(sparkContext)
+
+    writeLock.lock()
+    try {
+      // Grab delta from hand-off only if it's available *now*
+      val delta = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
+
+      // Update transform context with delta
+      delta.foreach(updateTransformContext(_, sparkContext))
+    }
+    finally {
+      writeLock.unlock()
+    }
+
+    transformContext
+  }
+
+  private def ensureInitialized(sparkContext: SparkContext): Unit = {
     if (transformContext == null) {
       // Blocking init of transform context and queue client used for non-blocking updates.
       // Initialization has not yet occurred since construction/deserialization.
@@ -50,28 +68,12 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
 
           // Start async update listener
           startQueueClient()
-
-          return transformContext
         }
       }
       finally {
         writeLock.unlock()
       }
     }
-
-    writeLock.lock()
-    try {
-      // Grab delta from hand-off only if it's available *now*
-      val delta = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
-
-      // Update transform context with delta
-      delta.foreach(updateTransformContext(_, sparkContext))
-    }
-    finally {
-      writeLock.unlock()
-    }
-
-    transformContext
   }
 
   private def startQueueClient(): Unit = {
