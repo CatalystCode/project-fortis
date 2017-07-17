@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-import java.io.{IOException, ObjectInputStream, ObjectOutputStream}
 import java.time.Duration
+import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.{CompletableFuture, SynchronousQueue, TimeUnit}
 
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
@@ -21,6 +21,7 @@ import scala.util.Properties
 
 class TransformManager(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
   private val shouldUpdate: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
+  private val writeLock: ReentrantLock = new ReentrantLock(true)
 
   // Do not serialize these values. The transformContext would otherwise contain stale Broadcast
   // instances, so we rebuild it on recovery from checkpoint.
@@ -31,7 +32,8 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
     if (transformContext == null) {
       // Blocking init of transform context and queue client used for non-blocking updates.
       // Initialization has not yet occurred since construction/deserialization.
-      synchronized {
+      writeLock.lock()
+      try {
         if (transformContext == null) {
 
           // Fetch data synchronously
@@ -52,14 +54,21 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
           return transformContext
         }
       }
+      finally {
+        writeLock.unlock()
+      }
     }
 
-    synchronized {
+    writeLock.lock()
+    try {
       // Grab delta from hand-off only if it's available *now*
       val delta = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
 
       // Update transform context with delta
       delta.foreach(updateTransformContext(_, sparkContext))
+    }
+    finally {
+      writeLock.unlock()
     }
 
     transformContext
@@ -83,8 +92,8 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
   }
 
   /**
-    * Creates a new transform context by copying the current one, overwriting any corresponding fields that are
-    * non-empty in the provided delta. Broadcast fields are broadcasted here as well as needed.
+    * Creates a new transform context from the current one, overwriting any corresponding fields that are
+    * non-empty in the provided delta. Broadcast fields are broadcasted here as well, as needed.
     *
     * Note: this is only called by Spark threads.
     */
@@ -171,18 +180,6 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
     )
   }
 
-  // TODO: remove. Here for serialization debugging.
-  @throws(classOf[IOException])
-  private def writeObject(out: ObjectOutputStream): Unit = {
-    out.defaultWriteObject()
-  }
-
-  // TODO: remove. Here for serialization debugging.
-  @throws(classOf[IOException])
-  private def readObject(in: ObjectInputStream): Unit = {
-    in.defaultReadObject()
-  }
-
   private class MessageHandler extends IMessageHandler {
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
       logError("Service Bus client threw error while processing message.", exception)
@@ -195,10 +192,10 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
       *       will execute it at a time) which is necessary for the concurrency correctness of this module.
       */
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      TransformManager.this.synchronized {
-        // Wait for the previous update of transform context to settle
-        // to ensure we're calculating the delta against the latest context
-      }
+      // Wait for the previous update of transform context to settle
+      // to ensure we're calculating the delta against the latest context
+      writeLock.lock()
+      writeLock.unlock()
 
       // Read the service bus message and build delta using data store.
       val delta = Option(message.getProperties.getOrDefault("dirty", null)) match {
