@@ -187,10 +187,8 @@ WITH OPTIONS = {
 'mode': 'CONTAINS',
 'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
 'analyzed': 'true',
-'tokenization_skip_stop_words': 'and, the, or',
 'tokenization_enable_stemming': 'true',
-'tokenization_normalize_lowercase': 'true',
-'tokenization_locale': 'en'
+'tokenization_normalize_lowercase': 'true'
 };
 
 CREATE CUSTOM INDEX ON events (title) USING 'org.apache.cassandra.index.sasi.SASIIndex'
@@ -198,8 +196,6 @@ WITH OPTIONS = {
 'mode': 'CONTAINS',
 'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
 'analyzed': 'true',
-'tokenization_skip_stop_words': 'and, the, or',
 'tokenization_enable_stemming': 'true',
-'tokenization_normalize_lowercase': 'true',
-'tokenization_locale': 'en'
+'tokenization_normalize_lowercase': 'true'
 };
