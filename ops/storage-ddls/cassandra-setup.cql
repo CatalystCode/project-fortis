@@ -5,11 +5,11 @@ USE fortis;
 
 CREATE TABLE watchlist(
     topicid uuid,
-    keyword text,
+    topic text,
     lang_code text,
     translations map<text, text>,
     insertion_time timestamp,
-    PRIMARY KEY (keyword, lang_code)
+    PRIMARY KEY (topic, lang_code)
 );
 
 CREATE TABLE blacklist(
