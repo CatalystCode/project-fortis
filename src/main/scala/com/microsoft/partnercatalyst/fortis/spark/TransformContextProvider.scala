@@ -77,10 +77,10 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
   private def startQueueClient(): Unit = {
     queueClient = new QueueClient(
       new ConnectionStringBuilder(
-        Properties.envOrElse("FORTIS_SERVICEBUS_NAMESPACE", ""),
-        Properties.envOrElse("FORTIS_SERVICEBUS_CONFIG_QUEUE", ""),
-        Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_NAME", ""),
-        Properties.envOrElse("FORTIS_SERVICEBUS_POLICY_KEY", "")
+        Properties.envOrNone(Constants.Env.ManagementBusNamespace).get,
+        Properties.envOrNone(Constants.Env.ManagementBusConfigQueueName).get,
+        Properties.envOrNone(Constants.Env.ManagementBusPolicyName).get,
+        Properties.envOrNone(Constants.Env.ManagementBusPolicyKey).get
       ), ReceiveMode.PeekLock)
 
     queueClient.registerMessageHandler(

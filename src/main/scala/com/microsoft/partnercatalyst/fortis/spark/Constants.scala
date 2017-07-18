@@ -17,5 +17,10 @@ object Constants {
     val KafkaHost = "FORTIS_KAFKA_HOST"
     val KafkaTopic = "FORTIS_KAFKA_TOPIC"
     val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
+
+    val ManagementBusNamespace = "FORTIS_SERVICEBUS_NAMESPACE"
+    val ManagementBusConfigQueueName = "FORTIS_SERVICEBUS_CONFIG_QUEUE"
+    val ManagementBusPolicyName = "FORTIS_SERVICEBUS_POLICY_NAME"
+    val ManagementBusPolicyKey = "FORTIS_SERVICEBUS_POLICY_KEY"
   }
 }
