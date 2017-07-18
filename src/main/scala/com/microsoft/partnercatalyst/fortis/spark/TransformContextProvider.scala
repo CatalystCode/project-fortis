@@ -6,7 +6,7 @@ import java.util.concurrent.{CompletableFuture, SynchronousQueue, TimeUnit}
 
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.azure.servicebus._
-import com.microsoft.partnercatalyst.fortis.spark.TransformManager._
+import com.microsoft.partnercatalyst.fortis.spark.TransformContextProvider._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
@@ -19,7 +19,7 @@ import org.apache.spark.SparkContext
 
 import scala.util.Properties
 
-class TransformManager(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
+class TransformContextProvider(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
   private val shouldUpdate: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
   private val writeLock: ReentrantLock = new ReentrantLock(true)
 
@@ -190,7 +190,7 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
     /**
       * Called by the QueueClient thread when a message arrives on the Service Bus.
       *
-      * Note: this is configured in [[TransformManager.startQueueClient]] such that it's called serially (only 1 thread
+      * Note: this is configured in [[TransformContextProvider.startQueueClient]] such that it's called serially (only 1 thread
       *       will execute it at a time) which is necessary for the concurrency correctness of this module.
       */
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
@@ -221,7 +221,7 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
       }
 
       // Block for up to two minutes for a Spark thread to acknowledge the updated
-      // state. If we time out, assume that this TransformManager instance has been
+      // state. If we time out, assume that this TransformContextProvider instance has been
       // replaced (Spark context restarted & checkpoint was discarded), and shut down to
       // allow our successor to handle the message instead.
       if (!shouldUpdate.offer(delta, 2, TimeUnit.MINUTES)) {
@@ -238,7 +238,7 @@ class TransformManager(configManager: ConfigurationManager, featureServiceClient
   }
 }
 
-private object TransformManager {
+private object TransformContextProvider {
 
   /**
     * Holds the next set of values for the fields of the current transform context. If the value of a field here is

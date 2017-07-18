@@ -66,12 +66,12 @@ object ProjectFortis extends App {
 
     val streamProvider = StreamProviderFactory.create()
 
-    val configManager: ConfigurationManager = DummyConfigurationManager
+    val configManager = DummyConfigurationManager
     val featureServiceClient = new FeatureServiceClient(Settings.featureServiceUrlBase)
-    val transformManager: TransformManager = new TransformManager(configManager, featureServiceClient)
+    val transformContextProvider = new TransformContextProvider(configManager, featureServiceClient)
 
     def pipeline[T: TypeTag](name: String, analyzer: Analyzer[T]) =
-      Pipeline(name, analyzer, ssc, streamProvider, transformManager, configManager)
+      Pipeline(name, analyzer, ssc, streamProvider, transformContextProvider, configManager)
 
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines

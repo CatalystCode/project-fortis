@@ -23,7 +23,7 @@ object Pipeline {
     analyzer: Analyzer[T],
     ssc: StreamingContext,
     streamProvider: StreamProvider,
-    transformManager: TransformManager,
+    transformContextProvider: TransformContextProvider,
     configurationManager: ConfigurationManager
   ): Option[DStream[FortisEvent]] = {
     val configs = configurationManager.fetchConnectorConfigs(name)
@@ -37,7 +37,7 @@ object Pipeline {
       // will execute on workers.
 
       // Get the shared transform context, updating it only if needed.
-      val transformContext = transformManager.getOrUpdateContext(rdd.sparkContext)
+      val transformContext = transformContextProvider.getOrUpdateContext(rdd.sparkContext)
 
       // Copy TransformContext fields locally to avoid serializing everything to each task. In this way, each task's
       // serialization will only include the fields that it accesses (Spark's closure cleaner will remove the others)
