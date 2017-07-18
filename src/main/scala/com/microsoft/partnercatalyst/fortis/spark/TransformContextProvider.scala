@@ -20,7 +20,7 @@ import org.apache.spark.SparkContext
 import scala.util.Properties
 
 class TransformContextProvider(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
-  private val shouldUpdate: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
+  private val deltaChannel: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
   private val writeLock: ReentrantLock = new ReentrantLock(true)
 
   // Do not serialize these values. The transformContext would otherwise contain stale Broadcast
@@ -33,13 +33,15 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
 
     writeLock.lock()
     try {
-      // Grab delta from hand-off only if it's available *now*
-      val delta = Option(shouldUpdate.poll(0, TimeUnit.SECONDS))
+      // Grab the next delta from the service bus client thread if one is ready.
+      // If not, either no update requests have arrived on the service bus queue, or the service bus client thread is
+      // still fulfilling a request (and hence the Delta is not yet available). Return the current context.
+      val delta = Option(deltaChannel.poll(0, TimeUnit.SECONDS))
 
-      // Update transform context with delta
-      delta.foreach(updateTransformContext(_, sparkContext))
-    }
-    finally {
+      if (delta.isDefined) {
+        updateTransformContextAndBroadcast(delta.get, sparkContext)
+      }
+    } finally {
       writeLock.unlock()
     }
 
@@ -63,14 +65,10 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
           delta = deltaWithWatchlist(langToWatchlist, delta)
           delta = deltaWithBlacklist(blacklist, delta)
 
-          // Create transformContext and broadcast
-          updateTransformContext(delta, sparkContext)
-
-          // Start async update listener
+          updateTransformContextAndBroadcast(delta, sparkContext)
           startQueueClient()
         }
-      }
-      finally {
+      } finally {
         writeLock.unlock()
       }
     }
@@ -99,7 +97,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
     *
     * Note: this is only called by Spark threads.
     */
-  private def updateTransformContext(delta: Delta, sparkContext: SparkContext): Unit = {
+  private def updateTransformContextAndBroadcast(delta: Delta, sparkContext: SparkContext): Unit = {
     if (transformContext == null) {
       transformContext = TransformContext()
     }
@@ -132,7 +130,9 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
   private def deltaWithSettings(siteSettings: SiteSettings, delta: Delta = Delta()): Delta = {
     // Note that parameters are call-by-name
     def updatedField[T](isDirty: => Boolean, newVal: => T): Option[T] = {
-      // Invoke 'isDirty' only if transform context is not null
+      // We resolve 'isDirty' if and only if the transform context is non-null. This allows the expression named by
+      // 'isDirty' to assume that the transform context will not be null.
+      // When the context is null, we treat the field as dirty since it requires initialization.
       if (transformContext == null || isDirty)
         Some(newVal)
       else
@@ -224,7 +224,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
       // state. If we time out, assume that this TransformContextProvider instance has been
       // replaced (Spark context restarted & checkpoint was discarded), and shut down to
       // allow our successor to handle the message instead.
-      if (!shouldUpdate.offer(delta, 2, TimeUnit.MINUTES)) {
+      if (!deltaChannel.offer(delta, 2, TimeUnit.MINUTES)) {
         logDebug("Shutting down Service Bus client: timeout exceeded.")
 
         // Shut down client
