@@ -2,7 +2,7 @@
 
 # project-fortis-ingestion
 
-A repository for Project Fortis' data ingestion Spark jobs.
+A repository for Project Fortis's data ingestion Spark jobs.
 
 ## What's this? ##
 
@@ -31,7 +31,7 @@ can consume the data. The schema of the data in Kafka is as follows:
             "type": "string"
           }
         },
-        "sentimens": {
+        "sentiments": {
           "type": "array",
           "items": {
             "description": "Neutral sentiment is 0.6, 0 is most negative, 1 is most positive.",
