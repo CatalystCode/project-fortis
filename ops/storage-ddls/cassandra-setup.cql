@@ -4,11 +4,12 @@ CREATE KEYSPACE fortis
 USE fortis;
 
 CREATE TABLE watchlist(
-    keyword text,
+    topicid uuid,
+    topic text,
     lang_code text,
     translations map<text, text>,
     insertion_time timestamp,
-    PRIMARY KEY (keyword, lang_code)
+    PRIMARY KEY (topic, lang_code)
 );
 
 CREATE TABLE blacklist(
@@ -18,7 +19,6 @@ CREATE TABLE blacklist(
 );
 
 CREATE TABLE sitesettings(
-    id uuid,
     sitename text,
     geofence list<double>,
     languages set<text>,
@@ -30,29 +30,27 @@ CREATE TABLE sitesettings(
     cogvisionsvctoken text,
     cogtextsvctoken text,
     insertion_time timestamp,
-    PRIMARY KEY (id, sitename)
+    PRIMARY KEY (sitename)
 );
-
-CREATE INDEX ON sitesettings (sitename);
 
 CREATE TABLE streams (
-  pipeline text,
-  streamid uuid,
-  connector text,
-  params frozen<map<text, text>>,
-  PRIMARY KEY ((pipeline), streamid)
+    streamid uuid,
+    pipelinekey text,
+    pipelinelabel text,
+    pipelineicon text,
+    streamfactory text,
+    params frozen<map<text, text>>,
+    PRIMARY KEY (pipelinekey, streamid)
 );
 
-CREATE TABLE trustedsources (
-   sourceid text,
+CREATE TABLE trustedsources (   
+   externalsourceid text,
    sourcetype text,
-   connector text,
+   streamfactory text,
    rank int,
    insertion_time timestamp,
-   PRIMARY KEY ((connector), sourceid, sourcetype)
+   PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
-
-CREATE INDEX ON trustedsources (rank);
 
 CREATE TYPE computedsentiment (
     pos_avg float,
@@ -78,88 +76,126 @@ CREATE TYPE features (
     entities frozen<set<computedentities>>
 );
 
-CREATE TABLE computedtiles (
+DROP TABLE IF EXISTS conjunctivetopics;
+CREATE TABLE conjunctivetopics (
+    topic text,
+    conjunctivetopic text,
+    mentions int,
+    PRIMARY KEY(topic, mentions, conjunctivetopic)
+) WITH CLUSTERING ORDER BY(mentions DESC);
+
+DROP TABLE IF EXISTS populartopics;
+CREATE TABLE populartopics (
+    periodstartdate timestamp,
+    periodenddate timestamp,
+    periodtype text,
+    pipelinekey text,
+    period text,
+    tilez int,
     tilex int,
     tiley int,
-    tilez int,
-    tileid text,
+    externalsourceid text,
+    topic text,
+    mentionCount int,
+    insertion_time timestamp,
+    PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
+);
+
+DROP TABLE IF EXISTS computedtiles;
+CREATE TABLE computedtiles (
     periodstartdate timestamp,
     periodenddate timestamp,
     periodtype text,
+    pipelinekey text,
     period text,
-    pipeline text,
-    sourceid text,
-    topic text,
-    topiclangcode text,
-    insertion_time timestamp,
+    tilez int,
+    tilex int,
+    tiley int,
+    externalsourceid text,
+    mentioncount int,
+    avgsentiment int,
     heatmap text,
     placeids frozen<set<text>>,
-    computedfeatures frozen<features>,
-    PRIMARY KEY ((tilex, tiley, tilez), periodstartdate, periodenddate, pipeline, sourceid, topic)
+    insertion_time timestamp,
+    conjunctiontopics tuple<text, text, text>,
+    PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
 );
 
-CREATE INDEX ON computedtiles (tileid);
-CREATE INDEX ON computedtiles (period);
-CREATE INDEX ON computedtiles (computedfeatures);
-CREATE INDEX ON computedtiles (periodtype);
+DROP MATERIALIZED VIEW IF EXISTS popularsources;
+CREATE MATERIALIZED VIEW popularsources
+AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
+   FROM computedtiles
+   WHERE periodtype IS NOT NULL AND conjunctiontopics IS NOT NULL AND tilez IS NOT NULL AND externalsourceid IS NOT NULL AND period IS NOT NULL AND pipelinekey IS NOT NULL AND conjunctiontopics IS NOT NULL AND periodtype IS NOT NULL AND tilez IS NOT NULL AND period IS NOT NULL AND tilex IS NOT NULL AND tiley IS NOT NULL AND periodstartdate IS NOT NULL AND periodenddate IS NOT NULL
+PRIMARY KEY ((periodtype, conjunctiontopics, tilez, externalsourceid, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey);
 
-CREATE TABLE computedplaces (
-    placeid text,
+DROP MATERIALIZED VIEW IF EXISTS timeseries;
+CREATE MATERIALIZED VIEW timeseries
+AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
+   FROM computedtiles
+   WHERE periodtype IS NOT NULL AND conjunctiontopics IS NOT NULL AND tilez IS NOT NULL AND externalsourceid IS NOT NULL AND period IS NOT NULL AND pipelinekey IS NOT NULL AND conjunctiontopics IS NOT NULL AND periodtype IS NOT NULL AND tilez IS NOT NULL AND period IS NOT NULL AND tilex IS NOT NULL AND tiley IS NOT NULL AND periodstartdate IS NOT NULL AND periodenddate IS NOT NULL
+PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipelinekey, externalsourceid, periodstartdate, periodenddate);
+
+DROP TABLE IF EXISTS popularplaces;
+CREATE TABLE popularplaces (
+    periodstartdate timestamp,
+    periodenddate timestamp,
+    periodtype text,
+    period text,
+    pipelinekey text,
+    externalsourceid text,
     placename text,
-    periodstartdate timestamp,
-    periodenddate timestamp,
-    periodtype text,
-    period text,
-    pipeline text,
-    sourceid text,
-    topic text,
-    topiclangcode text,
+    placeid text,
+    placecentroidcoordx double,
+    placecentroidcoordy double,
+    conjunctiontopics tuple<text, text, text>,
+    mentioncount int,
     insertion_time timestamp,
-    computedfeatures frozen<features>,
-    PRIMARY KEY ((placeid), periodstartdate, periodenddate, pipeline, sourceid, topic)
-);
+    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopics), mentioncount, periodstartdate, periodenddate, placecentroidcoordx, placecentroidcoordy)
+) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, placecentroidcoordx DESC, placecentroidcoordy DESC);
 
-CREATE INDEX ON computedplaces (period);
-CREATE INDEX ON computedplaces (computedfeatures);
-CREATE INDEX ON computedplaces (periodtype);
-
-CREATE TABLE computedtopics (
-    periodstartdate timestamp,
-    periodenddate timestamp,
-    periodtype text,
-    period text,
-    pipeline text,
-    sourceid text,
+DROP TABLE IF EXISTS eventtags;
+CREATE TABLE eventtags(
+    eventid uuid,
     topic text,
-    topiclangcode text,
-    insertion_time timestamp,
-    computedfeatures frozen<features>,
-    PRIMARY KEY ((topic), pipeline, periodstartdate, periodenddate, sourceid)
-);
+    placeid text,
+    placecentroidcoordx double,
+    placecentroidcoordy double,
+    event_time timestamp,
+    pipelinekey text,
+    externalsourceid text,
+    PRIMARY KEY (topic, pipelinekey, event_time, placecentroidcoordx, placecentroidcoordy, eventid)
+) WITH CLUSTERING ORDER BY (pipelinekey DESC, event_time ASC);
 
-CREATE INDEX ON computedtopics (period);
-CREATE INDEX ON computedtopics (computedfeatures);
-CREATE INDEX ON computedtopics (periodtype);
-
+DROP TABLE IF EXISTS events;
 CREATE TABLE events(
-    id uuid,
+    eventid uuid,
     externalid text,
-    pipeline text,
+    pipelinekey text,
     title text,
     sourceurl text,
-    detectedplaceids frozen<set<text>>,
-    sourceid text,
-    detectedkeywords frozen<set<text>>,
+    externalsourceid text,
     eventlangcode text,
     messagebody text,
     computedfeatures frozen<features>,
     insertion_time timestamp,
     event_time timestamp,
-    PRIMARY KEY (pipeline, externalid)
-);
+    PRIMARY KEY ((pipelinekey, eventid), event_time)
+) WITH CLUSTERING ORDER BY (event_time ASC);
 
-CREATE INDEX ON events (FULL(detectedplaceids));
-CREATE INDEX ON events (FULL(detectedkeywords));
-CREATE INDEX ON events (computedfeatures);
-CREATE INDEX ON events (eventlangcode);
-CREATE INDEX ON events (event_time);
+CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+'mode': 'CONTAINS',
+'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
+'analyzed': 'true',
+'tokenization_enable_stemming': 'true',
+'tokenization_normalize_lowercase': 'true'
+};
+
+CREATE CUSTOM INDEX ON events (title) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+'mode': 'CONTAINS',
+'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
+'analyzed': 'true',
+'tokenization_enable_stemming': 'true',
+'tokenization_normalize_lowercase': 'true'
+};

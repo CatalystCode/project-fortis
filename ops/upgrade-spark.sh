@@ -12,6 +12,6 @@ readonly SparkCommand="wget \"https://fortiscentral.blob.core.windows.net/jars/$
 
 cd charts || exit -2
 
-helm upgrade --set Worker.Replicas="${k8spark_worker_count}" --set Master.ConfigMapName="${ConfigMapName}" --set Master.SparkSubmitCommand="${SparkCommand}" --name spark-cluster ./stable/spark --namespace spark
+helm upgrade --set Worker.Replicas="${k8spark_worker_count}" --set Master.ConfigMapName="${ConfigMapName}" --set Master.SparkSubmitCommand="${SparkCommand}" spark-cluster ./stable/spark --namespace spark
 
 cd .. || exit -2
