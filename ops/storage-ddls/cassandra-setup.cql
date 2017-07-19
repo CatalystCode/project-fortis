@@ -208,3 +208,33 @@ WITH OPTIONS = {
 'tokenization_enable_stemming': 'true',
 'tokenization_normalize_lowercase': 'true'
 };
+
+DROP TABLE IF EXISTS timeseriestrends;
+CREATE TABLE timeseriestrends(
+    periodstartdate timestamp,
+    periodtype text,
+    period text,
+    tilez int,
+    tilex int,
+    tiley int,
+    trendscore float,
+    insertion_time timestamp,
+    topic text,
+    PRIMARY KEY ((periodtype, topic, tilez), periodstartdate, period, tilex, tiley)
+) WITH CLUSTERING ORDER BY (periodstartdate DESC);
+CREATE INDEX ON timeseriestrends(trendscore);
+
+DROP TABLE IF EXISTS timeseriesanomalies;
+CREATE TABLE timeseriesanomalies(
+    periodstartdate timestamp,
+    periodtype text,
+    period text,
+    tilez int,
+    tilex int,
+    tiley int,
+    anomalyscore float,
+    insertion_time timestamp,
+    topic text,
+    PRIMARY KEY ((periodtype, topic, tilez), periodstartdate, period, tilex, tiley)
+) WITH CLUSTERING ORDER BY (periodstartdate DESC);
+CREATE INDEX ON timeseriesanomalies(trendscore);
