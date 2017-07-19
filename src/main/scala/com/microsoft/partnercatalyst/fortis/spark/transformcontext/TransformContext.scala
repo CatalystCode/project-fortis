@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark
+package com.microsoft.partnercatalyst.fortis.spark.transformcontext
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer

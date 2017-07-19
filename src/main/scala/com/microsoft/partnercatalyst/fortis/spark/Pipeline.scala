@@ -6,6 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFo
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
+import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient

@@ -1,20 +1,15 @@
-package com.microsoft.partnercatalyst.fortis.spark
+package com.microsoft.partnercatalyst.fortis.spark.transformcontext
 
 import java.time.Duration
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.{CompletableFuture, SynchronousQueue, TimeUnit}
 
-import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.azure.servicebus._
-import com.microsoft.partnercatalyst.fortis.spark.TransformContextProvider._
+import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
+import com.microsoft.partnercatalyst.fortis.spark.Constants
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
-import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageDetector, LanguageDetectorAuth}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
-import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
 import org.apache.spark.SparkContext
 
 import scala.util.Properties
@@ -61,9 +56,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
           val langToWatchlist = configManager.fetchWatchlist()
           val blacklist = configManager.fetchBlacklist()
 
-          var delta = deltaWithSettings(siteSettings)
-          delta = deltaWithWatchlist(langToWatchlist, delta)
-          delta = deltaWithBlacklist(blacklist, delta)
+          val delta = Delta(featureServiceClient, siteSettings, langToWatchlist, blacklist)
 
           updateTransformContextAndBroadcast(delta, sparkContext)
           startQueueClient()
@@ -122,66 +115,6 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
     )
   }
 
-  /**
-    * Builds a delta against the current transform context using the provided site settings.
-    * @param delta An existing delta to be used as a base.
-    * @return
-    */
-  private def deltaWithSettings(siteSettings: SiteSettings, delta: Delta = Delta()): Delta = {
-    // Note that parameters are call-by-name
-    def updatedField[T](isDirty: => Boolean, newVal: => T): Option[T] = {
-      // We resolve 'isDirty' if and only if the transform context is non-null. This allows the expression named by
-      // 'isDirty' to assume that the transform context will not be null.
-      // When the context is null, we treat the field as dirty since it requires initialization.
-      if (transformContext == null || isDirty)
-        Some(newVal)
-      else
-        None
-    }
-
-    delta.copy(
-      siteSettings = Some(siteSettings),
-      locationsExtractorFactory = updatedField(
-        siteSettings.geofence != transformContext.siteSettings.geofence,
-        new LocationsExtractorFactory(featureServiceClient, siteSettings.geofence).buildLookup()
-      ),
-      imageAnalyzer = updatedField(
-        siteSettings.cogVisionSvcToken != transformContext.siteSettings.cogVisionSvcToken,
-        new ImageAnalyzer(ImageAnalysisAuth(siteSettings.cogVisionSvcToken), featureServiceClient)
-      ),
-      languageDetector = updatedField(
-        siteSettings.translationSvcToken != transformContext.siteSettings.translationSvcToken,
-        new LanguageDetector(LanguageDetectorAuth(siteSettings.translationSvcToken))
-      ),
-      sentimentDetectorAuth = updatedField(
-        siteSettings.translationSvcToken != transformContext.siteSettings.translationSvcToken,
-        SentimentDetectorAuth(siteSettings.translationSvcToken)
-      )
-    )
-  }
-
-  /**
-    * Builds a delta against the current transform context using the provided watchlist.
-    * @param delta An existing delta to be used as a base.
-    * @return
-    */
-  private def deltaWithWatchlist(langToWatchlist: Map[String, List[String]], delta: Delta = Delta()) = {
-    delta.copy(
-      langToWatchlist = Some(langToWatchlist)
-    )
-  }
-
-  /**
-    * Builds a delta against the current transform context using the provided blacklist.
-    * @param delta An existing delta to be used as a base.
-    * @return
-    */
-  private def deltaWithBlacklist(blacklist: List[BlacklistedTerm], delta: Delta = Delta()) = {
-    delta.copy(
-      blacklist = Some(blacklist)
-    )
-  }
-
   private class MessageHandler extends IMessageHandler {
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
       logError("Service Bus client threw error while processing message.", exception)
@@ -204,13 +137,13 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
         case Some(value) => value match {
           case "settings" =>
             val siteSettings = configManager.fetchSiteSettings()
-            deltaWithSettings(siteSettings)
+            Delta(transformContext, featureServiceClient, siteSettings = siteSettings)
           case "watchlist" =>
             val langToWatchlist = configManager.fetchWatchlist()
-            deltaWithWatchlist(langToWatchlist)
+            Delta(langToWatchlist = langToWatchlist)
           case "blacklist" =>
             val blacklist = configManager.fetchBlacklist()
-            deltaWithBlacklist(blacklist)
+            Delta(blacklist = blacklist)
           case unknown =>
             logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
             Delta()
@@ -236,21 +169,4 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
       CompletableFuture.completedFuture(null)
     }
   }
-}
-
-private object TransformContextProvider {
-
-  /**
-    * Holds the next set of values for the fields of the current transform context. If the value of a field here is
-    * empty, then the corresponding field of the transform context during update will be left as is.
-    */
-  private case class Delta(
-    siteSettings: Option[SiteSettings] = None,
-    langToWatchlist: Option[Map[String, List[String]]] = None,
-    blacklist: Option[List[BlacklistedTerm]] = None,
-    locationsExtractorFactory: Option[LocationsExtractorFactory] = None,
-    imageAnalyzer: Option[ImageAnalyzer] = None,
-    languageDetector: Option[LanguageDetector] = None,
-    sentimentDetectorAuth: Option[SentimentDetectorAuth] = None
-  )
 }
