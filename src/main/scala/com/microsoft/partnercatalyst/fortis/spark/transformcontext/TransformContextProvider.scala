@@ -14,6 +14,7 @@ import org.apache.spark.SparkContext
 
 import scala.util.Properties
 
+@SerialVersionUID(100L)
 class TransformContextProvider(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
   private val deltaChannel: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
   private val writeLock: ReentrantLock = new ReentrantLock(true)

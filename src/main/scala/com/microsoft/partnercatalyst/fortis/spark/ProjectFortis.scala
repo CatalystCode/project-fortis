@@ -103,6 +103,7 @@ object ProjectFortis extends App {
     * Build connector config registry from hard-coded values for demo.
     *
     */
+  @SerialVersionUID(100L)
   private object DummyConfigurationManager extends ConfigurationManager with Serializable {
     override def fetchConnectorConfigs(pipeline: String): List[ConnectorConfig] = {
       // The key is the name of the pipeline and the value is a list of connector configs whose streams should comprise it.
