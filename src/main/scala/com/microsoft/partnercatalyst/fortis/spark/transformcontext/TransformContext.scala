@@ -5,11 +5,12 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 import org.apache.spark.broadcast.Broadcast
 
 case class TransformContext(
   siteSettings: SiteSettings = null,
-  langToWatchlist: Broadcast[Map[String, List[String]]] = null,
+  langToKeywordExtractor: Broadcast[Map[String, KeywordExtractor]] = null,
   blacklist: Broadcast[List[BlacklistedTerm]] = null,
   locationsExtractorFactory: Broadcast[LocationsExtractorFactory] = null,
 

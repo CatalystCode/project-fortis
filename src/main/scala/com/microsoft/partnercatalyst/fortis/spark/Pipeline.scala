@@ -50,7 +50,7 @@ object Pipeline {
       val sentimentDetectorAuth = transformContext.sentimentDetectorAuth
 
       // Broadcast variables
-      val langToWatchlist = transformContext.langToWatchlist
+      val langToKeywordExtractor = transformContext.langToKeywordExtractor
       val blacklist = transformContext.blacklist
       val locationsExtractorFactory = transformContext.locationsExtractorFactory
 
@@ -74,9 +74,9 @@ object Pipeline {
       def addKeywords(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         event.analysis.language match {
           case Some(lang) =>
-            langToWatchlist.value.get(lang) match {
-              case Some(watchlist) => event.copy(
-                analysis = event.analysis.copy(keywords = analyzer.extractKeywords(event.details, new KeywordExtractor(watchlist)))
+            langToKeywordExtractor.value.get(lang) match {
+              case Some(extractor) => event.copy(
+                analysis = event.analysis.copy(keywords = analyzer.extractKeywords(event.details, extractor))
               )
               case None => event
             }

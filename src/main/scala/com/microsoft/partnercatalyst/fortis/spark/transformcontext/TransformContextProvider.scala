@@ -98,9 +98,9 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
 
     transformContext = transformContext.copy(
       siteSettings = delta.siteSettings.getOrElse(transformContext.siteSettings),
-      langToWatchlist = delta.langToWatchlist match {
+      langToKeywordExtractor = delta.langToKeywordExtractor match {
         case Some(list) => sparkContext.broadcast(list)
-        case None => transformContext.langToWatchlist
+        case None => transformContext.langToKeywordExtractor
       },
       blacklist = delta.blacklist match {
         case Some(list) => sparkContext.broadcast(list)

@@ -6,6 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{LanguageD
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
 
 /**
   * Holds the next set of values for the fields of the current transform context. If the value of a field here is
@@ -13,7 +14,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.Sentiment
   */
 private[transformcontext] trait Delta {
   val siteSettings: Option[SiteSettings]
-  val langToWatchlist: Option[Map[String, List[String]]]
+  val langToKeywordExtractor: Option[Map[String, KeywordExtractor]]
   val blacklist: Option[List[BlacklistedTerm]]
   val locationsExtractorFactory: Option[LocationsExtractorFactory]
   val imageAnalyzer: Option[ImageAnalyzer]
@@ -25,7 +26,7 @@ private[transformcontext] object Delta {
 
   private case class DeltaImpl(
     siteSettings: Option[SiteSettings] = None,
-    langToWatchlist: Option[Map[String, List[String]]] = None,
+    langToKeywordExtractor: Option[Map[String, KeywordExtractor]] = None,
     blacklist: Option[List[BlacklistedTerm]] = None,
     locationsExtractorFactory: Option[LocationsExtractorFactory] = None,
     imageAnalyzer: Option[ImageAnalyzer] = None,
@@ -102,7 +103,10 @@ private[transformcontext] object Delta {
       case None => DeltaImpl()
     }
 
-    settingsDelta.copy(langToWatchlist = langToWatchlistOpt, blacklist = blacklistOpt)
+    settingsDelta.copy(
+      langToKeywordExtractor = langToWatchlistOpt.map(_.mapValues(new KeywordExtractor(_))),
+      blacklist = blacklistOpt
+    )
   }
 
   /**
