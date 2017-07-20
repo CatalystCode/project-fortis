@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-import java.util.UUID
-
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Details, FortisEvent, Location}
 
 case class TestFortisEvent(
@@ -10,11 +8,11 @@ case class TestFortisEvent(
 ) extends FortisEvent
 
 case class TestFortisDetails(
-                              id: String,
-                              eventtime: Long,
-                              body: String,
-                              title: String,
-                              pipelinekey: String,
-                              sourceUrl: String,
-                              sharedLocations: List[Location] = List()
+  id: String,
+  eventtime: Long,
+  body: String,
+  title: String,
+  pipelinekey: String,
+  sourceUrl: String,
+  sharedLocations: List[Location] = List()
 ) extends Details

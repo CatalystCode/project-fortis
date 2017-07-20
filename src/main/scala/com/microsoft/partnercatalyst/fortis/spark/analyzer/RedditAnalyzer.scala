@@ -1,8 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.time.Instant.now
-import java.util.UUID.randomUUID
-
 import com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObject
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 

@@ -1,8 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.time.Instant.now
-import java.util.UUID.randomUUID
-
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import twitter4j.{Status => TwitterStatus}

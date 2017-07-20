@@ -1,8 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.time.Instant.now
-import java.util.UUID.randomUUID
-
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.dto._
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
