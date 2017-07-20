@@ -7,6 +7,7 @@ const chunk = require('lodash/chunk');
 const flatten = require('lodash/flatten');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
+const PAGE_SIZE = process.env.PAGE_SIZE || 5000;
 const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
 const MAX_CONCURRENT_BATCHES = process.env.MAX_CONCURRENT_BATCHES || 50;
 const distance = cassandra.types.distance;
@@ -55,7 +56,7 @@ function executeBatchMutations(mutations) {
   });
 }
 
-/**
+/** Retrieves up to 5000 rows
  * @param {string} query
  * @param {string[]} params
  * @returns {Promise.<object[]>}
@@ -64,14 +65,42 @@ function executeQuery(query, params) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
     try {
       client.execute(query, params, { prepare: true }, (err, result) => {
-        if (err) return reject(err);
-        else return resolve(result.rows);
+        if (err) reject(err);
+        else resolve(result.rows);
       });
     } catch (exception) {
-      return reject(exception);
+      reject(exception);
     }
   });
 }
+
+/** Retrieves up to pageSize rows at a page offset provided by pageState
+ * @param {string} query
+ * @param {string[]} params
+ * @param {string} [pageState]
+ * @param {int} [pageSize]
+ * @returns {Promise.<object[]>}
+ */
+function executeQueryWithPagination(query, params, pageState, pageSize=PAGE_SIZE) {
+  return new Promise((resolve, reject) => {
+    try {
+      let options = {prepare: true, pageState : pageState, fetchSize: pageSize};
+      let rows = [];
+      client.eachRow(query, params, options, (n, row) => {
+        rows.push(row);
+      }, (err, result) => {
+        if (err) reject(err);
+        else resolve({
+          rows: rows,
+          pageState: result.pageState
+        });
+      });
+    } catch (exception) {
+      reject(exception);
+    }
+  });
+}
+
 
 /**
  * @param {Array<{query: string, params: string[]}} queries
@@ -91,5 +120,6 @@ function executeQueries(queries) {
 module.exports = {
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
   executeQueries: trackDependency(executeQueries, 'Cassandra', 'executeQueries'),
+  executeQueryWithPagination: trackDependency(executeQueryWithPagination, 'Cassandra', 'executeQueryWithPagination'),
   executeQuery: trackDependency(executeQuery, 'Cassandra', 'executeQuery')
 };
