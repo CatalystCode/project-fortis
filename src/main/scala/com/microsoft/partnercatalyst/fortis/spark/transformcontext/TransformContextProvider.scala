@@ -57,7 +57,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
           val langToWatchlist = configManager.fetchWatchlist()
           val blacklist = configManager.fetchBlacklist()
 
-          val delta = Delta(featureServiceClient, siteSettings, langToWatchlist, blacklist)
+          val delta = Delta(TransformContext(), featureServiceClient, Some(siteSettings), Some(langToWatchlist), Some(blacklist))
 
           updateTransformContextAndBroadcast(delta, sparkContext)
           startQueueClient()
@@ -138,13 +138,13 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
         case Some(value) => value match {
           case "settings" =>
             val siteSettings = configManager.fetchSiteSettings()
-            Delta(transformContext, featureServiceClient, siteSettings = siteSettings)
+            Delta(transformContext, featureServiceClient, siteSettings = Some(siteSettings))
           case "watchlist" =>
             val langToWatchlist = configManager.fetchWatchlist()
-            Delta(langToWatchlist = langToWatchlist)
+            Delta(transformContext, featureServiceClient, langToWatchlist = Some(langToWatchlist))
           case "blacklist" =>
             val blacklist = configManager.fetchBlacklist()
-            Delta(blacklist = blacklist)
+            Delta(transformContext, featureServiceClient, blacklist = Some(blacklist))
           case unknown =>
             logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
             Delta()
