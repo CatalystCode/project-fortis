@@ -88,6 +88,12 @@ object Pipeline {
         analysis.keywords.nonEmpty
       }
 
+      def isEmpty(x: String) = x == null || x.isEmpty
+
+      def requiredValuesProvided(event: ExtendedFortisEvent[T]): Boolean = {
+        !isEmpty(event.details.id) && !isEmpty(event.details.externalsourceid) && !isEmpty(event.details.pipelinekey)
+      }
+
       def hasBlacklistedTerms(event: ExtendedFortisEvent[T]): Boolean = {
         analyzer.hasBlacklistedTerms(event.details, new Blacklist(blacklist.value))
       }
@@ -112,6 +118,7 @@ object Pipeline {
       // Configure analysis pipeline
       rdd
         .map(convertToSchema)
+        .filter(requiredValuesProvided)
         .filter(item => !hasBlacklistedTerms(item))
         .map(addLanguage)
         .filter(item => isLanguageSupported(item.analysis))

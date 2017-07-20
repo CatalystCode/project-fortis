@@ -8,11 +8,11 @@ trait FortisEvent {
 }
 
 trait Details {
-  val id: UUID
-  val createdAtEpoch: Long
+  val id: String
+  val eventtime: Long
   val body: String
   val title: String
-  val publisher: String
+  val pipelinekey: String
   val sourceUrl: String
   val sharedLocations: List[Location]
 }

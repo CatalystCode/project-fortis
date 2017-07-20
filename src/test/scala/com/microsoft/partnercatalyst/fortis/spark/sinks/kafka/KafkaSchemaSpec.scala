@@ -10,11 +10,11 @@ class KafkaSchemaSpec extends FlatSpec {
   "The kafka schema" should "convert events to compact json" in {
     val event = TestFortisEvent(
       details = TestFortisDetails(
-        id = UUID.fromString("b6a38df0-1dd6-4f74-a5a8-6fe9a2bcfedc"),
-        createdAtEpoch = 1500078876,
+        id = "b6a38df0-1dd6-4f74-a5a8-6fe9a2bcfedc",
+        eventtime = 1500078876,
         body = "body",
         title = "title",
-        publisher = "publisher",
+        pipelinekey = "publisher",
         sourceUrl = "sourceUrl"),
       analysis = Analysis(
         keywords = List(Tag("tag1", None), Tag("tag2", Some(0.9))),

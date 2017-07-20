@@ -10,11 +10,11 @@ case class TestFortisEvent(
 ) extends FortisEvent
 
 case class TestFortisDetails(
-  id: UUID,
-  createdAtEpoch: Long,
-  body: String,
-  title: String,
-  publisher: String,
-  sourceUrl: String,
-  sharedLocations: List[Location] = List()
+                              id: String,
+                              eventtime: Long,
+                              body: String,
+                              title: String,
+                              pipelinekey: String,
+                              sourceUrl: String,
+                              sharedLocations: List[Location] = List()
 ) extends Details

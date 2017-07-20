@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "com.github.catalystcode" %% "streaming-instagram" % "0.0.5",
   "com.github.catalystcode" %% "streaming-facebook" % "0.0.1",
   "com.github.catalystcode" %% "streaming-bing" % "0.0.1",
-  "com.github.catalystcode" %% "streaming-reddit" % "0.0.1",
+  "com.github.catalystcode" %% "streaming-reddit" % "0.0.2",
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.twitter4j" % "twitter4j-stream" % "4.0.4",
   "org.apache.commons" % "commons-collections4" % "4.1",

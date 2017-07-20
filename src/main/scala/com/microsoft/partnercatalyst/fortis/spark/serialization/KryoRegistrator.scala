@@ -56,7 +56,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.ExtendedFortisEvent[_]])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.ExtendedDetails[_]])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.BingAnalyzer])
-    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.FacebookAnalyzer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.FacebookPostAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.InstagramAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.RadioAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.analyzer.TadawebAnalyzer])

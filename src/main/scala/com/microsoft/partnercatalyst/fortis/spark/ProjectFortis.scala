@@ -78,7 +78,7 @@ object ProjectFortis extends App {
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
       pipeline("twitter", new TwitterAnalyzer),
-      pipeline("facebook", new FacebookAnalyzer),
+      pipeline("facebook", new FacebookPostAnalyzer),
       pipeline("instagram", new InstagramAnalyzer),
       pipeline("tadaweb", new TadawebAnalyzer),
       pipeline("customevents", new CustomEventAnalyzer),
@@ -86,7 +86,7 @@ object ProjectFortis extends App {
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
-    KafkaSink(fortisEvents, Settings.kafkaHost, Settings.kafkaTopic)
+    //KafkaSink(fortisEvents, Settings.kafkaHost, Settings.kafkaTopic)
 
     ssc.checkpoint(Settings.progressDir)
     ssc
