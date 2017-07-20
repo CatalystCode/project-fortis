@@ -209,32 +209,31 @@ WITH OPTIONS = {
 'tokenization_normalize_lowercase': 'true'
 };
 
-DROP TABLE IF EXISTS timeseriestrends;
-CREATE TABLE timeseriestrends(
+/**
+ * Allows for fetching trending topics given a
+ *
+ * select * from computedtrends
+ * where pipelinekey = 'twitter'
+ * and periodtype = 'day'
+ * and period = '2017-06-20'
+ * and tilez = 1
+ * and (tilex, tiley) >= (0, 0)
+ * and (tilex, and tiley) < (10, 10);
+ *
+ */
+DROP TABLE IF EXISTS computedtrends;
+CREATE TABLE computedtrends(
+    topic text,
+    pipelinekey text,
     periodstartdate timestamp,
     periodtype text,
     period text,
     tilez int,
     tilex int,
     tiley int,
-    trendscore float,
+    score float,
     insertion_time timestamp,
-    topic text,
-    PRIMARY KEY ((periodtype, topic, tilez), periodstartdate, period, tilex, tiley)
-) WITH CLUSTERING ORDER BY (periodstartdate DESC);
-CREATE INDEX ON timeseriestrends(trendscore);
+    PRIMARY KEY ((pipelinekey, periodtype, tilez, period), tilex, tiley, topic)
+) WITH CLUSTERING ORDER BY (tilex ASC, tiley ASC, topic ASC);
+CREATE INDEX ON computedtrends(score);
 
-DROP TABLE IF EXISTS timeseriesanomalies;
-CREATE TABLE timeseriesanomalies(
-    periodstartdate timestamp,
-    periodtype text,
-    period text,
-    tilez int,
-    tilex int,
-    tiley int,
-    anomalyscore float,
-    insertion_time timestamp,
-    topic text,
-    PRIMARY KEY ((periodtype, topic, tilez), periodstartdate, period, tilex, tiley)
-) WITH CLUSTERING ORDER BY (periodstartdate DESC);
-CREATE INDEX ON timeseriesanomalies(trendscore);
