@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, GregorianCalendar, TimeZone}
 
-case class Period(val timestamp: Long, val periodType: PeriodType) {
+case class Period(val timestamp: Long, val periodType: PeriodType) extends Serializable {
   override def toString: String = periodType.formatTimestamp(this.timestamp)
 }
 
@@ -22,7 +22,7 @@ object PeriodType {
   val all: Set[PeriodType] = Set(Minute, Hour, Day, Month, Year)
 }
 
-sealed class PeriodType(val sizeInMilliseconds: Long, format: String, truncateFields: Set[Int]) {
+sealed class PeriodType(val sizeInMilliseconds: Long, format: String, truncateFields: Set[Int]) extends Serializable {
 
   val periodTypeName: String = this.getClass.getSimpleName.replace("$", "").toLowerCase
 
