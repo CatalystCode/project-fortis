@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import TileIdMapper.MIN_ZOOM_LEVEL
-
 import scala.collection.mutable
 
 class TileId(var tileId: String) {
