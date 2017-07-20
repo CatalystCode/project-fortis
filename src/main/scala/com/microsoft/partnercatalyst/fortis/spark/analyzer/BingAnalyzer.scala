@@ -12,6 +12,7 @@ class BingAnalyzer extends Analyzer[BingPost] with Serializable
   with AnalysisDefaults.EnableAll[BingPost] {
 
   private val defaultFormat: String = "yyyy-MM-dd'T'HH:mm:ss"
+  private val defaultTimezone: String = "UTC"
 
   override def toSchema(item: BingPost, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[BingPost] = {
     ExtendedDetails(
@@ -26,9 +27,9 @@ class BingAnalyzer extends Analyzer[BingPost] with Serializable
     )
   }
 
-  def convertDatetimeStringToEpochLong(dateStr: String, format: Option[String] = None): Long ={
+  def convertDatetimeStringToEpochLong(dateStr: String, format: Option[String] = None, timezone: Option[String] = None): Long ={
       val sdf = new SimpleDateFormat(format.getOrElse(defaultFormat))
-      sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
+      sdf.setTimeZone(TimeZone.getTimeZone(timezone.getOrElse(defaultTimezone)))
 
       sdf.parse(dateStr).getTime
   }
