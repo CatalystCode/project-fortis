@@ -210,7 +210,7 @@ WITH OPTIONS = {
 };
 
 /**
- * Allows for fetching trending topics given a
+ * Allows for fetching trending topics given a pipeline, period and zoom level.
  *
  * select * from computedtrends
  * where pipelinekey = 'twitter'
