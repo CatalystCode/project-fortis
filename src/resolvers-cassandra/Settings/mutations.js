@@ -33,9 +33,9 @@ function _insertTopics(siteType) {
       .then(response => {
         const mutations = response.map(topic => {
           return {
-            query: `INSERT INTO fortis.watchlist (keyword,lang_code,translations,insertion_time) 
-                    VALUES (?, ?, ?, toTimestamp(now()));`,
-            params: [topic.keyword, topic.lang_code, topic.translations]
+            query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertion_time) 
+                    VALUES (?, ?, ?, ?, toTimestamp(now()));`,
+            params: [uuid(), topic.topic, topic.lang_code, topic.translations]
           };
         });
         return mutations;
