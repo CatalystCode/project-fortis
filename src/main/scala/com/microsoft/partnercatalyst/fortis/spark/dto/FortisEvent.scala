@@ -12,9 +12,10 @@ trait Details {
   val eventtime: Long
   val body: String
   val title: String
+  val externalsourceid: String
   val pipelinekey: String
-  val sourceUrl: String
-  val sharedLocations: List[Location]
+  val sourceurl: String
+  val sharedlocations: List[Location]
 }
 
 case class Analysis(

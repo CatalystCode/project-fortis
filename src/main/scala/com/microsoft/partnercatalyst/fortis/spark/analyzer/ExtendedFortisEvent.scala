@@ -14,7 +14,7 @@ case class ExtendedDetails[T](
                                title: String,
                                pipelinekey: String,
                                externalsourceid: String,
-                               sourceUrl: String,
-                               sharedLocations: List[Location] = List(),
+                               sourceurl: String,
+                               sharedlocations: List[Location] = List(),
                                original: T
 ) extends Details

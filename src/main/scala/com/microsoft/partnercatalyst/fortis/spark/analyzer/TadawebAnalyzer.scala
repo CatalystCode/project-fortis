@@ -16,8 +16,8 @@ class TadawebAnalyzer extends Analyzer[TadawebEvent] with Serializable
       body = item.text,
       title = item.title,
       pipelinekey = "TadaWeb",
-      sourceUrl = item.link,
-      sharedLocations = item.cities.flatMap(city => city.coordinates match {
+      sourceurl = item.link,
+      sharedlocations = item.cities.flatMap(city => city.coordinates match {
         case Seq(latitude, longitude) => locationFetcher(latitude, longitude)
         case _ => None
       }).toList,

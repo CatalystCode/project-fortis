@@ -15,8 +15,8 @@ class TwitterAnalyzer extends Analyzer[TwitterStatus] with Serializable
       title = "",
       externalsourceid = item.getSource,
       pipelinekey = "Twitter",
-      sourceUrl = s"https://twitter.com/statuses/${item.getId}",
-      sharedLocations = Option(item.getGeoLocation) match {
+      sourceurl = s"https://twitter.com/statuses/${item.getId}",
+      sharedlocations = Option(item.getGeoLocation) match {
         case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
         case None => List()
       },

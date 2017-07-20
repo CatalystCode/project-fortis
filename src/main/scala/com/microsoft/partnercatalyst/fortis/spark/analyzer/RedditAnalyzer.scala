@@ -14,7 +14,7 @@ class RedditAnalyzer extends Analyzer[RedditObject] with Serializable
       title = item.data.title.getOrElse(""),
       externalsourceid = item.data.author.getOrElse(""),
       pipelinekey = "Reddit",
-      sourceUrl = item.data.url.getOrElse(""),
+      sourceurl = item.data.url.getOrElse(""),
       original = item
     )
   }

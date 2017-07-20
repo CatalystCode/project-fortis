@@ -22,7 +22,7 @@ class BingAnalyzer extends Analyzer[BingPost] with Serializable
       body = item.snippet,
       title = item.name,
       pipelinekey = "Bing",
-      sourceUrl = item.url,
+      sourceurl = item.url,
       original = item
     )
   }

@@ -14,14 +14,15 @@ class KafkaSchemaSpec extends FlatSpec {
         eventtime = 1500078876,
         body = "body",
         title = "title",
-        pipelinekey = "publisher",
-        sourceUrl = "sourceUrl"),
-      analysis = Analysis(
+        externalsourceid = "erik",
+        pipelinekey = "kafkatest",
+        sourceurl = "sourceUrl"),
+        analysis = Analysis(
         keywords = List(Tag("tag1", None), Tag("tag2", Some(0.9))),
         language = Some("en")))
 
     val kafka = KafkaSchema(event)
 
-    assert(kafka == s"""{"language":"en","keywords":["tag1","tag2"],"id":"b6a38df0-1dd6-4f74-a5a8-6fe9a2bcfedc","createdAtEpoch":1500078876,"body":"body","title":"title","publisher":"publisher","sourceUrl":"sourceUrl"}""")
+    assert(kafka == s"""{"language":"en","keywords":["tag1","tag2"],"id":"b6a38df0-1dd6-4f74-a5a8-6fe9a2bcfedc","eventtime":1500078876,"body":"body","title":"title","pipelinekey":"kafkatest","sourceurl":"sourceUrl", "externalsourceid":"erik"}""")
   }
 }

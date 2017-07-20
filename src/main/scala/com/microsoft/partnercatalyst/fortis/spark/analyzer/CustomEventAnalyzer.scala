@@ -16,7 +16,7 @@ class CustomEventAnalyzer extends Analyzer[CustomEvent] with Serializable
       body = item.message,
       title = item.title.getOrElse(""),
       pipelinekey = item.source.getOrElse("CustomEvent"),
-      sourceUrl = item.link.getOrElse(""),
+      sourceurl = item.link.getOrElse(""),
       original = item
     )
   }

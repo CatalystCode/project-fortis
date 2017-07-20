@@ -17,7 +17,7 @@ class RadioAnalyzer extends Analyzer[RadioTranscription] with Serializable
       body = item.text,
       title = "",
       pipelinekey = "Radio",
-      sourceUrl = item.radioUrl,
+      sourceurl = item.radioUrl,
       original = item
     )
   }

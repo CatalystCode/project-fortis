@@ -14,8 +14,8 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable
       title = item.post.getCaption,
       externalsourceid = item.post.getSource.toString,
       pipelinekey = "Facebook",
-      sourceUrl = item.post.getPermalinkUrl.toString,
-      sharedLocations = Option(item.post.getPlace).map(_.getLocation) match {
+      sourceurl = item.post.getPermalinkUrl.toString,
+      sharedlocations = Option(item.post.getPlace).map(_.getLocation) match {
         case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
         case None => List()
       },

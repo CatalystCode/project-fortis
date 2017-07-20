@@ -33,7 +33,7 @@ case class KafkaRow(
   entities: List[String],
   summary: String,
   pipelinekey: String,
-  externalid: String,
+  id: String,
   eventtime: Long,
   body: String,
   title: String,
@@ -54,12 +54,12 @@ object KafkaSchema {
       pipelinekey = event.details.pipelinekey,
       entities = event.analysis.entities.map(_.name),
       summary = event.analysis.summary.getOrElse(""),
-      externalid = event.details.id.toString,
+      id = event.details.id.toString,
       eventtime = event.details.eventtime,
       body = event.details.body,
       title = event.details.title,
-      externalsourceid = event.details.pipelinekey,
-      sourceurl = event.details.sourceUrl
+      externalsourceid = event.details.externalsourceid,
+      sourceurl = event.details.sourceurl
     )).transform({
       case JArray(Nil) => JNothing
       case JString("") => JNothing
