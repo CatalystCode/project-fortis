@@ -1,3 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries
 
-case class TrendAnalysisRequest(val topic: String, val period: Period, val area: Area) extends Serializable
+import com.microsoft.partnercatalyst.fortis.spark.dto.Geofence
+
+case class TrendAnalysisRequest(topic: String, period: Period, geofence: Geofence) extends Serializable
