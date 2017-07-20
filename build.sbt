@@ -33,7 +33,8 @@ libraryDependencies ++= Seq(
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.twitter4j" % "twitter4j-stream" % "4.0.4",
   "org.apache.commons" % "commons-collections4" % "4.1",
-  "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.0.5",
+  "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.0.5" exclude("com.microsoft.azure", "azure-eventhubs"),
+  "com.microsoft.azure" % "azure-servicebus" % "1.0.0-PREVIEW-3",
   "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
   "com.github.benfradet" %% "spark-kafka-0-10-writer" % "0.3.0",
   "org.apache.kafka" %% "kafka" % "0.10.2.1",
@@ -60,6 +61,15 @@ artifact in (Compile, assembly) := {
 }
 
 addArtifact(artifact in (Compile, assembly), assembly)
+
+// Rename servicebus namespace in package spark-streaming-eventhubs to avoid confliction with azure-servicebus.
+// TODO: azure-eventhubs will rename their conflicting service bus package in the future (PR: https://github.com/Azure/azure-event-hubs-java/pull/101).
+//       Once this is done, spark-streaming-eventhubs needs to publish an updated lib containing this change (since they distribute a fat JAR), and then
+//       we can update to that package and remove this shading.
+assemblyShadeRules in assembly := Seq(
+  ShadeRule.rename("com.microsoft.azure.servicebus.**" -> "com.microsoft.azure.eventhub.servicebus.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.0.5", "com.microsoft.azure" % "azure-eventhubs" % "0.13.1"),
+  ShadeRule.rename("scalaj.http.**" -> "eventhub.scalaj.http.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.0.5")
+)
 
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "inject", xs @ _*) => MergeStrategy.last
