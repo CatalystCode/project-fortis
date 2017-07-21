@@ -59,11 +59,7 @@ object KafkaSchema {
       body = event.details.body,
       title = event.details.title,
       externalsourceid = event.details.externalsourceid,
-<<<<<<< HEAD
-     sourceurl = event.details.sourceurl
-=======
       sourceurl = event.details.sourceurl
->>>>>>> Addressing PR comments and integrated clemens recent FB streaming connector changes.
     )).transform({
       case JArray(Nil) => JNothing
       case JString("") => JNothing
