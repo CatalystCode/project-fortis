@@ -4,116 +4,54 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { allSources, withRunTime } = require('../shared');
-const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
-const { cross, makeMap, makeSet } = require('../../utils/collections');
+const { withRunTime } = require('../shared');
+const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
+const { makeSet } = require('../../utils/collections');
 
-function makeDefaultClauses(args) {
-  let params = [];
-  let clauses = [];
-
-  if (args.fromDate) {
-    clauses.push('(periodstartdate >= ?)');
-    params.push(args.fromDate);
-  }
-
-  if (args.toDate) {
-    clauses.push('(periodenddate <= ?)');
-    params.push(args.toDate);
-  }
-
-  if (args.timespan) {
-    clauses.push('(periodtype = ?)');
-    params.push(args.timespan);
-  }
-
-  const pipelines = args.sourceFilter && args.sourceFilter.length ? args.sourceFilter : allSources;
-  const keywords = (args.filteredEdges || []).concat(args.mainEdge ? [args.mainEdge] : []);
-  return {clauses, params, keywords, pipelines};
-}
-
-function makeTilesQueries(args, tileIds) {
-  const defaults = makeDefaultClauses(args);
-
-  return cross(tileIds, defaults.keywords, defaults.pipelines).map(tileIdAndKeywordAndPipeline => {
-    const params = defaults.params.slice();
-    const clauses = defaults.clauses.slice();
-
-    if (tileIdAndKeywordAndPipeline.a) {
-      clauses.push('(tileid = ?)');
-      params.push(tileIdAndKeywordAndPipeline.a);
-    }
-
-    if (tileIdAndKeywordAndPipeline.b) {
-      clauses.push('(topic = ?)');
-      params.push(tileIdAndKeywordAndPipeline.b);
-    }
-
-    if (tileIdAndKeywordAndPipeline.c) {
-      clauses.push('(pipeline = ?)');
-      params.push(tileIdAndKeywordAndPipeline.c);
-    }
-
-    const query = `SELECT tileid, computedfeatures, topic FROM fortis.computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
-    return {query: query, params: params};
-  });
-}
-
-function makeLocationsQueries(args, locationIds) {
-  const defaults = makeDefaultClauses(args);
-
-  return locationIds.map(locationId => {
-    const clauses = defaults.clauses.slice();
-    const params = defaults.params.slice();
-
-    clauses.push('(placeids CONTAINS ?)');
-    params.push(locationId);
-
-    const query = `SELECT tileid, computedfeatures, topic FROM fortis.computedtiles WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
-    return {query: query, params: params};
-  });
-}
-
-function tileIdsForBbox(bbox, zoomLevel) {
+function tilesForBbox(bbox, zoomLevel) {
   const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
-  return geotile.tileIdsForBoundingBox(fence, zoomLevel);
+  return geotile.tileIdsForBoundingBox(fence, zoomLevel).map(geotile.decodeTileId);
 }
 
-function fetchLocationIdsForPoints(points) {
-  return new Promise((resolve, reject) => {
-    Promise.all(points.map(point => featureServiceClient.fetchByPoint({latitude: point[0], longitude: point[1]})))
-    .then(locations => {
-      const locationIds = makeSet(locations, location => location.id);
-      resolve(locationIds);
-    })
-    .catch(reject);
-  });
+function toPipelineKey(sourceFilter) {
+  if (!sourceFilter || !sourceFilter.length) {
+    return 'all';
+  }
+
+  if (sourceFilter.length > 1) {
+    console.warn(`Only one source filter supported, ignoring: ${sourceFilter.slice(1).join(', ')}`);
+  }
+
+  return sourceFilter[0];
 }
 
-function cassandraRowsToEdges(rows) {
-  const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
-  return Object.keys(rowsByTileId).map(tileId => {
-    const row = rowsByTileId[tileId];
-    return {
-      mentionCount: row.computedfeatures && row.computedfeatures.mentions,
-      name: row.topic
-    };
-  });
+function toConjunctionTopics(mainEdge, filteredEdges) {
+  const selectedFilters = [];
+  selectedFilters.push(filteredEdges[0] || '');
+  selectedFilters.push(filteredEdges[1] || '');
+
+  if (filteredEdges.length > 2) {
+    console.warn(`Only two filtered edges supported, ignoring: ${filteredEdges.slice(2).join(', ')}`);
+  }
+
+  return [mainEdge].concat(selectedFilters.sort());
 }
 
-function cassandraRowsToFeatures(rows) {
-  const rowsByTileId = makeMap(rows, row => row.tileid, row => row);
-  return Object.keys(rowsByTileId).map(tileId => {
-    const row = rowsByTileId[tileId];
-    return {
-      properties: {
-        pos_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.pos_avg,
-        neg_sentiment: row.computedfeatures && row.computedfeatures.sentiment && row.computedfeatures.sentiment.neg_avg,
-        mentionCount: row.computedfeatures && row.computedfeatures.mentions,
-        tileId: tileId
-      }
-    };
-  });
+/**
+ * @param {{tilex: number, tiley: number, tilez: number, avgsentiment: number, mentioncount: number}} rows
+ */
+function computedtileToTile(row) {
+  const coordinates = [geotile.longitudeFromColumn(row.tiley, row.tilez), geotile.latitudeFromRow(row.tilex, row.tilez)];
+  const mentionCount = row.mentioncount;
+  const neg_sentiment = row.avgsentiment;
+  const tileId = geotile.tileIdFromRowColumn(row.tilex, row.tiley, row.tilez);
+
+  return {
+    coordinates,
+    mentionCount,
+    neg_sentiment,
+    tileId
+  };
 }
 
 /**
@@ -124,15 +62,43 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.bbox) return reject('No bounding box for which to fetch tiles specified');
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
+    if (!args || !args.mainEdge) return reject('No main edge for keyword filter specified');
+    if (!args || !args.filteredEdges) return reject('No secondary edges for keyword filter specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
-    const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
-    const queries = makeTilesQueries(args, tileIds);
-    cassandraConnector.executeQueries(queries)
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+
+    const query = `
+    SELECT tilex, tiley, tilez, avgsentiment, mentioncount
+    FROM fortis.computedtiles
+    WHERE periodtype = ?
+    AND conjunctiontopics = ?
+    AND tilez = ?
+    AND period = ?
+    AND tilex IN ?
+    AND tiley IN ?
+    AND periodstartdate >= ?
+    AND periodenddate <= ?
+    AND pipelinekey = ?
+    `.trim();
+
+    const params = [
+      '', // TODO periodtype
+      toConjunctionTopics(args.mainEdge, args.filteredEdges),
+      args.zoomLevel,
+      '', // TODO period
+      makeSet(tiles, tile => tile.row),
+      makeSet(tiles, tile => tile.column),
+      args.fromDate,
+      args.toDate,
+      toPipelineKey(args.sourceFilter)
+    ];
+
+    cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const features = cassandraRowsToFeatures(rows);
       resolve({
-        features: features
+        bbox: args.bbox,
+        features: rows.map(computedtileToTile)
       });
     })
     .catch(reject);
@@ -148,19 +114,9 @@ function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-var
     if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch tiles');
     if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch tiles');
 
-    fetchLocationIdsForPoints(args.locations)
-    .then(locationIds => {
-      const queries = makeLocationsQueries(args, locationIds);
-      cassandraConnector.executeQueries(queries)
-      .then(rows => {
-        const features = cassandraRowsToFeatures(rows);
-        resolve({
-          features: features
-        });
-      })
-      .catch(reject);
-    })
-    .catch(reject);
+    // FIXME this requires a zoomLevel so we can query computedtiles by tilez
+    // FIXME this requires a mainEdge so that we can query computedtiles by conjunctiontopics
+    throw new Error('not supported');
   });
 }
 
@@ -194,20 +150,21 @@ function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-var
     if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch edges');
     if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch edges');
 
-    fetchLocationIdsForPoints(args.locations)
-    .then(locationIds => {
-      const queries = makeLocationsQueries(args, locationIds);
-      cassandraConnector.executeQueries(queries)
-      .then(rows => {
-        const edges = cassandraRowsToEdges(rows);
-        resolve({
-          edges: edges
-        });
-      })
-      .catch(reject);
-    })
-    .catch(reject);
+    throw new Error('not supported');
   });
+}
+
+/**
+ * @param {{mentionCount: number, topic: string}} row 
+ */
+function populartopicToEdge(row) {
+  const mentionCount = row.mentionCount;
+  const name = row.topic;
+
+  return {
+    mentionCount,
+    name
+  };
 }
 
 /**
@@ -220,13 +177,40 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch edges specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
 
-    const tileIds = tileIdsForBbox(args.bbox, args.zoomLevel);
-    const queries = makeTilesQueries(args, tileIds);
-    cassandraConnector.executeQueries(queries)
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+
+    const query = `
+    SELECT mentionCount, topic
+    FROM populartopics
+    WHERE periodtype = ?
+    AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND tilez = ?
+    AND topic = ?
+    AND period = ?
+    AND tilex IN ?
+    AND tiley IN ?
+    AND periodstartdate >= ?
+    AND periodenddate <= ?
+    `.trim();
+
+    const params = [
+      '', // TODO periodtype
+      toPipelineKey(args.sourceFilter),
+      '', // FIXME this doesn't have externalsourceid
+      args.zoomLevel,
+      '', // FIXME this doesn't have topic
+      '', // TODO period
+      makeSet(tiles, tile => tile.row),
+      makeSet(tiles, tile => tile.column),
+      args.fromDate,
+      args.toDate
+    ];
+
+    cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const edges = cassandraRowsToEdges(rows);
       resolve({
-        edges: edges
+        edges: rows.map(populartopicToEdge)
       });
     })
     .catch(reject);
