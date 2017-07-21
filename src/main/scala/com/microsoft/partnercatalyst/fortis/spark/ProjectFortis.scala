@@ -179,7 +179,7 @@ object ProjectFortis extends App {
               "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
               "appId" -> System.getenv("FACEBOOK_APP_ID"),
               "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
-              "pageIds" -> "aljazeera,cnn,bloomberg"
+              "pageIds" -> "aljazeera|cnn|bloomberg"
             )
           )
         ),

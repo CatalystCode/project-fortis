@@ -11,8 +11,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 class BingAnalyzer extends Analyzer[BingPost] with Serializable
   with AnalysisDefaults.EnableAll[BingPost] {
 
-  private val defaultFormat: String = "yyyy-MM-dd'T'HH:mm:ss"
-  private val defaultTimezone: String = "UTC"
+  private final val DefaultFormat = "yyyy-MM-dd'T'HH:mm:ss"
+  private final val DefaultTimezone = "UTC"
 
   override def toSchema(item: BingPost, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[BingPost] = {
     ExtendedDetails(
@@ -28,8 +28,8 @@ class BingAnalyzer extends Analyzer[BingPost] with Serializable
   }
 
   private def convertDatetimeStringToEpochLong(dateStr: String, format: Option[String] = None, timezone: Option[String] = None): Long ={
-      val sdf = new SimpleDateFormat(format.getOrElse(defaultFormat))
-      sdf.setTimeZone(TimeZone.getTimeZone(timezone.getOrElse(defaultTimezone)))
+      val sdf = new SimpleDateFormat(format.getOrElse(DefaultFormat))
+      sdf.setTimeZone(TimeZone.getTimeZone(timezone.getOrElse(DefaultTimezone)))
 
       sdf.parse(dateStr).getTime
   }

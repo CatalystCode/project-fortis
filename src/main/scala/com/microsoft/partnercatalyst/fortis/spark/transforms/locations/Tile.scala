@@ -32,7 +32,6 @@ class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Dou
 
 object TileUtils {
   def apply(): TileUtils = new TileUtils
-
 }
 /**
   * Created by erisch on 5/24/2017.
@@ -89,16 +88,16 @@ class TileUtils {
   }
 
   def map_to_zoom_render_tile(tileTuple: (String, Int)): (String, (String, Int)) = {
-    val tile = TileUtils().tile_from_tile_id_str(tileTuple._1)
+    val tile = tile_from_tile_id_str(tileTuple._1)
     //return the tile id 5 levels deep from tileTuple which will be used to render in the heatmap
-    (TileUtils().tile_id_from_lat_long(tile.centerLatitude(), tile.centerLongitude(), tile.tileId.zoom - DETAIL_ZOOM_DELTA).tileId,
+    (tile_id_from_lat_long(tile.centerLatitude(), tile.centerLongitude(), tile.tileId.zoom - DETAIL_ZOOM_DELTA).tileId,
       (tile.tileId.tileId, tileTuple._2))
   }
 
   def tile_id_mapper_with_zoom(location: (Double, Double)): List[(String, (String, Int))] = {
     (for (zoom <- MIN_ZOOM to MAX_ZOOM)
-      yield (TileUtils().tile_id_from_lat_long(location._1, location._2, zoom).tileId,
-        (TileUtils().tile_id_from_lat_long(location._1, location._2, zoom + DETAIL_ZOOM_DELTA).tileId, 1))).toList
+      yield (tile_id_from_lat_long(location._1, location._2, zoom).tileId,
+        (tile_id_from_lat_long(location._1, location._2, zoom + DETAIL_ZOOM_DELTA).tileId, 1))).toList
   }
 
   def reduceMutableZoomTileMap(zoomTileTuple: (mutable.Map[String, Int], Int), tileEntry: (String, Int)

@@ -9,4 +9,6 @@ trait Loggable {
   def logInfo(message: String): Unit = log.info(message)
   def logError(message: String): Unit = log.error(message)
   def logError(message: String, throwable: Throwable): Unit = log.error(message, throwable)
+  def logFatalError(message: String): Unit = log.fatal(message)
+  def logFatalError(message: String, throwable: Throwable): Unit = log.fatal(message, throwable)
 }
