@@ -1,5 +1,5 @@
-CREATE KEYSPACE IF NOT EXISTS fortis
-   WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+DROP KEYSPACE IF EXISTS fortis;
+CREATE KEYSPACE fortis WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
 
 USE fortis;
 
@@ -57,8 +57,6 @@ CREATE TABLE trustedsources (
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
 
-DROP TABLE IF EXISTS events;
-DROP TYPE IF EXISTS features;
 DROP TYPE IF EXISTS computedsentiment;
 CREATE TYPE computedsentiment (
     pos_avg float,
@@ -79,6 +77,7 @@ CREATE TYPE computedentities (
     count float
 );
 
+DROP TYPE IF EXISTS features;
 CREATE TYPE features (
     mentions int,
     sentiment frozen<computedsentiment>,
@@ -111,8 +110,6 @@ CREATE TABLE populartopics (
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
 
-DROP MATERIALIZED VIEW IF EXISTS popularsources;
-DROP MATERIALIZED VIEW IF EXISTS timeseries;
 DROP TABLE IF EXISTS computedtiles;
 CREATE TABLE computedtiles (
     periodstartdate timestamp,
@@ -133,12 +130,14 @@ CREATE TABLE computedtiles (
     PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
 );
 
+DROP MATERIALIZED VIEW IF EXISTS popularsources;
 CREATE MATERIALIZED VIEW popularsources
 AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
    FROM computedtiles
    WHERE periodtype IS NOT NULL AND conjunctiontopics IS NOT NULL AND tilez IS NOT NULL AND externalsourceid IS NOT NULL AND period IS NOT NULL AND pipelinekey IS NOT NULL AND conjunctiontopics IS NOT NULL AND periodtype IS NOT NULL AND tilez IS NOT NULL AND period IS NOT NULL AND tilex IS NOT NULL AND tiley IS NOT NULL AND periodstartdate IS NOT NULL AND periodenddate IS NOT NULL
 PRIMARY KEY ((periodtype, conjunctiontopics, tilez, externalsourceid, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey);
 
+DROP MATERIALIZED VIEW IF EXISTS timeseries;
 CREATE MATERIALIZED VIEW timeseries
 AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
    FROM computedtiles
@@ -176,6 +175,7 @@ CREATE TABLE eventtags(
     PRIMARY KEY (topic, pipelinekey, event_time, placecentroidcoordx, placecentroidcoordy, eventid)
 ) WITH CLUSTERING ORDER BY (pipelinekey DESC, event_time ASC);
 
+DROP TABLE IF EXISTS events;
 CREATE TABLE events(
     eventid uuid,
     externalid text,
@@ -235,4 +235,3 @@ CREATE TABLE computedtrends(
     insertion_time timestamp,
     PRIMARY KEY ((pipelinekey, periodtype, tilez, period), tilex, tiley, topic)
 ) WITH CLUSTERING ORDER BY (tilex ASC, tiley ASC, topic ASC);
-
