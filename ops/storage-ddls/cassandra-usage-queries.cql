@@ -65,3 +65,9 @@ insert into conjunctivetopics (topic, conjunctivetopic, mentions) values ('isis'
 insert into conjunctivetopics (topic, conjunctivetopic, mentions) values ('isis', 'terror', 35);
 
 select * from conjunctivetopics where topic = 'isis';
+
+
+insert into computedtrends (topic, pipelinekey, periodstartdate, periodtype, period, tilez, tilex, tiley, score, insertion_time) values ('isis', 'twitter', '2017-06-20 00:00:00.00', 'day', '2017-06-20', 1, 2, 3, 1.234, toTimestamp(now()));
+select * from computedtrends where pipelinekey = 'twitter' and periodtype = 'day' and tilez = 1 and period = '2017-06-20';
+select * from computedtrends where pipelinekey = 'twitter' and periodtype = 'day' and period = '2017-06-20' and tilez = 1 and (tilex, tiley) >= (0, 0) and (tilex, tiley) < (10, 10);
+

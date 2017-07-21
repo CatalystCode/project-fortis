@@ -208,3 +208,31 @@ WITH OPTIONS = {
 'tokenization_enable_stemming': 'true',
 'tokenization_normalize_lowercase': 'true'
 };
+
+/**
+ * Allows for fetching trending topics given a pipeline, period and zoom level.
+ *
+ * select * from computedtrends
+ * where pipelinekey = 'twitter'
+ * and periodtype = 'day'
+ * and period = '2017-06-20'
+ * and tilez = 1
+ * and (tilex, tiley) >= (0, 0)
+ * and (tilex, and tiley) < (10, 10);
+ *
+ */
+DROP TABLE IF EXISTS computedtrends;
+CREATE TABLE computedtrends(
+    topic text,
+    pipelinekey text,
+    periodstartdate timestamp,
+    periodtype text,
+    period text,
+    tilez int,
+    tilex int,
+    tiley int,
+    score float,
+    insertion_time timestamp,
+    PRIMARY KEY ((pipelinekey, periodtype, tilez, period), tilex, tiley, topic)
+) WITH CLUSTERING ORDER BY (tilex ASC, tiley ASC, topic ASC);
+
