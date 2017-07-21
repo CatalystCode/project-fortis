@@ -3,6 +3,42 @@ CREATE KEYSPACE fortis WITH replication = {'class':'SimpleStrategy', 'replicatio
 
 USE fortis;
 
+/******************************************************************************
+ * Types
+ *****************************************************************************/
+
+DROP TYPE IF EXISTS computedsentiment;
+CREATE TYPE computedsentiment (
+    pos_avg float,
+    neg_avg float
+);
+
+DROP TYPE IF EXISTS computedgender;
+CREATE TYPE computedgender (
+    male_mentions int,
+    female_mentions int
+);
+
+DROP TYPE IF EXISTS computedentities;
+CREATE TYPE computedentities (
+    name text,
+    externalsource text,
+    externalrefid text,
+    count float
+);
+
+DROP TYPE IF EXISTS features;
+CREATE TYPE features (
+    mentions int,
+    sentiment frozen<computedsentiment>,
+    gender frozen<computedgender>,
+    entities frozen<set<computedentities>>
+);
+
+/******************************************************************************
+ * Tables
+ *****************************************************************************/
+
 DROP TABLE IF EXISTS watchlist;
 CREATE TABLE watchlist(
     topicid uuid,
@@ -57,34 +93,6 @@ CREATE TABLE trustedsources (
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
 
-DROP TYPE IF EXISTS computedsentiment;
-CREATE TYPE computedsentiment (
-    pos_avg float,
-    neg_avg float
-);
-
-DROP TYPE IF EXISTS computedgender;
-CREATE TYPE computedgender (
-    male_mentions int,
-    female_mentions int
-);
-
-DROP TYPE IF EXISTS computedentities;
-CREATE TYPE computedentities (
-    name text,
-    externalsource text,
-    externalrefid text,
-    count float
-);
-
-DROP TYPE IF EXISTS features;
-CREATE TYPE features (
-    mentions int,
-    sentiment frozen<computedsentiment>,
-    gender frozen<computedgender>,
-    entities frozen<set<computedentities>>
-);
-
 DROP TABLE IF EXISTS conjunctivetopics;
 CREATE TABLE conjunctivetopics (
     topic text,
@@ -129,20 +137,6 @@ CREATE TABLE computedtiles (
     conjunctiontopics tuple<text, text, text>,
     PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
 );
-
-DROP MATERIALIZED VIEW IF EXISTS popularsources;
-CREATE MATERIALIZED VIEW popularsources
-AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
-   FROM computedtiles
-   WHERE periodtype IS NOT NULL AND conjunctiontopics IS NOT NULL AND tilez IS NOT NULL AND externalsourceid IS NOT NULL AND period IS NOT NULL AND pipelinekey IS NOT NULL AND conjunctiontopics IS NOT NULL AND periodtype IS NOT NULL AND tilez IS NOT NULL AND period IS NOT NULL AND tilex IS NOT NULL AND tiley IS NOT NULL AND periodstartdate IS NOT NULL AND periodenddate IS NOT NULL
-PRIMARY KEY ((periodtype, conjunctiontopics, tilez, externalsourceid, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey);
-
-DROP MATERIALIZED VIEW IF EXISTS timeseries;
-CREATE MATERIALIZED VIEW timeseries
-AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
-   FROM computedtiles
-   WHERE periodtype IS NOT NULL AND conjunctiontopics IS NOT NULL AND tilez IS NOT NULL AND externalsourceid IS NOT NULL AND period IS NOT NULL AND pipelinekey IS NOT NULL AND conjunctiontopics IS NOT NULL AND periodtype IS NOT NULL AND tilez IS NOT NULL AND period IS NOT NULL AND tilex IS NOT NULL AND tiley IS NOT NULL AND periodstartdate IS NOT NULL AND periodenddate IS NOT NULL
-PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipelinekey, externalsourceid, periodstartdate, periodenddate);
 
 DROP TABLE IF EXISTS popularplaces;
 CREATE TABLE popularplaces (
@@ -191,24 +185,6 @@ CREATE TABLE events(
     PRIMARY KEY ((pipelinekey, eventid), event_time)
 ) WITH CLUSTERING ORDER BY (event_time ASC);
 
-CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
-WITH OPTIONS = {
-'mode': 'CONTAINS',
-'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
-'analyzed': 'true',
-'tokenization_enable_stemming': 'true',
-'tokenization_normalize_lowercase': 'true'
-};
-
-CREATE CUSTOM INDEX ON events (title) USING 'org.apache.cassandra.index.sasi.SASIIndex'
-WITH OPTIONS = {
-'mode': 'CONTAINS',
-'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
-'analyzed': 'true',
-'tokenization_enable_stemming': 'true',
-'tokenization_normalize_lowercase': 'true'
-};
-
 /**
  * Allows for fetching trending topics given a pipeline, period and zoom level.
  *
@@ -235,3 +211,69 @@ CREATE TABLE computedtrends(
     insertion_time timestamp,
     PRIMARY KEY ((pipelinekey, periodtype, tilez, period), tilex, tiley, topic)
 ) WITH CLUSTERING ORDER BY (tilex ASC, tiley ASC, topic ASC);
+
+/******************************************************************************
+ * Views
+ *****************************************************************************/
+
+DROP MATERIALIZED VIEW IF EXISTS popularsources;
+CREATE MATERIALIZED VIEW popularsources
+AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
+   FROM computedtiles
+   WHERE periodtype IS NOT NULL
+     AND conjunctiontopics IS NOT NULL
+     AND tilez IS NOT NULL
+     AND externalsourceid IS NOT NULL
+     AND period IS NOT NULL
+     AND pipelinekey IS NOT NULL
+     AND conjunctiontopics IS NOT NULL
+     AND periodtype IS NOT NULL
+     AND tilez IS NOT NULL
+     AND period IS NOT NULL
+     AND tilex IS NOT NULL
+     AND tiley IS NOT NULL
+     AND periodstartdate IS NOT NULL
+     AND periodenddate IS NOT NULL
+PRIMARY KEY ((periodtype, conjunctiontopics, tilez, externalsourceid, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey);
+
+DROP MATERIALIZED VIEW IF EXISTS timeseries;
+CREATE MATERIALIZED VIEW timeseries
+AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
+   FROM computedtiles
+   WHERE periodtype IS NOT NULL
+     AND conjunctiontopics IS NOT NULL
+     AND tilez IS NOT NULL
+     AND externalsourceid IS NOT NULL
+     AND period IS NOT NULL
+     AND pipelinekey IS NOT NULL
+     AND conjunctiontopics IS NOT NULL
+     AND periodtype IS NOT NULL
+     AND tilez IS NOT NULL
+     AND period IS NOT NULL
+     AND tilex IS NOT NULL
+     AND tiley IS NOT NULL
+     AND periodstartdate IS NOT NULL
+     AND periodenddate IS NOT NULL
+PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipelinekey, externalsourceid, periodstartdate, periodenddate);
+
+/******************************************************************************
+ * Indices
+ *****************************************************************************/
+
+CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+'mode': 'CONTAINS',
+'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
+'analyzed': 'true',
+'tokenization_enable_stemming': 'true',
+'tokenization_normalize_lowercase': 'true'
+};
+
+CREATE CUSTOM INDEX ON events (title) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+WITH OPTIONS = {
+'mode': 'CONTAINS',
+'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
+'analyzed': 'true',
+'tokenization_enable_stemming': 'true',
+'tokenization_normalize_lowercase': 'true'
+};
