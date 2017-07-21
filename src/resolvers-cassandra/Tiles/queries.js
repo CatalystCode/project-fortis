@@ -27,14 +27,25 @@ function toPipelineKey(sourceFilter) {
 
 function toConjunctionTopics(mainEdge, filteredEdges) {
   const selectedFilters = [];
-  selectedFilters.push(filteredEdges[0] || '');
-  selectedFilters.push(filteredEdges[1] || '');
+  if (filteredEdges[0] && filteredEdges[1]) {
+    selectedFilters.push(filteredEdges[0], filteredEdges[1]);
+    selectedFilters.sort();
+  } else if (filteredEdges[0]) {
+    selectedFilters.push(filteredEdges[0]);
+    selectedFilters.push('');
+  } else if (filteredEdges[1]) {
+    selectedFilters.push(filteredEdges[1]);
+    selectedFilters.push('');
+  } else {
+    selectedFilters.push('');
+    selectedFilters.push('');
+  }
 
   if (filteredEdges.length > 2) {
     console.warn(`Only two filtered edges supported, ignoring: ${filteredEdges.slice(2).join(', ')}`);
   }
 
-  return [mainEdge].concat(selectedFilters.sort());
+  return [mainEdge].concat(selectedFilters);
 }
 
 /**
