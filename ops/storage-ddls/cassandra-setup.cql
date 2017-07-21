@@ -7,12 +7,6 @@ USE fortis;
  * Types
  *****************************************************************************/
 
-DROP TYPE IF EXISTS computedsentiment;
-CREATE TYPE computedsentiment (
-    pos_avg float,
-    neg_avg float
-);
-
 DROP TYPE IF EXISTS computedgender;
 CREATE TYPE computedgender (
     male_mentions int,
@@ -30,7 +24,7 @@ CREATE TYPE computedentities (
 DROP TYPE IF EXISTS features;
 CREATE TYPE features (
     mentions int,
-    sentiment frozen<computedsentiment>,
+    sentiment float,
     gender frozen<computedgender>,
     entities frozen<set<computedentities>>
 );
@@ -130,7 +124,7 @@ CREATE TABLE computedtiles (
     tiley int,
     externalsourceid text,
     mentioncount int,
-    avgsentiment int,
+    avgsentiment float,
     heatmap text,
     placeids frozen<set<text>>,
     insertion_time timestamp,
