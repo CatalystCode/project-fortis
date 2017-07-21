@@ -16,12 +16,12 @@ class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
 
     ExtendedDetails(
-      id = item.id,
+      eventid = item.id,
       externalsourceid = item.user.username,
       eventtime = item.created_time.toLong,
       body = imageAnalysis.summary.getOrElse(""),
       title = item.caption.text,
-      sharedlocations = item.location match {
+      sharedLocations = item.location match {
         case Some(location) => locationFetcher(location.latitude, location.longitude).toList
         case None => List()
       },

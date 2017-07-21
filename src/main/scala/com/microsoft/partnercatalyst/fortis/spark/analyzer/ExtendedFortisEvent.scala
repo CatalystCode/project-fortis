@@ -8,13 +8,13 @@ case class ExtendedFortisEvent[T](
 ) extends FortisEvent
 
 case class ExtendedDetails[T](
-                               id: String,
-                               eventtime: Long,
-                               body: String,
-                               title: String,
-                               pipelinekey: String,
-                               externalsourceid: String,
-                               sourceurl: String,
-                               sharedlocations: List[Location] = List(),
-                               original: T
+  eventid: String,
+  eventtime: Long,
+  body: String,
+  title: String,
+  pipelinekey: String,
+  externalsourceid: String,
+  sourceurl: String,
+  sharedLocations: List[Location] = List(),
+  original: T
 ) extends Details

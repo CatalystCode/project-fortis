@@ -88,10 +88,10 @@ object Pipeline {
         analysis.keywords.nonEmpty
       }
 
-      def isEmpty(x: String) = x == null || x.isEmpty
-
       def requiredValuesProvided(event: ExtendedFortisEvent[T]): Boolean = {
-        !isEmpty(event.details.id) && !isEmpty(event.details.externalsourceid) && !isEmpty(event.details.pipelinekey)
+        def isEmpty(x: String) = x == null || x.isEmpty
+
+        !isEmpty(event.details.eventid) && !isEmpty(event.details.externalsourceid) && !isEmpty(event.details.pipelinekey)
       }
 
       def hasBlacklistedTerms(event: ExtendedFortisEvent[T]): Boolean = {

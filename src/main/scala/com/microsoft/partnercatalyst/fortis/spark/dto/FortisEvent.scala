@@ -8,14 +8,14 @@ trait FortisEvent {
 }
 
 trait Details {
-  val id: String
+  val eventid: String
   val eventtime: Long
   val body: String
   val title: String
   val externalsourceid: String
   val pipelinekey: String
   val sourceurl: String
-  val sharedlocations: List[Location]
+  val sharedLocations: List[Location]
 }
 
 case class Analysis(

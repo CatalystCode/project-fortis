@@ -4,7 +4,6 @@ import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, Geofence, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
-import com.microsoft.partnercatalyst.fortis.spark.sinks.kafka.KafkaSink
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
@@ -180,7 +179,7 @@ object ProjectFortis extends App {
               "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
               "appId" -> System.getenv("FACEBOOK_APP_ID"),
               "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
-              "pageId" -> "aljazeera"
+              "pageIds" -> "aljazeera,cnn,bloomberg"
             )
           )
         ),

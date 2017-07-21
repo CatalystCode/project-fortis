@@ -10,14 +10,14 @@ class TadawebAnalyzer extends Analyzer[TadawebEvent] with Serializable
   with AnalysisDefaults.EnableAll[TadawebEvent] {
   override def toSchema(item: TadawebEvent, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TadawebEvent] = {
     ExtendedDetails(
-      id = item.tada.id,
+      eventid = item.tada.id,
       externalsourceid = item.tada.name,
       eventtime = now.getEpochSecond,
       body = item.text,
       title = item.title,
       pipelinekey = "TadaWeb",
       sourceurl = item.link,
-      sharedlocations = item.cities.flatMap(city => city.coordinates match {
+      sharedLocations = item.cities.flatMap(city => city.coordinates match {
         case Seq(latitude, longitude) => locationFetcher(latitude, longitude)
         case _ => None
       }).toList,
