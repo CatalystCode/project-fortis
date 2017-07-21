@@ -235,5 +235,4 @@ CREATE TABLE computedtrends(
     insertion_time timestamp,
     PRIMARY KEY ((pipelinekey, periodtype, tilez, period), tilex, tiley, topic)
 ) WITH CLUSTERING ORDER BY (tilex ASC, tiley ASC, topic ASC);
-CREATE INDEX ON computedtrends(score);
 
