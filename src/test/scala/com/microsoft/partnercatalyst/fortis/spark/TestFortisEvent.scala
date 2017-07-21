@@ -8,12 +8,12 @@ case class TestFortisEvent(
 ) extends FortisEvent
 
 case class TestFortisDetails(
-                              eventid: String,
-                              eventtime: Long,
-                              body: String,
-                              externalsourceid: String,
-                              title: String,
-                              pipelinekey: String,
-                              sourceurl: String,
-                              sharedLocations: List[Location] = List()
+  eventid: String,
+  eventtime: Long,
+  body: String,
+  externalsourceid: String,
+  title: String,
+  pipelinekey: String,
+  sourceurl: String,
+  sharedLocations: List[Location] = List()
 ) extends Details
