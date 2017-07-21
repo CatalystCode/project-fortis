@@ -1,8 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.time.Instant.now
-import java.util.UUID.randomUUID
-
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.dto._
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
@@ -19,16 +16,17 @@ class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
 
     ExtendedDetails(
-      id = randomUUID(),
-      createdAtEpoch = now.getEpochSecond,
+      eventid = item.id,
+      externalsourceid = item.user.username,
+      eventtime = item.created_time.toLong,
       body = imageAnalysis.summary.getOrElse(""),
       title = item.caption.text,
       sharedLocations = item.location match {
         case Some(location) => locationFetcher(location.latitude, location.longitude).toList
         case None => List()
       },
-      publisher = "Instagram",
-      sourceUrl = item.link,
+      pipelinekey = "Instagram",
+      sourceurl = item.link,
       original = item
     )
   }

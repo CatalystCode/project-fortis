@@ -11,12 +11,13 @@ class RadioAnalyzer extends Analyzer[RadioTranscription] with Serializable
   with AnalysisDefaults.EnableAll[RadioTranscription] {
   override def toSchema(item: RadioTranscription, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RadioTranscription] = {
     ExtendedDetails(
-      id = randomUUID(),
-      createdAtEpoch = now.getEpochSecond,
+      eventid = randomUUID().toString,
+      eventtime = now.getEpochSecond,
+      externalsourceid = item.radioUrl,
       body = item.text,
       title = "",
-      publisher = "Radio",
-      sourceUrl = item.radioUrl,
+      pipelinekey = "Radio",
+      sourceurl = item.radioUrl,
       original = item
     )
   }

@@ -1,8 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
 import java.time.Instant.now
-import java.util.UUID.randomUUID
-
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.tadaweb.TadawebEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
@@ -12,12 +10,13 @@ class TadawebAnalyzer extends Analyzer[TadawebEvent] with Serializable
   with AnalysisDefaults.EnableAll[TadawebEvent] {
   override def toSchema(item: TadawebEvent, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TadawebEvent] = {
     ExtendedDetails(
-      id = randomUUID(),
-      createdAtEpoch = now.getEpochSecond,
+      eventid = item.tada.id,
+      externalsourceid = item.tada.name,
+      eventtime = now.getEpochSecond,
       body = item.text,
       title = item.title,
-      publisher = "TadaWeb",
-      sourceUrl = item.tada.name,
+      pipelinekey = "TadaWeb",
+      sourceurl = item.link,
       sharedLocations = item.cities.flatMap(city => city.coordinates match {
         case Seq(latitude, longitude) => locationFetcher(latitude, longitude)
         case _ => None

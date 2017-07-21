@@ -28,18 +28,17 @@ case class KafkaRow(
   language: String,
   locations: List[String],
   sentiments: List[Double],
-  moods: List[String],
   genders: List[String],
   keywords: List[String],
   entities: List[String],
   summary: String,
-  id: String,
-  createdAtEpoch: Long,
+  pipelinekey: String,
+  eventid: String,
+  eventtime: Long,
   body: String,
   title: String,
-  publisher: String,
-  sourceUrl: String,
-  sharedLocations: List[String]
+  externalsourceid: String,
+  sourceurl: String
 )
 
 object KafkaSchema {
@@ -50,18 +49,17 @@ object KafkaSchema {
       language = event.analysis.language.getOrElse(""),
       locations = event.analysis.locations.map(_.wofId),
       sentiments = event.analysis.sentiments,
-      moods = event.analysis.moods.map(_.name),
       genders = event.analysis.genders.map(_.name),
       keywords = event.analysis.keywords.map(_.name),
+      pipelinekey = event.details.pipelinekey,
       entities = event.analysis.entities.map(_.name),
       summary = event.analysis.summary.getOrElse(""),
-      id = event.details.id.toString,
-      createdAtEpoch = event.details.createdAtEpoch,
+      eventid = event.details.eventid.toString,
+      eventtime = event.details.eventtime,
       body = event.details.body,
       title = event.details.title,
-      publisher = event.details.publisher,
-      sourceUrl = event.details.sourceUrl,
-      sharedLocations = event.details.sharedLocations.map(_.wofId)
+      externalsourceid = event.details.externalsourceid,
+      sourceurl = event.details.sourceurl
     )).transform({
       case JArray(Nil) => JNothing
       case JString("") => JNothing

@@ -4,7 +4,6 @@ import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, Geofence, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
-import com.microsoft.partnercatalyst.fortis.spark.sinks.kafka.KafkaSink
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
@@ -78,7 +77,7 @@ object ProjectFortis extends App {
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
       pipeline("twitter", new TwitterAnalyzer),
-      pipeline("facebook", new FacebookAnalyzer),
+      pipeline("facebook", new FacebookPostAnalyzer),
       pipeline("instagram", new InstagramAnalyzer),
       pipeline("tadaweb", new TadawebAnalyzer),
       pipeline("customevents", new CustomEventAnalyzer),
@@ -86,7 +85,7 @@ object ProjectFortis extends App {
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
-    KafkaSink(fortisEvents, Settings.kafkaHost, Settings.kafkaTopic)
+    //KafkaSink(fortisEvents, Settings.kafkaHost, Settings.kafkaTopic)
 
     ssc.checkpoint(Settings.progressDir)
     ssc
@@ -180,7 +179,7 @@ object ProjectFortis extends App {
               "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
               "appId" -> System.getenv("FACEBOOK_APP_ID"),
               "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
-              "pageId" -> "aljazeera"
+              "pageIds" -> "aljazeera|cnn|bloomberg"
             )
           )
         ),

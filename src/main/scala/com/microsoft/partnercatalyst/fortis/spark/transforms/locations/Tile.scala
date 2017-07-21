@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
+import scala.collection.mutable
+
 class TileId(var tileId: String) {
   var row: Int = -1
   var zoom: Int = -1
@@ -28,19 +30,30 @@ class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Dou
   def midWestLongitude(): Double = (centerLongitude() + longitudeWest) / 2.0
 }
 
+object TileUtils {
+  def apply(): TileUtils = new TileUtils
+}
 /**
   * Created by erisch on 5/24/2017.
   */
 
 class TileUtils {
   final val MAX_ZOOM = 16
-  final val MIN_ZOOM = 0
+  final val MIN_ZOOM = 8
+  final val DETAIL_ZOOM_DELTA = 5
 
   def tile_id_from_lat_long(latitude: Double, longitude: Double, zoom: Int): TileId = {
     val row = row_from_latitude(latitude, zoom).toInt
     val column = column_from_longitude(longitude, zoom).toInt
 
     tile_id_from_row_column(row, column, zoom)
+  }
+
+  def tile_from_lat_long(latitude: Double, longitude: Double, zoom: Int): Tile = {
+    val row = row_from_latitude(latitude, zoom).toInt
+    val column = column_from_longitude(longitude, zoom).toInt
+
+    tile_from_tile_id(tile_id_from_row_column(row, column, zoom))
   }
 
   def row_from_latitude(latitude: Double, zoom: Int): Double = {
@@ -60,6 +73,10 @@ class TileUtils {
     column.toFloat / math.pow(2, zoom) * 360.0 - 180.0
   }
 
+  def tile_from_tile_id_str(tileId: String): Tile = {
+    tile_from_tile_id(new TileId(tileId))
+  }
+
   def tile_from_tile_id(tileId: TileId): Tile = {
     new Tile(tileId, latitude_from_row(tileId.row, tileId.zoom),
       latitude_from_row(tileId.row + 1, tileId.zoom), longitude_from_column(tileId.column, tileId.zoom),
@@ -67,8 +84,32 @@ class TileUtils {
   }
 
   def tile_id_from_row_column(row: Int, column: Int, zoom: Int ): TileId = {
-    val tileStr = printf("%d_%d_%d", zoom, row, column)
-    new TileId(tileStr.toString)
+    new TileId(f"$zoom%d_$row%d_$column%d")
+  }
+
+  def map_to_zoom_render_tile(tileTuple: (String, Int)): (String, (String, Int)) = {
+    val tile = tile_from_tile_id_str(tileTuple._1)
+    //return the tile id 5 levels deep from tileTuple which will be used to render in the heatmap
+    (tile_id_from_lat_long(tile.centerLatitude(), tile.centerLongitude(), tile.tileId.zoom - DETAIL_ZOOM_DELTA).tileId,
+      (tile.tileId.tileId, tileTuple._2))
+  }
+
+  def tile_id_mapper_with_zoom(location: (Double, Double)): List[(String, (String, Int))] = {
+    (for (zoom <- MIN_ZOOM to MAX_ZOOM)
+      yield (tile_id_from_lat_long(location._1, location._2, zoom).tileId,
+        (tile_id_from_lat_long(location._1, location._2, zoom + DETAIL_ZOOM_DELTA).tileId, 1))).toList
+  }
+
+  def reduceMutableZoomTileMap(zoomTileTuple: (mutable.Map[String, Int], Int), tileEntry: (String, Int)
+                              ): (mutable.Map[String, Int], Int) = {
+    val zoomTileId = tileEntry._1
+    val zoomTileMap = zoomTileTuple._1
+    zoomTileMap(zoomTileId) += 1
+    (zoomTileMap, zoomTileTuple._2 + 1)
+  }
+
+  def mergeTilePartitionRdds(p1: (mutable.Map[String, Int], Int), p2: (mutable.Map[String, Int], Int)): (mutable.Map[String, Int], Int) = {
+    (p1._1 ++ p2._1.map{ case (k,v) => k -> (v + p1._1.getOrElse(k,0)) }, p1._2 + p2._2)
   }
 
   def parent_id(tile: Tile): TileId = {
