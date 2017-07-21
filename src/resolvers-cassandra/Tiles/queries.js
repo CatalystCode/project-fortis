@@ -79,6 +79,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
 
+    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT tilex, tiley, tilez, avgsentiment, mentioncount
     FROM fortis.computedtiles
@@ -190,6 +191,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
 
+    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT mentionCount, topic
     FROM populartopics
