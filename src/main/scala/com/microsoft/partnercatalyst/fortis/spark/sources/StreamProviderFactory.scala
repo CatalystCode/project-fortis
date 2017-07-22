@@ -45,6 +45,11 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
+          new FacebookCommentStreamFactory
+        )
+      )
+      .withFactories(
+        List(
           new EventHubStreamFactory("Tadaweb", TadawebAdapter.apply,
             new File(settings.progressDir, Constants.EventHubProgressDir).getPath)
         )
