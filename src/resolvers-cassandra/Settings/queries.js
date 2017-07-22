@@ -66,17 +66,10 @@ function cassandraRowToTwitterAccount(row) {
 function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT params FROM fortis.streams WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQueryWithPagination(sourcesByConnector, [CONNECTOR_TWITTER], args.pageState, args.pageSize)
+    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
     .then(result => {
-      const accounts = result.rows.map(cassandraRowToTwitterAccount);
-      resolve({
-        TwitterAccountCollection: {
-          accounts: accounts
-        },
-        pageInfo: {
-          cursor: result.pageState
-        }
-      });
+      const accounts = result.map(cassandraRowToTwitterAccount);
+      resolve({accounts: accounts});
     })
     .catch(reject)
     ;
