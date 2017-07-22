@@ -92,7 +92,7 @@ function makePlacesQueries(args, placeIds) {
 }
 
 /**
- * @param {site: string, originalSource: string, coordinates: number[], mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
+ * @param {site: string, originalSource: string, coordinates: number[], filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byLocation(args, res) { // eslint-disable-line no-unused-vars
@@ -176,7 +176,7 @@ function makeEdgesQueries(args) {
 }
 
 /**
- * @param {site: string, originalSource: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
+ * @param {site: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
@@ -212,7 +212,7 @@ function makeEventQuery(args) {
 }
 
 /**
- * @param {{site: string, messageId: string, dataSources: string[], langCode: string}} args
+ * @param {{site: string, messageId: string}} args
  * @returns {Promise.<Feature>}
  */
 function event(args, res) { // eslint-disable-line no-unused-vars

@@ -9,14 +9,12 @@ const bodyParser = require('body-parser');
 const graphqlHTTP = require('express-graphql');
 
 const EdgesSchema = require('./src/schemas/EdgesSchema');
-const FactsSchema = require('./src/schemas/FactSchema');
 const MessageSchema = require('./src/schemas/MessageSchema');
 const SettingsSchema = require('./src/schemas/SettingsSchema');
 const TileSchema = require('./src/schemas/TilesSchema');
 
 const resolversDirectory = process.env.ENABLE_V2 ? './src/resolvers-cassandra' : './src/resolvers';
 const EdgesResolver = require(`${resolversDirectory}/Edges`);
-const FactsResolver = require(`${resolversDirectory}/Facts`);
 const MessageResolver = require(`${resolversDirectory}/Messages`);
 const SettingsResolver = require(`${resolversDirectory}/Settings`);
 const TileResolver = require(`${resolversDirectory}/Tiles`);
@@ -45,12 +43,6 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use('/api/messages', graphqlHTTP({
   schema: MessageSchema,
   rootValue: MessageResolver,
-  graphiql: true
-}));
-
-app.use('/api/facts', graphqlHTTP({
-  schema: FactsSchema,
-  rootValue: FactsResolver,
   graphiql: true
 }));
 
