@@ -152,32 +152,31 @@ CREATE TABLE popularplaces (
 
 DROP TABLE IF EXISTS eventtags;
 CREATE TABLE eventtags(
-    eventid uuid,
+    eventid text,
     topic text,
     placeid text,
     placecentroidcoordx double,
     placecentroidcoordy double,
-    event_time timestamp,
+    eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY (topic, pipelinekey, event_time, placecentroidcoordx, placecentroidcoordy, eventid)
-) WITH CLUSTERING ORDER BY (pipelinekey DESC, event_time ASC);
+    PRIMARY KEY (topic, pipelinekey, eventtime, placecentroidcoordx, placecentroidcoordy, eventid)
+) WITH CLUSTERING ORDER BY (pipelinekey DESC, eventtime ASC);
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events(
-    eventid uuid,
-    externalid text,
+    eventid text,
     pipelinekey text,
     title text,
     sourceurl text,
     externalsourceid text,
     eventlangcode text,
-    messagebody text,
+    body text,
     computedfeatures frozen<features>,
-    insertion_time timestamp,
-    event_time timestamp,
-    PRIMARY KEY ((pipelinekey, eventid), event_time)
-) WITH CLUSTERING ORDER BY (event_time ASC);
+    insertiontime timestamp,
+    eventtime timestamp,
+    PRIMARY KEY ((pipelinekey, eventid), eventtime)
+) WITH CLUSTERING ORDER BY (eventtime ASC);
 
 /**
  * Allows for fetching trending topics given a pipeline, period and zoom level.
@@ -255,6 +254,14 @@ PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipel
  *****************************************************************************/
 
 CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+    detectedkeywords frozen<set<text>>,
+    detectedplaceids frozen<set<text>>,
+    insertiontime timestamp,
+    eventtime timestamp,
+    PRIMARY KEY ((pipelinekey, eventid), eventtime)
+) WITH CLUSTERING ORDER BY (eventtime ASC);
+
+CREATE CUSTOM INDEX ON events (body) USING 'org.apache.cassandra.index.sasi.SASIIndex'
 WITH OPTIONS = {
 'mode': 'CONTAINS',
 'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
