@@ -7,7 +7,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 class FacebookCommentStreamFactory extends StreamFactory[FacebookComment] {
-  private final val DELIMITER: String = "|"
+  private val DELIMITER: String = "|"
 
   /**
     * Creates a DStream for a given connector config iff the connector config is supported by the stream factory.
@@ -17,7 +17,7 @@ class FacebookCommentStreamFactory extends StreamFactory[FacebookComment] {
     * @return A partial function for transforming a connector config
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[FacebookComment]] = {
-    case ConnectorConfig("FacebookPage", params) =>
+    case ConnectorConfig("Facebook", params) =>
       val facebookAuth = FacebookAuth(params("appId"), params("appSecret"), params("accessToken"))
       val pageIds = Option(params("pageIds")) match {
         case None => Set()

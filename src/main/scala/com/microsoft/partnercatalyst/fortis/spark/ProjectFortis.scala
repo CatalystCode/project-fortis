@@ -77,7 +77,8 @@ object ProjectFortis extends App {
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
       pipeline("twitter", new TwitterAnalyzer),
-      pipeline("facebook", new FacebookPostAnalyzer),
+      pipeline("facebookposts", new FacebookPostAnalyzer),
+      pipeline("facebookcomments", new FacebookCommentAnalyzer),
       pipeline("instagram", new InstagramAnalyzer),
       pipeline("tadaweb", new TadawebAnalyzer),
       pipeline("customevents", new CustomEventAnalyzer),
@@ -174,7 +175,7 @@ object ProjectFortis extends App {
         ),
         "facebook" -> List(
           ConnectorConfig(
-            "FacebookPage",
+            "Facebook",
             Map(
               "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
               "appId" -> System.getenv("FACEBOOK_APP_ID"),
