@@ -9,8 +9,8 @@ USE fortis;
 
 DROP TYPE IF EXISTS computedgender;
 CREATE TYPE computedgender (
-    male_mentions int,
-    female_mentions int
+    male_mentions counter,
+    female_mentions counter
 );
 
 DROP TYPE IF EXISTS computedentities;
@@ -18,7 +18,7 @@ CREATE TYPE computedentities (
     name text,
     externalsource text,
     externalrefid text,
-    count float
+    count counter
 );
 
 DROP TYPE IF EXISTS features;
@@ -91,9 +91,9 @@ DROP TABLE IF EXISTS conjunctivetopics;
 CREATE TABLE conjunctivetopics (
     topic text,
     conjunctivetopic text,
-    mentions int,
-    PRIMARY KEY(topic, mentions, conjunctivetopic)
-) WITH CLUSTERING ORDER BY(mentions DESC);
+    mentioncount counter,
+    PRIMARY KEY(topic, mentioncount, conjunctivetopic)
+) WITH CLUSTERING ORDER BY(mentioncount DESC);
 
 DROP TABLE IF EXISTS populartopics;
 CREATE TABLE populartopics (
@@ -107,7 +107,7 @@ CREATE TABLE populartopics (
     tiley int,
     externalsourceid text,
     topic text,
-    mentionCount int,
+    mentioncount counter,
     insertion_time timestamp,
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
@@ -123,7 +123,7 @@ CREATE TABLE computedtiles (
     tilex int,
     tiley int,
     externalsourceid text,
-    mentioncount int,
+    mentioncount counter,
     avgsentiment float,
     heatmap text,
     placeids frozen<set<text>>,
@@ -145,7 +145,7 @@ CREATE TABLE popularplaces (
     placecentroidcoordx double,
     placecentroidcoordy double,
     conjunctiontopics tuple<text, text, text>,
-    mentioncount int,
+    mentioncount counter,
     insertion_time timestamp,
     PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopics), mentioncount, periodstartdate, periodenddate, placecentroidcoordx, placecentroidcoordy)
 ) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, placecentroidcoordx DESC, placecentroidcoordy DESC);
