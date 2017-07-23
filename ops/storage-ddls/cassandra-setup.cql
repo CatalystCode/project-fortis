@@ -253,14 +253,6 @@ PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipel
  * Indices
  *****************************************************************************/
 
-CREATE CUSTOM INDEX ON events (messagebody) USING 'org.apache.cassandra.index.sasi.SASIIndex'
-    detectedkeywords frozen<set<text>>,
-    detectedplaceids frozen<set<text>>,
-    insertiontime timestamp,
-    eventtime timestamp,
-    PRIMARY KEY ((pipelinekey, eventid), eventtime)
-) WITH CLUSTERING ORDER BY (eventtime ASC);
-
 CREATE CUSTOM INDEX ON events (body) USING 'org.apache.cassandra.index.sasi.SASIIndex'
 WITH OPTIONS = {
 'mode': 'CONTAINS',
