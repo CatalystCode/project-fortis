@@ -3,28 +3,28 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, GregorianCalendar, TimeZone}
 
-case class Period(val timestamp: Long, val periodType: PeriodType) extends Serializable {
+case class Period(timestamp: Long, periodType: PeriodType) extends Serializable {
   override def toString: String = periodType.formatTimestamp(this.timestamp)
 }
 
 object PeriodType {
 
-  case object Minute extends PeriodType(60 * 1000, "yyyy-MM-dd HH:mm", Set())
+  val Minute = PeriodType("minute", 60 * 1000, "yyyy-MM-dd HH:mm", Set())
 
-  case object Hour extends PeriodType(60L * Minute.sizeInMilliseconds, "yyyy-MM-dd HH", Set(Calendar.MINUTE))
+  val Hour = PeriodType("hour", 60L * Minute.sizeInMilliseconds, "yyyy-MM-dd HH", Set(Calendar.MINUTE))
 
-  case object Day extends PeriodType(24L * Hour.sizeInMilliseconds, "yyyy-MM-dd", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY))
+  val Day = PeriodType("day", 24L * Hour.sizeInMilliseconds, "yyyy-MM-dd", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY))
 
-  case object Month extends PeriodType(30L * Day.sizeInMilliseconds, "yyyy-MM", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH))
+  val Week = PeriodType("week", 7L * Day.sizeInMilliseconds, "yyyy-w", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.WEEK_OF_YEAR))
 
-  case object Year extends PeriodType(12L * Month.sizeInMilliseconds, "yyyy", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH, Calendar.MONTH))
+  val Month = PeriodType("month", 30L * Day.sizeInMilliseconds, "yyyy-MM", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH))
+
+  val Year = PeriodType("year", 12L * Month.sizeInMilliseconds, "yyyy", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH, Calendar.MONTH))
 
   val all: Set[PeriodType] = Set(Minute, Hour, Day, Month, Year)
 }
 
-sealed class PeriodType(val sizeInMilliseconds: Long, format: String, truncateFields: Set[Int]) extends Serializable {
-
-  val periodTypeName: String = this.getClass.getSimpleName.replace("$", "").toLowerCase
+case class PeriodType(periodTypeName: String, sizeInMilliseconds: Long, format: String, truncateFields: Set[Int]) extends Serializable {
 
   def formatTimestamp(timestamp: Long, timeZone: Option[TimeZone] = None): String = {
     format(new Date(timestamp), timeZone)
@@ -68,4 +68,3 @@ sealed class PeriodType(val sizeInMilliseconds: Long, format: String, truncateFi
   }
 
 }
-

@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 
 import org.scalatest.FlatSpec
 
-class PeriodTypeSpec extends FlatSpec {
+class PeriodSpec extends FlatSpec {
 
   "Minute" should "format to omit seconds" in {
     val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
