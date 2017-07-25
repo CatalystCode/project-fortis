@@ -36,7 +36,7 @@ class ComputedTilesToComputedTrendsSpec extends FlatSpec with BeforeAndAfter {
     assert(trends(0).score.toInt == 100)
   }
 
-  "Downward trend" should "result in negative score" in {
+  it should "result in negative score for downward trend" in {
     val tiles = Seq(
       ComputedTile(2010, 0, PeriodType.Year.periodTypeName, "2010", "twitter", 8, 1, 2, "MarkHamillHimself", 100, 0, "", Seq(), 0, Tuple3(Some("europe"), None, None)),
       ComputedTile(2011, 0, PeriodType.Year.periodTypeName, "2011", "twitter", 8, 1, 2, "MarkHamillHimself", 90, 0, "", Seq(), 0, Tuple3(Some("europe"), None, None)),
@@ -52,7 +52,7 @@ class ComputedTilesToComputedTrendsSpec extends FlatSpec with BeforeAndAfter {
     assert(trends(0).score.toInt == -10)
   }
 
-  "No trend" should "result in zero score" in {
+  it should "result in zero score for flat trend" in {
     val tiles = Seq(
       ComputedTile(2010, 0, PeriodType.Year.periodTypeName, "2010", "twitter", 8, 1, 2, "MarkHamillHimself", 100, 0, "", Seq(), 0, Tuple3(Some("europe"), None, None)),
       ComputedTile(2011, 0, PeriodType.Year.periodTypeName, "2011", "twitter", 8, 1, 2, "MarkHamillHimself", 90, 0, "", Seq(), 0, Tuple3(Some("europe"), None, None)),

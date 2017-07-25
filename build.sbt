@@ -14,6 +14,8 @@ scalacOptions ++= Seq(
 
 val sparkVersion = "2.1.0"
 
+parallelExecution in Test := false
+
 // Dependencies provided by the Spark distro
 libraryDependencies ++= Seq(
   "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2",

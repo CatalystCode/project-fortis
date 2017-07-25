@@ -26,7 +26,7 @@ case class DefaultComputedTilesDAOConfig() extends ComputedTilesDAOConfig {
 class ComputedTilesDAO(config: ComputedTilesDAOConfig = DefaultComputedTilesDAOConfig()) extends ComputedTilesSource {
 
   override def latestTiles(sc: SparkContext,
-                           topics: Set[String],
+                           topics: Set[(Option[String], Option[String], Option[String])],
                            periodType: PeriodType,
                            referenceTime: Long = new Date().getTime,
                            tilez: Seq[Int] = (8 to 16)): RDD[ComputedTile] = {
