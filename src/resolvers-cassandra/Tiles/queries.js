@@ -4,43 +4,13 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { withRunTime } = require('../shared');
+const { parseFromToDate, withRunTime, toConjunctionTopics, toPipelineKey } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { makeSet } = require('../../utils/collections');
 
 function tilesForBbox(bbox, zoomLevel) {
   const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
   return geotile.tileIdsForBoundingBox(fence, zoomLevel).map(geotile.decodeTileId);
-}
-
-function toPipelineKey(sourceFilter) {
-  if (!sourceFilter || !sourceFilter.length) {
-    return 'all';
-  }
-
-  if (sourceFilter.length > 1) {
-    console.warn(`Only one source filter supported, ignoring: ${sourceFilter.slice(1).join(', ')}`);
-  }
-
-  return sourceFilter[0];
-}
-
-function toConjunctionTopics(mainEdge, filteredEdges) {
-  if (!filteredEdges || !filteredEdges.length) {
-    return [mainEdge, null, null];
-  }
-
-  const extraFilters = filteredEdges.slice(0, 2);
-  if (filteredEdges.length > 2) {
-    console.warn(`Only two filtered edges supported, ignoring: ${filteredEdges.slice(2).join(', ')}`);
-  }
-
-  const selectedFilters = [mainEdge].concat(extraFilters).sort();
-  while (selectedFilters.length < 3) {
-    selectedFilters.push(null);
-  }
-
-  return selectedFilters;
 }
 
 /**
@@ -72,6 +42,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.filteredEdges) return reject('No secondary edges for keyword filter specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch tiles specified');
 
+    const { periodType, period, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
 
     // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
@@ -90,14 +61,14 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     `.trim();
 
     const params = [
-      '', // TODO periodtype
+      periodType,
       toConjunctionTopics(args.mainEdge, args.filteredEdges),
       args.zoomLevel,
-      '', // TODO period
+      period,
       makeSet(tiles, tile => tile.row),
       makeSet(tiles, tile => tile.column),
-      args.fromDate,
-      args.toDate,
+      fromDate,
+      toDate,
       toPipelineKey(args.sourceFilter)
     ];
 
@@ -184,6 +155,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch edges specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
 
+    const { periodType, period, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
 
     // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
@@ -203,16 +175,16 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     `.trim();
 
     const params = [
-      '', // TODO periodtype
+      periodType,
       toPipelineKey(args.sourceFilter),
-      '', // FIXME this doesn't have externalsourceid
+      'all', // externalsourceid
       args.zoomLevel,
       '', // FIXME this doesn't have topic
-      '', // TODO period
+      period,
       makeSet(tiles, tile => tile.row),
       makeSet(tiles, tile => tile.column),
-      args.fromDate,
-      args.toDate
+      fromDate,
+      toDate
     ];
 
     cassandraConnector.executeQuery(query, params)

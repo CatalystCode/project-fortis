@@ -8,6 +8,17 @@ function makeMap(iterable, keyFunc, valueFunc) {
   return map;
 }
 
+function makeMultiMap(iterable, keyFunc, valueFunc) {
+  const map = {};
+  iterable.forEach(item => {
+    const key = keyFunc(item);
+    let value = map[key];
+    if (!value) value = map[key] = [];
+    value.push(valueFunc(item));
+  });
+  return map;
+}
+
 function makeSet(iterable, func) {
   const set = new Set();
   iterable.forEach(item => set.add(func(item)));
@@ -33,5 +44,6 @@ function cross(A, B, C) {
 module.exports = {
   cross: cross,
   makeMap: makeMap,
+  makeMultiMap,
   makeSet: makeSet
 };
