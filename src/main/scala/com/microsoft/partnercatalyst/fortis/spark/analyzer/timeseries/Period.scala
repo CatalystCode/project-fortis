@@ -35,7 +35,8 @@ case class PeriodType(periodTypeName: String, sizeInMilliseconds: Long, format: 
     if (timeZone.isDefined) {
       sdf.setTimeZone(timeZone.get)
     }
-    sdf.format(date)
+    val formattedDate = sdf.format(date)
+    this.periodTypeName + "-" + formattedDate
   }
 
   def truncateTimestamp(timestamp: Long, timeZone: Option[TimeZone] = None): Long = {
