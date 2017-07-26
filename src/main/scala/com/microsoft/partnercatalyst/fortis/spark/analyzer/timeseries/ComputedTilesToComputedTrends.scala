@@ -16,9 +16,9 @@ object ComputedTilesToComputedTrends {
       val score = regressionResult.getSlope
       if (score.isNaN) Seq[ComputedTrend]()
       else {
-        val latestTile = tiles.sortBy(t => -t.periodstartdate).head
-        val filteredTiles = tiles.filter(t => t.period == latestTile.period)
-        val trends = filteredTiles.map(new ComputedTrend(_, score))
+        val latestTile = tiles.maxBy(_.periodstartdate)
+        val tilesFromLatestPeriod = tiles.filter(t => t.period == latestTile.period)
+        val trends = tilesFromLatestPeriod.map(new ComputedTrend(_, score))
         trends
       }
     })

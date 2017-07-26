@@ -166,4 +166,12 @@ class ComputedTilesToComputedTrendsSpec extends FlatSpec with BeforeAndAfter {
     val trends = ComputedTilesToComputedTrends(sc.makeRDD(tiles)).collect()
     assert(trends.map(_.score.toInt).sorted.toList == List(20, 20, 20))
   }
+
+  it should "format groups" in {
+    val group = ComputedTilesToComputedTrends.tileGroup(
+      ComputedTile(2017, 0, PeriodType.Year.periodTypeName, "2017", "twitter", 10, 1, 2, "HamillHimself", 150, 0, "", Seq(), 0, Tuple3(Some("europe"), None, None))
+    )
+    assert(group == "(twitter,(Some(europe),None,None),10)")
+  }
+
 }
