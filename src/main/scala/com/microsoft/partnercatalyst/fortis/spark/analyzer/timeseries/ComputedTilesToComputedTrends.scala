@@ -7,7 +7,7 @@ import org.apache.spark.rdd.RDD
 object ComputedTilesToComputedTrends {
 
   def apply(computedTiles: RDD[ComputedTile]): RDD[ComputedTrend] = {
-    val groupedTiles = computedTiles.groupBy(t=>t.pipelinekey + t.conjunctiontopics._1.get + t.tilez.toString)
+    val groupedTiles = computedTiles.groupBy(tileGroup)
     groupedTiles.flatMap[ComputedTrend]((group) => {
       val tiles = group._2.toSeq
 
@@ -22,6 +22,14 @@ object ComputedTilesToComputedTrends {
         trends
       }
     })
+  }
+
+  def tileGroup(computedTile: ComputedTile): String = {
+    (
+      computedTile.pipelinekey,
+      computedTile.conjunctiontopics.toString,
+      computedTile.tilez.toString
+    ).toString()
   }
 
   def linearRegression(computedTiles: Seq[ComputedTile]): SimpleRegression = {
