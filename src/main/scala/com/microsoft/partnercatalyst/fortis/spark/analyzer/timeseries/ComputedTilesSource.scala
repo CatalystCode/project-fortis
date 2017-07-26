@@ -8,8 +8,8 @@ import org.apache.spark.rdd.RDD
 
 trait ComputedTilesSource extends Serializable {
   def latestTiles(sc: SparkContext,
-                  topics: Set[(Option[String], Option[String], Option[String])],
+                  topics: (Option[String], Option[String], Option[String]),
                   periodType: PeriodType,
                   referenceTime: Long = new Date().getTime,
-                  tilez: Seq[Int] = (1 to 16)): RDD[ComputedTile]
+                  tilez: Int): RDD[ComputedTile]
 }
