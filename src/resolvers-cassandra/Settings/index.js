@@ -4,7 +4,8 @@ const mutations = require('./mutations');
 const queries = require('./queries');
 
 module.exports = {
-  createOrReplaceSite: mutations.createOrReplaceSite,
+  createSite: mutations.createSite,
+  removeSite: mutations.removeSite,
   modifyFacebookPages: mutations.modifyFacebookPages,
   removeFacebookPages: mutations.removeFacebookPages,
   modifyTrustedTwitterAccounts: mutations.modifyTrustedTwitterAccounts,

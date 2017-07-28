@@ -2,6 +2,7 @@
 
 const Promise = require('promise');
 const request = require('request');
+const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 /**
  * @param {string} uri
@@ -27,5 +28,5 @@ function fetchJson(uri) {
 }
 
 module.exports = {
-  fetchJson: fetchJson
+  fetchJson: trackDependency(fetchJson, 'BlobStorage', 'fetchJson')
 };

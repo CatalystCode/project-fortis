@@ -3,9 +3,10 @@
 const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
+const blobStorageClient = require('../../clients/storage/BlobStorageClient');
 const withRunTime = require('../shared').withRunTime;
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
-
+const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 const STREAM_PIPELINE_TWITTER = 'twitter';
 const STREAM_CONNECTOR_TWITTER = 'Twitter';
 
@@ -13,11 +14,130 @@ const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
-/**
- * @param {{input: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
- * @returns {Promise.<{name: string, properties: {targetBBox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}
- */
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+    return reject(
+      'This API call is no longer supported. ' +
+      'Its functionality has been separated into createSite and removeSite.'
+    );
+  });
+}
+
+function _insertTopics(siteType) {
+  return new Promise((resolve, reject) => {
+    if(!siteType || !siteType.length) {
+      return reject('insertTopics: siteType is not defined');
+    }
+    const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+    blobStorageClient.fetchJson(uri)
+      .then(response => {
+        const mutations = response.map(topic => {
+          return {
+            query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertion_time) 
+                    VALUES (?, ?, ?, ?, toTimestamp(now()));`,
+            params: [uuid(), topic.topic, topic.lang_code, topic.translations]
+          };
+        });
+        return mutations;
+      })
+      .then(mutations => {
+        cassandraConnector.executeBatchMutations(mutations)
+        .then(() => {
+          resolve({
+            numTopicsInserted: mutations.length
+          });
+        })
+        .catch(reject);
+      })
+      .catch(reject);
+  });
+}
+
+const insertTopics = trackEvent(_insertTopics, 'Settings.Topics.Insert', (response, err) => ({numTopicsInserted: err ? 0 : response.numTopicsInserted}));
+
+/**
+ * @param {{input: {siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
+ * @returns {Promise}
+ */
+function createSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const siteType = args && args.input && args.input.siteType;
+    if(!siteType || !siteType.length) {
+      return reject(`siteType for sitename ${args.input.name} is not defined`);
+    }
+
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?;', [args.input.name])
+      .then(rows => {
+        if (!rows || !rows.length) {
+          insertTopics(siteType)
+            .then(() => {
+              return cassandraConnector.executeBatchMutations([{
+                query: `INSERT INTO fortis.sitesettings (
+                  geofence,
+                  defaultzoom,
+                  logo,
+                  title,
+                  sitename,
+                  languages,
+                  insertion_time
+                ) VALUES (?,?,?,?,?,?,toTimestamp(now()))`,
+                params: [
+                  args.input.targetBbox,
+                  args.input.defaultZoomLevel,
+                  args.input.logo,
+                  args.input.title,
+                  args.input.name,
+                  args.input.supportedLanguages
+                ]
+              }]);
+            })
+            .then(() => { 
+              resolve({
+                name: args.input.name,
+                properties: {
+                  targetBbox: args.input.targetBbox,
+                  defaultZoomLevel: args.input.defaultZoomLevel,
+                  logo: args.input.logo,
+                  title: args.input.title,
+                  defaultLocation: args.input.defaultLocation,
+                  supportedLanguages:args.input.supportedLanguages
+                }
+              });
+            })
+            .catch(reject);
+        } 
+        else if (rows.length == 1) return reject(`Site with sitename ${args.input.name} already exists.`);
+        else return reject(`(${rows.length}) number of sites with sitename ${args.input.name} already exist.`);
+      })
+      .catch(reject);
+  });
+}
+
+/**
+ * @param {{input: {siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
+ * @returns {Promise}
+ */
+function removeSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    cassandraConnector.executeBatchMutations([{
+      query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?;',
+      params: [args.input.name]
+    }])
+    .then(() => { 
+      resolve({
+        name: args.input.name,
+        properties: {
+          targetBbox: args.input.targetBbox,
+          defaultZoomLevel: args.input.defaultZoomLevel,
+          logo: args.input.logo,
+          title: args.input.title,
+          defaultLocation: args.input.defaultLocation,
+          supportedLanguages: args.input.supportedLanguages
+        }
+      });
+    })
+    .catch(reject);
+  });
 }
 
 function facebookPagePrimaryKeyValuesToRowKey(values) {
@@ -296,7 +416,9 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  createOrReplaceSite: trackEvent(createOrReplaceSite, 'createOrReplaceSite'),
+  createOrReplaceSite: createOrReplaceSite,
+  createSite: trackEvent(createSite, 'createSite'),
+  removeSite: trackEvent(removeSite, 'removeSite'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
   modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),

@@ -67,8 +67,8 @@ function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT params FROM fortis.streams WHERE connector = ? ALLOW FILTERING';
     cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
-    .then(rows => {
-      const accounts = rows.map(cassandraRowToTwitterAccount);
+    .then(result => {
+      const accounts = result.map(cassandraRowToTwitterAccount);
       resolve({accounts: accounts});
     })
     .catch(reject)

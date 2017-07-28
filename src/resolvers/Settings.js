@@ -20,6 +20,22 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function createSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+    return reject(
+      'This API call is supported in v2. '
+    );
+  });
+}
+
+function removeSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+    return reject(
+      'This API call is supported in v2. '
+    );
+  });
+}
+
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   const siteDefintion = args.input;
   return new Promise((resolve, reject) => {
@@ -268,6 +284,8 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 module.exports = {
   sites: sites,
+  createSite: createSite,
+  removeSite: removeSite,
   createOrReplaceSite: createOrReplaceSite,
   modifyFacebookPages: modifyFacebookPages,
   modifyTrustedTwitterAccounts: modifyTrustedTwitterAccounts,

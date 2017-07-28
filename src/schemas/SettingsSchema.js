@@ -11,6 +11,8 @@ module.exports = graphql.buildSchema(`
   }
 
   type Mutation {
+    createSite(input: SiteDefinition!): Site
+    removeSite(input: SiteDefinition!): Site
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     createOrReplaceSite(input: SiteDefinition!): Site
@@ -47,7 +49,7 @@ module.exports = graphql.buildSchema(`
 
   type TwitterAccountCollection {
     runTime: String,
-    accounts: [TwitterAccount],
+    accounts: [TwitterAccount]
   }
 
   type TrustedTwitterAccountCollection {
@@ -101,6 +103,7 @@ module.exports = graphql.buildSchema(`
   }
 
   input SiteDefinition {
+    siteType: String,
     targetBbox: [Float],
     defaultZoomLevel: Int,
     logo: String,

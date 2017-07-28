@@ -7,6 +7,7 @@ const chunk = require('lodash/chunk');
 const flatten = require('lodash/flatten');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
+const FETCH_SIZE = process.env.FETCH_SIZE || 1000;
 const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
 const MAX_CONCURRENT_BATCHES = process.env.MAX_CONCURRENT_BATCHES || 50;
 const distance = cassandra.types.distance;
@@ -20,6 +21,11 @@ const options = {
       [distance.local]: CORE_CONNECTIONS_PER_HOST_LOCAL,
       [distance.remote]: CORE_CONNECTIONS_PER_HOST_REMOTE
     } 
+  },
+  queryOptions: {
+    autoPage: true,
+    prepare: true,
+    fetchSize: FETCH_SIZE
   }
 };
 const client = new cassandra.Client(options);
@@ -49,11 +55,8 @@ function executeBatchMutations(mutations) {
       }
     },
     (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
+      if (err) reject(err);
+      else resolve({numBatchMutations: chunkedMutations.length});
     });
   });
 }
@@ -61,17 +64,29 @@ function executeBatchMutations(mutations) {
 /**
  * @param {string} query
  * @param {string[]} params
+ * @param {{fetchSize: int}} [options]
  * @returns {Promise.<object[]>}
  */
-function executeQuery(query, params) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    client.execute(query, params, { prepare: true }, (err, result) => {
-      if (err) {
-        return reject(err);
-      } else {
-        return resolve(result.rows);
-      }
-    });
+function executeQuery(query, params, options) {
+  return new Promise((resolve, reject) => {
+    try {
+      const rows = [];
+      const stream = client.stream(query, params, options)
+        .on('readable', () => {
+          let row;
+          while((row = stream.read()) != undefined) {
+            rows.push(row);
+          }
+        })
+        .on('error', err => {
+          if (err) reject(err);
+        })
+        .on('end', () => {
+          resolve(rows);
+        });
+    } catch (exception) {
+      reject(exception);
+    }
   });
 }
 
