@@ -55,7 +55,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 
       const tagsQuery = `
       SELECT eventid
-      FROM eventtags
+      FROM fortis.eventtags
       WHERE topic IN ?
       AND pipelinekey = ?
       AND event_time = ?
@@ -81,7 +81,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 
         const eventsQuery = `
         SELECT *
-        FROM events
+        FROM fortis.events
         WHERE pipelinekey = ?
         AND eventid IN ?
         AND fulltext LIKE ?
@@ -116,7 +116,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
 
     const tagsQuery = `
     SELECT eventid, topic
-    FROM eventtags
+    FROM fortis.eventtags
     WHERE topic IN ?
     AND pipelinekey = ?
     AND event_time = ?
@@ -138,7 +138,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
 
       const eventQuery = `
       SELECT *
-      FROM events
+      FROM fortis.events
       WHERE pipelinekey = ?
       AND eventid IN ?
       `.trim();
@@ -169,7 +169,7 @@ function event(args, res) { // eslint-disable-line no-unused-vars
 
     const eventQuery = `
     SELECT *
-    FROM events
+    FROM fortis.events
     WHERE eventid = ?
     AND pipelinekey = 'all'
     `.trim();
@@ -185,7 +185,7 @@ function event(args, res) { // eslint-disable-line no-unused-vars
 
       const tagsQuery = `
       SELECT topic
-      FROM eventtags
+      FROM fortis.eventtags
       WHERE pipelinekey = 'all'
       AND topic = ?
       AND pipelinekey = ?

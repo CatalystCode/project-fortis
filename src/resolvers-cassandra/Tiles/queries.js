@@ -153,7 +153,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT mentionCount, topic
-    FROM populartopics
+    FROM fortis.populartopics
     WHERE periodtype = ?
     AND pipelinekey = ?
     AND externalsourceid = ?

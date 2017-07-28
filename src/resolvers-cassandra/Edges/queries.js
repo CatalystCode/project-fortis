@@ -91,7 +91,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
 
     const query = `
     SELECT placename, placeid, mentioncount
-    FROM popularplaces
+    FROM fortis.popularplaces
     WHERE period = ?
     AND periodtype = ?
     AND pipelinekey = ?
@@ -133,7 +133,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
     // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT conjunctiontopics, periodstartdate, mentioncount
-    FROM timeseries
+    FROM fortis.timeseries
     WHERE periodtype = ?
     AND conjunctiontopics = ?
     AND tilez = ?
@@ -187,7 +187,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT placename, mentioncount, pipelinekey
-    FROM popularsources
+    FROM fortis.popularsources
     WHERE periodtype = ?
     AND conjunctiontopics = ?
     AND tilez = ?
