@@ -60,6 +60,14 @@ function toConjunctionTopics(mainEdge, filteredEdges) {
   return selectedFilters;
 }
 
+function parseTimespan(timespan) {
+  // TODO: implement
+  return {
+    period: timespan,
+    periodType: ''
+  };
+}
+
 function parseFromToDate(fromDate, toDate) {
   // TODO: implement
   return {
@@ -72,6 +80,7 @@ function parseFromToDate(fromDate, toDate) {
 
 module.exports = {
   parseFromToDate,
+  parseTimespan,
   toPipelineKey,
   toConjunctionTopics,
   allSources: allSources,

@@ -3,8 +3,8 @@
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { withRunTime, toPipelineKey } = require('../shared');
-const { makeSet } = require('../../utils/collections');
+const { parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
+const { makeSet, makeMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 /**
@@ -86,6 +86,40 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, coordinates: number[], population: number}>}>}
  */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const { period, periodType } = parseTimespan(args.timespan);
+
+    const query = `
+    SELECT placename, placeid, mentioncount
+    FROM popularplaces
+    WHERE period = ?
+    AND periodtype = ?
+    AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND conjunctiontopics = ?
+    `.trim();
+
+    const params = [
+      period,
+      periodType,
+      toPipelineKey(args.sourceFilter),
+      '', // FIXME: no externalsourceid available
+      '' // FIXME: no conjunctiontopics available
+    ];
+
+    return cassandraConnector.executeQuery(query, params)
+    .then(rows => {
+      featureServiceClient.fetchById(makeSet(rows, row => row.placeid))
+      .then(features => {
+        const placeidToBbox = makeMap(features, feature => feature.id, feature => feature.bbox);
+        resolve({
+          edges: rows.map(row => ({name: row.placename, mentions: row.mentioncount, coordinates: placeidToBbox[row.placeid]}))
+        });
+      })
+      .catch(reject);
+    })
+    .catch(reject);
+  });
 }
 
 /**
@@ -100,6 +134,46 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
  */
 function topSources(args,res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+
+    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
+    const query = `
+    SELECT placename, mentioncount, pipelinekey
+    FROM popularsources
+    WHERE periodtype = ?
+    AND conjunctiontopics = ?
+    AND tilez = ?
+    AND externalsourceid = ?
+    AND period = ?
+    AND tilex IN ?
+    AND tiley IN ?
+    AND periodstartdate >= ?
+    AND periodenddate <= ?
+    AND pipelinekey = ?
+    `.trim();
+
+    const params = [
+      periodType,
+      toConjunctionTopics(args.mainTerm),
+      0, // FIXME: no tilez available
+      '', // FIXME: no externalsourceid available
+      period,
+      [], // FIXME: no tilex available
+      [], // FIXME: no tiley available
+      fromDate,
+      toDate,
+      toPipelineKey(args.sourceFilter)
+    ];
+
+    return cassandraConnector.executeQuery(query, params)
+    .then(rows => {
+      resolve({
+        sources: rows.map(row => ({Name: row.placename, Count: row.mentioncount, Source: row.pipelinekey}))
+      });
+    })
+    .catch(reject);
+  });
 }
 
 module.exports = {
