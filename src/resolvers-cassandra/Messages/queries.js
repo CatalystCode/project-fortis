@@ -84,11 +84,13 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
         FROM events
         WHERE pipelinekey = ?
         AND eventid IN ?
+        AND fulltext LIKE ?
         `.trim();
 
         const eventsParams = [
           toPipelineKey(args.sourceFilter),
-          eventIds
+          eventIds,
+          `%${args.fulltextTerm}%`
         ];
 
         return cassandraConnector.executeQuery(eventsQuery, eventsParams);
