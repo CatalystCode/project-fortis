@@ -175,7 +175,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
       toPipelineKey(args.sourceFilter),
       '', // FIXME no externalsourceid available
       args.zoomLevel,
-      '', // FIXME no topic available
+      args.mainEdge,
       period,
       Math.max(...tilex),
       Math.max(...tiley),
