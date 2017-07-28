@@ -4,7 +4,7 @@ const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
-const { makeSet, makeMap } = require('../../utils/collections');
+const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 /**
@@ -127,6 +127,53 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{labels: Array<{name: string, mentions: number}>, graphData: Array<{date: string, edges: string[], mentions: number[]}>}>}
  */
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+
+    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
+    const query = `
+    SELECT conjunctiontopics, periodstartdate, mentioncount
+    FROM timeseries
+    WHERE periodtype = ?
+    AND conjunctiontopics = ?
+    AND tilez = ?
+    AND period = ?
+    AND tilex IN ?
+    AND tiley IN ?
+    AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND periodstartdate >= ?
+    AND periodenddate <= ?
+    `.trim();
+
+    const params = [
+      periodType,
+      toConjunctionTopics(args.mainTerm),
+      0, // FIXME: no tilez available
+      period,
+      [], // FIXME: no tilex available
+      [], // FIXME: no tiley available
+      toPipelineKey(args.sourceFilter),
+      '', // FIXME: no externalsourceid available
+      fromDate,
+      toDate
+    ];
+
+    const getTopic = row => row.conjunctiontopics[0];
+
+    return cassandraConnector.executeQuery(query, params)
+    .then(rows => {
+      const topicToCounts = makeMultiMap(rows, row => getTopic(row), row => row.mentioncount);
+      const labels = Object.keys(topicToCounts).map(topic => ({name: topic, mentions: topicToCounts[topic].reduce((a, b) => a + b, 0)}));
+      const dateToRows = makeMultiMap(rows, row => row.periodstartdate, row => row);
+      const graphData = Object.keys(dateToRows).map(date => ({date, edges: rows.map(getTopic), mentions: rows.map(row => row.mentioncount)}));
+      resolve({
+        labels,
+        graphData
+      });
+    })
+    .catch(reject);
+  });
 }
 
 /**
