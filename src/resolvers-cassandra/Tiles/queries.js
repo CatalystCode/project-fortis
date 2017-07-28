@@ -44,8 +44,9 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const { periodType, period, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const tilex = makeSet(tiles, tile => tile.row);
+    const tiley = makeSet(tiles, tile => tile.column);
 
-    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT tilex, tiley, tilez, avgsentiment, mentioncount
     FROM fortis.computedtiles
@@ -53,11 +54,10 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     AND conjunctiontopics = ?
     AND tilez = ?
     AND period = ?
-    AND tilex IN ?
-    AND tiley IN ?
-    AND periodstartdate >= ?
-    AND periodenddate <= ?
     AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
+    AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
     `.trim();
 
     const params = [
@@ -65,11 +65,16 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
       toConjunctionTopics(args.mainEdge, args.filteredEdges),
       args.zoomLevel,
       period,
-      makeSet(tiles, tile => tile.row),
-      makeSet(tiles, tile => tile.column),
-      fromDate,
+      toPipelineKey(args.sourceFilter),
+      '', // FIXME no externalsourceid available,
+      Math.max(...tilex),
+      Math.max(...tiley),
       toDate,
-      toPipelineKey(args.sourceFilter)
+      toDate,
+      Math.min(...tilex),
+      Math.min(...tiley),
+      fromDate,
+      fromDate
     ];
 
     cassandraConnector.executeQuery(query, params)
@@ -149,8 +154,9 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const { periodType, period, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const tilex = makeSet(tiles, tile => tile.row);
+    const tiley = makeSet(tiles, tile => tile.column);
 
-    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT mentionCount, topic
     FROM fortis.populartopics
@@ -160,23 +166,25 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     AND tilez = ?
     AND topic = ?
     AND period = ?
-    AND tilex IN ?
-    AND tiley IN ?
-    AND periodstartdate >= ?
-    AND periodenddate <= ?
+    AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
+    AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
     `.trim();
 
     const params = [
       periodType,
       toPipelineKey(args.sourceFilter),
-      'all', // externalsourceid
+      '', // FIXME no externalsourceid available
       args.zoomLevel,
-      '', // FIXME this doesn't have topic
+      '', // FIXME no topic available
       period,
-      makeSet(tiles, tile => tile.row),
-      makeSet(tiles, tile => tile.column),
+      Math.max(...tilex),
+      Math.max(...tiley),
+      toDate,
+      toDate,
+      Math.min(...tilex),
+      Math.min(...tiley),
       fromDate,
-      toDate
+      fromDate
     ];
 
     cassandraConnector.executeQuery(query, params)

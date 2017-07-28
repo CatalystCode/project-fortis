@@ -130,7 +130,6 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
 
-    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT conjunctiontopics, periodstartdate, mentioncount
     FROM fortis.timeseries
@@ -138,12 +137,10 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
     AND conjunctiontopics = ?
     AND tilez = ?
     AND period = ?
-    AND tilex IN ?
-    AND tiley IN ?
     AND pipelinekey = ?
     AND externalsourceid = ?
-    AND periodstartdate >= ?
-    AND periodenddate <= ?
+    AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
+    AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
     `.trim();
 
     const params = [
@@ -151,12 +148,16 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       toConjunctionTopics(args.mainTerm),
       0, // FIXME: no tilez available
       period,
-      [], // FIXME: no tilex available
-      [], // FIXME: no tiley available
       toPipelineKey(args.sourceFilter),
       '', // FIXME: no externalsourceid available
+      Math.max(...[]), // FIXME no tilex available
+      Math.max(...[]), // FIXME no tiley available
+      toDate,
+      toDate,
+      Math.min(...[]), // FIXME no tilex available
+      Math.min(...[]), // FIXME no tiley available
       fromDate,
-      toDate
+      fromDate
     ];
 
     const getTopic = row => row.conjunctiontopics[0];
@@ -184,7 +185,6 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
 
-    // FIXME can't filter by both periodstartdate>= and periodenddate<=, https://stackoverflow.com/a/33879423/3817588
     const query = `
     SELECT placename, mentioncount, pipelinekey
     FROM fortis.popularsources
@@ -193,11 +193,9 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     AND tilez = ?
     AND externalsourceid = ?
     AND period = ?
-    AND tilex IN ?
-    AND tiley IN ?
-    AND periodstartdate >= ?
-    AND periodenddate <= ?
     AND pipelinekey = ?
+    AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
+    AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
     `.trim();
 
     const params = [
@@ -206,11 +204,15 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
       0, // FIXME: no tilez available
       '', // FIXME: no externalsourceid available
       period,
-      [], // FIXME: no tilex available
-      [], // FIXME: no tiley available
-      fromDate,
+      toPipelineKey(args.sourceFilter),
+      Math.max(...[]), // FIXME no tilex available
+      Math.max(...[]), // FIXME no tiley available
       toDate,
-      toPipelineKey(args.sourceFilter)
+      toDate,
+      Math.min(...[]), // FIXME no tilex available
+      Math.min(...[]), // FIXME no tiley available
+      fromDate,
+      fromDate
     ];
 
     return cassandraConnector.executeQuery(query, params)
