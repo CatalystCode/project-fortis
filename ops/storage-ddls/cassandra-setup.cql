@@ -9,8 +9,14 @@ USE fortis;
 
 DROP TYPE IF EXISTS computedgender;
 CREATE TYPE computedgender (
-    male_mentions counter,
-    female_mentions counter
+    male_mentions bigint,
+    female_mentions bigint
+);
+
+DROP TYPE IF EXISTS sentiment;
+CREATE TYPE sentiment (
+    pos_avg float,
+    neg_avg float
 );
 
 DROP TYPE IF EXISTS computedentities;
@@ -18,15 +24,24 @@ CREATE TYPE computedentities (
     name text,
     externalsource text,
     externalrefid text,
-    count counter
+    count bigint
+);
+
+DROP TYPE IF EXISTS place;
+CREATE TYPE place (
+    placeid text,
+    centroidlat double, 
+    centroidlon double
 );
 
 DROP TYPE IF EXISTS features;
 CREATE TYPE features (
-    mentions int,
-    sentiment float,
+    mentions bigint,
+    sentiment frozen<sentiment>,
     gender frozen<computedgender>,
-    entities frozen<set<computedentities>>
+    entities frozen<list<computedentities>>,
+    keywords frozen<list<text>>,
+    places frozen<list<place>>
 );
 
 /******************************************************************************
@@ -39,7 +54,7 @@ CREATE TABLE watchlist(
     topic text,
     lang_code text,
     translations map<text, text>,
-    insertion_time timestamp,
+    insertiontime timestamp,
     PRIMARY KEY (topic, lang_code)
 );
 
@@ -62,7 +77,7 @@ CREATE TABLE sitesettings(
     cogspeechsvctoken text,
     cogvisionsvctoken text,
     cogtextsvctoken text,
-    insertion_time timestamp,
+    insertiontime timestamp,
     PRIMARY KEY (sitename)
 );
 
@@ -83,7 +98,7 @@ CREATE TABLE trustedsources (
    sourcetype text,
    pipelinekey text,
    rank int,
-   insertion_time timestamp,
+   insertiontime timestamp,
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
 
@@ -91,9 +106,9 @@ DROP TABLE IF EXISTS conjunctivetopics;
 CREATE TABLE conjunctivetopics (
     topic text,
     conjunctivetopic text,
-    mentioncount counter,
-    PRIMARY KEY(topic, mentioncount, conjunctivetopic)
-) WITH CLUSTERING ORDER BY(mentioncount DESC);
+    mentioncount bigint,
+    PRIMARY KEY(topic, conjunctivetopic)
+);
 
 DROP TABLE IF EXISTS populartopics;
 CREATE TABLE populartopics (
@@ -108,7 +123,7 @@ CREATE TABLE populartopics (
     externalsourceid text,
     topic text,
     mentioncount counter,
-    insertion_time timestamp,
+    insertiontime timestamp,
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
 
@@ -127,7 +142,7 @@ CREATE TABLE computedtiles (
     avgsentiment float,
     heatmap text,
     placeids frozen<set<text>>,
-    insertion_time timestamp,
+    insertiontime timestamp,
     conjunctiontopics tuple<text, text, text>,
     PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
 );
@@ -140,32 +155,34 @@ CREATE TABLE popularplaces (
     period text,
     pipelinekey text,
     externalsourceid text,
-    placename text,
     placeid text,
-    placecentroidcoordx double,
-    placecentroidcoordy double,
+    centroidlat double,
+    centroidlon double,
     conjunctiontopics tuple<text, text, text>,
-    mentioncount counter,
-    insertion_time timestamp,
-    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopics), mentioncount, periodstartdate, periodenddate, placecentroidcoordx, placecentroidcoordy)
-) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, placecentroidcoordx DESC, placecentroidcoordy DESC);
+    mentioncount bigint,
+    insertiontime timestamp,
+    avgnegsentiment float,
+    avgpossentiment float,
+    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopics), mentioncount, periodstartdate, periodenddate, centroidlat, centroidlon)
+) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, centroidlat DESC, centroidlon DESC);
 
 DROP TABLE IF EXISTS eventtags;
 CREATE TABLE eventtags(
     eventid text,
     topic text,
+    centroidlat double,
+    centroidlon double,
     placeid text,
-    placecentroidcoordx double,
-    placecentroidcoordy double,
     eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY (topic, pipelinekey, eventtime, placecentroidcoordx, placecentroidcoordy, eventid)
+    PRIMARY KEY (topic, pipelinekey, eventtime, centroidlat, centroidlon, eventid)
 ) WITH CLUSTERING ORDER BY (pipelinekey DESC, eventtime ASC);
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events(
     eventid text,
+    batchid uuid,
     pipelinekey text,
     title text,
     sourceurl text,
@@ -175,8 +192,21 @@ CREATE TABLE events(
     computedfeatures frozen<features>,
     insertiontime timestamp,
     eventtime timestamp,
-    PRIMARY KEY ((pipelinekey, eventid), eventtime)
-) WITH CLUSTERING ORDER BY (eventtime ASC);
+    PRIMARY KEY ((pipelinekey, eventid)));
+
+/**
+ * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
+**/
+DROP MATERIALIZED VIEW IF EXISTS eventbatches;
+CREATE MATERIALIZED VIEW eventbatches
+AS SELECT batchid, eventid, pipelinekey, eventtime, computedfeatures, externalsourceid
+   FROM events
+   WHERE batchid IS NOT NULL
+     AND eventid IS NOT NULL
+     AND pipelinekey IS NOT NULL
+     AND eventtime IS NOT NULL
+     AND externalsourceid IS NOT NULL
+PRIMARY KEY (batchid, eventid, pipelinekey);
 
 /**
  * Allows for fetching trending topics given a pipeline, period and zoom level.
