@@ -330,15 +330,6 @@ export const HeatMap = React.createClass({
       this.sentimentGraph.update({weightedSentiment});
   },
 
-  moveMapToNewLocation(location, zoom){
-      const originalLocation = this.map.coordinates;
-
-      if(location && location.length > 0 && location[0] !== originalLocation[0] && location[1] !== originalLocation[1]){
-          this.map.setView([location[1], location[0]], zoom);
-          this.map.coordinates = [location[0], location[1]];
-      } 
-  },
-
   getLeafletBbox(){
       if(this.map){
         const bounds = this.map.getBounds();
@@ -357,15 +348,14 @@ export const HeatMap = React.createClass({
     this.clearMap();
     this.status = "loading";
     const siteKey = this.props.siteKey;
-    this.moveMapToNewLocation(state.selectedLocationCoordinates, this.map.getZoom());
     const zoom = this.map.getZoom();
     const bbox = this.getLeafletBbox();
     let self = this;
     this.weightedMeanValues = [];
 
     if(state.categoryValue.name){
-        SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection, 
-                                bbox, Array.from(state.termFilters), [state.selectedLocationCoordinates], Actions.DataSources(state.dataSource), 
+        SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection,
+                                bbox, Array.from(state.termFilters), undefined, Actions.DataSources(state.dataSource),
                 (error, response, body) => {
                     if (!error && response.statusCode === 200) {
                         self.createLayers(body, bbox)
