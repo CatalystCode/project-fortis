@@ -89,12 +89,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
  */
 function fetchTilesByLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch tiles');
-    if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch tiles');
-
-    // FIXME this requires a zoomLevel so we can query computedtiles by tilez
-    // FIXME this requires a mainEdge so that we can query computedtiles by conjunctiontopics
-    throw new Error('not supported');
+    return reject('Querying by location is no longer supported, please query using the place name instead');
   });
 }
 
@@ -125,10 +120,7 @@ function fetchPlacesByBBox(args, res) { // eslint-disable-line no-unused-vars
  */
 function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args || !args.locations || !args.locations.length) return reject('No locations specified for which to fetch edges');
-    if (args.locations.some(loc => loc.length !== 2)) return reject('Invalid locations specified to fetch edges');
-
-    throw new Error('not supported');
+    return reject('Querying by location is no longer supported, please query using the place name instead');
   });
 }
 
