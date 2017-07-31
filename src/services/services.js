@@ -242,7 +242,7 @@ export const SERVICES = {
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
         let fromDate = dates.fromDate, toDate = dates.toDate;
 
-        const zoomLevel = MAX_ZOOM;
+        const zoomLevel = zoom != null ? zoom : MAX_ZOOM;
 
         console.log(`processing tile request [${mainEdge}, ${timespan}, ${bbox}, ${filteredEdges.join(",")}]`)
         if (bbox && Array.isArray(bbox) && bbox.length === 4) {
