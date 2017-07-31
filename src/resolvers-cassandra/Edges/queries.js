@@ -3,7 +3,7 @@
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
+const { tilesForBbox, parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
 const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
@@ -129,6 +129,11 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    // FIXME no bbox available
+    // FIXME no zoomLevel available
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const tilex = makeSet(tiles, tile => tile.row);
+    const tiley = makeSet(tiles, tile => tile.column);
 
     const query = `
     SELECT conjunctiontopics, periodstartdate, mentioncount
@@ -146,16 +151,16 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
     const params = [
       periodType,
       toConjunctionTopics(args.mainTerm),
-      0, // FIXME: no tilez available
+      args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),
       args.externalSourceId || 'all', // FIXME: no externalsourceid available
-      Math.max(...[]), // FIXME no tilex available
-      Math.max(...[]), // FIXME no tiley available
+      Math.max(...tilex),
+      Math.max(...tiley),
       toDate,
       toDate,
-      Math.min(...[]), // FIXME no tilex available
-      Math.min(...[]), // FIXME no tiley available
+      Math.min(...tilex),
+      Math.min(...tiley),
       fromDate,
       fromDate
     ];
@@ -184,6 +189,11 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 function topSources(args,res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    // FIXME no bbox available
+    // FIXME no zoomLevel available
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const tilex = makeSet(tiles, tile => tile.row);
+    const tiley = makeSet(tiles, tile => tile.column);
 
     const query = `
     SELECT placename, mentioncount, pipelinekey
@@ -201,16 +211,16 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     const params = [
       periodType,
       toConjunctionTopics(args.mainTerm),
-      0, // FIXME: no tilez available
+      args.zoomLevel,
       args.externalSourceId || 'all', // FIXME: no externalsourceid available
       period,
       toPipelineKey(args.sourceFilter),
-      Math.max(...[]), // FIXME no tilex available
-      Math.max(...[]), // FIXME no tiley available
+      Math.max(...tilex),
+      Math.max(...tiley),
       toDate,
       toDate,
-      Math.min(...[]), // FIXME no tilex available
-      Math.min(...[]), // FIXME no tiley available
+      Math.min(...tilex),
+      Math.min(...tiley),
       fromDate,
       fromDate
     ];

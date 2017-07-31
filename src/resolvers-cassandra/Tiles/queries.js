@@ -4,14 +4,9 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { parseFromToDate, withRunTime, toConjunctionTopics, toPipelineKey } = require('../shared');
+const { tilesForBbox, parseFromToDate, withRunTime, toConjunctionTopics, toPipelineKey } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { makeSet } = require('../../utils/collections');
-
-function tilesForBbox(bbox, zoomLevel) {
-  const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
-  return geotile.tileIdsForBoundingBox(fence, zoomLevel).map(geotile.decodeTileId);
-}
 
 /**
  * @param {{tilex: number, tiley: number, tilez: number, avgsentiment: number, mentioncount: number}} rows

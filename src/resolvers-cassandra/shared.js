@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
+const geotile = require('geotile');
 
 function withRunTime(promiseFunc) {
   function runTimer() {
@@ -60,6 +61,11 @@ function toConjunctionTopics(mainEdge, filteredEdges) {
   return selectedFilters;
 }
 
+function tilesForBbox(bbox, zoomLevel) {
+  const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
+  return geotile.tileIdsForBoundingBox(fence, zoomLevel).map(geotile.decodeTileId);
+}
+
 function parseTimespan(timespan) {
   // TODO: implement
   return {
@@ -83,6 +89,7 @@ module.exports = {
   parseTimespan,
   toPipelineKey,
   toConjunctionTopics,
+  tilesForBbox,
   allSources: allSources,
   withRunTime: withRunTime
 };
