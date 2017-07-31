@@ -90,7 +90,11 @@ export const Dashboard = React.createClass({
   },
 
   getMainEdge() {
-    return this.state.categoryValue && this.state.categoryValue[`name_${this.state.language}`];
+    if (!this.state.categoryValue) {
+      return undefined;
+    }
+
+    return this.state.categoryValue[`name_${this.state.language}`] || this.state.categoryValue.name;
   },
 
   heatmapComponent() {
