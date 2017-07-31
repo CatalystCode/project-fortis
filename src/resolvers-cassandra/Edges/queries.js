@@ -82,7 +82,7 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, timespan: string, sourceFilter: string[]}} args
+ * @param {{site: string, timespan: string, sourceFilter: string[], mainEdge: string}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, coordinates: number[], population: number}>}>}
  */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
@@ -104,7 +104,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       periodType,
       toPipelineKey(args.sourceFilter),
       args.externalSourceId || 'all', // FIXME: no externalsourceid available
-      '' // FIXME: no conjunctiontopics available
+      toConjunctionTopics(args.mainEdge)
     ];
 
     return cassandraConnector.executeQuery(query, params)
