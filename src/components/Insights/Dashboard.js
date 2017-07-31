@@ -85,6 +85,14 @@ export const Dashboard = React.createClass({
     this.setState({heatmapToggleText, newsfeedResizedHeight, watchlistResizedHeight});
   },
 
+  getEdges() {
+    return Array.from(this.state.termFilters);
+  },
+
+  getMainEdge() {
+    return this.state.categoryValue && this.state.categoryValue[`name_${this.state.language}`];
+  },
+
   heatmapComponent() {
     const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
     const {contentAreaHeight, contentRowHeight} = this.state;
@@ -99,10 +107,10 @@ export const Dashboard = React.createClass({
             height={HeatMapFullScreen ? contentAreaHeight : contentRowHeight}
             timespanType={this.state.timespanType}
             datetimeSelection={this.state.datetimeSelection}
-            categoryValue={this.state.categoryValue}
+            categoryValue={this.getMainEdge()}
             language={this.state.language}
             categoryType={this.state.categoryType}
-            edges={Array.from(this.state.termFilters)}
+            edges={this.getEdges()}
             {...this.props}
           />
         </div>
@@ -122,12 +130,12 @@ export const Dashboard = React.createClass({
             infiniteScrollHeight={HeatMapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
             timespanType={this.state.timespanType}
             datetimeSelection={this.state.datetimeSelection}
-            categoryValue={this.state.categoryValue}
+            categoryValue={this.getMainEdge()}
             dataSource={this.state.dataSource}
             categoryType={this.state.categoryType}
             originalSource={this.state.originalSource}
             language={this.state.language}
-            edges={Array.from(this.state.termFilters)}
+            edges={this.getEdges()}
             {...this.props}
           />
           : undefined}
@@ -145,7 +153,7 @@ export const Dashboard = React.createClass({
       <div key={'locations'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <PopularLocationsChart
-            mainEdge={this.state.categoryValue["name_"+this.state.language]}
+            mainEdge={this.getMainEdge()}
             datetimeSelection={this.state.datetimeSelection}
             timespanType={this.state.timespanType}
             language={this.state.language}
@@ -166,7 +174,7 @@ export const Dashboard = React.createClass({
       <div key={'topics'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <PopularTermsChart
-            mainEdge={this.state.categoryValue["name_"+this.state.language]}
+            mainEdge={this.getMainEdge()}
             edgeType={this.state.categoryType}
             timespanType={this.state.timespanType}
             datetimeSelection={this.state.datetimeSelection}
@@ -188,7 +196,7 @@ export const Dashboard = React.createClass({
       <div key={'sources'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <TopSourcesChart
-            mainEdge={this.state.categoryValue["name_"+this.state.language]}
+            mainEdge={this.getMainEdge()}
             originalSource={this.state.originalSource}
             timespanType={this.state.timespanType}
             datetimeSelection={this.state.datetimeSelection}
@@ -209,7 +217,7 @@ export const Dashboard = React.createClass({
       <div key={'timeline'}>
         <GraphCard cardHeader={cardHeader}>
           <TimeSeriesGraph
-            mainEdge={this.state.categoryValue.name}
+            mainEdge={this.getMainEdge()}
             edgeType={this.state.categoryType}
             language={this.state.language}
             timespanType={this.state.timespanType}
@@ -230,7 +238,7 @@ export const Dashboard = React.createClass({
       <div key={'watchlist'}>
         <GraphCard>
           <SentimentTreeview
-            enabledTerms={Array.from(this.state.termFilters)}
+            enabledTerms={this.getEdges()}
             language={this.state.language}
             height={HeatMapFullScreen ? contentAreaHeight : (watchlistResizedHeight > 0 ) ? watchlistResizedHeight : contentRowHeight}
             {...this.props}
