@@ -26,7 +26,7 @@ function computedtileToTile(row) {
 }
 
 /**
- * @param {{site: string, bbox: number[], mainEdge: string, filteredEdges: string[], zoomLevel: number, sourceFilter: string[], fromDate: string, toDate: string}} args
+ * @param {{site: string, bbox: number[], mainEdge: string, filteredEdges: string[], zoomLevel: number, sourceFilter: string[], fromDate: string, toDate: string, originalSource: string}} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Array<{type: string, coordinates: number[], properties: {mentionCount: number, location: string, population: number, neg_sentiment: number, pos_sentiment: number, tileId: string}}>}>}
  */
 function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
@@ -61,7 +61,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),
-      args.externalSourceId || 'all', // FIXME no externalsourceid available,
+      args.originalSource || 'all',
       Math.max(...tilex),
       Math.max(...tiley),
       toDate,
@@ -138,7 +138,7 @@ function populartopicToEdge(row) {
 }
 
 /**
- * @param {{site: string, bbox: number[], zoomLevel: number, mainEdge: string, timespan: string, sourceFilter: string[], fromDate: string, toDate: string}} args
+ * @param {{site: string, bbox: number[], zoomLevel: number, mainEdge: string, timespan: string, sourceFilter: string[], fromDate: string, toDate: string, originalSource: string}} args
  * @returns {Promise.<{runTime: string, edges: Array<{type: string, name: string, mentionCount: string}>}>}
  */
 function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
@@ -168,7 +168,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     const params = [
       periodType,
       toPipelineKey(args.sourceFilter),
-      args.externalSourceId || 'all', // FIXME no externalsourceid available
+      args.originalSource || 'all',
       args.zoomLevel,
       args.mainEdge,
       period,
