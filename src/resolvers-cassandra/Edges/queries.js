@@ -82,7 +82,7 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, timespan: string, sourceFilter: string[], mainEdge: string}} args
+ * @param {{site: string, timespan: string, sourceFilter: string[], mainEdge: string, originalSource: string}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, coordinates: number[], population: number}>}>}
  */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
@@ -103,7 +103,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       period,
       periodType,
       toPipelineKey(args.sourceFilter),
-      args.externalSourceId || 'all', // FIXME: no externalsourceid available
+      args.originalSource || 'all',
       toConjunctionTopics(args.mainEdge)
     ];
 
@@ -123,7 +123,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainEdge: string, bbox: number[], zoomLevel: number}} args
+ * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainEdge: string, bbox: number[], zoomLevel: number, originalSource: string}} args
  * @returns {Promise.<{labels: Array<{name: string, mentions: number}>, graphData: Array<{date: string, edges: string[], mentions: number[]}>}>}
  */
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
@@ -152,7 +152,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),
-      args.externalSourceId || 'all', // FIXME: no externalsourceid available
+      args.originalSource || 'all',
       Math.max(...tilex),
       Math.max(...tiley),
       toDate,
@@ -181,7 +181,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainTerm: string, limit: number, bbox: number[], zoomLevel: number}} args
+ * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainTerm: string, limit: number, bbox: number[], zoomLevel: number, originalSource: string}} args
  * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
  */
 function topSources(args,res) { // eslint-disable-line no-unused-vars
@@ -208,7 +208,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
       periodType,
       toConjunctionTopics(args.mainTerm),
       args.zoomLevel,
-      args.externalSourceId || 'all', // FIXME: no externalsourceid available
+      args.originalSource || 'all',
       period,
       toPipelineKey(args.sourceFilter),
       Math.max(...tilex),
