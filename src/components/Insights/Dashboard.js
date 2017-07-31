@@ -111,7 +111,7 @@ export const Dashboard = React.createClass({
             height={HeatMapFullScreen ? contentAreaHeight : contentRowHeight}
             timespanType={this.state.timespanType}
             datetimeSelection={this.state.datetimeSelection}
-            categoryValue={this.getMainEdge()}
+            mainEdge={this.getMainEdge()}
             language={this.state.language}
             categoryType={this.state.categoryType}
             edges={this.getEdges()}
@@ -129,12 +129,13 @@ export const Dashboard = React.createClass({
     return (
       <div key={'newsfeed'}>
         <div id="newsfeed-container">
-          {this.state.bbox && this.state.bbox.length > 0 && this.state.categoryValue ?
-          <ActivityFeed bbox={this.state.bbox}
+          {this.state.bbox && this.state.bbox.length > 0 && this.getMainEdge() ?
+          <ActivityFeed
+            bbox={this.state.bbox}
             infiniteScrollHeight={HeatMapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
             timespanType={this.state.timespanType}
             datetimeSelection={this.state.datetimeSelection}
-            categoryValue={this.getMainEdge()}
+            mainEdge={this.getMainEdge()}
             dataSource={this.state.dataSource}
             categoryType={this.state.categoryType}
             originalSource={this.state.originalSource}
