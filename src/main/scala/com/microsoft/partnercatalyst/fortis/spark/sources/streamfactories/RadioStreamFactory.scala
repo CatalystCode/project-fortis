@@ -8,8 +8,15 @@ import org.apache.spark.streaming.dstream.DStream
 class RadioStreamFactory extends StreamFactory[RadioTranscription]{
   override def createStream(ssc: StreamingContext): PartialFunction[ConnectorConfig, DStream[RadioTranscription]] = {
     case ConnectorConfig("Radio", params) =>
-      RadioStreamUtils.createStream(
-        ssc, params("radioUrl"), params("audioType"), params("locale"),
-        params("subscriptionKey"), params("speechType"), params("outputFormat"))
+      import ParameterExtensions._
+
+      RadioStreamUtils.createStream(ssc,
+        params.getAs[String]("radioUrl"),
+        params.getAs[String]("audioType"),
+        params.getAs[String]("locale"),
+        params.getAs[String]("subscriptionKey"),
+        params.getAs[String]("speechType"),
+        params.getAs[String]("outputFormat")
+      )
   }
 }

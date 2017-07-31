@@ -13,12 +13,14 @@ import twitter4j.{FilterQuery, Status}
 class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[Status]] = {
     case ConnectorConfig("Twitter", params) =>
+      import ParameterExtensions._
+
       val auth = new OAuthAuthorization(
         new ConfigurationBuilder()
-          .setOAuthConsumerKey(params("consumerKey"))
-          .setOAuthConsumerSecret(params("consumerSecret"))
-          .setOAuthAccessToken(params("accessToken"))
-          .setOAuthAccessTokenSecret(params("accessTokenSecret"))
+          .setOAuthConsumerKey(params.getAs[String]("consumerKey"))
+          .setOAuthConsumerSecret(params.getAs[String]("consumerSecret"))
+          .setOAuthAccessToken(params.getAs[String]("accessToken"))
+          .setOAuthAccessTokenSecret(params.getAs[String]("accessTokenSecret"))
           .build()
       )
 
@@ -39,7 +41,7 @@ class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
         query = Some(query))
   }
 
-  private def addKeywords(query: FilterQuery, params: Map[String, String]): Boolean = {
+  private def addKeywords(query: FilterQuery, params: Map[String, Any]): Boolean = {
     parseKeywords(params) match {
       case Some(keywords) =>
         query.track(keywords:_*)
@@ -49,7 +51,7 @@ class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
     }
   }
 
-  private def addUsers(query: FilterQuery, params: Map[String, String]): Boolean = {
+  private def addUsers(query: FilterQuery, params: Map[String, Any]): Boolean = {
     parseUserIds(params) match {
       case Some(userIds) =>
         query.follow(userIds:_*)
@@ -59,7 +61,7 @@ class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
     }
   }
 
-  private def addLanguages(query: FilterQuery, params: Map[String, String]): Boolean = {
+  private def addLanguages(query: FilterQuery, params: Map[String, Any]): Boolean = {
     parseLanguages(params) match {
       case Some(languages) =>
         query.language(languages:_*)
@@ -69,7 +71,7 @@ class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
     }
   }
 
-  private def addLocations(query: FilterQuery, params: Map[String, String]): Boolean = {
+  private def addLocations(query: FilterQuery, params: Map[String, Any]): Boolean = {
     parseLocations(params) match {
       case Some(locations) =>
         query.locations(locations:_*)
@@ -81,7 +83,7 @@ class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
 }
 
 object TwitterStreamFactory {
-  def parseLocations(params: Map[String, String]): Option[Array[Array[Double]]] = {
+  def parseLocations(params: Map[String, Any]): Option[Array[Array[Double]]] = {
     parseList(params, "locations").map(_.map(_.split(','))) match {
       case None => None
       case Some(locations) if locations.exists(_.length != 4) => None
@@ -89,9 +91,9 @@ object TwitterStreamFactory {
     }
   }
 
-  def parseLanguages(params: Map[String, String]): Option[Array[String]] = parseList(params, "languages")
-  def parseUserIds(params: Map[String, String]): Option[Array[Long]] = parseList(params, "userIds").map(_.map(_.toLong))
-  def parseKeywords(params: Map[String, String]): Option[Array[String]] = parseList(params, "keywords")
+  def parseLanguages(params: Map[String, Any]): Option[Array[String]] = parseList(params, "languages")
+  def parseUserIds(params: Map[String, Any]): Option[Array[Long]] = parseList(params, "userIds").map(_.map(_.toLong))
+  def parseKeywords(params: Map[String, Any]): Option[Array[String]] = parseList(params, "keywords")
 
-  private def parseList(params: Map[String, String], key: String): Option[Array[String]] = params.get(key).map(_.split('|'))
+  private def parseList(params: Map[String, Any], key: String): Option[Array[String]] = params.get(key).map(_.asInstanceOf[String].split('|'))
 }

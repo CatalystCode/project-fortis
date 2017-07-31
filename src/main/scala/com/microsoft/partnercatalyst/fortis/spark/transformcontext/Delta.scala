@@ -15,7 +15,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtrac
 private[transformcontext] class Delta private(
   val siteSettings: Option[SiteSettings],
   val langToKeywordExtractor: Option[Map[String, KeywordExtractor]],
-  val blacklist: Option[List[BlacklistedTerm]],
+  val blacklist: Option[Seq[BlacklistedTerm]],
   val locationsExtractorFactory: Option[LocationsExtractorFactory],
   val imageAnalyzer: Option[ImageAnalyzer],
   val languageDetector: Option[LanguageDetector],
@@ -32,8 +32,8 @@ private[transformcontext] object Delta {
     transformContext: TransformContext,
     featureServiceClient: FeatureServiceClient,
     siteSettings: Option[SiteSettings] = None,
-    langToWatchlist: Option[Map[String, List[String]]] = None,
-    blacklist: Option[List[BlacklistedTerm]] = None): Delta =
+    langToWatchlist: Option[Map[String, Seq[String]]] = None,
+    blacklist: Option[Seq[BlacklistedTerm]] = None): Delta =
   {
     // Note that parameters are call-by-name
     def updatedField[T](isDirty: => Boolean, newVal: => T): Option[T] = {

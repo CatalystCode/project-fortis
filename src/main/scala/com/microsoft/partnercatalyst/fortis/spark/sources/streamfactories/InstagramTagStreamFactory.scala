@@ -16,8 +16,9 @@ class InstagramTagStreamFactory extends StreamFactory[InstagramItem]{
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[InstagramItem]] = {
     case ConnectorConfig("InstagramTag", params) =>
-      val auth = InstagramAuth(params("authToken"))
+      import ParameterExtensions._
 
-      InstagramUtils.createTagStream(streamingContext, auth, params("tag"))
+      val auth = InstagramAuth(params.getAs[String]("authToken"))
+      InstagramUtils.createTagStream(streamingContext, auth, params.getAs[String]("tag"))
   }
 }

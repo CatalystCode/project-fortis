@@ -16,12 +16,14 @@ class InstagramLocationStreamFactory extends StreamFactory[InstagramItem]{
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[InstagramItem]] = {
     case ConnectorConfig("InstagramLocation", params) =>
-      val auth = InstagramAuth(params("authToken"))
+      import ParameterExtensions._
+
+      val auth = InstagramAuth(params.getAs[String]("authToken"))
 
       InstagramUtils.createLocationStream(
         streamingContext,
         auth,
-        latitude = params("latitude").toDouble,
-        longitude = params("longitude").toDouble)
+        latitude = params.getAs[String]("latitude").toDouble,
+        longitude = params.getAs[String]("longitude").toDouble)
   }
 }

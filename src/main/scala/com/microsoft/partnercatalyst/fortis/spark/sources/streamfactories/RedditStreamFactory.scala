@@ -9,12 +9,14 @@ import org.apache.spark.streaming.dstream.DStream
 class RedditStreamFactory extends StreamFactory[RedditObject] {
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[RedditObject]] = {
     case ConnectorConfig("RedditObject", params) =>
-      val auth = RedditAuth(params("applicationId"), params("applicationSecret"))
-      val keywords = params("keywords").split('|')
+      import ParameterExtensions._
 
-      val subreddit = params.get("subreddit")
-      val searchLimit = params.getOrElse("searchLimit", "25").toInt
-      val searchResultType = Some(params.getOrElse("searchResultType", "link"))
+      val auth = RedditAuth(params.getAs[String]("applicationId"), params.getAs[String]("applicationSecret"))
+      val keywords = params.getAs[String]("keywords").split('|')
+
+      val subreddit = params.get("subreddit").asInstanceOf[Option[String]]
+      val searchLimit = params.getOrElse("searchLimit", "25").asInstanceOf[String].toInt
+      val searchResultType = Some(params.getOrElse("searchResultType", "link").asInstanceOf[String])
       RedditUtils.createPageStream(
         auth,
         keywords.toSeq,

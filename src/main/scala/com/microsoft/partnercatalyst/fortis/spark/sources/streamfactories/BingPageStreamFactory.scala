@@ -9,9 +9,11 @@ import org.apache.spark.streaming.dstream.DStream
 class BingPageStreamFactory extends StreamFactory[BingPost]{
   override def createStream(ssc: StreamingContext): PartialFunction[ConnectorConfig, DStream[BingPost]] = {
     case ConnectorConfig("BingPage", params) =>
-      val auth = BingAuth(params("accessToken"))
-      val searchInstanceId = params("searchInstanceId")
-      val keywords = params("keywords").split('|')
+      import ParameterExtensions._
+
+      val auth = BingAuth(params.getAs[String]("accessToken"))
+      val searchInstanceId = params.getAs[String]("searchInstanceId")
+      val keywords = params.getAs[String]("keywords").split('|')
 
       BingUtils.createPageStream(ssc, auth, searchInstanceId, keywords)
   }

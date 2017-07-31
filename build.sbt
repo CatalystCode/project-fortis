@@ -43,6 +43,7 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" %% "kafka" % "0.10.2.1",
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
+  "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0",
   "net.lingala.zip4j" % "zip4j" % "1.3.2",
   "eus.ixa" % "ixa-pipe-pos" % "1.5.2",
   "eus.ixa" % "ixa-pipe-tok" % "1.8.6",
