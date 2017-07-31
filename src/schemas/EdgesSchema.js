@@ -5,8 +5,8 @@ module.exports = graphql.buildSchema(`
     locations(site: String!): LocationCollection
     terms(site: String!, fromDate: String, toDate: String, sourceFilter: [String]): TermCollection
     popularLocations(site: String!, timespan: String!, sourceFilter: [String], mainEdge: String): TopNLocationCollection
-    timeSeries(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], mainEdge: String): EdgeTimeSeriesCollection
-    topSources(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], mainTerm: String, limit: Int!): TopSourcesCollection
+    timeSeries(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], mainEdge: String, bbox: [Float], zoomLevel: Int): EdgeTimeSeriesCollection
+    topSources(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], mainTerm: String, limit: Int!, bbox: [Float], zoomLevel: Int): TopSourcesCollection
   }
 
   type Mutation {

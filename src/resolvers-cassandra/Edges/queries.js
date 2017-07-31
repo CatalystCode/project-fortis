@@ -123,14 +123,12 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainEdge: string}} args
+ * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainEdge: string, bbox: number[], zoomLevel: number}} args
  * @returns {Promise.<{labels: Array<{name: string, mentions: number}>, graphData: Array<{date: string, edges: string[], mentions: number[]}>}>}
  */
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-    // FIXME no bbox available
-    // FIXME no zoomLevel available
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
     const tilex = makeSet(tiles, tile => tile.row);
     const tiley = makeSet(tiles, tile => tile.column);
@@ -183,14 +181,12 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainTerm: string, limit: number}} args
+ * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainTerm: string, limit: number, bbox: number[], zoomLevel: number}} args
  * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
  */
 function topSources(args,res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-    // FIXME no bbox available
-    // FIXME no zoomLevel available
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
     const tilex = makeSet(tiles, tile => tile.row);
     const tiley = makeSet(tiles, tile => tile.column);
