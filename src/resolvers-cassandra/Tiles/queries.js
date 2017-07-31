@@ -126,19 +126,6 @@ function fetchEdgesByLocations(args, res) { // eslint-disable-line no-unused-var
 }
 
 /**
- * @param {{mentionCount: number, topic: string}} row 
- */
-function populartopicToEdge(row) {
-  const mentionCount = row.mentionCount;
-  const name = row.topic;
-
-  return {
-    mentionCount,
-    name
-  };
-}
-
-/**
  * @param {{site: string, bbox: number[], zoomLevel: number, mainEdge: string, timespan: string, sourceFilter: string[], fromDate: string, toDate: string, originalSource: string}} args
  * @returns {Promise.<{runTime: string, edges: Array<{type: string, name: string, mentionCount: string}>}>}
  */
@@ -188,7 +175,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     cassandraConnector.executeQuery(query, params)
     .then(rows => {
       resolve({
-        edges: rows.map(populartopicToEdge)
+        edges: rows.map(row => ({mentionCount: row.mentionCount, name: row.topic}))
       });
     })
     .catch(reject);
