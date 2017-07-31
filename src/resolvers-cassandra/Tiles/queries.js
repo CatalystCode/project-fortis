@@ -66,7 +66,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),
-      '', // FIXME no externalsourceid available,
+      args.externalSourceId || 'all', // FIXME no externalsourceid available,
       Math.max(...tilex),
       Math.max(...tiley),
       toDate,
@@ -173,7 +173,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
     const params = [
       periodType,
       toPipelineKey(args.sourceFilter),
-      '', // FIXME no externalsourceid available
+      args.externalSourceId || 'all', // FIXME no externalsourceid available
       args.zoomLevel,
       args.mainEdge,
       period,

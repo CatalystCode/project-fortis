@@ -103,7 +103,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       period,
       periodType,
       toPipelineKey(args.sourceFilter),
-      '', // FIXME: no externalsourceid available
+      args.externalSourceId || 'all', // FIXME: no externalsourceid available
       '' // FIXME: no conjunctiontopics available
     ];
 
@@ -149,7 +149,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       0, // FIXME: no tilez available
       period,
       toPipelineKey(args.sourceFilter),
-      '', // FIXME: no externalsourceid available
+      args.externalSourceId || 'all', // FIXME: no externalsourceid available
       Math.max(...[]), // FIXME no tilex available
       Math.max(...[]), // FIXME no tiley available
       toDate,
@@ -202,7 +202,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
       periodType,
       toConjunctionTopics(args.mainTerm),
       0, // FIXME: no tilez available
-      '', // FIXME: no externalsourceid available
+      args.externalSourceId || 'all', // FIXME: no externalsourceid available
       period,
       toPipelineKey(args.sourceFilter),
       Math.max(...[]), // FIXME no tilex available
