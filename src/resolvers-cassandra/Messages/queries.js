@@ -266,7 +266,7 @@ module.exports = {
   byLocation: trackEvent(withRunTime(byLocation), 'messagesForLocation'),
   byBbox: trackEvent(withRunTime(byBbox), 'messagesForBbox'),
   byEdges: trackEvent(withRunTime(byEdges), 'messagesForEdges'),
-  event: trackEvent(event, 'messageForEven'),
+  event: trackEvent(event, 'messageForEvent'),
   translate: trackEvent(translate, 'translate'),
   translateWords: trackEvent(translateWords, 'translateWords')
 };
