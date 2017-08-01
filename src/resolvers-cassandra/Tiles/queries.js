@@ -32,7 +32,7 @@ function computedtileToTile(row) {
 function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.bbox) return reject('No bounding box for which to fetch tiles specified');
-    if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch tiles specified');
+    if (!args || args.zoomLevel == null) return reject('No zoom level for which to fetch tiles specified');
     if (!args || !args.mainEdge) return reject('No main edge for keyword filter specified');
     if (!args || !args.filteredEdges) return reject('No secondary edges for keyword filter specified');
     if (!args || !args.fromDate || !args.toDate) return reject('No time period for which to fetch edges specified');
@@ -133,7 +133,7 @@ function fetchEdgesByBBox(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.mainEdge) return reject('No main edge for which to fetch edges specified');
     if (!args || !args.bbox) return reject('No bounding box for which to fetch edges specified');
-    if (!args || !args.zoomLevel) return reject('No zoom level for which to fetch edges specified');
+    if (!args || args.zoomLevel == null) return reject('No zoom level for which to fetch edges specified');
     if (!args || !args.fromDate || !args.toDate) return reject('No time period for which to fetch edges specified');
     if (args.bbox.length !== 4) return reject('Invalid bounding box for which to fetch edges specified');
 
