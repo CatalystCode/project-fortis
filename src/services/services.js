@@ -144,7 +144,7 @@ const visualizationChartFragments = `fragment FortisDashboardTimeSeriesView on E
                                         }`;
 
 export const SERVICES = {
-    getChartVisualizationData(site, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, mainEdge, dataSource, fromDate, toDate, bbox, zoomLevel, callback){
+    getChartVisualizationData(site, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, mainEdge, dataSource, fromDate, toDate, bbox, zoomLevel, originalSource, callback){
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         let timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let sourceFilter = Actions.DataSources(dataSource);
@@ -154,19 +154,19 @@ export const SERVICES = {
 
         let query = `${visualizationChartFragments}
                      ${selectedTerm ? `${topSourcesFragment}` : ``}
-                      query PopularEdges($site: String!, $additionalTerms: String, $timespan: String!, $sourceFilter: [String], ${selectedTerm ? `$selectedTerm: String!, $limit: Int!,` : `,`} $fromDate: String!, $toDate: String!, $bbox: [Float], $zoomLevel: Int) {
-                            timeSeries:timeSeries(site: $site, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, mainEdge: $additionalTerms, bbox: $bbox, zoomLevel: $zoomLevel){
+                      query PopularEdges($site: String!, $additionalTerms: String, $timespan: String!, $sourceFilter: [String], ${selectedTerm ? `$selectedTerm: String!, $limit: Int!,` : `,`} $fromDate: String!, $toDate: String!, $bbox: [Float], $zoomLevel: Int, $originalSource: String) {
+                            timeSeries:timeSeries(site: $site, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, mainEdge: $additionalTerms, bbox: $bbox, zoomLevel: $zoomLevel, originalSource: $originalSource){
                                                         ...FortisDashboardTimeSeriesView
                             },
-                            locations: popularLocations(site: $site, timespan: $timespan, sourceFilter: $sourceFilter) {
+                            locations: popularLocations(site: $site, timespan: $timespan, sourceFilter: $sourceFilter, originalSource: $originalSource) {
                                                         ...FortisDashboardLocationView
                             }${selectedTerm ? `, 
-                            topSources(site: $site, fromDate: $fromDate, toDate: $toDate, limit: $limit, mainTerm: $selectedTerm, sourceFilter: $sourceFilter, bbox: $bbox, zoomLevel: $zoomLevel) {
+                            topSources(site: $site, fromDate: $fromDate, toDate: $toDate, limit: $limit, mainTerm: $selectedTerm, sourceFilter: $sourceFilter, bbox: $bbox, zoomLevel: $zoomLevel, originalSource: $originalSource) {
                             ... FortisTopSourcesView
                             }`: ``}
                        }`;
 
-        let variables = { site, additionalTerms, selectedTerm, timespan, limit, sourceFilter, fromDate, toDate, bbox, zoomLevel };
+        let variables = { site, additionalTerms, selectedTerm, timespan, limit, sourceFilter, fromDate, toDate, bbox, zoomLevel, originalSource };
         let host = process.env.REACT_APP_SERVICE_HOST;
         let POST = {
             url: `${host}/api/edges`,

@@ -163,7 +163,7 @@ const methods = {
                 },
                 chartData: callback => {
                         SERVICES.getChartVisualizationData(siteId, dataStore.datetimeSelection, dataStore.timespanType, undefined, undefined, undefined, 
-                                                           dataSource, fromDate, toDate, dataStore.bbox, dataStore.zoomLevel,
+                                                           dataSource, fromDate, toDate, dataStore.bbox, dataStore.zoomLevel, dataStore.originalSource,
                                                            (error, response, body) => ResponseHandler(error, response, body, callback))
                 }
             }, (error, results) => {
@@ -199,7 +199,10 @@ const methods = {
                 toDate = toDateFilter;
             }
 
-            SERVICES.getChartVisualizationData(siteKey, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, dataStore.categoryValue, dataSource, fromDate, toDate, dataStore.bbox, dataStore.zoomLevel, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+            SERVICES.getChartVisualizationData(siteKey, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm,
+                                               dataStore.categoryValue, dataSource, fromDate, toDate,
+                                               dataStore.bbox, dataStore.zoomLevel, dataStore.originalSource,
+                                               (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
                     if(graphqlResponse) {
                         const {timeSeries, locations, topSources} = graphqlResponse;
                         self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, { selectedEntity: selectedEntity,
