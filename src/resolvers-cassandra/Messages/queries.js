@@ -17,7 +17,7 @@ function eventToFeature(row) {
     type: row.pipelinekey,
     coordinates: [],
     properties: {
-      edges: [],
+      edges: row.topics,
       messageid: row.eventid,
       createdtime: row.event_time,
       sentiment: row.computedfeatures && row.computedfeatures.sentiment,
@@ -181,36 +181,8 @@ function event(args, res) { // eslint-disable-line no-unused-vars
     cassandraConnector.executeQuery(eventQuery, eventParams)
     .then(eventRows => {
       if (eventRows.length > 1) return reject(`Got more ${eventRows.length} events with id ${args.messageId}`);
-      const event = eventRows[0];
 
-      const tagsQuery = `
-      SELECT topic
-      FROM fortis.eventtags
-      WHERE pipelinekey = 'all'
-      AND topic = ?
-      AND pipelinekey = ?
-      AND event_time = ?
-      AND placecentroidcoordx = ?
-      AND placecentroidcoordy = ?
-      AND eventid = ?
-      `.trim();
-
-      const tagsParams = [
-        '', // FIXME topic not available
-        event.pipelinekey,
-        event.event_time,
-        '', // FIXME placecentroidcoordx not available
-        '', // FIXME placecentroidcoordy not available
-        event.event_id
-      ];
-
-      cassandraConnector.executeQuery(tagsQuery, tagsParams)
-      .then(tagsRows => {
-        const feature = eventToFeature(event);
-        feature.properties.edges = makeSet(tagsRows, row => row.topic);
-        resolve(feature);
-      })
-      .catch(reject);
+      resolve(eventToFeature(eventRows[0]));
     })
     .catch(reject);
   });
