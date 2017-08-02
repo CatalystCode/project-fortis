@@ -15,27 +15,27 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args) return reject('No args specified');
 
+    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+
     const query = `
-    SELECT topic
-    FROM fortis.eventtags
-    WHERE topic = ?
-    AND pipelinekey = ?
-    AND event_time = ?
-    AND placecentroidcoordx = ?
-    AND placecentroidcoordy = ?
+    SELECT topics
+    FROM fortis.mentionedtopics
+    WHERE pipelinekey = ?
+    AND externalsourceid = ?
+    AND event_time <= ?
+    AND event_time >= ?
     `.trim();
 
     const params = [
-      '', // FIXME: no topic available
       toPipelineKey(args.sourceFilter),
-      '', // FIXME: how to convert fromDate/toDate to event_time?
-      '', // FIXME: no placecentroidcoordx available
-      '' // FIXME: no placecentroidcoordy available
+      'all',
+      toDate,
+      fromDate
     ];
 
     cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const keywords = makeSet(rows, row => row.topic);
+      const keywords = makeSet(rows.map(row => row.topics), topic => topic);
 
       return {
         edges: keywords.map(keyword => ({name: keyword}))

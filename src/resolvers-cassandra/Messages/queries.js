@@ -4,8 +4,8 @@ const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
-const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
+const { parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
+const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
@@ -48,36 +48,35 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
 
+    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+
     featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
     .then(places => {
-      const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const placeIds = Object.keys(idToBbox);
+      const placeIds = makeSet(places, place => place.id);
 
       const tagsQuery = `
-      SELECT eventid
-      FROM fortis.eventtags
-      WHERE topic IN ?
+      SELECT eventids
+      FROM fortis.eventplaces
+      WHERE placeid IN ?
+      AND conjunctiontopics = ?
       AND pipelinekey = ?
-      AND event_time = ?
-      AND placecentroidx = ?
-      AND placecentroidy = ?
-      AND eventid = ?
-      AND placeid IN ?
+      AND externalsourceid = ?
+      AND event_time <= ?
+      AND event_time >= ?
       `.trim();
 
       const tagsParams = [
+        placeIds,
         toConjunctionTopics(args.mainTerm, args.filteredEdges),
         toPipelineKey(args.sourceFilter),
-        '', // FIXME: how to convert formDate and toDate to event_time?
-        '', // FIXME: no placecentroidx available
-        '', // FIXME: no placecentroidy available
-        '', // FIXME: no eventid available
-        placeIds // FIXME: not part of primary key
+        'all',
+        toDate,
+        fromDate
       ];
 
       cassandraConnector.executeQuery(tagsQuery, tagsParams)
       .then(rows => {
-        const eventIds = makeSet(rows, row => row.eventid);
+        const eventIds = makeSet(rows.map(row => row.eventids), eventId => eventId);
 
         const eventsQuery = `
         SELECT *
@@ -114,27 +113,29 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
+    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+
     const tagsQuery = `
-    SELECT eventid, topic
-    FROM fortis.eventtags
+    SELECT eventids
+    FROM fortis.eventtopics
     WHERE topic IN ?
     AND pipelinekey = ?
-    AND event_time = ?
-    AND placecentroidcoordx = ?
-    AND placecentroidcoordy = ?
+    AND externalsourceid = ?
+    AND event_time <= ?
+    AND event_time >= ?
     `.trim();
 
     const tagsParams = [
       args.filteredEdges,
       toPipelineKey(args.sourceFilter),
-      '', // FIXME event_time not available
-      '', // FIXME placecentroidcoordx not available
-      '' // FIXME placecentroidcoordy not available
+      'all',
+      toDate,
+      fromDate
     ];
 
     cassandraConnector.executeQuery(tagsQuery, tagsParams)
     .then(rows => {
-      const eventIds = makeMultiMap(rows, row => row.eventid, row => row.topic);
+      const eventIds = makeSet(rows.map(row => row.eventids), eventId => eventId);
 
       const eventQuery = `
       SELECT *
