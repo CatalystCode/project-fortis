@@ -77,8 +77,8 @@ object ProjectFortis extends App {
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
       pipeline("twitter", new TwitterAnalyzer),
-      pipeline("facebookposts", new FacebookPostAnalyzer),
-      pipeline("facebookcomments", new FacebookCommentAnalyzer),
+      pipeline("facebookpost", new FacebookPostAnalyzer),
+      pipeline("facebookcomment", new FacebookCommentAnalyzer),
       pipeline("instagram", new InstagramAnalyzer),
       pipeline("tadaweb", new TadawebAnalyzer),
       pipeline("customevents", new CustomEventAnalyzer),
@@ -86,7 +86,7 @@ object ProjectFortis extends App {
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
-    CassandraSink
+    //CassandraSink
     //KafkaSink(fortisEvents, Settings.kafkaHost, Settings.kafkaTopic)
 
     ssc.checkpoint(Settings.progressDir)
@@ -174,9 +174,20 @@ object ProjectFortis extends App {
             )
           )
         ),
-        "facebook" -> List(
+        "facebookpost" -> List(
           ConnectorConfig(
-            "Facebook",
+            "FacebookPost",
+            Map(
+              "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
+              "appId" -> System.getenv("FACEBOOK_APP_ID"),
+              "appSecret" -> System.getenv("FACEBOOK_APP_SECRET"),
+              "pageIds" -> "aljazeera|cnn|bloomberg"
+            )
+          )
+        ),
+        "facebookcomment" -> List(
+          ConnectorConfig(
+            "FacebookComment",
             Map(
               "accessToken" -> System.getenv("FACEBOOK_AUTH_TOKEN"),
               "appId" -> System.getenv("FACEBOOK_APP_ID"),

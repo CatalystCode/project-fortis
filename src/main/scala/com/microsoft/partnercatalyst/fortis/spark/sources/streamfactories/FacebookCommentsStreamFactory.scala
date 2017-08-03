@@ -17,7 +17,7 @@ class FacebookCommentStreamFactory extends StreamFactory[FacebookComment] {
     * @return A partial function for transforming a connector config
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[FacebookComment]] = {
-    case ConnectorConfig("Facebook", params) =>
+    case ConnectorConfig("FacebookComment", params) =>
       val facebookAuth = FacebookAuth(params("appId"), params("appSecret"), params("accessToken"))
       val pageIds = Option(params("pageIds")) match {
         case None => Set()
