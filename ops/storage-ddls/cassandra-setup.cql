@@ -166,18 +166,28 @@ CREATE TABLE popularplaces (
     PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), mentioncount, periodstartdate, periodenddate, centroidlat, centroidlon)
 ) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, centroidlat DESC, centroidlon DESC);
 
-DROP TABLE IF EXISTS eventtags;
-CREATE TABLE eventtags(
-    eventid text,
+DROP TABLE IF EXISTS eventtopics;
+CREATE TABLE eventtopics(
+    eventids set<text>,
     topic text,
-    centroidlat double,
-    centroidlon double,
+    eventtime timestamp,
+    pipelinekey text,
+    externalsourceid text,
+    PRIMARY KEY ((topic), pipelinekey, externalsourceid, eventtime)
+);
+
+DROP TABLE IF EXISTS eventplaces;
+CREATE TABLE eventplaces(
+    eventids set<text>,
+    conjunctiontopic1 text,
+    conjunctiontopic2 text,
+    conjunctiontopic3 text,
     placeid text,
     eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY (topic, pipelinekey, eventtime, centroidlat, centroidlon, eventid)
-) WITH CLUSTERING ORDER BY (pipelinekey DESC, eventtime ASC);
+    PRIMARY KEY ((placeid), conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid, eventtime)
+);
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events(
