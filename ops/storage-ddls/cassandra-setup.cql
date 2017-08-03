@@ -15,7 +15,6 @@ CREATE TYPE computedgender (
 
 DROP TYPE IF EXISTS sentiment;
 CREATE TYPE sentiment (
-    pos_avg float,
     neg_avg float
 );
 
@@ -122,7 +121,7 @@ CREATE TABLE populartopics (
     tiley int,
     externalsourceid text,
     topic text,
-    mentioncount counter,
+    mentioncount bigint,
     insertiontime timestamp,
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
@@ -132,13 +131,13 @@ CREATE TABLE computedtiles (
     periodstartdate timestamp,
     periodenddate timestamp,
     periodtype text,
-    pipelinekey text,
+        pipelinekey text,
     period text,
     tilez int,
     tilex int,
     tiley int,
     externalsourceid text,
-    mentioncount counter,
+    mentioncount bigint,
     avgsentiment float,
     heatmap text,
     placeids frozen<set<text>>,
@@ -158,12 +157,13 @@ CREATE TABLE popularplaces (
     placeid text,
     centroidlat double,
     centroidlon double,
-    conjunctiontopics tuple<text, text, text>,
+    conjunctiontopic1 text,
+    conjunctiontopic2 text,
+    conjunctiontopic3 text,
     mentioncount bigint,
     insertiontime timestamp,
-    avgnegsentiment float,
-    avgpossentiment float,
-    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopics), mentioncount, periodstartdate, periodenddate, centroidlat, centroidlon)
+    avgsentiment float,
+    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), mentioncount, periodstartdate, periodenddate, centroidlat, centroidlon)
 ) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, centroidlat DESC, centroidlon DESC);
 
 DROP TABLE IF EXISTS eventtags;
