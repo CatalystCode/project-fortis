@@ -52,11 +52,11 @@ insert into popularplaces (periodstartdate, periodenddate, period, periodtype, e
 
 select period, periodtype, pipelinekey, externalsourceid, conjunctiontopics, mentioncount, placename from popularplaces where conjunctiontopics = ('isis', 'car') and periodtype = 'month' and externalsourceid = 'all' and pipelinekey = 'all' and period IN('month-2017-06') and (mentioncount, periodstartdate, periodenddate, placecentroidcoordx, placecentroidcoordy) >= (1, '2017-06-01', '2017-06-01', 22, -33) and (mentioncount, periodstartdate, periodenddate, placecentroidcoordx, placecentroidcoordy) <= (100000000, '2017-06-30', '2017-06-30', 26, 0) LIMIT 1;
 
-insert into eventtags(eventid, topic, placeid, placecentroidcoordx, placecentroidcoordy, event_time, pipelinekey, externalsourceid) values (uuid(), 'isis', '455633', 12.43434, -45.3434, '2017-06-30', 'twitter', 'cnn');
+insert into eventtags(eventid, topic, placeid, placecentroidcoordx, placecentroidcoordy, eventtime, pipelinekey, externalsourceid) values (uuid(), 'isis', '455633', 12.43434, -45.3434, '2017-06-30', 'twitter', 'cnn');
 
-insert into eventtags(eventid, topic, placeid, placecentroidcoordx, placecentroidcoordy, event_time, pipelinekey, externalsourceid) values (ac01cb69-1684-4b5e-9016-7a4f0dcde074, 'car', '455633', 12.43434, -45.3434, '2017-06-30', 'twitter', 'cnn');
+insert into eventtags(eventid, topic, placeid, placecentroidcoordx, placecentroidcoordy, eventtime, pipelinekey, externalsourceid) values (ac01cb69-1684-4b5e-9016-7a4f0dcde074, 'car', '455633', 12.43434, -45.3434, '2017-06-30', 'twitter', 'cnn');
 
-select eventid, pipelinekey, event_time from eventtags where topic IN('isis', 'car') and pipelinekey IN('twitter', 'facebook') and (event_time, placecentroidcoordx, placecentroidcoordy) >= ('2017-06-01', 12, -46) and (event_time, placecentroidcoordx, placecentroidcoordy) <= ('2017-07-15', 12, -44);
+select eventid, pipelinekey, eventtime from eventtags where topic IN('isis', 'car') and pipelinekey IN('twitter', 'facebook') and (eventtime, placecentroidcoordx, placecentroidcoordy) >= ('2017-06-01', 12, -46) and (eventtime, placecentroidcoordx, placecentroidcoordy) <= ('2017-07-15', 12, -44);
 
 select * from events where eventid IN(609a367a-c536-46a9-aee0-415625e8ff43, 7c0933b9-f6d1-417a-a7b2-fb738aad441c) and pipelinekey IN('twitter');
 
