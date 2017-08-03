@@ -13,29 +13,17 @@ const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
  */
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args) return reject('No args specified');
-
-    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-
     const query = `
-    SELECT topics
-    FROM fortis.mentionedtopics
-    WHERE pipelinekey = ?
-    AND externalsourceid = ?
-    AND event_time <= ?
-    AND event_time >= ?
+    SELECT topic
+    FROM fortis.watchlist
     `.trim();
 
     const params = [
-      toPipelineKey(args.sourceFilter),
-      'all',
-      toDate,
-      fromDate
     ];
 
     cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const keywords = makeSet(rows.map(row => row.topics), topic => topic);
+      const keywords = makeSet(rows, row => row.topic);
 
       return {
         edges: keywords.map(keyword => ({name: keyword}))
