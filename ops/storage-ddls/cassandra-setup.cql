@@ -131,7 +131,7 @@ CREATE TABLE computedtiles (
     periodstartdate timestamp,
     periodenddate timestamp,
     periodtype text,
-        pipelinekey text,
+    pipelinekey text,
     period text,
     tilez int,
     tilex int,
@@ -202,7 +202,7 @@ CREATE TABLE events(
     computedfeatures frozen<features>,
     insertiontime timestamp,
     eventtime timestamp,
-    fulltext, /* conjunction of title and body to enable querying of both at the same time */
+    fulltext text, /* conjunction of title and body to enable querying of both at the same time */
     PRIMARY KEY ((pipelinekey, eventid)));
 
 /**
