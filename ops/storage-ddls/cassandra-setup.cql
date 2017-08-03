@@ -176,15 +176,6 @@ CREATE TABLE eventtopics(
     PRIMARY KEY ((topic), pipelinekey, externalsourceid, eventtime)
 );
 
-DROP TABLE IF EXISTS mentionedtopics;
-CREATE TABLE mentionedtopics(
-    topics set<text>,
-    eventtime timestamp,
-    pipelinekey text,
-    externalsourceid text,
-    PRIMARY KEY (pipelinekey, externalsourceid, eventtime)
-);
-
 DROP TABLE IF EXISTS eventplaces;
 CREATE TABLE eventplaces(
     eventids set<text>,
