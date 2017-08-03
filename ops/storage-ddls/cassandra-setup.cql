@@ -202,6 +202,8 @@ CREATE TABLE events(
     computedfeatures frozen<features>,
     insertiontime timestamp,
     eventtime timestamp,
+    topics frozen<set<text>>,
+    placeids frozen<set<text>>,
     fulltext text, /* conjunction of title and body to enable querying of both at the same time */
     PRIMARY KEY ((pipelinekey, eventid)));
 
