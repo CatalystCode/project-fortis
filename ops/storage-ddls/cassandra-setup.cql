@@ -192,6 +192,7 @@ CREATE TABLE events(
     computedfeatures frozen<features>,
     insertiontime timestamp,
     eventtime timestamp,
+    fulltext, /* conjunction of title and body to enable querying of both at the same time */
     PRIMARY KEY ((pipelinekey, eventid)));
 
 /**
@@ -283,16 +284,8 @@ PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipel
  * Indices
  *****************************************************************************/
 
-CREATE CUSTOM INDEX ON events (body) USING 'org.apache.cassandra.index.sasi.SASIIndex'
-WITH OPTIONS = {
-'mode': 'CONTAINS',
-'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
-'analyzed': 'true',
-'tokenization_enable_stemming': 'true',
-'tokenization_normalize_lowercase': 'true'
-};
-
-CREATE CUSTOM INDEX ON events (title) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+DROP INDEX IF EXISTS events_fulltext_idx;
+CREATE CUSTOM INDEX ON events (fulltext) USING 'org.apache.cassandra.index.sasi.SASIIndex'
 WITH OPTIONS = {
 'mode': 'CONTAINS',
 'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
