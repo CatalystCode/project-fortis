@@ -6,15 +6,19 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{Connec
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
-class BingPageStreamFactory extends StreamFactory[BingPost]{
-  override def createStream(ssc: StreamingContext): PartialFunction[ConnectorConfig, DStream[BingPost]] = {
-    case ConnectorConfig("BingPage", params) =>
-      import ParameterExtensions._
+class BingPageStreamFactory extends StreamFactoryBase[BingPost]{
+  override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
+    connectorConfig.name == "BingPage"
+  }
 
-      val auth = BingAuth(params.getAs[String]("accessToken"))
-      val searchInstanceId = params.getAs[String]("searchInstanceId")
-      val keywords = params.getAs[String]("keywords").split('|')
+  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[BingPost] = {
+    import ParameterExtensions._
 
-      BingUtils.createPageStream(ssc, auth, searchInstanceId, keywords)
+    val params = connectorConfig.parameters
+    val auth = BingAuth(params.getAs[String]("accessToken"))
+    val searchInstanceId = params.getAs[String]("searchInstanceId")
+    val keywords = params.getAs[String]("keywords").split('|')
+
+    BingUtils.createPageStream(streamingContext, auth, searchInstanceId, keywords)
   }
 }

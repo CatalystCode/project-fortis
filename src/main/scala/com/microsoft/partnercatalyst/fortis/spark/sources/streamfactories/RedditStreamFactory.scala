@@ -6,24 +6,28 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{Connec
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
-class RedditStreamFactory extends StreamFactory[RedditObject] {
-  override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[RedditObject]] = {
-    case ConnectorConfig("RedditObject", params) =>
-      import ParameterExtensions._
+class RedditStreamFactory extends StreamFactoryBase[RedditObject] {
+  override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
+    connectorConfig.name == "RedditObject"
+  }
 
-      val auth = RedditAuth(params.getAs[String]("applicationId"), params.getAs[String]("applicationSecret"))
-      val keywords = params.getAs[String]("keywords").split('|')
+  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[RedditObject] = {
+    import ParameterExtensions._
 
-      val subreddit = params.get("subreddit").asInstanceOf[Option[String]]
-      val searchLimit = params.getOrElse("searchLimit", "25").asInstanceOf[String].toInt
-      val searchResultType = Some(params.getOrElse("searchResultType", "link").asInstanceOf[String])
-      RedditUtils.createPageStream(
-        auth,
-        keywords.toSeq,
-        streamingContext,
-        subredit = subreddit,
-        searchLimit = searchLimit,
-        searchResultType = searchResultType
-      )
+    val params = connectorConfig.parameters
+    val auth = RedditAuth(params.getAs[String]("applicationId"), params.getAs[String]("applicationSecret"))
+    val keywords = params.getAs[String]("keywords").split('|')
+    val subreddit = params.get("subreddit").asInstanceOf[Option[String]]
+    val searchLimit = params.getOrElse("searchLimit", "25").asInstanceOf[String].toInt
+    val searchResultType = Some(params.getOrElse("searchResultType", "link").asInstanceOf[String])
+
+    RedditUtils.createPageStream(
+      auth,
+      keywords.toSeq,
+      streamingContext,
+      subredit = subreddit,
+      searchLimit = searchLimit,
+      searchResultType = searchResultType
+    )
   }
 }

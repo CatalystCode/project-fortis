@@ -10,35 +10,40 @@ import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 import twitter4j.{FilterQuery, Status}
 
-class TwitterStreamFactory extends StreamFactory[Status] with Loggable {
-  override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[Status]] = {
-    case ConnectorConfig("Twitter", params) =>
-      import ParameterExtensions._
+class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
 
-      val auth = new OAuthAuthorization(
-        new ConfigurationBuilder()
-          .setOAuthConsumerKey(params.getAs[String]("consumerKey"))
-          .setOAuthConsumerSecret(params.getAs[String]("consumerSecret"))
-          .setOAuthAccessToken(params.getAs[String]("accessToken"))
-          .setOAuthAccessTokenSecret(params.getAs[String]("accessTokenSecret"))
-          .build()
-      )
+  override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
+    connectorConfig.name == "Twitter"
+  }
 
-      val query = new FilterQuery
-      val hasQuery =
-        addKeywords(query, params) ||
+  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[Status] = {
+    import ParameterExtensions._
+
+    val params = connectorConfig.parameters
+    val auth = new OAuthAuthorization(
+      new ConfigurationBuilder()
+        .setOAuthConsumerKey(params.getAs[String]("consumerKey"))
+        .setOAuthConsumerSecret(params.getAs[String]("consumerSecret"))
+        .setOAuthAccessToken(params.getAs[String]("accessToken"))
+        .setOAuthAccessTokenSecret(params.getAs[String]("accessTokenSecret"))
+        .build()
+    )
+
+    val query = new FilterQuery
+    val hasQuery =
+      addKeywords(query, params) ||
         addUsers(query, params) ||
         addLanguages(query, params) ||
         addLocations(query, params)
 
-      if (!hasQuery) {
-        logInfo("No filter set for Twitter stream")
-      }
+    if (!hasQuery) {
+      logInfo("No filter set for Twitter stream")
+    }
 
-      TwitterUtils.createFilteredStream(
-        streamingContext,
-        twitterAuth = Some(auth),
-        query = Some(query))
+    TwitterUtils.createFilteredStream(
+      streamingContext,
+      twitterAuth = Some(auth),
+      query = Some(query))
   }
 
   private def addKeywords(query: FilterQuery, params: Map[String, Any]): Boolean = {

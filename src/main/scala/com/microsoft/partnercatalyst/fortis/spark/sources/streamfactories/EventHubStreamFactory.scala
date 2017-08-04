@@ -13,34 +13,38 @@ import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byte]) => Try[A], progressDir: String)
-  extends StreamFactory[A] {
+  extends StreamFactoryBase[A] {
+  override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
+    connectorConfig.name == `identifier`
+  }
 
-  override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[A]] = {
-    case ConnectorConfig(`identifier`, params) =>
-      import ParameterExtensions._
+  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[A] = {
+    import ParameterExtensions._
 
-      // Copy adapter ref locally to avoid serializing entire EventHubStreamFactory instance
-      val adapter_ = adapter
-      val className_ = this.getClass.getName
+    // Copy adapter ref locally to avoid serializing entire EventHubStreamFactory instance
+    val adapter_ = adapter
+    val className_ = this.getClass.getName
 
-      EventHubsUtils.createDirectStreams(
-        streamingContext,
-        params.getAs[String]("namespace"),
-        progressDir,
-        Map(params.getAs[String]("name") -> Map(
-          "eventhubs.policyname" -> params.getAs[String]("policyName"),
-          "eventhubs.policykey" -> params.getAs[String]("policyKey"),
-          "eventhubs.namespace" -> params.getAs[String]("namespace"),
-          "eventhubs.name" -> params.getAs[String]("name"),
-          "eventhubs.partition.count" -> params.getAs[String]("partitionCount"),
-          "eventhubs.consumergroup" -> params.getAs[String]("consumerGroup")
-        ))
-      ).map(_.getBytes).flatMap(adapter_(_) match {
-        case Success(event) => Some(event)
-        case Failure(ex) =>
-          LogManager.getLogger(className_).error("Unable to parse EventHub message", ex)
-          None
-      })
+    val params = connectorConfig.parameters
+
+    EventHubsUtils.createDirectStreams(
+      streamingContext,
+      params.getAs[String]("namespace"),
+      progressDir,
+      Map(params.getAs[String]("name") -> Map(
+        "eventhubs.policyname" -> params.getAs[String]("policyName"),
+        "eventhubs.policykey" -> params.getAs[String]("policyKey"),
+        "eventhubs.namespace" -> params.getAs[String]("namespace"),
+        "eventhubs.name" -> params.getAs[String]("name"),
+        "eventhubs.partition.count" -> params.getAs[String]("partitionCount"),
+        "eventhubs.consumergroup" -> params.getAs[String]("consumerGroup")
+      ))
+    ).map(_.getBytes).flatMap(adapter_(_) match {
+      case Success(event) => Some(event)
+      case Failure(ex) =>
+        LogManager.getLogger(className_).error("Unable to parse EventHub message", ex)
+        None
+    })
   }
 }
 

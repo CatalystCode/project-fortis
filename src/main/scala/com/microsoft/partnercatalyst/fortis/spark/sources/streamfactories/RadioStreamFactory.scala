@@ -5,18 +5,23 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.radio.{
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
-class RadioStreamFactory extends StreamFactory[RadioTranscription]{
-  override def createStream(ssc: StreamingContext): PartialFunction[ConnectorConfig, DStream[RadioTranscription]] = {
-    case ConnectorConfig("Radio", params) =>
-      import ParameterExtensions._
+class RadioStreamFactory extends StreamFactoryBase[RadioTranscription]{
+  override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
+    connectorConfig.name == "Radio"
+  }
 
-      RadioStreamUtils.createStream(ssc,
-        params.getAs[String]("radioUrl"),
-        params.getAs[String]("audioType"),
-        params.getAs[String]("locale"),
-        params.getAs[String]("subscriptionKey"),
-        params.getAs[String]("speechType"),
-        params.getAs[String]("outputFormat")
-      )
+  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[RadioTranscription] = {
+    import ParameterExtensions._
+
+    val params = connectorConfig.parameters
+
+    RadioStreamUtils.createStream(ssc,
+      params.getAs[String]("radioUrl"),
+      params.getAs[String]("audioType"),
+      params.getAs[String]("locale"),
+      params.getAs[String]("subscriptionKey"),
+      params.getAs[String]("speechType"),
+      params.getAs[String]("outputFormat")
+    )
   }
 }
