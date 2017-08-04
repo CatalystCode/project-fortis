@@ -2,11 +2,11 @@ const graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
   type Query {
-    fetchTilesByBBox(site: String!, bbox: [Float]!, mainEdge: String!, filteredEdges: [String], timespan: String!, zoomLevel: Int, sourceFilter: [String], fromDate: String, toDate: String): FeatureCollection,
+    fetchTilesByBBox(site: String!, bbox: [Float]!, mainEdge: String!, filteredEdges: [String], timespan: String!, zoomLevel: Int, sourceFilter: [String], fromDate: String, toDate: String, originalSource: String): FeatureCollection,
     fetchPlacesByBBox(site: String!, bbox: [Float]!, zoom: Int): PlaceCollection,
     fetchTilesByLocations(site: String!, locations: [[Float]]!, filteredEdges: [String], timespan: String!, sourceFilter: [String], fromDate: String, toDate: String): FeatureCollection,
     fetchEdgesByLocations(site: String!, locations: [[Float]]!, timespan: String!, sourceFilter: [String], fromDate: String, toDate: String): EdgeCollection,
-    fetchEdgesByBBox(site: String!, bbox: [Float]!, zoomLevel: Int, mainEdge: String!, timespan: String!, sourceFilter: [String], fromDate: String, toDate: String): EdgeCollection
+    fetchEdgesByBBox(site: String!, bbox: [Float]!, zoomLevel: Int, mainEdge: String!, timespan: String!, sourceFilter: [String], fromDate: String, toDate: String, originalSource: String): EdgeCollection
   }
 
   enum TypeEnum {

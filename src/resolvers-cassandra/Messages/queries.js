@@ -4,91 +4,30 @@ const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const withRunTime = require('../shared').withRunTime;
-const { cross, makeMap } = require('../../utils/collections');
+const { parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics, limitForInClause } = require('../shared');
+const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 /**
  * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
  */
 
-function cassandraRowToFeature(row) {
+function eventToFeature(row) {
   return {
-    type: row.pipeline,
+    type: row.pipelinekey,
     coordinates: [],
     properties: {
-      edges: row.detectedkeywords,
-      messageid: row.externalid,
+      edges: row.topics,
+      messageid: row.eventid,
       createdtime: row.event_time,
-      sentiment: row.computedfeatures && row.computedfeatures.sentiment &&
-        row.computedfeatures.sentiment.pos_avg > row.computedfeatures.sentiment.neg_avg
-        ? row.computedfeatures.sentiment.pos_avg - row.computedfeatures.sentiment.neg_avg + 0.6
-        : row.computedfeatures.sentiment.neg_avg - row.computedfeatures.sentence.pos_avg,
+      sentiment: row.computedfeatures && row.computedfeatures.sentiment,
       title: row.title,
-      originalSources: row.pipeline &&
-        [row.pipeline],
+      originalSources: row.externalsourceid,
       language: row.eventlangcode,
       source: row.sourceurl,
       fullText: row.messagebody
     }
   };
-}
-
-const SUPPORTED_PIPELINES = ['twitter', 'facebook', 'instagram', 'radio', 'reddit'];
-
-function makeDefaultClauses(args) {
-  const params = [];
-  const clauses = [];
-
-  if (args.fromDate) {
-    clauses.push('(event_time >= ?)');
-    params.push(args.fromDate);
-  }
-
-  if (args.toDate) {
-    clauses.push('(event_time <= ?)');
-    params.push(args.toDate);
-  }
-
-  if (args.langCode) {
-    clauses.push('(eventlangcode = ?)');
-    params.push(args.langCode);
-  }
-
-  if (args.originalSource) {
-    clauses.push('(sourceid = ?)');
-    params.push(args.originalSource);
-  }
-
-  const keywords = (args.filteredEdges || []).concat(args.mainTerm ? [args.mainTerm] : []);
-  return {clauses: clauses, params: params, keywords};
-}
-
-function makePlacesQueries(args, placeIds) {
-  const defaults = makeDefaultClauses(args);
-
-  return cross(placeIds, defaults.keywords, SUPPORTED_PIPELINES).map(placeIdAndKeywordAndPipeline => {
-    const clauses = defaults.clauses.slice();
-    const params = defaults.params.slice();
-
-    if (placeIdAndKeywordAndPipeline.a) {
-      clauses.push('(detectedplaceids CONTAINS ?)');
-      params.push(placeIdAndKeywordAndPipeline.a);
-    }
-
-    if (placeIdAndKeywordAndPipeline.b) {
-      clauses.push('(detectedkeywords CONTAINS ?)');
-      params.push(placeIdAndKeywordAndPipeline.b);
-    }
-
-    if (placeIdAndKeywordAndPipeline.c) {
-      clauses.push('(pipeline = ?)');
-      params.push(placeIdAndKeywordAndPipeline.c);
-    }
-
-    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
-    return {query: query, params: params};
-  });
 }
 
 /**
@@ -97,28 +36,7 @@ function makePlacesQueries(args, placeIds) {
  */
 function byLocation(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args.coordinates || args.coordinates.length !== 2) return reject('No valid coordinates specified to fetch');
-
-    featureServiceClient.fetchByPoint({latitude: args.coordinates[0], longitude: args.coordinates[1]})
-    .then(places => {
-      const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const placeIds = Object.keys(idToBbox);
-      const queries = makePlacesQueries(args, placeIds);
-      cassandraConnector.executeQueries(queries)
-      .then(rows => {
-        const features = rows.map(row => {
-          const feature = cassandraRowToFeature(row);
-          feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
-          return feature;
-        });
-
-        resolve({
-          features: features
-        });
-      })
-      .catch(reject);
-    })
-    .catch(reject);
+    return reject('Querying by location is no longer supported, please query using the place name instead');
   });
 }
 
@@ -130,48 +48,67 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
 
+    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+
     featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
     .then(places => {
-      const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-      const placeIds = Object.keys(idToBbox);
-      const queries = makePlacesQueries(args, placeIds);
-      cassandraConnector.executeQueries(queries)
-      .then(rows => {
-        const features = rows.map(row => {
-          const feature = cassandraRowToFeature(row);
-          feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
-          return feature;
-        });
+      const placeIds = makeSet(places, place => place.id);
+      const limit = args.limit || 15;
 
+      const tagsQuery = `
+      SELECT eventids
+      FROM fortis.eventplaces
+      WHERE placeid IN ?
+      AND conjunctiontopic1 = ?
+      AND conjunctiontopic2 = ?
+      AND conjunctiontopic3 = ?
+      AND pipelinekey = ?
+      AND externalsourceid = ?
+      AND event_time <= ?
+      AND event_time >= ?
+      LIMIT ?
+      `.trim();
+
+      const tagsParams = [
+        limitForInClause(placeIds),
+        ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
+        toPipelineKey(args.sourceFilter),
+        'all',
+        toDate,
+        fromDate,
+        limit
+      ];
+
+      cassandraConnector.executeQuery(tagsQuery, tagsParams)
+      .then(rows => {
+        const eventIds = makeSet(rows.map(row => row.eventids), eventId => eventId);
+
+        const eventsQuery = `
+        SELECT *
+        FROM fortis.events
+        WHERE pipelinekey = ?
+        AND eventid IN ?
+        AND fulltext LIKE ?
+        LIMIT ?
+        `.trim();
+
+        const eventsParams = [
+          toPipelineKey(args.sourceFilter),
+          limitForInClause(eventIds),
+          `%${args.fulltextTerm}%`,
+          limit
+        ];
+
+        return cassandraConnector.executeQuery(eventsQuery, eventsParams);
+      })
+      .then(rows => {
         resolve({
-          features: features
+          features: rows.map(eventToFeature)
         });
       })
       .catch(reject);
     })
     .catch(reject);
-  });
-}
-
-function makeEdgesQueries(args) {
-  const defaults = makeDefaultClauses(args);
-
-  return cross(defaults.keywords, SUPPORTED_PIPELINES).map(keywordAndPipeline => {
-    const clauses = defaults.clauses.slice();
-    const params = defaults.params.slice();
-
-    if (keywordAndPipeline.a) {
-      clauses.push('(detectedkeywords CONTAINS ?)');
-      params.push(keywordAndPipeline.a);
-    }
-
-    if (keywordAndPipeline.b) {
-      clauses.push('(pipeline = ?)');
-      params.push(keywordAndPipeline.b);
-    }
-
-    const query = `SELECT * FROM fortis.events WHERE ${clauses.join(' AND ')} ALLOW FILTERING`;
-    return {query: query, params: params};
   });
 }
 
@@ -180,35 +117,59 @@ function makeEdgesQueries(args) {
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
-  const queries = makeEdgesQueries(args);
   return new Promise((resolve, reject) => {
-    cassandraConnector.executeQueries(queries)
-    .then(rows => {
-      const placeIds = new Set();
-      rows.forEach(row => row.detectedplaceids.forEach(placeId => placeIds.add(placeId)));
-      featureServiceClient.fetchById(placeIds)
-      .then(places => {
-        const idToBbox = makeMap(places, place => place.id, place => place.bbox);
-        const features = rows.map(row => {
-          const feature = cassandraRowToFeature(row);
-          feature.coordinates = row.detectedplaceids.map(placeId => idToBbox[placeId]).filter(bbox => bbox != null);
-          return feature;
-        });
+    if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
-        resolve({
-          features: features
-        });
-      })
-      .catch(reject);
+    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    const limit = args.limit || 15;
+
+    const tagsQuery = `
+    SELECT eventids
+    FROM fortis.eventtopics
+    WHERE topic IN ?
+    AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND event_time <= ?
+    AND event_time >= ?
+    LIMIT ?
+    `.trim();
+
+    const tagsParams = [
+      limitForInClause(args.filteredEdges),
+      toPipelineKey(args.sourceFilter),
+      'all',
+      toDate,
+      fromDate,
+      limit
+    ];
+
+    cassandraConnector.executeQuery(tagsQuery, tagsParams)
+    .then(rows => {
+      const eventIds = makeSet(rows.map(row => row.eventids), eventId => eventId);
+
+      const eventQuery = `
+      SELECT *
+      FROM fortis.events
+      WHERE pipelinekey = ?
+      AND eventid IN ?
+      LIMIT ?
+      `.trim();
+
+      const eventParams = [
+        toPipelineKey(args.sourceFilter),
+        limitForInClause(eventIds),
+        limit
+      ];
+
+      return cassandraConnector.executeQuery(eventQuery, eventParams);
+    })
+    .then(rows => {
+      resolve({
+        features: rows.map(eventToFeature)
+      });
     })
     .catch(reject);
   });
-}
-
-function makeEventQuery(args) {
-  const query = 'SELECT * FROM fortis.events WHERE id = ? ALLOW FILTERING';
-  const params = [args.messageId];
-  return {query: query, params: params};
 }
 
 /**
@@ -219,20 +180,23 @@ function event(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.messageId) return reject('No event id to fetch specified');
 
-    const query = makeEventQuery(args);
-    cassandraConnector.executeQuery(query.query, query.params)
-    .then(rows => {
-      if (rows.length > 1) return reject(`Got more ${rows.length} events with id ${args.messageId}`);
+    const eventQuery = `
+    SELECT *
+    FROM fortis.events
+    WHERE eventid = ?
+    AND pipelinekey = 'all'
+    LIMIT 2
+    `.trim();
 
-      const row = rows[0];
-      const feature = cassandraRowToFeature(row);
-      featureServiceClient.fetchById(row.detectedplaceids || [])
-      .then(places => {
-        feature.coordinates = places.map(place => place.bbox);
+    const eventParams = [
+      args.messageId
+    ];
 
-        resolve(feature);
-      })
-      .catch(reject);
+    cassandraConnector.executeQuery(eventQuery, eventParams)
+    .then(eventRows => {
+      if (eventRows.length > 1) return reject(`Got more ${eventRows.length} events with id ${args.messageId}`);
+
+      resolve(eventToFeature(eventRows[0]));
     })
     .catch(reject);
   });
