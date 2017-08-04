@@ -4,7 +4,7 @@ const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
+const { parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
@@ -68,7 +68,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       `.trim();
 
       const tagsParams = [
-        placeIds,
+        limitForInClause(placeIds),
         ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
         toPipelineKey(args.sourceFilter),
         'all',
@@ -90,7 +90,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 
         const eventsParams = [
           toPipelineKey(args.sourceFilter),
-          eventIds,
+          limitForInClause(eventIds),
           `%${args.fulltextTerm}%`
         ];
 
@@ -128,7 +128,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     `.trim();
 
     const tagsParams = [
-      args.filteredEdges,
+      limitForInClause(args.filteredEdges),
       toPipelineKey(args.sourceFilter),
       'all',
       toDate,
@@ -148,7 +148,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
 
       const eventParams = [
         toPipelineKey(args.sourceFilter),
-        eventIds
+        limitForInClause(eventIds)
       ];
 
       return cassandraConnector.executeQuery(eventQuery, eventParams);

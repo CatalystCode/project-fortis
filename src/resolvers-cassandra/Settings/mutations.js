@@ -4,7 +4,7 @@ const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const blobStorageClient = require('../../clients/storage/BlobStorageClient');
-const withRunTime = require('../shared').withRunTime;
+const { withRunTime, limitForInClause } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 const STREAM_PIPELINE_TWITTER = 'twitter';
@@ -400,18 +400,28 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
     const terms = args && args.input && args.input.terms;
     if (!terms || !terms.length) return reject('No terms specified');
     
-    const invalidTerms = terms.filter(terms=>!terms.RowKey);
-    if (invalidTerms.length > 0) {
-      reject(`RowKey required for ${JSON.stringify(invalidTerms)}`);
-      return;
-    }
+    const invalidTerms = terms.some(terms => !terms.RowKey);
+    if (invalidTerms.length > 0) return reject(`RowKey required for ${JSON.stringify(invalidTerms)}`);
+
+    const termIds = terms.map(term => term.RowKey);
     
-    const params = [terms.map( t => { return t.RowKey; } )];
-    const update = 'DELETE FROM fortis.blacklist WHERE id IN ?';
-    cassandraConnector.executeQuery(update, params)
-    .then(() => { resolve({ filters: terms }); })
-    .catch(reject)
-    ;
+    const query = `
+    DELETE
+    FROM fortis.blacklist
+    WHERE id IN ?
+    `;
+
+    const params = [
+      limitForInClause(termIds)
+    ];
+
+    cassandraConnector.executeQuery(query, params)
+    .then(() => {
+      resolve({
+        filters: terms
+      });
+    })
+    .catch(reject);
   });
 }
 

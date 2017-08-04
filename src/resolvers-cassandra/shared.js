@@ -20,16 +20,17 @@ function withRunTime(promiseFunc) {
   return runTimer;
 }
 
-const allSources = [
-  'bing',
-  'customevents',
-  'tadaweb',
-  'facebook',
-  'twitter',
-  'radio',
-  'reddit',
-  'instagram'
-];
+const MAX_IN_CLAUSES = 65535;
+
+function limitForInClause(collection) {
+  const list = collection.constructor === Array ? collection : Array.from(collection);
+  if (list.length <= MAX_IN_CLAUSES) {
+    return list;
+  }
+
+  console.warn(`Only ${MAX_IN_CLAUSES} items allowed for IN clause, ignoring ${list.length - MAX_IN_CLAUSES} elements`);
+  return list.slice(0, MAX_IN_CLAUSES);
+}
 
 function toPipelineKey(sourceFilter) {
   if (!sourceFilter || !sourceFilter.length) {
@@ -90,6 +91,6 @@ module.exports = {
   toPipelineKey,
   toConjunctionTopics,
   tilesForBbox,
-  allSources: allSources,
+  limitForInClause,
   withRunTime: withRunTime
 };
