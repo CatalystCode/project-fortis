@@ -18,12 +18,14 @@ class FacebookCommentStreamFactory extends StreamFactory[FacebookComment] {
     */
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[FacebookComment]] = {
     case ConnectorConfig("FacebookComment", params) =>
-      val facebookAuth = FacebookAuth(params("appId"), params("appSecret"), params("accessToken"))
-      val pageIds = Option(params("pageIds")) match {
-        case None => Set()
-        case Some(pageIds) => pageIds.split(DELIMITER).toSet
-      }
+      import ParameterExtensions._
 
-      FacebookUtils.createCommentsStreams(streamingContext, facebookAuth, pageIds.toSet)
+      val facebookAuth = FacebookAuth(
+        params.getAs[String]("appId"),
+        params.getAs[String]("appSecret"),
+        params.getAs[String]("accessToken")
+      )
+
+      FacebookUtils.createCommentsStreams(streamingContext, facebookAuth, params.getTrustedSources.toSet)
   }
 }
