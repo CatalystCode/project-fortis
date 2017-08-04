@@ -29,7 +29,11 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
 
       ConnectorConfig(
         stream.connector,
-        stream.params + ("trustedSources" -> trustedSources)
+        stream.params +
+          (
+            "trustedSources" -> trustedSources,
+            "streamId" -> stream.streamid
+          )
       )
 
     }).toList
