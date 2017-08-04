@@ -106,7 +106,7 @@ object ProjectFortis extends App {
     */
   @SerialVersionUID(100L)
   private object DummyConfigurationManager extends ConfigurationManager with Serializable {
-    override def fetchConnectorConfigs(pipeline: String): List[ConnectorConfig] = {
+    override def fetchConnectorConfigs(sparkContext: SparkContext, pipeline: String): List[ConnectorConfig] = {
       // The key is the name of the pipeline and the value is a list of connector configs whose streams should comprise it.
       Map[String, List[ConnectorConfig]](
         "instagram" -> List(
@@ -225,7 +225,7 @@ object ProjectFortis extends App {
       )(pipeline)
     }
 
-    override def fetchSiteSettings(): SiteSettings = SiteSettings(
+    override def fetchSiteSettings(sparkContext: SparkContext): SiteSettings = SiteSettings(
       id = null,
       siteName = "",
       geofence = Geofence(north = 49.6185146245, west = -124.9578052195, south = 46.8691952854, east = -121.0945042053),
@@ -237,17 +237,15 @@ object ProjectFortis extends App {
       cogSpeechSvcToken = System.getenv("OXFORD_SPEECH_TOKEN"),
       cogTextSvcToken = Settings.oxfordLanguageToken,
       cogVisionSvcToken = Settings.oxfordVisionToken,
-      insertionTime = ""
+      insertionTime = 0L
     )
 
-    override def fetchTrustedSources(connector: String): List[String] = ???
-
-    override def fetchWatchlist(): Map[String, List[String]] =
+    override def fetchWatchlist(sparkContext: SparkContext): Map[String, Seq[String]] =
       Map(
         "en" -> List("Ariana")
       )
 
-    override def fetchBlacklist(): List[BlacklistedTerm] =
+    override def fetchBlacklist(sparkContext: SparkContext): Seq[BlacklistedTerm] =
       List(
         BlacklistedTerm(conjunctiveFilter = Set("Trump", "Hilary"))
       )

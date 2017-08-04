@@ -17,22 +17,23 @@ class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byt
 
   override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[A]] = {
     case ConnectorConfig(`identifier`, params) =>
+      import ParameterExtensions._
 
       // Copy adapter ref locally to avoid serializing entire EventHubStreamFactory instance
       val adapter_ = adapter
-      val className_ = getClass.getName
+      val className_ = this.getClass.getName
 
       EventHubsUtils.createDirectStreams(
         streamingContext,
-        params("namespace"),
+        params.getAs[String]("namespace"),
         progressDir,
-        Map(params("name") -> Map(
-          "eventhubs.policyname" -> params("policyName"),
-          "eventhubs.policykey" -> params("policyKey"),
-          "eventhubs.namespace" -> params("namespace"),
-          "eventhubs.name" -> params("name"),
-          "eventhubs.partition.count" -> params("partitionCount"),
-          "eventhubs.consumergroup" -> params("consumerGroup")
+        Map(params.getAs[String]("name") -> Map(
+          "eventhubs.policyname" -> params.getAs[String]("policyName"),
+          "eventhubs.policykey" -> params.getAs[String]("policyKey"),
+          "eventhubs.namespace" -> params.getAs[String]("namespace"),
+          "eventhubs.name" -> params.getAs[String]("name"),
+          "eventhubs.partition.count" -> params.getAs[String]("partitionCount"),
+          "eventhubs.consumergroup" -> params.getAs[String]("consumerGroup")
         ))
       ).map(_.getBytes).flatMap(adapter_(_) match {
         case Success(event) => Some(event)

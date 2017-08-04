@@ -27,7 +27,7 @@ object Pipeline {
     transformContextProvider: TransformContextProvider,
     configurationManager: ConfigurationManager
   ): Option[DStream[FortisEvent]] = {
-    val configs = configurationManager.fetchConnectorConfigs(name)
+    val configs = configurationManager.fetchConnectorConfigs(ssc.sparkContext, name)
     val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
     val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/opener/opener-$language.zip", Settings.modelsDir)

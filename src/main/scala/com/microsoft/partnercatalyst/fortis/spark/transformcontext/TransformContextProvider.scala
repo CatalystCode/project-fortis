@@ -53,14 +53,14 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
         if (transformContext == null) {
 
           // Fetch data synchronously
-          val siteSettings = configManager.fetchSiteSettings()
-          val langToWatchlist = configManager.fetchWatchlist()
-          val blacklist = configManager.fetchBlacklist()
+          val siteSettings = configManager.fetchSiteSettings(sparkContext)
+          val langToWatchlist = configManager.fetchWatchlist(sparkContext)
+          val blacklist = configManager.fetchBlacklist(sparkContext)
 
           val delta = Delta(TransformContext(), featureServiceClient, Some(siteSettings), Some(langToWatchlist), Some(blacklist))
 
           updateTransformContextAndBroadcast(delta, sparkContext)
-          startQueueClient()
+          startQueueClient(sparkContext)
         }
       } finally {
         writeLock.unlock()
@@ -68,7 +68,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
     }
   }
 
-  private def startQueueClient(): Unit = {
+  private def startQueueClient(sparkContext: SparkContext): Unit = {
     queueClient = new QueueClient(
       new ConnectionStringBuilder(
         Properties.envOrNone(Constants.Env.ManagementBusNamespace).get,
@@ -78,7 +78,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
       ), ReceiveMode.PeekLock)
 
     queueClient.registerMessageHandler(
-      new MessageHandler(),
+      new MessageHandler(sparkContext),
       new MessageHandlerOptions(
         1, // Max concurrent calls
         true,
@@ -116,7 +116,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
     )
   }
 
-  private class MessageHandler extends IMessageHandler {
+  private class MessageHandler(sparkContext: SparkContext) extends IMessageHandler {
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
       logError("Service Bus client threw error while processing message.", exception)
     }
@@ -137,13 +137,13 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
       val delta = Option(message.getProperties.getOrDefault("dirty", null)) match {
         case Some(value) => value match {
           case "settings" =>
-            val siteSettings = configManager.fetchSiteSettings()
+            val siteSettings = configManager.fetchSiteSettings(sparkContext)
             Delta(transformContext, featureServiceClient, siteSettings = Some(siteSettings))
           case "watchlist" =>
-            val langToWatchlist = configManager.fetchWatchlist()
+            val langToWatchlist = configManager.fetchWatchlist(sparkContext)
             Delta(transformContext, featureServiceClient, langToWatchlist = Some(langToWatchlist))
           case "blacklist" =>
-            val blacklist = configManager.fetchBlacklist()
+            val blacklist = configManager.fetchBlacklist(sparkContext)
             Delta(transformContext, featureServiceClient, blacklist = Some(blacklist))
           case unknown =>
             logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")

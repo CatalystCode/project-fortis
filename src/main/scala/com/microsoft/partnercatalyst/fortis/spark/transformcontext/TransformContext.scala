@@ -11,7 +11,7 @@ import org.apache.spark.broadcast.Broadcast
 case class TransformContext(
   siteSettings: SiteSettings = null,
   langToKeywordExtractor: Broadcast[Map[String, KeywordExtractor]] = null,
-  blacklist: Broadcast[List[BlacklistedTerm]] = null,
+  blacklist: Broadcast[Seq[BlacklistedTerm]] = null,
   locationsExtractorFactory: Broadcast[LocationsExtractorFactory] = null,
 
   // The following objects have a small serialized forms. Consequently, we don't bother to broadcast them

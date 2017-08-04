@@ -14,5 +14,5 @@ case class SiteSettings(
   cogSpeechSvcToken: String,
   cogVisionSvcToken: String,
   cogTextSvcToken: String,
-  insertionTime: String
+  insertionTime: Long
 )
