@@ -53,6 +53,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
     .then(places => {
       const placeIds = makeSet(places, place => place.id);
+      const limit = args.limit || 15;
 
       const tagsQuery = `
       SELECT eventids
@@ -65,6 +66,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       AND externalsourceid = ?
       AND event_time <= ?
       AND event_time >= ?
+      LIMIT ?
       `.trim();
 
       const tagsParams = [
@@ -73,7 +75,8 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
         toPipelineKey(args.sourceFilter),
         'all',
         toDate,
-        fromDate
+        fromDate,
+        limit
       ];
 
       cassandraConnector.executeQuery(tagsQuery, tagsParams)
@@ -86,12 +89,14 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
         WHERE pipelinekey = ?
         AND eventid IN ?
         AND fulltext LIKE ?
+        LIMIT ?
         `.trim();
 
         const eventsParams = [
           toPipelineKey(args.sourceFilter),
           limitForInClause(eventIds),
-          `%${args.fulltextTerm}%`
+          `%${args.fulltextTerm}%`,
+          limit
         ];
 
         return cassandraConnector.executeQuery(eventsQuery, eventsParams);
@@ -116,6 +121,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
     const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    const limit = args.limit || 15;
 
     const tagsQuery = `
     SELECT eventids
@@ -125,6 +131,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     AND externalsourceid = ?
     AND event_time <= ?
     AND event_time >= ?
+    LIMIT ?
     `.trim();
 
     const tagsParams = [
@@ -132,7 +139,8 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
       toPipelineKey(args.sourceFilter),
       'all',
       toDate,
-      fromDate
+      fromDate,
+      limit
     ];
 
     cassandraConnector.executeQuery(tagsQuery, tagsParams)
@@ -144,11 +152,13 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
       FROM fortis.events
       WHERE pipelinekey = ?
       AND eventid IN ?
+      LIMIT ?
       `.trim();
 
       const eventParams = [
         toPipelineKey(args.sourceFilter),
-        limitForInClause(eventIds)
+        limitForInClause(eventIds),
+        limit
       ];
 
       return cassandraConnector.executeQuery(eventQuery, eventParams);
@@ -175,6 +185,7 @@ function event(args, res) { // eslint-disable-line no-unused-vars
     FROM fortis.events
     WHERE eventid = ?
     AND pipelinekey = 'all'
+    LIMIT 2
     `.trim();
 
     const eventParams = [

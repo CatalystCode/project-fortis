@@ -180,6 +180,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
     const tilex = makeSet(tiles, tile => tile.row);
     const tiley = makeSet(tiles, tile => tile.column);
+    const limit = args.limit || 1000;
 
     const query = `
     SELECT placename, mentioncount, pipelinekey
@@ -194,6 +195,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     AND pipelinekey = ?
     AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
     AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
+    LIMIT ?
     `.trim();
 
     const params = [
@@ -210,7 +212,8 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
       Math.min(...tilex),
       Math.min(...tiley),
       fromDate,
-      fromDate
+      fromDate,
+      limit
     ];
 
     return cassandraConnector.executeQuery(query, params)
