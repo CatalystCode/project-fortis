@@ -45,7 +45,7 @@ function toPipelineKey(sourceFilter) {
 
 function toConjunctionTopics(mainEdge, filteredEdges) {
   if (!filteredEdges || !filteredEdges.length) {
-    return [mainEdge, null, null];
+    return [mainEdge, '', ''];
   }
 
   const extraFilters = filteredEdges.slice(0, 2);
@@ -55,7 +55,7 @@ function toConjunctionTopics(mainEdge, filteredEdges) {
 
   const selectedFilters = [mainEdge].concat(extraFilters).sort();
   while (selectedFilters.length < 3) {
-    selectedFilters.push(null);
+    selectedFilters.push('');
   }
 
   return selectedFilters;

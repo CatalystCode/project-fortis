@@ -58,7 +58,9 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       SELECT eventids
       FROM fortis.eventplaces
       WHERE placeid IN ?
-      AND conjunctiontopics = ?
+      AND conjunctiontopic1 = ?
+      AND conjunctiontopic2 = ?
+      AND conjunctiontopic3 = ?
       AND pipelinekey = ?
       AND externalsourceid = ?
       AND event_time <= ?
@@ -67,7 +69,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 
       const tagsParams = [
         placeIds,
-        toConjunctionTopics(args.mainTerm, args.filteredEdges),
+        ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
         toPipelineKey(args.sourceFilter),
         'all',
         toDate,

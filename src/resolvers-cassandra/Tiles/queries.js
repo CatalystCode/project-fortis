@@ -47,7 +47,9 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
     SELECT tilex, tiley, tilez, avgsentiment, mentioncount
     FROM fortis.computedtiles
     WHERE periodtype = ?
-    AND conjunctiontopics = ?
+    AND conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ?
+    AND conjunctiontopic3 = ?
     AND tilez = ?
     AND period = ?
     AND pipelinekey = ?
@@ -58,7 +60,7 @@ function fetchTilesByBBox(args, res) { // eslint-disable-line no-unused-vars
 
     const params = [
       periodType,
-      toConjunctionTopics(args.mainEdge, args.filteredEdges),
+      ...toConjunctionTopics(args.mainEdge, args.filteredEdges),
       args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),

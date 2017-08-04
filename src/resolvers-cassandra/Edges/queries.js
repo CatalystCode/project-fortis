@@ -84,7 +84,9 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     AND periodtype = ?
     AND pipelinekey = ?
     AND externalsourceid = ?
-    AND conjunctiontopics = ?
+    AND conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ?
+    AND conjunctiontopic3 = ?
     `.trim();
 
     const params = [
@@ -92,7 +94,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       periodType,
       toPipelineKey(args.sourceFilter),
       args.originalSource || 'all',
-      toConjunctionTopics(args.mainEdge)
+      ...toConjunctionTopics(args.mainEdge)
     ];
 
     return cassandraConnector.executeQuery(query, params)
@@ -122,10 +124,12 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
     const tiley = makeSet(tiles, tile => tile.column);
 
     const query = `
-    SELECT conjunctiontopics, periodstartdate, mentioncount
+    SELECT conjunctiontopic1, periodstartdate, mentioncount
     FROM fortis.timeseries
     WHERE periodtype = ?
-    AND conjunctiontopics = ?
+    AND conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ?
+    AND conjunctiontopic3 = ?
     AND tilez = ?
     AND period = ?
     AND pipelinekey = ?
@@ -136,7 +140,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 
     const params = [
       periodType,
-      toConjunctionTopics(args.mainTerm),
+      ...toConjunctionTopics(args.mainTerm),
       args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),
@@ -151,14 +155,12 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       fromDate
     ];
 
-    const getTopic = row => row.conjunctiontopics[0];
-
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const topicToCounts = makeMultiMap(rows, row => getTopic(row), row => row.mentioncount);
+      const topicToCounts = makeMultiMap(rows, row => row.conjunctiontopic1, row => row.mentioncount);
       const labels = Object.keys(topicToCounts).map(topic => ({name: topic, mentions: topicToCounts[topic].reduce((a, b) => a + b, 0)}));
       const dateToRows = makeMultiMap(rows, row => row.periodstartdate, row => row);
-      const graphData = Object.keys(dateToRows).map(date => ({date, edges: rows.map(getTopic), mentions: rows.map(row => row.mentioncount)}));
+      const graphData = Object.keys(dateToRows).map(date => ({date, edges: rows.map(row => row.conjunctiontopic1), mentions: rows.map(row => row.mentioncount)}));
       resolve({
         labels,
         graphData
@@ -183,7 +185,9 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     SELECT placename, mentioncount, pipelinekey
     FROM fortis.popularsources
     WHERE periodtype = ?
-    AND conjunctiontopics = ?
+    AND conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ?
+    AND conjunctiontopic3 = ?
     AND tilez = ?
     AND externalsourceid = ?
     AND period = ?
@@ -194,7 +198,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
 
     const params = [
       periodType,
-      toConjunctionTopics(args.mainTerm),
+      ...toConjunctionTopics(args.mainTerm),
       args.zoomLevel,
       args.originalSource || 'all',
       period,
