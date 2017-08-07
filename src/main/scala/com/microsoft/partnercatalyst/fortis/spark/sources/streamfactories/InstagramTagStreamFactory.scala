@@ -11,12 +11,12 @@ class InstagramTagStreamFactory extends StreamFactoryBase[InstagramItem]{
     connectorConfig.name == "InstagramTag"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[InstagramItem] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[InstagramItem] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
     val auth = InstagramAuth(params.getAs[String]("authToken"))
 
-    InstagramUtils.createTagStream(streamingContext, auth, params.getAs[String]("tag"))
+    InstagramUtils.createTagStream(ssc, auth, params.getAs[String]("tag"))
   }
 }

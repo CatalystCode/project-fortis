@@ -15,10 +15,10 @@ import scala.util.{Failure, Success, Try}
 class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byte]) => Try[A], progressDir: String)
   extends StreamFactoryBase[A] {
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == `identifier`
+    connectorConfig.name == identifier
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[A] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[A] = {
     import ParameterExtensions._
 
     // Copy adapter ref locally to avoid serializing entire EventHubStreamFactory instance
@@ -28,7 +28,7 @@ class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byt
     val params = connectorConfig.parameters
 
     EventHubsUtils.createDirectStreams(
-      streamingContext,
+      ssc,
       params.getAs[String]("namespace"),
       progressDir,
       Map(params.getAs[String]("name") -> Map(

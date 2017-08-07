@@ -8,9 +8,9 @@ import org.apache.spark.streaming.dstream.DStream
 import scala.reflect.ClassTag
 
 abstract class StreamFactoryBase[A: ClassTag] extends StreamFactory[A]{
-  override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[A]] = {
+  override def createStream(ssc: StreamingContext): PartialFunction[ConnectorConfig, DStream[A]] = {
     case config if canHandle(config) =>
-      val stream = buildStream(streamingContext, config)
+      val stream = buildStream(ssc, config)
 
       stream.transform(rdd => {
         rdd.cache()
@@ -25,5 +25,5 @@ abstract class StreamFactoryBase[A: ClassTag] extends StreamFactory[A]{
   }
 
   protected def canHandle(connectorConfig: ConnectorConfig): Boolean
-  protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[A]
+  protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[A]
 }

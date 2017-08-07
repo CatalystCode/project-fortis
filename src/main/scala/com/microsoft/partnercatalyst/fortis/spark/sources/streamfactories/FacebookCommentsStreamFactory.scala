@@ -7,13 +7,11 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
 class FacebookCommentStreamFactory extends StreamFactoryBase[FacebookComment] {
-  private val DELIMITER: String = "|"
-
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
     connectorConfig.name == "FacebookComment"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[FacebookComment] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[FacebookComment] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
@@ -23,6 +21,6 @@ class FacebookCommentStreamFactory extends StreamFactoryBase[FacebookComment] {
       params.getAs[String]("accessToken")
     )
 
-    FacebookUtils.createCommentsStreams(streamingContext, facebookAuth, params.getTrustedSources.toSet)
+    FacebookUtils.createCommentsStreams(ssc, facebookAuth, params.getTrustedSources.toSet)
   }
 }

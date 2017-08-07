@@ -10,7 +10,7 @@ class RadioStreamFactory extends StreamFactoryBase[RadioTranscription]{
     connectorConfig.name == "Radio"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[RadioTranscription] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[RadioTranscription] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters

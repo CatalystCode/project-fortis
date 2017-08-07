@@ -11,7 +11,7 @@ class RedditStreamFactory extends StreamFactoryBase[RedditObject] {
     connectorConfig.name == "RedditObject"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[RedditObject] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[RedditObject] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
@@ -24,7 +24,7 @@ class RedditStreamFactory extends StreamFactoryBase[RedditObject] {
     RedditUtils.createPageStream(
       auth,
       keywords.toSeq,
-      streamingContext,
+      ssc,
       subredit = subreddit,
       searchLimit = searchLimit,
       searchResultType = searchResultType

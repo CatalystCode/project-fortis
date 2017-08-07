@@ -11,7 +11,7 @@ class FacebookPageStreamFactory extends StreamFactoryBase[FacebookPost] {
     connectorConfig.name == "FacebookPage"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[FacebookPost] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[FacebookPost] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
@@ -21,6 +21,6 @@ class FacebookPageStreamFactory extends StreamFactoryBase[FacebookPost] {
       params.getAs[String]("accessToken")
     )
 
-    FacebookUtils.createPageStreams(streamingContext, facebookAuth, params.getTrustedSources.toSet)
+    FacebookUtils.createPageStreams(ssc, facebookAuth, params.getTrustedSources.toSet)
   }
 }

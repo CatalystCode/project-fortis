@@ -11,12 +11,11 @@ import twitter4j.conf.ConfigurationBuilder
 import twitter4j.{FilterQuery, Status}
 
 class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
-
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
     connectorConfig.name == "Twitter"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[Status] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[Status] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
@@ -41,7 +40,7 @@ class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
     }
 
     TwitterUtils.createFilteredStream(
-      streamingContext,
+      ssc,
       twitterAuth = Some(auth),
       query = Some(query))
   }

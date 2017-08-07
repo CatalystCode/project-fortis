@@ -11,14 +11,14 @@ class InstagramLocationStreamFactory extends StreamFactoryBase[InstagramItem]{
     connectorConfig.name == "InstagramLocation"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[InstagramItem] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[InstagramItem] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
     val auth = InstagramAuth(params.getAs[String]("authToken"))
 
     InstagramUtils.createLocationStream(
-      streamingContext,
+      ssc,
       auth,
       latitude = params.getAs[String]("latitude").toDouble,
       longitude = params.getAs[String]("longitude").toDouble)

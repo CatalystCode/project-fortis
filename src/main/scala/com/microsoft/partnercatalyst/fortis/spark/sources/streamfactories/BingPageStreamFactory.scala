@@ -11,7 +11,7 @@ class BingPageStreamFactory extends StreamFactoryBase[BingPost]{
     connectorConfig.name == "BingPage"
   }
 
-  override protected def buildStream(streamingContext: StreamingContext, connectorConfig: ConnectorConfig): DStream[BingPost] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[BingPost] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
@@ -19,6 +19,6 @@ class BingPageStreamFactory extends StreamFactoryBase[BingPost]{
     val searchInstanceId = params.getAs[String]("searchInstanceId")
     val keywords = params.getAs[String]("keywords").split('|')
 
-    BingUtils.createPageStream(streamingContext, auth, searchInstanceId, keywords)
+    BingUtils.createPageStream(ssc, auth, searchInstanceId, keywords)
   }
 }
