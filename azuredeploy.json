@@ -436,7 +436,7 @@
         {
             "name": "[variables('applicationInsightServiceName')]",
             "type": "Microsoft.Insights/components",
-            "location": "[resourceGroup().location]",
+            "location": "eastus",
             "apiVersion": "2014-04-01",
             "tags": {
                 "displayName": "Component ApplicationInsight"
