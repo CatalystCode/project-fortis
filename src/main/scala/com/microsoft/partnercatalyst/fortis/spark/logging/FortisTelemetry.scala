@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.logging
 
 trait FortisTelemetry {
-  def logIncomingEventBatch(streamId: String, connectorName: String, batchSize: Int)
+  def logIncomingEventBatch(streamId: String, connectorName: String, batchSize: Long)
 }
 
 object FortisTelemetry {
