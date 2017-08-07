@@ -103,10 +103,19 @@ CREATE TABLE trustedsources (
 
 DROP TABLE IF EXISTS conjunctivetopics;
 CREATE TABLE conjunctivetopics (
+    periodstartdate timestamp,
+    periodenddate timestamp,
+    periodtype text,
+    pipelinekey text,
+    period text,
+    tilez int,
+    tilex int,
+    tiley int,
+    externalsourceid text,    
     topic text,
     conjunctivetopic text,
-    mentioncount bigint,
-    PRIMARY KEY(topic, conjunctivetopic)
+    mentioncount counter,
+    PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), conjunctivetopic, tilex, tiley, periodstartdate, periodenddate)
 );
 
 DROP TABLE IF EXISTS populartopics;
@@ -121,8 +130,7 @@ CREATE TABLE populartopics (
     tiley int,
     externalsourceid text,
     topic text,
-    mentioncount bigint,
-    insertiontime timestamp,
+    mentioncount counter,
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
 
@@ -160,20 +168,19 @@ CREATE TABLE popularplaces (
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
-    mentioncount bigint,
-    insertiontime timestamp,
-    avgsentiment float,
-    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), mentioncount, periodstartdate, periodenddate, centroidlat, centroidlon)
-) WITH CLUSTERING ORDER BY (mentioncount DESC, periodstartdate DESC, periodenddate DESC, centroidlat DESC, centroidlon DESC);
+    mentioncount counter,
+    avgsentimentnumerator counter,
+    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), placeid, periodstartdate, periodenddate, centroidlat, centroidlon)
+);
 
 DROP TABLE IF EXISTS eventtopics;
 CREATE TABLE eventtopics(
     eventids set<text>,
     topic text,
-    eventtime timestamp,
+    insertiontime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((topic), pipelinekey, externalsourceid, eventtime)
+    PRIMARY KEY ((topic), pipelinekey, externalsourceid)
 );
 
 DROP TABLE IF EXISTS eventplaces;
@@ -182,11 +189,13 @@ CREATE TABLE eventplaces(
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
+    centroidlat double,
+    centroidlon double,
     placeid text,
-    eventtime timestamp,
+    insertiontime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((placeid), conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid, eventtime)
+    PRIMARY KEY ((placeid), conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid, centroidlat, centroidlon)
 );
 
 DROP TABLE IF EXISTS events;
