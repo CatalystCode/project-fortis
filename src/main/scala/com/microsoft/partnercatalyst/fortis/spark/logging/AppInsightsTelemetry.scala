@@ -6,7 +6,7 @@ import java.util.HashMap
 class AppInsightsTelemetry extends FortisTelemetry {
   private val client: TelemetryClient = new TelemetryClient(TelemetryConfiguration.createDefault())
 
-  def logIncomingEventBatch(streamId: String, connectorName: String, batchSize: Int): Unit = {
+  def logIncomingEventBatch(streamId: String, connectorName: String, batchSize: Long): Unit = {
     val properties = new HashMap[String, String](2)
     properties.put("streamId", streamId)
     properties.put("connectorName", connectorName)
