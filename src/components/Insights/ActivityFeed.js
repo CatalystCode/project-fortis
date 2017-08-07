@@ -246,7 +246,7 @@ export const ActivityFeed = React.createClass({
 
       SERVICES.FetchMessageSentences(siteKey, originalSource, bbox, datetimeSelection, timespanType, 
                                      limit, offset, edges, DEFAULT_LANGUAGE, Actions.DataSources(filteredSource), 
-                                     categoryValue?categoryValue.name.toLowerCase():categoryValue, searchValue, undefined, callback);
+                                     categoryValue?categoryValue.name.toLowerCase():categoryValue, searchValue, callback);
   },
 
   renderDataSourceTabs(iconStyle){

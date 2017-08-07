@@ -673,7 +673,7 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, coordinates, callback) {
+    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, callback) {
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
         let fromDate = dates.fromDate, toDate = dates.toDate;
