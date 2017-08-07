@@ -36,8 +36,8 @@
                 "Standard_GS3",
                 "Standard_GS4",
                 "Standard_GS5",
-                "Standard_L4",
-                "Standard_L8"
+                "Standard_L4s",
+                "Standard_L8s"
             ],
             "metadata": {
                 "description": "The size of the Virtual Machine."
