@@ -355,7 +355,7 @@ export const HeatMap = React.createClass({
 
     if(state.categoryValue.name){
         SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection,
-                                bbox, Array.from(state.termFilters), undefined, Actions.DataSources(state.dataSource),
+                                bbox, Array.from(state.termFilters), Actions.DataSources(state.dataSource),
                 (error, response, body) => {
                     if (!error && response.statusCode === 200) {
                         self.createLayers(body, bbox)
