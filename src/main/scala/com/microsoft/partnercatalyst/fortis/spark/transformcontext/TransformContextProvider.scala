@@ -6,16 +6,16 @@ import java.util.concurrent.{CompletableFuture, SynchronousQueue, TimeUnit}
 
 import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
-import com.microsoft.partnercatalyst.fortis.spark.Constants
+import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.spark.SparkContext
 
-import scala.util.Properties
-
 @SerialVersionUID(100L)
-class TransformContextProvider(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient) extends Serializable with Loggable {
+class TransformContextProvider(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient)
+  (implicit settings: FortisSettings) extends Serializable with Loggable
+{
   private val deltaChannel: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
   private val writeLock: ReentrantLock = new ReentrantLock(true)
 
@@ -71,10 +71,10 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
   private def startQueueClient(sparkContext: SparkContext): Unit = {
     queueClient = new QueueClient(
       new ConnectionStringBuilder(
-        Properties.envOrNone(Constants.Env.ManagementBusNamespace).get,
-        Properties.envOrNone(Constants.Env.ManagementBusConfigQueueName).get,
-        Properties.envOrNone(Constants.Env.ManagementBusPolicyName).get,
-        Properties.envOrNone(Constants.Env.ManagementBusPolicyKey).get
+        settings.managementBusNamespace,
+        settings.managementBusConfigQueueName,
+        settings.managementBusPolicyName,
+        settings.managementBusPolicyKey
       ), ReceiveMode.PeekLock)
 
     queueClient.registerMessageHandler(

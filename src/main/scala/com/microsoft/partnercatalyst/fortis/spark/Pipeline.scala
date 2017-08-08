@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-// TODO: remove this once transform context settings can be read from Cassandra
-import com.microsoft.partnercatalyst.fortis.spark.ProjectFortis.Settings
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
@@ -9,10 +7,9 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamP
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
-import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.Blacklist
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -26,12 +23,12 @@ object Pipeline {
     streamProvider: StreamProvider,
     transformContextProvider: TransformContextProvider,
     configurationManager: ConfigurationManager
-  ): Option[DStream[FortisEvent]] = {
+  )(implicit settings: FortisSettings): Option[DStream[FortisEvent]] = {
     val configs = configurationManager.fetchConnectorConfigs(ssc.sparkContext, name)
     val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
-    val entityModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/opener/opener-$language.zip", Settings.modelsDir)
-    val sentimentModelsProvider = new ZipModelsProvider(language => s"${Settings.blobUrlBase}/sentiment/sentiment-$language.zip", Settings.modelsDir)
+    val entityModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/opener/opener-$language.zip", settings.modelsDir)
+    val sentimentModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/sentiment/sentiment-$language.zip", settings.modelsDir)
 
     sourceStream.map(_.transform(rdd => {
       // Note: this block executes on the driver, whereas the operations applied to 'rdd' (i.e. rdd.map(_))

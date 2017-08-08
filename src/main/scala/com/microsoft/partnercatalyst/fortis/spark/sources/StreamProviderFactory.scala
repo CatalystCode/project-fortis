@@ -6,10 +6,10 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.customevents.CustomEventsAdapter
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.tadaweb.TadawebAdapter
-import com.microsoft.partnercatalyst.fortis.spark.{Constants, Settings}
+import com.microsoft.partnercatalyst.fortis.spark.{Constants, FortisSettings}
 
 object StreamProviderFactory {
-  def create()(implicit settings: Settings): StreamProvider = {
+  def create()(implicit settings: FortisSettings): StreamProvider = {
     import EventHubStreamFactory.utf8ToString
     val streamProvider = StreamProvider()
       .withFactories(
