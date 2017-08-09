@@ -49,7 +49,7 @@ function FetchMessageSentences(site, bbox, fromDate, toDate, limit, offset, filt
   }
 
   FetchMessageSentences("ocha", [7.734374999999999,26.725986812271756,24.697265625,32.45415593941475],
-                        "11/5/2016", "11/7/2016", 20, 0, ["attack"], "en", (err, result)=>{
+                        "11/5/2016", "11/7/2016", 20, 0, ["attack"], "en", undefined, (err, result)=>{
                             console.log(err);
                             console.log(JSON.stringify(result));
                         });
