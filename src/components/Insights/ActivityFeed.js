@@ -243,6 +243,12 @@ export const ActivityFeed = React.createClass({
   fetchSentences(requestPayload, callback){
       let {mainEdge, timespanType, searchValue, limit, offset, edges, siteKey,
            categoryType, filteredSource, bbox, datetimeSelection, originalSource} = requestPayload;
+<<<<<<< HEAD
+
+      SERVICES.FetchMessageSentences(siteKey, originalSource, bbox, datetimeSelection, timespanType, 
+                                     limit, offset, edges, DEFAULT_LANGUAGE, Actions.DataSources(filteredSource), 
+                                     categoryValue?categoryValue.name.toLowerCase():categoryValue, searchValue, callback);
+=======
       let location = [];
 
       if(categoryType === "Location"){
@@ -253,6 +259,7 @@ export const ActivityFeed = React.createClass({
       SERVICES.FetchMessageSentences(siteKey, originalSource, bbox, datetimeSelection, timespanType, 
                                      limit, offset, edges, DEFAULT_LANGUAGE, Actions.DataSources(filteredSource), 
                                      mainEdge, searchValue, location, callback);
+>>>>>>> master
   },
 
   renderDataSourceTabs(iconStyle){

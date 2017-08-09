@@ -656,7 +656,7 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, coordinates, callback) {
+    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, callback) {
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
         let fromDate = dates.fromDate, toDate = dates.toDate;
@@ -687,23 +687,13 @@ export const SERVICES = {
 
             let query, variables;
 
-            if (coordinates && coordinates.length === 2) {
-                query = `  ${fragmentView}
-                       query ByLocation($site: String!, $originalSource: String, $coordinates: [Float]!, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) { 
-                             byLocation(site: $site, originalSource: $originalSource, coordinates: $coordinates, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
-                                ...FortisDashboardView 
-                            }
-                        }`;
-                variables = { site, coordinates, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
-            } else {
-                query = `  ${fragmentView}
-                       query ByBbox($site: String!, $originalSource: String, $bbox: [Float]!, $mainTerm: String, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) { 
-                             byBbox(site: $site, originalSource: $originalSource, bbox: $bbox, mainTerm: $mainTerm, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
-                                ...FortisDashboardView 
-                            }
-                        }`;
-                variables = { site, originalSource, bbox, mainTerm, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
-            }
+            query = `  ${fragmentView}
+                    query ByBbox($site: String!, $originalSource: String, $bbox: [Float]!, $mainTerm: String, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) {
+                            byBbox(site: $site, originalSource: $originalSource, bbox: $bbox, mainTerm: $mainTerm, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
+                            ...FortisDashboardView
+                        }
+                    }`;
+            variables = { site, originalSource, bbox, mainTerm, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
 
             let host = process.env.REACT_APP_SERVICE_HOST
             var POST = {
