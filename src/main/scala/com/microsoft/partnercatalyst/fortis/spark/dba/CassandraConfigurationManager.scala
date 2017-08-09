@@ -22,7 +22,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
     }
 
     val pipelineConfigRows = sparkContext.cassandraTable[CassandraSchema.Table.Stream](CassandraSchema.KeyspaceName,
-      CassandraSchema.Table.StreamsName).collect()
+      CassandraSchema.Table.StreamsName).where("pipelinekey = ?", pipeline).collect()
 
     pipelineConfigRows.map(stream => {
       val trustedSources = connectorToTrustedSources.computeIfAbsent(stream.streamfactory, (fetchTrustedSources _).asJava)
