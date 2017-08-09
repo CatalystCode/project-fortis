@@ -236,11 +236,7 @@ export const SERVICES = {
   },
 
   getHeatmapTiles(site, timespanType, zoom, mainEdge, datetimeSelection, bbox,
-<<<<<<< HEAD
-        filteredEdges, sourceFilter, callback) {
-=======
-        filteredEdges, locations, sourceFilter, originalSource, callback) {
->>>>>>> master
+        filteredEdges, sourceFilter, originalSource, callback) {
         const formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         const timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
