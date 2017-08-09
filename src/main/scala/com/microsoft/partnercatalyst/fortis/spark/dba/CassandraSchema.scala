@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.dba
 
-import java.util.UUID
-
 object CassandraSchema {
   val KeyspaceName = "fortis"
 
@@ -13,10 +11,9 @@ object CassandraSchema {
     val TrustedSourcesName = "trustedsources"
 
     case class SiteSetting(
-      id: UUID,
       sitename: String,
       geofence: Seq[Double],
-      languages: Set[String],
+      languages: Seq[String],
       defaultzoom: Int,
       title: String,
       logo: String,
@@ -24,7 +21,7 @@ object CassandraSchema {
       cogspeechsvctoken: String,
       cogvisionsvctoken: String,
       cogtextsvctoken: String,
-      insertionTime: Long
+      insertiontime: Long
     )
 
     case class Stream(

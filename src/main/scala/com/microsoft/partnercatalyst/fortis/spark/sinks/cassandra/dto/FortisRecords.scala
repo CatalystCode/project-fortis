@@ -76,7 +76,6 @@ case class PopularTopicAggregate(
                                 ) extends AggregationRecordTile with Serializable
 
 case class SiteSetting(
-                        id: String,
                         sitename: String,
                         geofence: Seq[Double],
                         languages: Set[String],
@@ -87,7 +86,7 @@ case class SiteSetting(
                         cogspeechsvctoken: String,
                         cogvisionsvctoken: String,
                         cogtextsvctoken: String,
-                        insertion_time: Long
+                        insertiontime: Long
                       )
 
 case class Stream(
