@@ -4,21 +4,50 @@ CREATE KEYSPACE fortis WITH replication = {'class':'SimpleStrategy', 'replicatio
 USE fortis;
 
 /******************************************************************************
- * Types
+ * Down migration
+ *****************************************************************************/
+DROP MATERIALIZED VIEW IF EXISTS eventbatches;
+DROP MATERIALIZED VIEW IF EXISTS popularsources;
+DROP MATERIALIZED VIEW IF EXISTS timeseries;
+DROP INDEX IF EXISTS events_fulltext_idx;
+
+DROP TABLE IF EXISTS watchlist;
+DROP TABLE IF EXISTS blacklist;
+DROP TABLE IF EXISTS sitesettings;
+DROP TABLE IF EXISTS streams;
+DROP TABLE IF EXISTS trustedsources;
+DROP TABLE IF EXISTS conjunctivetopics;
+DROP TABLE IF EXISTS populartopics;
+DROP TABLE IF EXISTS computedtiles;
+DROP TABLE IF EXISTS popularplaces;
+DROP TABLE IF EXISTS eventtopics;
+DROP TABLE IF EXISTS eventplaces;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS computedtrends;
+
+DROP TYPE IF EXISTS features;
+DROP TYPE IF EXISTS computedgender;
+DROP TYPE IF EXISTS sentiment;
+DROP TYPE IF EXISTS computedentities;
+DROP TYPE IF EXISTS place;
+
+/******************************************************************************
+ * Up migration
  *****************************************************************************/
 
-DROP TYPE IF EXISTS computedgender;
+/**************************************
+ * Types
+ *************************************/
+
 CREATE TYPE computedgender (
     male_mentions bigint,
     female_mentions bigint
 );
 
-DROP TYPE IF EXISTS sentiment;
 CREATE TYPE sentiment (
     neg_avg float
 );
 
-DROP TYPE IF EXISTS computedentities;
 CREATE TYPE computedentities (
     name text,
     externalsource text,
@@ -26,14 +55,12 @@ CREATE TYPE computedentities (
     count bigint
 );
 
-DROP TYPE IF EXISTS place;
 CREATE TYPE place (
     placeid text,
     centroidlat double, 
     centroidlon double
 );
 
-DROP TYPE IF EXISTS features;
 CREATE TYPE features (
     mentions bigint,
     sentiment frozen<sentiment>,
@@ -43,11 +70,10 @@ CREATE TYPE features (
     places frozen<list<place>>
 );
 
-/******************************************************************************
+/**************************************
  * Tables
- *****************************************************************************/
+ *************************************/
 
-DROP TABLE IF EXISTS watchlist;
 CREATE TABLE watchlist(
     topicid uuid,
     topic text,
@@ -57,14 +83,12 @@ CREATE TABLE watchlist(
     PRIMARY KEY (topic, lang_code)
 );
 
-DROP TABLE IF EXISTS blacklist;
 CREATE TABLE blacklist(
     id uuid,
     conjunctivefilter frozen<list<text>>,
     PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS sitesettings;
 CREATE TABLE sitesettings(
     sitename text,
     geofence list<double>,
@@ -80,7 +104,6 @@ CREATE TABLE sitesettings(
     PRIMARY KEY (sitename)
 );
 
-DROP TABLE IF EXISTS streams;
 CREATE TABLE streams (
     streamid uuid,
     pipelinekey text,
@@ -91,7 +114,6 @@ CREATE TABLE streams (
     PRIMARY KEY (pipelinekey, streamid)
 );
 
-DROP TABLE IF EXISTS trustedsources;
 CREATE TABLE trustedsources (   
    externalsourceid text,
    sourcetype text,
@@ -101,7 +123,6 @@ CREATE TABLE trustedsources (
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
 
-DROP TABLE IF EXISTS conjunctivetopics;
 CREATE TABLE conjunctivetopics (
     periodstartdate timestamp,
     periodenddate timestamp,
@@ -118,7 +139,6 @@ CREATE TABLE conjunctivetopics (
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), conjunctivetopic, tilex, tiley, periodstartdate, periodenddate)
 );
 
-DROP TABLE IF EXISTS populartopics;
 CREATE TABLE populartopics (
     periodstartdate timestamp,
     periodenddate timestamp,
@@ -134,7 +154,6 @@ CREATE TABLE populartopics (
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
 
-DROP TABLE IF EXISTS computedtiles;
 CREATE TABLE computedtiles (
     periodstartdate timestamp,
     periodenddate timestamp,
@@ -154,7 +173,6 @@ CREATE TABLE computedtiles (
     PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
 );
 
-DROP TABLE IF EXISTS popularplaces;
 CREATE TABLE popularplaces (
     periodstartdate timestamp,
     periodenddate timestamp,
@@ -173,7 +191,6 @@ CREATE TABLE popularplaces (
     PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), placeid, periodstartdate, periodenddate, centroidlat, centroidlon)
 );
 
-DROP TABLE IF EXISTS eventtopics;
 CREATE TABLE eventtopics(
     eventids set<text>,
     topic text,
@@ -183,7 +200,6 @@ CREATE TABLE eventtopics(
     PRIMARY KEY ((topic), pipelinekey, externalsourceid)
 );
 
-DROP TABLE IF EXISTS eventplaces;
 CREATE TABLE eventplaces(
     eventids set<text>,
     conjunctiontopic1 text,
@@ -198,7 +214,6 @@ CREATE TABLE eventplaces(
     PRIMARY KEY ((placeid), conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid, centroidlat, centroidlon)
 );
 
-DROP TABLE IF EXISTS events;
 CREATE TABLE events(
     eventid text,
     batchid uuid,
@@ -219,7 +234,6 @@ CREATE TABLE events(
 /**
  * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
 **/
-DROP MATERIALIZED VIEW IF EXISTS eventbatches;
 CREATE MATERIALIZED VIEW eventbatches
 AS SELECT batchid, eventid, pipelinekey, eventtime, computedfeatures, externalsourceid
    FROM events
@@ -242,7 +256,6 @@ PRIMARY KEY (batchid, eventid, pipelinekey);
  * and (tilex, and tiley) < (10, 10);
  *
  */
-DROP TABLE IF EXISTS computedtrends;
 CREATE TABLE computedtrends(
     topic text,
     pipelinekey text,
@@ -257,11 +270,10 @@ CREATE TABLE computedtrends(
     PRIMARY KEY ((pipelinekey, periodtype, tilez, period), tilex, tiley, topic)
 ) WITH CLUSTERING ORDER BY (tilex ASC, tiley ASC, topic ASC);
 
-/******************************************************************************
+/**************************************
  * Views
- *****************************************************************************/
+ *************************************/
 
-DROP MATERIALIZED VIEW IF EXISTS popularsources;
 CREATE MATERIALIZED VIEW popularsources
 AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
    FROM computedtiles
@@ -281,7 +293,6 @@ AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipeli
      AND periodenddate IS NOT NULL
 PRIMARY KEY ((periodtype, conjunctiontopics, tilez, externalsourceid, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey);
 
-DROP MATERIALIZED VIEW IF EXISTS timeseries;
 CREATE MATERIALIZED VIEW timeseries
 AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
    FROM computedtiles
@@ -301,11 +312,10 @@ AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipeli
      AND periodenddate IS NOT NULL
 PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), tilex, tiley, pipelinekey, externalsourceid, periodstartdate, periodenddate);
 
-/******************************************************************************
+/**************************************
  * Indices
- *****************************************************************************/
+ *************************************/
 
-DROP INDEX IF EXISTS events_fulltext_idx;
 CREATE CUSTOM INDEX ON events (fulltext) USING 'org.apache.cassandra.index.sasi.SASIIndex'
 WITH OPTIONS = {
 'mode': 'CONTAINS',
