@@ -110,7 +110,7 @@ export const HeatMap = React.createClass({
             let selectionType = state.categoryType;
             let selectedLanguage = state.language;
             let translations = state.allEdges.get(DEFAULT_LANGUAGE);
-            let mainSearchEntity = state.categoryValue[`name_${selectedLanguage}`];
+            let mainSearchEntity = state.mainEdge;
             let numberOfDisplayedTerms = 0;
             let maxTerms = 3;
             let infoBoxInnerHtml = '';
@@ -161,8 +161,8 @@ export const HeatMap = React.createClass({
 
   componentWillReceiveProps(nextProps){
       if(((this.hasChanged(this.getStateFromFlux(), this, "bbox") && this.props.bbox.length > 0) || this.hasChanged(nextProps, this.props, "datetimeSelection") || this.props.height !== nextProps.height
-       ||  this.hasChanged(nextProps, this.props, "timespanType") || this.hasChanged(nextProps, this.props, "edges") || (!this.status && nextProps.categoryValue) || this.hasChanged(nextProps, this.props, "language")
-      ||  this.hasChanged(nextProps.categoryValue, this.props.categoryValue, `name_${this.state.language}`) || this.hasChanged(nextProps, this.props, "dataSource")) && this.status !== 'loading'){
+       ||  this.hasChanged(nextProps, this.props, "timespanType") || this.hasChanged(nextProps, this.props, "edges") || (!this.status && nextProps.mainEdge) || this.hasChanged(nextProps, this.props, "language")
+      ||  this.hasChanged(nextProps, this.props, "mainEdge") || this.hasChanged(nextProps, this.props, "dataSource")) && this.status !== 'loading'){
            this.updateHeatmap();
 
         if(this.map){
@@ -216,7 +216,7 @@ export const HeatMap = React.createClass({
             accessToken: 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg'
         }).addTo(this.map);
         
-        this.map.selectedTerm = state.categoryValue["name_"+this.props.language];
+        this.map.selectedTerm = state.mainEdge;
         this.map.datetimeSelection = state.datetimeSelection;
         this.map.dataSource = state.dataSource;
         this.map.on('moveend',() => {
@@ -371,7 +371,7 @@ export const HeatMap = React.createClass({
     let self = this;
     this.weightedMeanValues = [];
 
-    if(state.categoryValue.name){
+    if (state.mainEdge) {
         SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection, 
                                 bbox, Array.from(state.termFilters), [state.selectedLocationCoordinates], Actions.DataSources(state.dataSource), 
                                 state.originalSource,
@@ -380,7 +380,7 @@ export const HeatMap = React.createClass({
                         self.createLayers(body, bbox, zoom)
                     }else{
                         this.status = 'failed';
-                        console.error(`[${error}] occured while processing tile request [${state.categoryValue.name}, ${state.datetimeSelection}, ${bbox}]`);
+                        console.error(`[${error}] occured while processing tile request [${state.mainEdge}, ${state.datetimeSelection}, ${bbox}]`);
                     }
                 });
     }
