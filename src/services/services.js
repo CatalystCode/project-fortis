@@ -158,7 +158,7 @@ export const SERVICES = {
                             timeSeries:timeSeries(site: $site, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, mainEdge: $additionalTerms, bbox: $bbox, zoomLevel: $zoomLevel, originalSource: $originalSource){
                                                         ...FortisDashboardTimeSeriesView
                             },
-                            locations: popularLocations(site: $site, timespan: $timespan, sourceFilter: $sourceFilter, originalSource: $originalSource) {
+                            locations: popularLocations(site: $site, timespan: $timespan, sourceFilter: $sourceFilter, originalSource: $originalSource, mainEdge: $additionalTerms) {
                                                         ...FortisDashboardLocationView
                             }${selectedTerm ? `, 
                             topSources(site: $site, fromDate: $fromDate, toDate: $toDate, limit: $limit, mainTerm: $selectedTerm, sourceFilter: $sourceFilter, bbox: $bbox, zoomLevel: $zoomLevel, originalSource: $originalSource) {
