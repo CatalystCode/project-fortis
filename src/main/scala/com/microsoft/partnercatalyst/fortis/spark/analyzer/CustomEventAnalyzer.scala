@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.time.Instant.now
-
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.customevents.CustomEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 

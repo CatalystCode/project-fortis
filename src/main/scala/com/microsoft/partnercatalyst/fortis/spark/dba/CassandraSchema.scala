@@ -28,10 +28,12 @@ object CassandraSchema {
     )
 
     case class Stream(
-      pipeline: String,
-      streamid: Long,
-      connector: String,
-      params: Map[String, String]
+      pipelinekey: String,
+      streamid: String,
+      params: Map[String, String],
+      pipelineicon: String,
+      pipelinelabel: String,
+      streamfactory: String
     )
   }
 }

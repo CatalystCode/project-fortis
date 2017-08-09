@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.Place
+
 import scala.collection.mutable
 
 class TileId(var tileId: String) {
@@ -31,13 +33,6 @@ class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Dou
 }
 
 object TileUtils {
-  def apply(): TileUtils = new TileUtils
-}
-/**
-  * Created by erisch on 5/24/2017.
-  */
-
-class TileUtils {
   final val MAX_ZOOM = 16
   final val MIN_ZOOM = 8
   final val DETAIL_ZOOM_DELTA = 5
@@ -92,6 +87,14 @@ class TileUtils {
     //return the tile id 5 levels deep from tileTuple which will be used to render in the heatmap
     (tile_id_from_lat_long(tile.centerLatitude(), tile.centerLongitude(), tile.tileId.zoom - DETAIL_ZOOM_DELTA).tileId,
       (tile.tileId.tileId, tileTuple._2))
+  }
+
+  def tile_seq_from_places(places: Seq[Place]): Seq[TileId] = {
+    for {
+      zoom <- MIN_ZOOM to MAX_ZOOM
+      place <- places
+    }
+      yield tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
   }
 
   def tile_id_mapper_with_zoom(location: (Double, Double)): List[(String, (String, Int))] = {

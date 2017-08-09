@@ -25,10 +25,10 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
       CassandraSchema.Table.StreamsName).collect()
 
     pipelineConfigRows.map(stream => {
-      val trustedSources = connectorToTrustedSources.computeIfAbsent(stream.connector, (fetchTrustedSources _).asJava)
+      val trustedSources = connectorToTrustedSources.computeIfAbsent(stream.streamfactory, (fetchTrustedSources _).asJava)
 
       ConnectorConfig(
-        stream.connector,
+        stream.streamfactory,
         stream.params +
           (
             "trustedSources" -> trustedSources,
