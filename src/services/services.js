@@ -236,7 +236,7 @@ export const SERVICES = {
   },
 
   getHeatmapTiles(site, timespanType, zoom, mainEdge, datetimeSelection, bbox,
-        filteredEdges, sourceFilter, originalSource, callback) {
+        filteredEdges, locations, sourceFilter, originalSource, callback) {
         const formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         const timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
@@ -272,18 +272,35 @@ export const SERVICES = {
                                         }
                                     }`;
 
-            const query = `${edgesFragmentView}
-                ${featuresFragmentView}
-                    query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String, originalSource: String) {
-                        features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
-                            ...FortisDashboardViewFeatures
-                        }
-                        edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
-                            ...FortisDashboardViewEdges
-                        }
-                    }`;
+            let query, variables;
 
-            const variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate, originalSource };
+            if (locations && locations.length > 0 && locations[0].length > 0) {
+                query = `${edgesFragmentView}
+                     ${featuresFragmentView}
+                        query FetchAllEdgesAndTilesByLocations($site: String!, $locations: [[Float]]!, $filteredEdges: [String], $timespan: String!, $sourceFilter: [String], $fromDate: String, $toDate: String) {
+                            features: fetchTilesByLocations(site: $site, locations: $locations, filteredEdges: $filteredEdges, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                                ...FortisDashboardViewFeatures
+                            }
+                            edges: fetchEdgesByLocations(site: $site, locations: $locations, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                                ...FortisDashboardViewEdges
+                            }
+                        }`;
+
+                variables = { site, locations, filteredEdges, timespan, sourceFilter };
+            } else {
+                query = `${edgesFragmentView}
+                    ${featuresFragmentView}
+                      query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String, originalSource: String) {
+                            features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
+                                ...FortisDashboardViewFeatures
+                            }
+                            edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
+                                ...FortisDashboardViewEdges
+                            }
+                        }`;
+
+                variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate, originalSource };
+            }
 
             let host = process.env.REACT_APP_SERVICE_HOST
 
