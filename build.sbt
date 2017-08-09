@@ -18,11 +18,10 @@ parallelExecution in Test := false
 
 // Dependencies provided by the Spark distro
 libraryDependencies ++= Seq(
-  "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2",
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
   "org.apache.spark" %% "spark-streaming" % sparkVersion
-)
+).map(_ % "provided")
 
 // Bundled dependencies
 libraryDependencies ++= Seq(
