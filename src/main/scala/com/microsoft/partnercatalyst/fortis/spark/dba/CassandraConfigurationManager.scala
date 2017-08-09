@@ -46,7 +46,6 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
     siteSettingRow match {
       case Some(row) =>
         SiteSettings(
-          id = row.id,
           siteName = row.sitename,
           geofence = Geofence(row.geofence(0), row.geofence(1), row.geofence(2), row.geofence(3)),
           languages = row.languages,
@@ -57,7 +56,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
           cogSpeechSvcToken = row.cogspeechsvctoken,
           cogVisionSvcToken = row.cogvisionsvctoken,
           cogTextSvcToken = row.cogtextsvctoken,
-          insertionTime = row.insertionTime
+          insertiontime = row.insertiontime
         )
       case None =>
         val ex = new Exception(s"Table '${CassandraSchema.Table.SiteSettingsName}' must have at least 1 entry.")

@@ -1,12 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
-import java.util.UUID
-
 case class SiteSettings(
-  id: UUID,
   siteName: String,
   geofence: Geofence,
-  languages: Set[String],
+  languages: Seq[String],
   defaultZoom: Int,
   title: String,
   logo: String,
@@ -14,5 +11,5 @@ case class SiteSettings(
   cogSpeechSvcToken: String,
   cogVisionSvcToken: String,
   cogTextSvcToken: String,
-  insertionTime: Long
+  insertiontime: Long
 )
