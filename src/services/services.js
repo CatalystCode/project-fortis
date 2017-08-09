@@ -236,7 +236,7 @@ export const SERVICES = {
   },
 
   getHeatmapTiles(site, timespanType, zoom, mainEdge, datetimeSelection, bbox,
-        filteredEdges, locations, sourceFilter, callback) {
+        filteredEdges, locations, sourceFilter, originalSource, callback) {
         const formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         const timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
@@ -290,16 +290,16 @@ export const SERVICES = {
             } else {
                 query = `${edgesFragmentView}
                     ${featuresFragmentView}
-                      query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String) {
-                            features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                      query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String, originalSource: String) {
+                            features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
                                 ...FortisDashboardViewFeatures
                             }
-                            edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                            edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
                                 ...FortisDashboardViewEdges
                             }
                         }`;
 
-                variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate };
+                variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate, originalSource };
             }
 
             let host = process.env.REACT_APP_SERVICE_HOST
