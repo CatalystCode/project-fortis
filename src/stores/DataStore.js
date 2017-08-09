@@ -29,7 +29,6 @@ export const DataStore = Fluxxor.createStore({
           bbox: [],
           zoomLevel: 8,
           colorMap: new Map(),
-          selectedLocationCoordinates: [],
           categoryValue: false,
           language: 'en'
       }
@@ -128,7 +127,6 @@ export const DataStore = Fluxxor.createStore({
 
         if(selectedEntity){
             this.dataStore.categoryValue = edgeMap.get(selectedEntity[`name_${language}`]);
-            this.dataStore.selectedLocationCoordinates = selectedEntity.coordinates || [];
             this.dataStore.categoryType = selectedEntity.type;
         }
     },
