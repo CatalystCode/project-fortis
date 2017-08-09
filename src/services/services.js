@@ -236,7 +236,7 @@ export const SERVICES = {
   },
 
   getHeatmapTiles(site, timespanType, zoom, mainEdge, datetimeSelection, bbox,
-        filteredEdges, sourceFilter, originalSource, callback) {
+        filteredEdges, locations, sourceFilter, originalSource, callback) {
         const formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         const timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
@@ -272,18 +272,35 @@ export const SERVICES = {
                                         }
                                     }`;
 
-            const query = `${edgesFragmentView}
-                ${featuresFragmentView}
-                    query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String, originalSource: String) {
-                        features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
-                            ...FortisDashboardViewFeatures
-                        }
-                        edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
-                            ...FortisDashboardViewEdges
-                        }
-                    }`;
+            let query, variables;
 
-            const variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate, originalSource };
+            if (locations && locations.length > 0 && locations[0].length > 0) {
+                query = `${edgesFragmentView}
+                     ${featuresFragmentView}
+                        query FetchAllEdgesAndTilesByLocations($site: String!, $locations: [[Float]]!, $filteredEdges: [String], $timespan: String!, $sourceFilter: [String], $fromDate: String, $toDate: String) {
+                            features: fetchTilesByLocations(site: $site, locations: $locations, filteredEdges: $filteredEdges, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                                ...FortisDashboardViewFeatures
+                            }
+                            edges: fetchEdgesByLocations(site: $site, locations: $locations, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                                ...FortisDashboardViewEdges
+                            }
+                        }`;
+
+                variables = { site, locations, filteredEdges, timespan, sourceFilter };
+            } else {
+                query = `${edgesFragmentView}
+                    ${featuresFragmentView}
+                      query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String, originalSource: String) {
+                            features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
+                                ...FortisDashboardViewFeatures
+                            }
+                            edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
+                                ...FortisDashboardViewEdges
+                            }
+                        }`;
+
+                variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate, originalSource };
+            }
 
             let host = process.env.REACT_APP_SERVICE_HOST
 
@@ -656,7 +673,7 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, callback) {
+    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, coordinates, callback) {
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
         let fromDate = dates.fromDate, toDate = dates.toDate;
@@ -687,13 +704,23 @@ export const SERVICES = {
 
             let query, variables;
 
-            query = `  ${fragmentView}
-                    query ByBbox($site: String!, $originalSource: String, $bbox: [Float]!, $mainTerm: String, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) {
-                            byBbox(site: $site, originalSource: $originalSource, bbox: $bbox, mainTerm: $mainTerm, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
-                            ...FortisDashboardView
-                        }
-                    }`;
-            variables = { site, originalSource, bbox, mainTerm, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
+            if (coordinates && coordinates.length === 2) {
+                query = `  ${fragmentView}
+                       query ByLocation($site: String!, $originalSource: String, $coordinates: [Float]!, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) { 
+                             byLocation(site: $site, originalSource: $originalSource, coordinates: $coordinates, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
+                                ...FortisDashboardView 
+                            }
+                        }`;
+                variables = { site, coordinates, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
+            } else {
+                query = `  ${fragmentView}
+                       query ByBbox($site: String!, $originalSource: String, $bbox: [Float]!, $mainTerm: String, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) { 
+                             byBbox(site: $site, originalSource: $originalSource, bbox: $bbox, mainTerm: $mainTerm, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
+                                ...FortisDashboardView 
+                            }
+                        }`;
+                variables = { site, originalSource, bbox, mainTerm, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
+            }
 
             let host = process.env.REACT_APP_SERVICE_HOST
             var POST = {
