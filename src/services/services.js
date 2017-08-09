@@ -144,7 +144,7 @@ const visualizationChartFragments = `fragment FortisDashboardTimeSeriesView on E
                                         }`;
 
 export const SERVICES = {
-    getChartVisualizationData(site, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, mainEdge, dataSource, fromDate, toDate, callback){
+    getChartVisualizationData(site, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, mainEdge, dataSource, fromDate, toDate, bbox, zoomLevel, originalSource, callback){
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         let timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let sourceFilter = Actions.DataSources(dataSource);
@@ -154,19 +154,19 @@ export const SERVICES = {
 
         let query = `${visualizationChartFragments}
                      ${selectedTerm ? `${topSourcesFragment}` : ``}
-                      query PopularEdges($site: String!, $additionalTerms: String, $timespan: String!, $sourceFilter: [String], ${selectedTerm ? `$selectedTerm: String!, $limit: Int!,` : `,`} $fromDate: String!, $toDate: String!) {
-                            timeSeries:timeSeries(site: $site, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, mainEdge: $additionalTerms){
+                      query PopularEdges($site: String!, $additionalTerms: String, $timespan: String!, $sourceFilter: [String], ${selectedTerm ? `$selectedTerm: String!, $limit: Int!,` : `,`} $fromDate: String!, $toDate: String!, $bbox: [Float], $zoomLevel: Int, $originalSource: String) {
+                            timeSeries:timeSeries(site: $site, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, mainEdge: $additionalTerms, bbox: $bbox, zoomLevel: $zoomLevel, originalSource: $originalSource){
                                                         ...FortisDashboardTimeSeriesView
                             },
-                            locations: popularLocations(site: $site, timespan: $timespan, sourceFilter: $sourceFilter) {
+                            locations: popularLocations(site: $site, timespan: $timespan, sourceFilter: $sourceFilter, originalSource: $originalSource, mainEdge: $additionalTerms) {
                                                         ...FortisDashboardLocationView
                             }${selectedTerm ? `, 
-                            topSources(site: $site, fromDate: $fromDate, toDate: $toDate, limit: $limit, mainTerm: $selectedTerm, sourceFilter: $sourceFilter) {
+                            topSources(site: $site, fromDate: $fromDate, toDate: $toDate, limit: $limit, mainTerm: $selectedTerm, sourceFilter: $sourceFilter, bbox: $bbox, zoomLevel: $zoomLevel, originalSource: $originalSource) {
                             ... FortisTopSourcesView
                             }`: ``}
                        }`;
 
-        let variables = { site, additionalTerms, selectedTerm, timespan, limit, sourceFilter, fromDate, toDate };
+        let variables = { site, additionalTerms, selectedTerm, timespan, limit, sourceFilter, fromDate, toDate, bbox, zoomLevel, originalSource };
         let host = process.env.REACT_APP_SERVICE_HOST;
         let POST = {
             url: `${host}/api/edges`,
@@ -236,13 +236,17 @@ export const SERVICES = {
   },
 
   getHeatmapTiles(site, timespanType, zoom, mainEdge, datetimeSelection, bbox,
+<<<<<<< HEAD
         filteredEdges, sourceFilter, callback) {
+=======
+        filteredEdges, locations, sourceFilter, originalSource, callback) {
+>>>>>>> master
         const formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         const timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
         let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
         let fromDate = dates.fromDate, toDate = dates.toDate;
 
-        const zoomLevel = MAX_ZOOM;
+        const zoomLevel = zoom != null ? zoom : MAX_ZOOM;
 
         console.log(`processing tile request [${mainEdge}, ${timespan}, ${bbox}, ${filteredEdges.join(",")}]`)
         if (bbox && Array.isArray(bbox) && bbox.length === 4) {
@@ -272,20 +276,18 @@ export const SERVICES = {
                                         }
                                     }`;
 
-            let query, variables;
-
-            query = `${edgesFragmentView}
+            const query = `${edgesFragmentView}
                 ${featuresFragmentView}
-                    query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String) {
-                        features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                    query FetchAllEdgesAndTilesByBBox($site: String!, $bbox: [Float]!, $mainEdge: String!, $filteredEdges: [String], $timespan: String!, $zoomLevel: Int, $sourceFilter: [String], $fromDate: String, $toDate: String, originalSource: String) {
+                        features: fetchTilesByBBox(site: $site, bbox: $bbox, mainEdge: $mainEdge, filteredEdges: $filteredEdges, timespan: $timespan, zoomLevel: $zoomLevel, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
                             ...FortisDashboardViewFeatures
                         }
-                        edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate) {
+                        edges: fetchEdgesByBBox(site: $site, bbox: $bbox, zoomLevel: $zoomLevel, mainEdge: $mainEdge, timespan: $timespan, sourceFilter: $sourceFilter, fromDate: $fromDate, toDate: $toDate, originalSource: $originalSource) {
                             ...FortisDashboardViewEdges
                         }
                     }`;
 
-            variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate };
+            const variables = { site, bbox, mainEdge, filteredEdges, timespan, zoomLevel, sourceFilter, fromDate, toDate, originalSource };
 
             let host = process.env.REACT_APP_SERVICE_HOST
 

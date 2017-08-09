@@ -220,7 +220,7 @@ export const HeatMap = React.createClass({
         this.map.datetimeSelection = state.datetimeSelection;
         this.map.dataSource = state.dataSource;
         this.map.on('moveend',() => {
-            this.getFlux().actions.DASHBOARD.updateAssociatedTerms(this.getStateFromFlux().associatedKeywords, this.getLeafletBbox());
+            this.getFlux().actions.DASHBOARD.updateAssociatedTerms(this.getStateFromFlux().associatedKeywords, this.getLeafletBbox(), this.getLeafletZoomLevel());
         });
 
         this.addClusterGroup();
@@ -302,7 +302,7 @@ export const HeatMap = React.createClass({
       }
   },
 
-  updateDataStore(errors, bbox, filters){
+  updateDataStore(errors, bbox, filters, zoomLevel) {
       let aggregatedAssociatedTermMentions = new Map();
       let self = this;
       let weightedSentiment = weightedMean(this.weightedMeanValues) * 100;
@@ -325,7 +325,7 @@ export const HeatMap = React.createClass({
       this.status = 'loaded';
       //sort the associated terms by mention count.
       let sortedEdgeMap = new Map([...aggregatedAssociatedTermMentions.entries()].sort(this.sortTerms));
-      this.getFlux().actions.DASHBOARD.updateAssociatedTerms(sortedEdgeMap, bbox);
+      this.getFlux().actions.DASHBOARD.updateAssociatedTerms(sortedEdgeMap, bbox, zoomLevel);
       this.breadCrumbControl.update(Array.from(this.state.termFilters));
       this.sentimentGraph.update({weightedSentiment});
   },
@@ -341,6 +341,14 @@ export const HeatMap = React.createClass({
           return undefined;
       }
   },
+
+  getLeafletZoomLevel() {
+    if (!this.map) {
+      return undefined;
+    }
+
+    return this.map.getZoom();
+  },
   
   updateHeatmap() {
     const state = this.getStateFromFlux();
@@ -354,11 +362,12 @@ export const HeatMap = React.createClass({
     this.weightedMeanValues = [];
 
     if(state.categoryValue.name){
-        SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection,
-                                bbox, Array.from(state.termFilters), Actions.DataSources(state.dataSource),
+        SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection, 
+                                bbox, Array.from(state.termFilters), Actions.DataSources(state.dataSource), 
+                                state.originalSource,
                 (error, response, body) => {
                     if (!error && response.statusCode === 200) {
-                        self.createLayers(body, bbox)
+                        self.createLayers(body, bbox, zoom)
                     }else{
                         this.status = 'failed';
                         console.error(`[${error}] occured while processing tile request [${state.categoryValue.name}, ${state.datetimeSelection}, ${bbox}]`);
@@ -367,7 +376,7 @@ export const HeatMap = React.createClass({
     }
   },
   
-  createLayers(response, bbox) {
+  createLayers(response, bbox, zoomLevel) {
     let self = this;
 
     if(response && response.data){
@@ -375,9 +384,9 @@ export const HeatMap = React.createClass({
         if(features && edges){
             eachLimit(features.features, PARELLEL_TILE_LAYER_RENDER_LIMIT, (tileFeature, cb) => {
                  self.processMapCluster(tileFeature, cb);
-            }, errors => self.updateDataStore(errors, bbox, edges.edges || []));
+            }, errors => self.updateDataStore(errors, bbox, edges.edges || [], zoomLevel));
         }else{
-            self.updateDataStore('Invalid GrphQL Service response', bbox, undefined);
+            self.updateDataStore('Invalid GrphQL Service response', bbox, undefined, zoomLevel);
         }
     }
   },

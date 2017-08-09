@@ -163,7 +163,8 @@ const methods = {
                 },
                 chartData: callback => {
                         SERVICES.getChartVisualizationData(siteId, dataStore.datetimeSelection, dataStore.timespanType, undefined, undefined, undefined, 
-                                                           dataSource, fromDate, toDate, (error, response, body) => ResponseHandler(error, response, body, callback))
+                                                           dataSource, fromDate, toDate, dataStore.bbox, dataStore.zoomLevel, dataStore.originalSource,
+                                                           (error, response, body) => ResponseHandler(error, response, body, callback))
                 }
             }, (error, results) => {
                     if(!error && Object.keys(results).length === 4
@@ -198,7 +199,10 @@ const methods = {
                 toDate = toDateFilter;
             }
 
-            SERVICES.getChartVisualizationData(siteKey, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, dataStore.categoryValue, dataSource, fromDate, toDate, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+            SERVICES.getChartVisualizationData(siteKey, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm,
+                                               dataStore.categoryValue, dataSource, fromDate, toDate,
+                                               dataStore.bbox, dataStore.zoomLevel, dataStore.originalSource,
+                                               (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
                     if(graphqlResponse) {
                         const {timeSeries, locations, topSources} = graphqlResponse;
                         self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, { selectedEntity: selectedEntity,
@@ -235,8 +239,8 @@ const methods = {
         changeTermsFilterToOnly(newFilter){
            this.dispatch(constants.DASHBOARD.CHANGE_TERM_FILTERS_TO_ONLY, newFilter);
         },
-        updateAssociatedTerms(associatedKeywords, bbox){
-            this.dispatch(constants.DASHBOARD.ASSOCIATED_TERMS, {associatedKeywords, bbox});
+        updateAssociatedTerms(associatedKeywords, bbox, zoomLevel){
+            this.dispatch(constants.DASHBOARD.ASSOCIATED_TERMS, {associatedKeywords, bbox, zoomLevel});
         },
         loadDetail(siteKey, messageId, dataSources, sourcePropeties){
             let self = this;
