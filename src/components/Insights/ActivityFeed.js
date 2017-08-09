@@ -241,12 +241,25 @@ export const ActivityFeed = React.createClass({
   },
 
   fetchSentences(requestPayload, callback){
-      let {categoryValue, timespanType, searchValue, limit, offset, edges, siteKey,
+      let {mainEdge, timespanType, searchValue, limit, offset, edges, siteKey,
            categoryType, filteredSource, bbox, datetimeSelection, originalSource} = requestPayload;
+<<<<<<< HEAD
 
       SERVICES.FetchMessageSentences(siteKey, originalSource, bbox, datetimeSelection, timespanType, 
                                      limit, offset, edges, DEFAULT_LANGUAGE, Actions.DataSources(filteredSource), 
                                      categoryValue?categoryValue.name.toLowerCase():categoryValue, searchValue, callback);
+=======
+      let location = [];
+
+      if(categoryType === "Location"){
+          mainEdge = undefined;
+          location = this.state.selectedLocationCoordinates;
+      }
+
+      SERVICES.FetchMessageSentences(siteKey, originalSource, bbox, datetimeSelection, timespanType, 
+                                     limit, offset, edges, DEFAULT_LANGUAGE, Actions.DataSources(filteredSource), 
+                                     mainEdge, searchValue, location, callback);
+>>>>>>> master
   },
 
   renderDataSourceTabs(iconStyle){
@@ -287,7 +300,7 @@ export const ActivityFeed = React.createClass({
       if((this.hasChanged(nextProps, this.props, "bbox") && this.props.bbox.length > 0) || this.hasChanged(nextProps, this.props, "datetimeSelection")
        ||  this.props.originalSource !== nextProps.originalSource
        ||  this.hasChanged(nextProps, "timespanType") || this.hasChanged(nextProps, this.props, "edges") ||  this.hasChanged(nextProps, this.props, "language")
-       ||  this.hasChanged(nextProps.categoryValue, this.props.categoryValue, `name_${this.state.language}`) || this.hasChanged(nextProps, this.props, "dataSource")){
+       ||  this.hasChanged(nextProps, this.props, "mainEdge") || this.hasChanged(nextProps, this.props, "dataSource")){
           const params = {...nextProps, elementStartList: [], offset: 0, filteredSource: nextProps.dataSource};
           this.setState({filteredSource: params.filteredSource, elements: []});
           this.lastRenderedElementLength = 0;
@@ -451,7 +464,7 @@ export const ActivityFeed = React.createClass({
   render() {
     const state = this.getStateFromFlux();
     const translatedDashboardEdges = this.translatedTerms(DEFAULT_LANGUAGE, this.state.language, this.props.edges);
-    const mainTerm = state.categoryValue[`name_${this.props.language}`];
+    const mainTerm = state.mainEdge;
     const otherTags = this.refs && this.refs.filterTextInput && this.refs.filterTextInput.value !== "" ? [this.refs.filterTextInput.value, mainTerm] : [mainTerm];
     
     return (

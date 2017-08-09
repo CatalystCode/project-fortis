@@ -110,7 +110,7 @@ export const HeatMap = React.createClass({
             let selectionType = state.categoryType;
             let selectedLanguage = state.language;
             let translations = state.allEdges.get(DEFAULT_LANGUAGE);
-            let mainSearchEntity = state.categoryValue[`name_${selectedLanguage}`];
+            let mainSearchEntity = state.mainEdge;
             let numberOfDisplayedTerms = 0;
             let maxTerms = 3;
             let infoBoxInnerHtml = '';
@@ -161,8 +161,8 @@ export const HeatMap = React.createClass({
 
   componentWillReceiveProps(nextProps){
       if(((this.hasChanged(this.getStateFromFlux(), this, "bbox") && this.props.bbox.length > 0) || this.hasChanged(nextProps, this.props, "datetimeSelection") || this.props.height !== nextProps.height
-       ||  this.hasChanged(nextProps, this.props, "timespanType") || this.hasChanged(nextProps, this.props, "edges") || (!this.status && nextProps.categoryValue) || this.hasChanged(nextProps, this.props, "language")
-      ||  this.hasChanged(nextProps.categoryValue, this.props.categoryValue, `name_${this.state.language}`) || this.hasChanged(nextProps, this.props, "dataSource")) && this.status !== 'loading'){
+       ||  this.hasChanged(nextProps, this.props, "timespanType") || this.hasChanged(nextProps, this.props, "edges") || (!this.status && nextProps.mainEdge) || this.hasChanged(nextProps, this.props, "language")
+      ||  this.hasChanged(nextProps, this.props, "mainEdge") || this.hasChanged(nextProps, this.props, "dataSource")) && this.status !== 'loading'){
            this.updateHeatmap();
 
         if(this.map){
@@ -216,11 +216,11 @@ export const HeatMap = React.createClass({
             accessToken: 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg'
         }).addTo(this.map);
         
-        this.map.selectedTerm = state.categoryValue["name_"+this.props.language];
+        this.map.selectedTerm = state.mainEdge;
         this.map.datetimeSelection = state.datetimeSelection;
         this.map.dataSource = state.dataSource;
         this.map.on('moveend',() => {
-            this.getFlux().actions.DASHBOARD.updateAssociatedTerms(this.getStateFromFlux().associatedKeywords, this.getLeafletBbox());
+            this.getFlux().actions.DASHBOARD.updateAssociatedTerms(this.getStateFromFlux().associatedKeywords, this.getLeafletBbox(), this.getLeafletZoomLevel());
         });
 
         this.addClusterGroup();
@@ -302,7 +302,7 @@ export const HeatMap = React.createClass({
       }
   },
 
-  updateDataStore(errors, bbox, filters){
+  updateDataStore(errors, bbox, filters, zoomLevel) {
       let aggregatedAssociatedTermMentions = new Map();
       let self = this;
       let weightedSentiment = weightedMean(this.weightedMeanValues) * 100;
@@ -325,18 +325,9 @@ export const HeatMap = React.createClass({
       this.status = 'loaded';
       //sort the associated terms by mention count.
       let sortedEdgeMap = new Map([...aggregatedAssociatedTermMentions.entries()].sort(this.sortTerms));
-      this.getFlux().actions.DASHBOARD.updateAssociatedTerms(sortedEdgeMap, bbox);
+      this.getFlux().actions.DASHBOARD.updateAssociatedTerms(sortedEdgeMap, bbox, zoomLevel);
       this.breadCrumbControl.update(Array.from(this.state.termFilters));
       this.sentimentGraph.update({weightedSentiment});
-  },
-
-  moveMapToNewLocation(location, zoom){
-      const originalLocation = this.map.coordinates;
-
-      if(location && location.length > 0 && location[0] !== originalLocation[0] && location[1] !== originalLocation[1]){
-          this.map.setView([location[1], location[0]], zoom);
-          this.map.coordinates = [location[0], location[1]];
-      } 
   },
 
   getLeafletBbox(){
@@ -350,6 +341,14 @@ export const HeatMap = React.createClass({
           return undefined;
       }
   },
+
+  getLeafletZoomLevel() {
+    if (!this.map) {
+      return undefined;
+    }
+
+    return this.map.getZoom();
+  },
   
   updateHeatmap() {
     const state = this.getStateFromFlux();
@@ -357,27 +356,27 @@ export const HeatMap = React.createClass({
     this.clearMap();
     this.status = "loading";
     const siteKey = this.props.siteKey;
-    this.moveMapToNewLocation(state.selectedLocationCoordinates, this.map.getZoom());
     const zoom = this.map.getZoom();
     const bbox = this.getLeafletBbox();
     let self = this;
     this.weightedMeanValues = [];
 
-    if(state.categoryValue.name){
+    if (state.mainEdge) {
         SERVICES.getHeatmapTiles(siteKey, state.timespanType, zoom, state.categoryValue.name, state.datetimeSelection, 
-                                bbox, Array.from(state.termFilters), [state.selectedLocationCoordinates], Actions.DataSources(state.dataSource), 
+                                bbox, Array.from(state.termFilters), Actions.DataSources(state.dataSource), 
+                                state.originalSource,
                 (error, response, body) => {
                     if (!error && response.statusCode === 200) {
-                        self.createLayers(body, bbox)
+                        self.createLayers(body, bbox, zoom)
                     }else{
                         this.status = 'failed';
-                        console.error(`[${error}] occured while processing tile request [${state.categoryValue.name}, ${state.datetimeSelection}, ${bbox}]`);
+                        console.error(`[${error}] occured while processing tile request [${state.mainEdge}, ${state.datetimeSelection}, ${bbox}]`);
                     }
                 });
     }
   },
   
-  createLayers(response, bbox) {
+  createLayers(response, bbox, zoomLevel) {
     let self = this;
 
     if(response && response.data){
@@ -385,9 +384,9 @@ export const HeatMap = React.createClass({
         if(features && edges){
             eachLimit(features.features, PARELLEL_TILE_LAYER_RENDER_LIMIT, (tileFeature, cb) => {
                  self.processMapCluster(tileFeature, cb);
-            }, errors => self.updateDataStore(errors, bbox, edges.edges || []));
+            }, errors => self.updateDataStore(errors, bbox, edges.edges || [], zoomLevel));
         }else{
-            self.updateDataStore('Invalid GrphQL Service response', bbox, undefined);
+            self.updateDataStore('Invalid GrphQL Service response', bbox, undefined, zoomLevel);
         }
     }
   },

@@ -27,8 +27,8 @@ export const DataStore = Fluxxor.createStore({
           termFilters: new Set(),
           allEdges: new Map(),
           bbox: [],
+          zoomLevel: 8,
           colorMap: new Map(),
-          selectedLocationCoordinates: [],
           categoryValue: false,
           language: 'en'
       }
@@ -127,7 +127,6 @@ export const DataStore = Fluxxor.createStore({
 
         if(selectedEntity){
             this.dataStore.categoryValue = edgeMap.get(selectedEntity[`name_${language}`]);
-            this.dataStore.selectedLocationCoordinates = selectedEntity.coordinates || [];
             this.dataStore.categoryType = selectedEntity.type;
         }
     },
@@ -207,6 +206,7 @@ export const DataStore = Fluxxor.createStore({
         this.dataStore.associatedKeywords = heatmapData.associatedKeywords;
         this.syncAssociatedTermsSelections(this.dataStore.termFilters);
         this.dataStore.bbox = heatmapData.bbox;
+        this.dataStore.zoomLevel = heatmapData.zoomLevel;
         this.emit("change");
     }
 });
