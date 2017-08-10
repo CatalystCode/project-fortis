@@ -56,7 +56,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       const limit = args.limit || 15;
 
       const tagsQuery = `
-      SELECT eventids
+      SELECT eventid
       FROM fortis.eventplaces
       WHERE placeid IN ?
       AND conjunctiontopic1 = ?
@@ -64,8 +64,8 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       AND conjunctiontopic3 = ?
       AND pipelinekey = ?
       AND externalsourceid = ?
-      AND event_time <= ?
-      AND event_time >= ?
+      AND eventtime <= ?
+      AND eventtime >= ?
       LIMIT ?
       `.trim();
 
@@ -81,7 +81,7 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
 
       cassandraConnector.executeQuery(tagsQuery, tagsParams)
       .then(rows => {
-        const eventIds = makeSet(rows.map(row => row.eventids), eventId => eventId);
+        const eventIds = makeSet(rows, row => row.eventid);
 
         const eventsQuery = `
         SELECT *
@@ -124,13 +124,13 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     const limit = args.limit || 15;
 
     const tagsQuery = `
-    SELECT eventids
+    SELECT eventid
     FROM fortis.eventtopics
     WHERE topic IN ?
     AND pipelinekey = ?
     AND externalsourceid = ?
-    AND event_time <= ?
-    AND event_time >= ?
+    AND eventtime <= ?
+    AND eventtime >= ?
     LIMIT ?
     `.trim();
 
@@ -145,7 +145,7 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeQuery(tagsQuery, tagsParams)
     .then(rows => {
-      const eventIds = makeSet(rows.map(row => row.eventids), eventId => eventId);
+      const eventIds = makeSet(rows, row => row.eventid);
 
       const eventQuery = `
       SELECT *
