@@ -3,11 +3,12 @@ package com.microsoft.partnercatalyst.fortis.spark
 object Constants {
   val SparkAppName = "project-fortis-spark"
   val SparkMasterDefault = "local[*]"
-  val SparkStreamingBatchSizeDefault = 1
+  val SparkStreamingBatchSizeDefault = 5
 
   val EventHubProgressDir = "eventhubProgress"
 
   object Env {
+    val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
     val HighlyAvailableProgressDir = "HA_PROGRESS_DIR"
     val AppInsightsKey = "FORTIS_APPINSIGHTS_IKEY"
     val LanguageModelDir = "FORTIS_MODELS_DIRECTORY"
