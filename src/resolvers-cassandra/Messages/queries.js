@@ -3,7 +3,6 @@
 const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
@@ -49,64 +48,61 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
 
     const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    const limit = args.limit || 15;
+    const [north, west, south, east] = args.bbox;
 
-    featureServiceClient.fetchByBbox({north: args.bbox[0], west: args.bbox[1], south: args.bbox[2], east: args.bbox[3]})
-    .then(places => {
-      const placeIds = makeSet(places, place => place.id);
-      const limit = args.limit || 15;
+    const tagsQuery = `
+    SELECT eventid
+    FROM fortis.eventplaces
+    WHERE conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ?
+    AND conjunctiontopic3 = ?
+    AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND (centroidlat, centroidlon, eventtime) <= (?, ?, ?)
+    AND (centroidlat, centroidlon, eventtime) >= (?, ?, ?)
+    LIMIT ?
+    `.trim();
 
-      const tagsQuery = `
-      SELECT eventid
-      FROM fortis.eventplaces
-      WHERE placeid IN ?
-      AND conjunctiontopic1 = ?
-      AND conjunctiontopic2 = ?
-      AND conjunctiontopic3 = ?
-      AND pipelinekey = ?
-      AND externalsourceid = ?
-      AND eventtime <= ?
-      AND eventtime >= ?
+    const tagsParams = [
+      ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
+      toPipelineKey(args.sourceFilter),
+      'all',
+      north,
+      east,
+      fromDate,
+      south,
+      west,
+      toDate,
+      limit
+    ];
+
+    cassandraConnector.executeQuery(tagsQuery, tagsParams)
+    .then(rows => {
+      const eventIds = makeSet(rows, row => row.eventid);
+
+      const eventsQuery = `
+      SELECT *
+      FROM fortis.events
+      WHERE pipelinekey = ?
+      AND eventid IN ?
+      AND fulltext LIKE ?
       LIMIT ?
       `.trim();
 
-      const tagsParams = [
-        limitForInClause(placeIds),
-        ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
+      const eventsParams = [
         toPipelineKey(args.sourceFilter),
-        'all',
-        toDate,
-        fromDate,
+        limitForInClause(eventIds),
+        `%${args.fulltextTerm}%`,
         limit
       ];
 
-      cassandraConnector.executeQuery(tagsQuery, tagsParams)
-      .then(rows => {
-        const eventIds = makeSet(rows, row => row.eventid);
-
-        const eventsQuery = `
-        SELECT *
-        FROM fortis.events
-        WHERE pipelinekey = ?
-        AND eventid IN ?
-        AND fulltext LIKE ?
-        LIMIT ?
-        `.trim();
-
-        const eventsParams = [
-          toPipelineKey(args.sourceFilter),
-          limitForInClause(eventIds),
-          `%${args.fulltextTerm}%`,
-          limit
-        ];
-
-        return cassandraConnector.executeQuery(eventsQuery, eventsParams);
-      })
-      .then(rows => {
-        resolve({
-          features: rows.map(eventToFeature)
-        });
-      })
-      .catch(reject);
+      return cassandraConnector.executeQuery(eventsQuery, eventsParams);
+    })
+    .then(rows => {
+      resolve({
+        features: rows.map(eventToFeature)
+      });
     })
     .catch(reject);
   });
