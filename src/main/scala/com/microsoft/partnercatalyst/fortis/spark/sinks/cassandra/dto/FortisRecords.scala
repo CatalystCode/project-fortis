@@ -75,6 +75,21 @@ case class PopularTopicAggregate(
                                   topic: String
                                 ) extends AggregationRecordTile with Serializable
 
+case class ConjunctiveTopicAggregate(
+                                      conjunctivetopic: String,
+                                      externalsourceid: String,
+                                      mentioncount: Long,
+                                      period: String,
+                                      periodenddate: Long,
+                                      periodstartdate: Long,
+                                      periodtype: String,
+                                      pipelinekey: String,
+                                      tilex: Int,
+                                      tiley: Int,
+                                      tilez: Int,
+                                      topic: String
+                                    ) extends Serializable
+
 case class SiteSetting(
                         sitename: String,
                         geofence: Seq[Double],
