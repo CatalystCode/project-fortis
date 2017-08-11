@@ -52,7 +52,7 @@ object ProjectFortis extends App {
   Logger.getLogger("liblocations").setLevel(Level.DEBUG)
 
   private def createStreamingContext(): StreamingContext = {
-    val batchDuration = Seconds(Constants.SparkStreamingBatchSizeDefault)
+    val batchDuration = Seconds(envOrElse(Constants.Env.SparkStreamingBatchSize, Constants.SparkStreamingBatchSizeDefault.toString).toLong)
     val conf = new SparkConf()
       .setAppName(Constants.SparkAppName)
       .setIfMissing("spark.master", Constants.SparkMasterDefault)
