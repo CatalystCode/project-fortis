@@ -14,7 +14,7 @@ class AppInsightsTelemetry extends FortisTelemetry {
     val metrics = new HashMap[String, java.lang.Double](1)
     metrics.put("batchSize", batchSize.toDouble)
 
-    client.trackEvent("process.events", properties, metrics)
+    client.trackEvent("batch.receive", properties, metrics)
   }
 
 }
