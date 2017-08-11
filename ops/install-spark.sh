@@ -11,5 +11,5 @@ readonly fortis_jar="fortis-${latest_version}.jar"
 readonly SparkCommand="spark-submit --deploy-mode cluster --driver-memory 4g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/${fortis_jar}\""
 
 cd charts || exit -2
-helm install --set Worker.Replicas="${k8spark_worker_count}" --set Master.ConfigMapName="${ConfigMapName}" --set Master.SparkSubmitCommand="${SparkCommand}" --name spark-cluster ./stable/spark --namespace spark
+helm install --set Worker.Replicas="${k8spark_worker_count}"  --set Worker.ConfigMapName="${ConfigMapName}" --set Master.ConfigMapName="${ConfigMapName}" --set Master.SparkSubmitCommand="${SparkCommand}" --name spark-cluster ./stable/spark --namespace spark
 cd ..
