@@ -21,7 +21,7 @@ At the end of the ingestion pipeline, we publish the events and various aggregat
 ```sh
 # set up variables from deployment environment
 export HA_PROGRESS_DIR="..."
-export FORTIS_APPINSIGHTS_IKEY="..."
+export APPLICATION_INSIGHTS_IKEY="..."
 export FORTIS_FEATURE_SERVICE_HOST="..."
 export FORTIS_MODELS_DIRECTORY="..."
 export FORTIS_CENTRAL_ASSETS_HOST="..."
