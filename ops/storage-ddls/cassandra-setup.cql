@@ -45,7 +45,7 @@ CREATE TYPE computedgender (
 );
 
 CREATE TYPE sentiment (
-    neg_avg float
+    neg_avg double
 );
 
 CREATE TYPE computedentities (
@@ -64,7 +64,6 @@ CREATE TYPE place (
 CREATE TYPE features (
     mentions bigint,
     sentiment frozen<sentiment>,
-    gender frozen<computedgender>,
     entities frozen<list<computedentities>>,
     keywords frozen<list<text>>,
     places frozen<list<place>>
@@ -151,6 +150,7 @@ CREATE TABLE populartopics (
     externalsourceid text,
     topic text,
     mentioncount counter,
+    avgsentimentnumerator counter,
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, period), tilex, tiley, periodstartdate, periodenddate)
 );
 
@@ -167,10 +167,11 @@ CREATE TABLE computedtiles (
     mentioncount bigint,
     avgsentiment float,
     heatmap text,
-    placeids frozen<set<text>>,
     insertiontime timestamp,
-    conjunctiontopics tuple<text, text, text>,
-    PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), pipelinekey, externalsourceid, tilex, tiley, periodstartdate, periodenddate)
+    conjunctiontopic1 text,
+    conjunctiontopic2 text,
+    conjunctiontopic3 text,
+    PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
 );
 
 CREATE TABLE popularplaces (
@@ -192,16 +193,16 @@ CREATE TABLE popularplaces (
 );
 
 CREATE TABLE eventtopics(
-    eventids set<text>,
+    eventid text,
     topic text,
-    insertiontime timestamp,
+    eventime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((topic), pipelinekey, externalsourceid)
+    PRIMARY KEY ((topic, pipelinekey, externalsourceid), eventime, eventid)
 );
 
 CREATE TABLE eventplaces(
-    eventids set<text>,
+    eventid text,
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
@@ -209,9 +210,10 @@ CREATE TABLE eventplaces(
     centroidlon double,
     placeid text,
     insertiontime timestamp,
+    eventime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((placeid), conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid, centroidlat, centroidlon)
+    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid), centroidlat, centroidlon, eventime, eventid)
 );
 
 CREATE TABLE events(
