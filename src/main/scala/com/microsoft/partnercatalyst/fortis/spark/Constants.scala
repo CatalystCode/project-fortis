@@ -10,7 +10,7 @@ object Constants {
   object Env {
     val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
     val HighlyAvailableProgressDir = "HA_PROGRESS_DIR"
-    val AppInsightsKey = "FORTIS_APPINSIGHTS_IKEY"
+    val AppInsightsKey = "APPLICATION_INSIGHTS_IKEY"
     val LanguageModelDir = "FORTIS_MODELS_DIRECTORY"
     val FeatureServiceUrlBase = "FORTIS_FEATURE_SERVICE_HOST"
     val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
