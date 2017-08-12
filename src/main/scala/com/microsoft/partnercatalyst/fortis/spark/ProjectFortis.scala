@@ -29,11 +29,10 @@ object ProjectFortis extends App {
       // Required
       progressDir = envOrFail(Constants.Env.HighlyAvailableProgressDir),
       featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase),
-      managementBusNamespace = envOrFail(Constants.Env.ManagementBusNamespace),
       cassandraHosts = envOrFail(Constants.Env.CassandraHost),
+      managementBusConnectionString = envOrFail(Constants.Env.ManagementBusConnectionString),
       managementBusConfigQueueName = envOrFail(Constants.Env.ManagementBusConfigQueueName),
-      managementBusPolicyName = envOrFail(Constants.Env.ManagementBusPolicyName),
-      managementBusPolicyKey = envOrFail(Constants.Env.ManagementBusPolicyKey),
+      managementBusCommandQueueName = envOrFail(Constants.Env.ManagementBusCommandQueueName),
 
       // Optional
       blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net"),

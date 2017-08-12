@@ -15,9 +15,8 @@ object Constants {
     val FeatureServiceUrlBase = "FORTIS_FEATURE_SERVICE_HOST"
     val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
     val CassandraHost = "FORTIS_CASSANDRA_HOST"
-    val ManagementBusNamespace = "FORTIS_SERVICEBUS_NAMESPACE"
-    val ManagementBusConfigQueueName = "FORTIS_SERVICEBUS_CONFIG_QUEUE"
-    val ManagementBusPolicyName = "FORTIS_SERVICEBUS_POLICY_NAME"
-    val ManagementBusPolicyKey = "FORTIS_SERVICEBUS_POLICY_KEY"
+    val ManagementBusConnectionString = "FORTIS_SB_CONN_STR"
+    val ManagementBusConfigQueueName = "FORTIS_SB_CONFIG_QUEUE"
+    val ManagementBusCommandQueueName = "FORTIS_SB_COMMAND_QUEUE"
   }
 }
