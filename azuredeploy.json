@@ -135,8 +135,8 @@
         "postDeploymentExtensionScript": "fortis-deploy.sh",
         "githubClonePath": "https://github.com/CatalystCode/fortisdeploy.git",
         "sbNamespace": "fortisservicebusns",
-        "sbQueueNameSiteSettings": "siteMutations",
-        "sbQueueNameStreams": "streamMutations",
+        "sbQueueNameConfiguration": "configuration",
+        "sbQueueNameCommand": "command",
         "sbAuthRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('sbNamespace'), variables('defaultSASKeyName'))]",
         "defaultSASKeyName": "RootManageSharedAccessKey",
         "sbAuthRuleName": "[concat(variables('sbNamespace'),'/fortisAuthRule')]",
@@ -247,7 +247,7 @@
             "resources": [
                 {
                     "apiVersion": "[variables('sbVersion')]",
-                    "name": "[variables('sbQueueNameStreams')]",
+                    "name": "[variables('sbQueueNameCommand')]",
                     "type": "Queues",
                     "dependsOn": [
                         "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
@@ -255,7 +255,7 @@
                 },
                 {
                     "apiVersion": "[variables('sbVersion')]",
-                    "name": "[variables('sbQueueNameSiteSettings')]",
+                    "name": "[variables('sbQueueNameConfiguration')]",
                     "type": "Queues",
                     "dependsOn": [
                         "[concat('Microsoft.ServiceBus/namespaces/', variables('sbNamespace'))]"
