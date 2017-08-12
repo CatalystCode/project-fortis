@@ -21,8 +21,8 @@ readonly default_language="en"
 readonly checkpoint_directory="HDFS://"
 readonly eh_path="published-messages"
 readonly eh_consumer_group="\$Default"
-readonly sb_queue_site="siteMutations"
-readonly sb_queue_streams="streamMutations"
+readonly sb_queue_config="configuration"
+readonly sb_queue_command="command"
 readonly fortis_models_directory="${fortis_central_directory}/sentiment/"
 
 kubectl create configmap "${spark_config_map_name}" --namespace spark \
@@ -35,9 +35,9 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=DEFAULT_LANGUAGE="${default_language}" \
 --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
 --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
---from-literal=SERVICE_BUS_CONNECTION_STRING="${sb_conn_str}" \
---from-literal=SERVICE_BUS_QUEUE_SITE="${sb_queue_site}" \
---from-literal=SERVICE_BUS_QUEUE_STREAM="${sb_queue_streams}" \
+--from-literal=FORTIS_SB_CONN_STR="${sb_conn_str}" \
+--from-literal=FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" \
+--from-literal=FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
@@ -55,9 +55,9 @@ deis config:set FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}"
 deis config:set PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}"
 deis config:set PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}"
 deis config:set PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
-deis config:set SERVICE_BUS_QUEUE_STREAM="${sb_queue_streams}"
-deis config:set SERVICE_BUS_QUEUE_SITE="${sb_queue_site}"
-deis config:set SERVICE_BUS_CONNECTION_STRING="${sb_conn_str}"
+deis config:set FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}"
+deis config:set FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}"
+deis config:set FORTIS_SB_CONN_STR="${sb_conn_str}"
 
 cd ../fortis-interface || exit 2
 deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
