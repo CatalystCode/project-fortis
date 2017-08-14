@@ -57,7 +57,7 @@ CREATE TYPE computedentities (
 
 CREATE TYPE place (
     placeid text,
-    centroidlat double, 
+    centroidlat double,
     centroidlon double
 );
 
@@ -113,7 +113,7 @@ CREATE TABLE streams (
     PRIMARY KEY (pipelinekey, streamid)
 );
 
-CREATE TABLE trustedsources (   
+CREATE TABLE trustedsources (
    externalsourceid text,
    sourcetype text,
    pipelinekey text,
@@ -131,7 +131,7 @@ CREATE TABLE conjunctivetopics (
     tilez int,
     tilex int,
     tiley int,
-    externalsourceid text,    
+    externalsourceid text,
     topic text,
     conjunctivetopic text,
     mentioncount counter,
