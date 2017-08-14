@@ -32,6 +32,7 @@ object CassandraEventsSink{
 
         eventsRDD.cache()
         val batchSize = eventsRDD.count()
+
         Timer.time(duration => { FortisTelemetry.get().logEventBatchAggregation(duration, batchSize) }){
           if(!eventsRDD.isEmpty) {
             val batchid = UUID.randomUUID().toString
