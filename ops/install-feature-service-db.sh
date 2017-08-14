@@ -4,7 +4,7 @@ fs__location="$1"
 fs__resource_group="$2"
 
 fs__randomString() { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"$1"; }
-fs__randomId() {  < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
+fs__randomId() { < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
 
 fs__pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
 fs__pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
