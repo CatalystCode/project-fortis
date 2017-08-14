@@ -50,7 +50,8 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
     ))
   }
 
-  it should "produce an empty sequence on single keyword" in {
+  it should "produce a non-empty sequence on single keyword" in {
+    val period = Period("day-2017-08-11")
     val topics = CassandraConjunctiveTopics(Event(
       pipelinekey = "twitter",
       computedfeatures = Features(
@@ -60,7 +61,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
         places = Seq(Place("abc123", 10.0, 20.0)),
         entities = Seq()
       ),
-      eventtime = new Date().getTime,
+      eventtime = period.startTime(),
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
       insertiontime = new Date().getTime,
@@ -73,7 +74,21 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       sourceurl = "",
       title = ""
     ))
-    assert(topics == Seq())
+    assert(topics.size == 45)
+    assert(topics.head == ConjunctiveTopicAggregate(
+      conjunctivetopic = null,
+      externalsourceid = "HamillHimself",
+      mentioncount = 1,
+      period = period.toString,
+      periodenddate =  period.endTime(),
+      periodstartdate =  period.startTime(),
+      periodtype = "day",
+      pipelinekey = "twitter",
+      tilex = 142,
+      tiley = 120,
+      tilez = 8,
+      topic = "europe"
+    ))
   }
 
   it should "produce an empty sequence on empty places" in {

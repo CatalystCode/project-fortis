@@ -82,7 +82,7 @@ object CassandraPopularTopics {
 object CassandraConjunctiveTopics {
   def apply(item: Event): Seq[ConjunctiveTopicAggregate] = {
     val keywords = item.computedfeatures.keywords
-    val keywordPairs = keywords.combinations(2).flatMap(combination=>Seq(
+    val keywordPairs = if (keywords.size == 1) Seq((keywords.head, null)) else keywords.combinations(2).flatMap(combination=>Seq(
       (combination(0), combination(1)),
       (combination(1), combination(0))
     ))
