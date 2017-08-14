@@ -6,14 +6,14 @@ fs__resource_group="$2"
 fs__randomString() { < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c"$1"; }
 fs__randomId() { < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
 
-fs__pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v1.sql.gz"
+fs__pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v2.sql.gz"
 fs__pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
 fs__pg_user="${FEATUREDB_USER:-frontend}"
 fs__pg_name="${FEATUREDB_NAME:-fortis-feature-service-db-$(fs__randomId 8)}"
 fs__pg_tier="${FEATUREDB_TIER:-Basic}"
 fs__pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
 fs__pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
-fs__pg_dbname="${FEATUREDB_DBNAME:-geofeatures}"
+fs__pg_dbname="${FEATUREDB_DBNAME:-features}"
 fs__pg_user_password="$(fs__randomString 32)"
 fs__pg_admin_password="$(fs__randomString 32)"
 
