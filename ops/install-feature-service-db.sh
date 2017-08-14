@@ -8,13 +8,12 @@ fs__randomId() { < /dev/urandom tr -dc a-z0-9 | head -c"$1"; }
 
 fs__pg_dump="https://fortiscentral.blob.core.windows.net/locations/feature-service.v2.sql.gz"
 fs__pg_admin="${FEATUREDB_ADMIN:-fortisadmin}"
-fs__pg_user="${FEATUREDB_USER:-frontend}"
 fs__pg_name="${FEATUREDB_NAME:-fortis-feature-service-db-$(fs__randomId 8)}"
 fs__pg_tier="${FEATUREDB_TIER:-Basic}"
 fs__pg_compute="${FEATUREDB_COMPUTEUNITS:-50}"
 fs__pg_version="${FEATUREDB_POSTGRESVERSION:-9.6}"
-fs__pg_dbname="${FEATUREDB_DBNAME:-features}"
-fs__pg_user_password="$(fs__randomString 32)"
+fs__pg_user_password_ops="$(fs__randomString 32)"
+fs__pg_user_password_frontend="$(fs__randomString 32)"
 fs__pg_admin_password="$(fs__randomString 32)"
 
 if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
@@ -46,14 +45,14 @@ curl "${fs__pg_dump}" | gunzip --to-stdout > "${fs__dbdump}"
 fs__pg_host="$(az postgres server show --resource-group "${fs__resource_group}" --name "${fs__pg_name}" | jq -r '.fullyQualifiedDomainName')"
 echo "Finished. Now populating the database hosted at ${fs__pg_host}"
 
-echo "CREATE DATABASE ${fs__pg_dbname}; CREATE USER ${fs__pg_user} WITH login PASSWORD '${fs__pg_user_password}';" | \
+echo "CREATE DATABASE features; CREATE USER ops WITH login PASSWORD '${fs__pg_user_password_ops}'; CREATE USER frontend WITH login PASSWORD '${fs__pg_user_password_frontend}';" | \
 psql "postgresql://${fs__pg_host}:5432/postgres?user=${fs__pg_admin}@${fs__pg_name}&password=${fs__pg_admin_password}&ssl=true"
 
 < "${fs__dbdump}" \
-psql "postgresql://${fs__pg_host}:5432/${fs__pg_dbname}?user=${fs__pg_admin}@${fs__pg_name}&password=${fs__pg_admin_password}&ssl=true" --quiet
+psql "postgresql://${fs__pg_host}:5432/features?user=${fs__pg_admin}@${fs__pg_name}&password=${fs__pg_admin_password}&ssl=true" --quiet
 rm "${fs__dbdump}"
 
-FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://${fs__pg_user}@${fs__pg_name}:${fs__pg_user_password}@${fs__pg_host}:5432/${fs__pg_dbname}?ssl=true"
+FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://frontend@${fs__pg_name}:${fs__pg_user_password_frontend}@${fs__pg_host}:5432/features?ssl=true"
 export FEATURE_SERVICE_DB_CONNECTION_STRING
 
 echo "All done installing feature service database"
