@@ -277,15 +277,16 @@ CREATE TABLE computedtrends(
  *************************************/
 
 CREATE MATERIALIZED VIEW popularsources
-AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
+AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period, pipelinekey, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
    FROM computedtiles
    WHERE periodtype IS NOT NULL
-     AND conjunctiontopics IS NOT NULL
+     AND conjunctiontopic1 IS NOT NULL
+     AND conjunctiontopic2 IS NOT NULL
+     AND conjunctiontopic3 IS NOT NULL
      AND tilez IS NOT NULL
      AND externalsourceid IS NOT NULL
      AND period IS NOT NULL
      AND pipelinekey IS NOT NULL
-     AND conjunctiontopics IS NOT NULL
      AND periodtype IS NOT NULL
      AND tilez IS NOT NULL
      AND period IS NOT NULL
@@ -293,18 +294,19 @@ AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipeli
      AND tiley IS NOT NULL
      AND periodstartdate IS NOT NULL
      AND periodenddate IS NOT NULL
-PRIMARY KEY ((periodtype, conjunctiontopics, tilez, externalsourceid, period), pipelinekey, tilex, tiley, periodstartdate, periodenddate);
+PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period), pipelinekey, tilex, tiley, periodstartdate, periodenddate);
 
 CREATE MATERIALIZED VIEW timeseries
-AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipelinekey, conjunctiontopics, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
+AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period, pipelinekey, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentiment
    FROM computedtiles
    WHERE periodtype IS NOT NULL
-     AND conjunctiontopics IS NOT NULL
+     AND conjunctiontopic1 IS NOT NULL
+     AND conjunctiontopic2 IS NOT NULL
+     AND conjunctiontopic3 IS NOT NULL
      AND tilez IS NOT NULL
      AND externalsourceid IS NOT NULL
      AND period IS NOT NULL
      AND pipelinekey IS NOT NULL
-     AND conjunctiontopics IS NOT NULL
      AND periodtype IS NOT NULL
      AND tilez IS NOT NULL
      AND period IS NOT NULL
@@ -312,7 +314,7 @@ AS SELECT periodtype, conjunctiontopics, tilez, externalsourceid, period, pipeli
      AND tiley IS NOT NULL
      AND periodstartdate IS NOT NULL
      AND periodenddate IS NOT NULL
-PRIMARY KEY ((periodtype, conjunctiontopics, tilez, period), pipelinekey, externalsourceid, tilex, tiley, periodstartdate, periodenddate);
+PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, period), pipelinekey, externalsourceid, tilex, tiley, periodstartdate, periodenddate);
 
 /**************************************
  * Indices
