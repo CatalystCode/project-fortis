@@ -70,12 +70,8 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
 
   private def startQueueClient(sparkContext: SparkContext): Unit = {
     queueClient = new QueueClient(
-      new ConnectionStringBuilder(
-        settings.managementBusNamespace,
-        settings.managementBusConfigQueueName,
-        settings.managementBusPolicyName,
-        settings.managementBusPolicyKey
-      ), ReceiveMode.PeekLock)
+      new ConnectionStringBuilder(settings.managementBusConnectionString, settings.managementBusConfigQueueName),
+      ReceiveMode.PeekLock)
 
     queueClient.registerMessageHandler(
       new MessageHandler(sparkContext),
