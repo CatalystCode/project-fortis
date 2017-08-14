@@ -12,6 +12,8 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs._
 import org.apache.spark.streaming.Time
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
+import com.microsoft.partnercatalyst.fortis.spark.logging.Timer
 
 import scala.util.{Failure, Success, Try}
 
@@ -27,22 +29,26 @@ object CassandraEventsSink{
 
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession): Unit = {
       val batchStream = dstream.foreachRDD{ (eventsRDD, time: Time) => {
-        if(!eventsRDD.isEmpty) {
-          val batchid = UUID.randomUUID().toString
-          val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
-          writeFortisEvents(fortisEventsRDD, batchid)
-          val aggregators = Seq(new PopularPlacesAggregator, new PopularTopicAggregator, new ComputedTilesAggregator).par
-          val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
-            .appName(eventsRDD.sparkContext.appName)
 
-            .getOrCreate()
+        eventsRDD.cache()
+        val batchSize = eventsRDD.count()
+        Timer.time(duration => { FortisTelemetry.get().logEventBatchAggregation(duration, batchSize) }){
+          if(!eventsRDD.isEmpty) {
+            val batchid = UUID.randomUUID().toString
+            val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
+            writeFortisEvents(fortisEventsRDD, batchid)
+            val aggregators = Seq(new PopularPlacesAggregator, new PopularTopicAggregator, new ComputedTilesAggregator).par
+            val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
+              .appName(eventsRDD.sparkContext.appName)
+              .getOrCreate()
 
-            registerUDFs(session)
-            val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
-            writeEventBatchToEventTagTables(eventBatchDF, session)
-            aggregators.map(aggregator => {
-              aggregateEventBatch(eventBatchDF, session, aggregator)
-            })
+              registerUDFs(session)
+              val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
+              writeEventBatchToEventTagTables(eventBatchDF, session)
+              aggregators.map(aggregator => {
+                aggregateEventBatch(eventBatchDF, session, aggregator)
+              })
+          }
         }
       }}
   }
