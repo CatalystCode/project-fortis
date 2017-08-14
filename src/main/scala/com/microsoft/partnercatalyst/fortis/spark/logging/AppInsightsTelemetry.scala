@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.logging
 
-import java.util
-
 import com.microsoft.applicationinsights.{TelemetryClient, TelemetryConfiguration}
 import java.util.HashMap
 
@@ -20,7 +18,7 @@ class AppInsightsTelemetry extends FortisTelemetry {
   }
 
   def logEventBatchAggregation(duration: Long, batchSize: Long): Unit = {
-    val properties = new util.HashMap[String, String](0)
+    val properties = new HashMap[String, String](0)
 
     val metrics = new HashMap[String, java.lang.Double](2)
     metrics.put("batchSize", batchSize.toDouble)
