@@ -53,6 +53,8 @@ psql "postgresql://${fs__pg_host}:5432/features?user=${fs__pg_admin}@${fs__pg_na
 rm "${fs__dbdump}"
 
 FEATURE_SERVICE_DB_CONNECTION_STRING="postgres://frontend@${fs__pg_name}:${fs__pg_user_password_frontend}@${fs__pg_host}:5432/features?ssl=true"
+FEATURE_SERVICE_DB_CONNECTION_STRING_2="postgres://ops@${fs__pg_name}:${fs__pg_user_password_ops}@${fs__pg_host}:5432/features?ssl=true"
 export FEATURE_SERVICE_DB_CONNECTION_STRING
+export FEATURE_SERVICE_DB_CONNECTION_STRING_2
 
 echo "All done installing feature service database"
