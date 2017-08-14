@@ -35,7 +35,66 @@ function eventToFeature(row) {
  */
 function byLocation(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    return reject('Querying by location is no longer supported, please query using the place name instead');
+    if (!args.coordinates || args.coordinates.length !== 2) return reject('Invalid coordinates specified');
+
+    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    const limit = args.limit || 15;
+    const [lat, lon] = args.coordinates;
+
+    const tagsQuery = `
+    SELECT eventid
+    FROM fortis.eventplaces
+    WHERE conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ?
+    AND conjunctiontopic3 = ?
+    AND pipelinekey = ?
+    AND externalsourceid = ?
+    AND centroidlat = ?
+    AND centroidlon = ?
+    AND eventtime >= ?
+    AND eventtime <= ?
+    LIMIT ?
+    `.trim();
+
+    const tagsParams = [
+      ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
+      toPipelineKey(args.sourceFilter),
+      'all',
+      lat,
+      lon,
+      fromDate,
+      toDate,
+      limit
+    ];
+
+    cassandraConnector.executeQuery(tagsQuery, tagsParams)
+    .then(rows => {
+      const eventIds = makeSet(rows, row => row.eventid);
+
+      const eventsQuery = `
+      SELECT *
+      FROM fortis.events
+      WHERE pipelinekey = ?
+      AND eventid IN ?
+      AND fulltext LIKE ?
+      LIMIT ?
+      `.trim();
+
+      const eventsParams = [
+        toPipelineKey(args.sourceFilter),
+        limitForInClause(eventIds),
+        `%${args.fulltextTerm}%`,
+        limit
+      ];
+
+      return cassandraConnector.executeQuery(eventsQuery, eventsParams);
+    })
+    .then(rows => {
+      resolve({
+        features: rows.map(eventToFeature)
+      });
+    })
+    .catch(reject);
   });
 }
 
