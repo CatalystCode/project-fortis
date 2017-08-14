@@ -6,6 +6,8 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import java.text.Collator
 import java.util.Locale
+
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.TileUtils.{DETAIL_ZOOM_DELTA, MAX_ZOOM, MIN_ZOOM}
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.{Period, PeriodType}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations._
 
@@ -75,6 +77,35 @@ object CassandraPopularTopics {
       mentioncount = item.computedfeatures.mentions,
       avgsentimentnumerator = 0,
       avgsentiment = item.computedfeatures.sentiment.neg_avg
+    )
+  }
+}
+
+object CassandraComputedTiles {
+  def apply(item: Event): Seq[ComputedTile] = {
+    for {
+      ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
+      place <- item.computedfeatures.places
+      periodType <- Utils.getCassandraPeriodTypes
+      zoom <- MAX_ZOOM to MIN_ZOOM by -1
+      tileId = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
+    } yield ComputedTile(
+        pipelinekey = item.pipelinekey,
+        periodstartdate = Period(item.eventtime, periodType).startTime(),
+        periodenddate = Period(item.eventtime, periodType).endTime(),
+        periodtype = periodType.periodTypeName,
+        period = periodType.format(item.eventtime),
+        tilex = tileId.column,
+        tiley = tileId.row,
+        tilez = tileId.zoom,
+        detailtileid = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom + DETAIL_ZOOM_DELTA).tileId,
+        conjunctiontopic1 = ct._1,
+        conjunctiontopic2 = ct._2,
+        conjunctiontopic3 = ct._3,
+        externalsourceid = item.externalsourceid,
+        mentioncount = item.computedfeatures.mentions,
+        avgsentimentnumerator = 0,
+        avgsentiment = item.computedfeatures.sentiment.neg_avg
     )
   }
 }

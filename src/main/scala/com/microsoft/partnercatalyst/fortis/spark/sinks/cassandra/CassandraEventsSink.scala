@@ -31,9 +31,10 @@ object CassandraEventsSink{
           val batchid = UUID.randomUUID().toString
           val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
           writeFortisEvents(fortisEventsRDD, batchid)
-          val aggregators = Seq(new PopularPlacesAggregator, new PopularTopicAggregator).par
+          val aggregators = Seq(new PopularPlacesAggregator, new PopularTopicAggregator, new ComputedTilesAggregator).par
           val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
             .appName(eventsRDD.sparkContext.appName)
+
             .getOrCreate()
 
             registerUDFs(session)
@@ -53,6 +54,7 @@ object CassandraEventsSink{
   private def registerUDFs(session: SparkSession): Unit ={
     session.sqlContext.udf.register("MeanAverage", FortisUdfFunctions.MeanAverage)
     session.sqlContext.udf.register("SumMentions", FortisUdfFunctions.OptionalSummation)
+    session.sqlContext.udf.register("MergeHeatMap", FortisUdfFunctions.MergeHeatMap)
     session.sqlContext.udf.register("SentimentWeightedAvg", SentimentWeightedAvg)
   }
 
@@ -67,7 +69,7 @@ object CassandraEventsSink{
     val ds = session.sqlContext.sql(s"select eventid, pipelinekey from $TableEventBatches where batchid = '$batchid'")
     val eventsDS = events.toDF().as[Event]
     val filteredEvents = eventsDS.join(ds, Seq("eventid", "pipelinekey"))
-
+    filteredEvents.cache()
     filteredEvents.as[Event]
   }
 

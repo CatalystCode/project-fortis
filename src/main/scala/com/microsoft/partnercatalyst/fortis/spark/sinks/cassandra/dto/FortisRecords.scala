@@ -59,6 +59,30 @@ case class PopularPlaceAggregate(
                                   conjunctiontopic3: String
                         ) extends AggregationRecord with Serializable
 
+case class ComputedTile(
+                         override val periodstartdate: Long,
+                         override val externalsourceid: String,
+                         override val periodenddate: Long,
+                         override val periodtype: String,
+                         override val period: String,
+                         override val pipelinekey: String,
+                         override val mentioncount: Long,
+                         override val avgsentimentnumerator: Long,
+                         override val avgsentiment: Double,
+                         override val tilex: Int,
+                         override val tilez: Int,
+                         override val tiley: Int,
+                         detailtileid: String,
+                         conjunctiontopic1: String,
+                         conjunctiontopic2: String,
+                         conjunctiontopic3: String
+                       ) extends AggregationRecordTile with Serializable
+
+case class HeatmapEntry (
+                          mentioncountagg: Long,
+                          avgsentimentagg: Double
+                        )
+
 case class PopularTopicAggregate(
                                   override val periodstartdate: Long,
                                   override val externalsourceid: String,
