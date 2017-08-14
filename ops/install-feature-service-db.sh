@@ -45,7 +45,7 @@ curl "${fs__pg_dump}" | gunzip --to-stdout > "${fs__dbdump}"
 fs__pg_host="$(az postgres server show --resource-group "${fs__resource_group}" --name "${fs__pg_name}" | jq -r '.fullyQualifiedDomainName')"
 echo "Finished. Now populating the database hosted at ${fs__pg_host}"
 
-echo "CREATE DATABASE features; CREATE USER ops WITH login PASSWORD '${fs__pg_user_password_ops}'; CREATE USER frontend WITH login PASSWORD '${fs__pg_user_password_frontend}';" | \
+echo "CREATE DATABASE features; CREATE USER ops WITH login PASSWORD '${fs__pg_user_password_ops}'; CREATE USER frontend WITH login PASSWORD '${fs__pg_user_password_frontend}'; GRANT ops TO ${fs__pg_admin}; GRANT frontend TO ${fs__pg_admin};" | \
 psql "postgresql://${fs__pg_host}:5432/postgres?user=${fs__pg_admin}@${fs__pg_name}&password=${fs__pg_admin_password}&ssl=true"
 
 < "${fs__dbdump}" \
