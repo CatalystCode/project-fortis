@@ -28,7 +28,7 @@ az postgres server create \
   --admin-password "${fs__pg_admin_password}" \
   --performance-tier "${fs__pg_tier}" \
   --compute-units "${fs__pg_compute}" \
-  --version "${fs__pg_version}"
+  --version "${fs__pg_version}" > /dev/null
 
 echo "Finished. Now opening up database server firewall"
 az postgres server firewall-rule create \
@@ -36,7 +36,7 @@ az postgres server firewall-rule create \
   --server "${fs__pg_name}" \
   --name AllowAllIps \
   --start-ip-address 0.0.0.0 \
-  --end-ip-address 255.255.255.255
+  --end-ip-address 255.255.255.255 > /dev/null
 
 fs__dbdump="$(mktemp)"
 echo "Finished. Now downloading database dump to ${fs__dbdump}"
