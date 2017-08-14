@@ -33,8 +33,8 @@ object CassandraEventsSink{
         eventsRDD.cache()
         val batchSize = eventsRDD.count()
 
-        Timer.time(duration => { FortisTelemetry.get().logEventBatchAggregation(duration, batchSize) }){
-          if(!eventsRDD.isEmpty) {
+        if(!eventsRDD.isEmpty) {
+          Timer.time(duration => { FortisTelemetry.get().logEventBatchAggregation(duration, batchSize) }){
             val batchid = UUID.randomUUID().toString
             val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
             writeFortisEvents(fortisEventsRDD, batchid)
@@ -43,12 +43,12 @@ object CassandraEventsSink{
               .appName(eventsRDD.sparkContext.appName)
               .getOrCreate()
 
-              registerUDFs(session)
-              val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
-              writeEventBatchToEventTagTables(eventBatchDF, session)
-              aggregators.map(aggregator => {
-                aggregateEventBatch(eventBatchDF, session, aggregator)
-              })
+            registerUDFs(session)
+            val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
+            writeEventBatchToEventTagTables(eventBatchDF, session)
+            aggregators.map(aggregator => {
+              aggregateEventBatch(eventBatchDF, session, aggregator)
+            })
           }
         }
       }}
