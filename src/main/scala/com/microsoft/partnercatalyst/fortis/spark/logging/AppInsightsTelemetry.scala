@@ -19,7 +19,7 @@ class AppInsightsTelemetry extends FortisTelemetry {
   }
 
   def logSink(duration: Long, eventName: String, batchSize: Long): Unit = {
-    val name = "batch.sink." + eventName
+    val name = s"batch.sink.$eventName"
 
     val properties = new util.HashMap[String, String](0)
 
