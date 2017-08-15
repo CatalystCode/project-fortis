@@ -17,3 +17,7 @@ project/plugins/project/
 .history
 .cache
 .lib/
+
+# Miscellaneous
+*.orig
+
