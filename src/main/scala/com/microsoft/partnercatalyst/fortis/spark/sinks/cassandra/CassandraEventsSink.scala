@@ -55,7 +55,8 @@ object CassandraEventsSink{
             writeEventBatchToEventTagTables(eventBatchDF, session)
           }
           aggregators.foreach(aggregator => {
-            Timer.time(FortisTelemetry.get().logSink(_, "aggregate", batchSize)) {
+            val eventName = aggregator.FortisTargetTablename
+            Timer.time(FortisTelemetry.get().logSink(_, eventName, batchSize)) {
               aggregateEventBatch(eventBatchDF, session, aggregator)
             }
           })
