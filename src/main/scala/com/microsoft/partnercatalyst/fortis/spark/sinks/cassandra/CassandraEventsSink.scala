@@ -39,6 +39,7 @@ object CassandraEventsSink{
           ).par
           val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
             .appName(eventsRDD.sparkContext.appName)
+            
             .getOrCreate()
 
             registerUDFs(session)
