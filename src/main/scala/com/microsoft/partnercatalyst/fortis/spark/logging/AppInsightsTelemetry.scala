@@ -18,14 +18,16 @@ class AppInsightsTelemetry extends FortisTelemetry {
     client.trackEvent("batch.receive", properties, metrics)
   }
 
-  def logCassandraEventsSink(duration: Long, batchSize: Long): Unit = {
+  def logSink(duration: Long, eventName: String, batchSize: Long): Unit = {
+    val name = "batch.sink." + eventName
+
     val properties = new util.HashMap[String, String](0)
 
     val metrics = new util.HashMap[String, java.lang.Double](2)
     metrics.put("batchSize", batchSize.toDouble)
     metrics.put("duration", duration.toDouble)
 
-    client.trackEvent("batch.sink", properties, metrics)
+    client.trackEvent(name, properties, metrics)
   }
 
   def logLanguageDetection(language: Option[String]): Unit = {

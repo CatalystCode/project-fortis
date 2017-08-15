@@ -34,27 +34,31 @@ object CassandraEventsSink{
 
         if(!eventsRDD.isEmpty) {
           val batchSize = eventsRDD.count()
-          Timer.time(FortisTelemetry.get().logCassandraEventsSink(_, batchSize)){
-            val batchid = UUID.randomUUID().toString
-            val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
+          val batchid = UUID.randomUUID().toString
+          val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
+          Timer.time(FortisTelemetry.get().logSink(_, "save", batchSize)) {
             writeFortisEvents(fortisEventsRDD, batchid)
-            val aggregators = Seq(
-              new ConjunctiveTopicsAggregator,
-              new PopularPlacesAggregator,
-              new PopularTopicAggregator,
-              new ComputedTilesAggregator
-            ).par
-            val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
-              .appName(eventsRDD.sparkContext.appName)
-              .getOrCreate()
-
-            registerUDFs(session)
-            val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
-            writeEventBatchToEventTagTables(eventBatchDF, session)
-            aggregators.foreach(aggregator => {
-              aggregateEventBatch(eventBatchDF, session, aggregator)
-            })
           }
+          val aggregators = Seq(
+            new ConjunctiveTopicsAggregator,
+            new PopularPlacesAggregator,
+            new PopularTopicAggregator,
+            new ComputedTilesAggregator
+          ).par
+          val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
+            .appName(eventsRDD.sparkContext.appName)
+            .getOrCreate()
+
+          registerUDFs(session)
+          val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
+          Timer.time(FortisTelemetry.get().logSink(_, "tagtables", batchSize)) {
+            writeEventBatchToEventTagTables(eventBatchDF, session)
+          }
+          aggregators.foreach(aggregator => {
+            Timer.time(FortisTelemetry.get().logSink(_, "aggregate", batchSize)) {
+              aggregateEventBatch(eventBatchDF, session, aggregator)
+            }
+          })
         }
       }}
   }
