@@ -29,33 +29,41 @@ object CassandraEventsSink{
 
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession): Unit = {
       val batchStream = dstream.foreachRDD{ (eventsRDD, time: Time) => {
-
         eventsRDD.cache()
 
         if(!eventsRDD.isEmpty) {
           val batchSize = eventsRDD.count()
           val batchid = UUID.randomUUID().toString
           val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
+
           Timer.time(FortisTelemetry.get().logSink("save", _, batchSize)) {
             writeFortisEvents(fortisEventsRDD, batchid)
           }
+
           val aggregators = Seq(
             new ConjunctiveTopicsAggregator,
             new PopularPlacesAggregator,
             new PopularTopicAggregator,
             new ComputedTilesAggregator
           ).par
+
           val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
             .appName(eventsRDD.sparkContext.appName)
             .getOrCreate()
 
           registerUDFs(session)
-          val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
+
+          val eventBatchDF = Timer.time(FortisTelemetry.get().logSink("fetch", _, batchSize)) {
+            fetchEventBatch(batchid, fortisEventsRDD, session)
+          }
+
           Timer.time(FortisTelemetry.get().logSink("tagtables", _, batchSize)) {
             writeEventBatchToEventTagTables(eventBatchDF, session)
           }
+
           aggregators.foreach(aggregator => {
             val eventName = aggregator.FortisTargetTablename
+
             Timer.time(FortisTelemetry.get().logSink(eventName, _, batchSize)) {
               aggregateEventBatch(eventBatchDF, session, aggregator)
             }
