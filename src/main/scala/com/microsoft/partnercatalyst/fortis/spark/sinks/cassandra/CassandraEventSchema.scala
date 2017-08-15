@@ -81,6 +81,37 @@ object CassandraPopularTopics {
   }
 }
 
+object CassandraConjunctiveTopics {
+  def apply(item: Event): Seq[ConjunctiveTopicAggregate] = {
+    val keywords = item.computedfeatures.keywords
+    val keywordPairs = if (keywords.size == 1) Seq((keywords.head, null)) else keywords.combinations(2).flatMap(combination => Seq(
+      (combination(0), combination(1)),
+      (combination(1), combination(0))
+    ))
+
+    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
+
+    (for {
+      kwPair <- keywordPairs
+      tileid <- tiles
+      periodType <- Utils.getCassandraPeriodTypes
+    } yield ConjunctiveTopicAggregate(
+      topic = kwPair._1,
+      conjunctivetopic = kwPair._2,
+      externalsourceid = item.externalsourceid,
+      mentioncount = item.computedfeatures.mentions,
+      period = periodType.format(item.eventtime),
+      periodenddate = Period(item.eventtime, periodType).endTime(),
+      periodstartdate = Period(item.eventtime, periodType).startTime(),
+      periodtype = periodType.periodTypeName,
+      pipelinekey = item.pipelinekey,
+      tilex = tileid.column,
+      tiley = tileid.row,
+      tilez = tileid.zoom
+    )).toSeq
+  }
+}
+
 object CassandraComputedTiles {
   def apply(item: Event): Seq[ComputedTile] = {
     for {
