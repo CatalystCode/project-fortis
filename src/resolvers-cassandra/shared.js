@@ -4,10 +4,10 @@ const Promise = require('promise');
 const geotile = require('geotile');
 
 function withRunTime(promiseFunc) {
-  function runTimer() {
+  function runTimer(...args) {
     return new Promise((resolve, reject) => {
       const startTime = Date.now();
-      promiseFunc.apply(this, arguments)
+      promiseFunc(...args)
       .then(returnValue => {
         const endTime = Date.now();
         returnValue.runTime = endTime - startTime;
