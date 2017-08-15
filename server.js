@@ -72,4 +72,4 @@ const serverStartBlocker = process.env.ENABLE_V2
   ? require('./src/clients/cassandra/CassandraConnector').initialize()
   : require('promise').resolve();
 
-serverStartBlocker.then(startServer);
+serverStartBlocker.then(startServer).catch(console.error);
