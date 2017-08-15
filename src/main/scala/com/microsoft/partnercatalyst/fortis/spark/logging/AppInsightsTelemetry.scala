@@ -26,7 +26,6 @@ class AppInsightsTelemetry extends FortisTelemetry {
     metrics.put("duration", duration.toDouble)
 
     val name = s"batch.sink.$eventName"
-
     client.trackEvent(name, properties, metrics)
   }
 
