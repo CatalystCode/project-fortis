@@ -45,11 +45,16 @@ function toPipelineKey(sourceFilter) {
 }
 
 function toConjunctionTopics(mainEdge, filteredEdges) {
+  if (!mainEdge) {
+    console.warn('mainEdge not set');
+    mainEdge = '';
+  }
+
   if (!filteredEdges || !filteredEdges.length) {
     return [mainEdge, '', ''];
   }
 
-  const extraFilters = filteredEdges.slice(0, 2);
+  const extraFilters = filteredEdges.filter(edge => !!edge).slice(0, 2);
   if (filteredEdges.length > 2) {
     console.warn(`Only two filtered edges supported, ignoring: ${filteredEdges.slice(2).join(', ')}`);
   }
@@ -71,21 +76,23 @@ function tilesForLocations(locations, zoomLevel) {
   return locations.map(([lat, lon]) => geotile.tileIdFromLatLong(lat, lon, zoomLevel)).map(geotile.decodeTileId);
 }
 
-function parseTimespan(timespan) {
+function parseTimespan(timespan) { // eslint-disable-line no-unused-vars
   // TODO: implement
   return {
-    period: timespan,
-    periodType: ''
+    fromDate: '2017-08-11 15:00:00.000000+0000',
+    toDate: '2017-08-11 16:00:00.000000+0000',
+    period: 'hour-2017-08-11 15',
+    periodType: 'hour'
   };
 }
 
-function parseFromToDate(fromDate, toDate) {
+function parseFromToDate(fromDate, toDate) { // eslint-disable-line no-unused-vars
   // TODO: implement
   return {
-    period: '',
-    periodType: '',
-    fromDate,
-    toDate
+    fromDate: '2017-08-11 15:00:00.000000+0000',
+    toDate: '2017-08-11 16:00:00.000000+0000',
+    period: 'hour-2017-08-11 15',
+    periodType: 'hour'
   };
 }
 

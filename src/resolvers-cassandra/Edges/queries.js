@@ -4,7 +4,7 @@ const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { tilesForBbox, parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
-const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
+const { makeSet, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 /**
@@ -49,7 +49,7 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
     `.trim();
 
     const params = [
-      args.sitename
+      args.site
     ];
 
     cassandraConnector.executeQuery(query, params)
@@ -62,8 +62,10 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
       return featureServiceClient.fetchByBbox({north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]});
     })
     .then(locations => {
+      const edges = locations.map(location => ({name: location.name, coordinates: location.bbox}));
+
       resolve({
-        edges: locations.map(location => ({name: location.name, coordinates: location.bbox}))
+        edges
       });
     })
     .catch(reject);
@@ -76,10 +78,10 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
  */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const { period, periodType } = parseTimespan(args.timespan);
+    const { period, periodType, fromDate, toDate } = parseTimespan(args.timespan);
 
     const query = `
-    SELECT placename, placeid, mentioncount
+    SELECT placename, mentioncount, centroidlat, centroidlon
     FROM fortis.popularplaces
     WHERE period = ?
     AND periodtype = ?
@@ -88,6 +90,8 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     AND conjunctiontopic1 = ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
+    AND (periodstartdate, periodenddate) <= (?, ?)
+    AND (periodstartdate, periodenddate) >= (?, ?)
     `.trim();
 
     const params = [
@@ -95,19 +99,20 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       periodType,
       toPipelineKey(args.sourceFilter),
       args.originalSource || 'all',
-      ...toConjunctionTopics(args.mainEdge)
+      ...toConjunctionTopics(args.mainEdge),
+      toDate,
+      toDate,
+      fromDate,
+      fromDate
     ];
 
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      featureServiceClient.fetchById(makeSet(rows, row => row.placeid))
-      .then(features => {
-        const placeidToBbox = makeMap(features, feature => feature.id, feature => feature.bbox);
-        resolve({
-          edges: rows.map(row => ({name: row.placename, mentions: row.mentioncount, coordinates: placeidToBbox[row.placeid]}))
-        });
-      })
-      .catch(reject);
+      const edges = rows.map(row => ({name: row.placename, mentions: row.mentioncount, coordinates: [row.centroidlat, row.centroidlon]}));
+
+      resolve({
+        edges
+      });
     })
     .catch(reject);
   });
@@ -162,6 +167,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       const labels = Object.keys(topicToCounts).map(topic => ({name: topic, mentions: topicToCounts[topic].reduce((a, b) => a + b, 0)}));
       const dateToRows = makeMultiMap(rows, row => row.periodstartdate, row => row);
       const graphData = Object.keys(dateToRows).map(date => ({date, edges: rows.map(row => row.conjunctiontopic1), mentions: rows.map(row => row.mentioncount)}));
+
       resolve({
         labels,
         graphData
@@ -175,7 +181,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
  * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainTerm: string, limit: number, bbox: number[], zoomLevel: number, originalSource: string}} args
  * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
  */
-function topSources(args,res) { // eslint-disable-line no-unused-vars
+function topSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
@@ -184,7 +190,7 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
     const limit = args.limit || 1000;
 
     const query = `
-    SELECT placename, mentioncount, pipelinekey
+    SELECT mentioncount, pipelinekey
     FROM fortis.popularsources
     WHERE periodtype = ?
     AND conjunctiontopic1 = ?
@@ -219,8 +225,10 @@ function topSources(args,res) { // eslint-disable-line no-unused-vars
 
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
+      const sources = rows.map(row => ({Name: row.pipelinekey, Count: row.mentioncount, Source: row.pipelinekey}));
+
       resolve({
-        sources: rows.map(row => ({Name: row.placename, Count: row.mentioncount, Source: row.pipelinekey}))
+        sources
       });
     })
     .catch(reject);
