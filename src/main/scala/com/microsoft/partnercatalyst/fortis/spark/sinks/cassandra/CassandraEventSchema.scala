@@ -118,7 +118,7 @@ object CassandraEventTopicSchema {
       pipelinekey = item.pipelinekey,
       eventid = item.eventid,
       topic = kw.toLowerCase,
-      eventime = item.eventtime,
+      eventtime = item.eventtime,
       insertiontime = new Date().getTime,
       externalsourceid = item.externalsourceid
     )
@@ -135,7 +135,7 @@ object CassandraEventPlacesSchema {
       centroidlat = location.centroidlat,
       centroidlon = location.centroidlon,
       eventid = item.eventid,
-      eventime = item.eventtime,
+      eventtime = item.eventtime,
       conjunctiontopic1 = ct._1,
       conjunctiontopic2 = ct._2,
       conjunctiontopic3 = ct._3,

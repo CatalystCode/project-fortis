@@ -25,7 +25,7 @@ case class EventTopics(
                         insertiontime: Long,
                         eventid: String,
                         externalsourceid: String,
-                        eventime: Long,
+                        eventtime: Long,
                         topic: String) extends Serializable
 
 case class EventPlaces(
@@ -38,7 +38,7 @@ case class EventPlaces(
                         conjunctiontopic2: String,
                         conjunctiontopic3: String,
                         externalsourceid: String,
-                        eventime: Long,
+                        eventtime: Long,
                         placeid: String) extends Serializable
 
 case class PopularPlaceAggregate(
