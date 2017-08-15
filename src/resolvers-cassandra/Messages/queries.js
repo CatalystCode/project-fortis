@@ -3,7 +3,7 @@
 const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics, limitForInClause } = require('../shared');
+const { parseFromToDate, parseLimit, withRunTime, toPipelineKey, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
@@ -29,8 +29,51 @@ function eventToFeature(row) {
   };
 }
 
+function queryEventsTable(rowsWithEventIds, args) {
+  return new Promise((resolve, reject) => {
+    const eventIds = makeSet(rowsWithEventIds, row => row.eventid);
+
+    if (!eventIds.size) {
+      return reject('No events matched the query');
+    }
+
+    let eventsQuery = `
+    SELECT *
+    FROM fortis.events
+    WHERE pipelinekey = ?
+    AND eventid IN ?
+    `.trim();
+
+    const eventsParams = [
+      toPipelineKey(args.sourceFilter),
+      limitForInClause(eventIds)
+    ];
+
+    if (args.fulltextTerm) {
+      eventsQuery += ' AND fulltext LIKE ?';
+      eventsParams.push(`%${args.fulltextTerm}%`);
+    }
+
+    const limit = parseLimit(args.limit);
+    if (limit) {
+      eventsQuery += ' LIMIT ?';
+      eventsParams.push(limit);
+    }
+
+    cassandraConnector.executeQuery(eventsQuery, eventsParams)
+    .then(rows => {
+      const features = rows.map(eventToFeature);
+
+      resolve({
+        features
+      });
+    })
+    .catch(reject);
+  });
+}
+
 /**
- * @param {site: string, originalSource: string, coordinates: number[], filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
+ * @param {site: string, originalSource: string, coordinates: number[], mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byLocation(args, res) { // eslint-disable-line no-unused-vars
@@ -38,7 +81,6 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
     if (!args.coordinates || args.coordinates.length !== 2) return reject('Invalid coordinates specified');
 
     const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-    const limit = args.limit || 15;
     const [lat, lon] = args.coordinates;
 
     const tagsQuery = `
@@ -51,8 +93,8 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
     AND externalsourceid = ?
     AND centroidlat = ?
     AND centroidlon = ?
-    AND eventtime >= ?
-    AND eventtime <= ?
+    AND eventime >= ?
+    AND eventime <= ?
     LIMIT ?
     `.trim();
 
@@ -64,36 +106,14 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
       lon,
       fromDate,
       toDate,
-      limit
+      parseLimit(args.limit)
     ];
 
     cassandraConnector.executeQuery(tagsQuery, tagsParams)
     .then(rows => {
-      const eventIds = makeSet(rows, row => row.eventid);
-
-      const eventsQuery = `
-      SELECT *
-      FROM fortis.events
-      WHERE pipelinekey = ?
-      AND eventid IN ?
-      AND fulltext LIKE ?
-      LIMIT ?
-      `.trim();
-
-      const eventsParams = [
-        toPipelineKey(args.sourceFilter),
-        limitForInClause(eventIds),
-        `%${args.fulltextTerm}%`,
-        limit
-      ];
-
-      return cassandraConnector.executeQuery(eventsQuery, eventsParams);
+      return queryEventsTable(rows, args);
     })
-    .then(rows => {
-      resolve({
-        features: rows.map(eventToFeature)
-      });
-    })
+    .then(resolve)
     .catch(reject);
   });
 }
@@ -107,7 +127,6 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
 
     const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-    const limit = args.limit || 15;
     const [north, west, south, east] = args.bbox;
 
     const tagsQuery = `
@@ -133,42 +152,20 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
       south,
       west,
       toDate,
-      limit
+      parseLimit(args.limit)
     ];
 
     cassandraConnector.executeQuery(tagsQuery, tagsParams)
     .then(rows => {
-      const eventIds = makeSet(rows, row => row.eventid);
-
-      const eventsQuery = `
-      SELECT *
-      FROM fortis.events
-      WHERE pipelinekey = ?
-      AND eventid IN ?
-      AND fulltext LIKE ?
-      LIMIT ?
-      `.trim();
-
-      const eventsParams = [
-        toPipelineKey(args.sourceFilter),
-        limitForInClause(eventIds),
-        `%${args.fulltextTerm}%`,
-        limit
-      ];
-
-      return cassandraConnector.executeQuery(eventsQuery, eventsParams);
+      return queryEventsTable(rows, args);
     })
-    .then(rows => {
-      resolve({
-        features: rows.map(eventToFeature)
-      });
-    })
+    .then(resolve)
     .catch(reject);
   });
 }
 
 /**
- * @param {site: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
+ * @param {site: string, mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
@@ -176,7 +173,6 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
     const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-    const limit = args.limit || 15;
 
     const tagsQuery = `
     SELECT eventid
@@ -190,39 +186,19 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
     `.trim();
 
     const tagsParams = [
-      limitForInClause(args.filteredEdges),
+      limitForInClause(toConjunctionTopics(args.mainTerm, args.filteredEdges).filter(topic => !!topic)),
       toPipelineKey(args.sourceFilter),
       'all',
       toDate,
       fromDate,
-      limit
+      parseLimit(args.limit)
     ];
 
     cassandraConnector.executeQuery(tagsQuery, tagsParams)
     .then(rows => {
-      const eventIds = makeSet(rows, row => row.eventid);
-
-      const eventQuery = `
-      SELECT *
-      FROM fortis.events
-      WHERE pipelinekey = ?
-      AND eventid IN ?
-      LIMIT ?
-      `.trim();
-
-      const eventParams = [
-        toPipelineKey(args.sourceFilter),
-        limitForInClause(eventIds),
-        limit
-      ];
-
-      return cassandraConnector.executeQuery(eventQuery, eventParams);
+      return queryEventsTable(rows, args);
     })
-    .then(rows => {
-      resolve({
-        features: rows.map(eventToFeature)
-      });
-    })
+    .then(resolve)
     .catch(reject);
   });
 }
@@ -239,7 +215,6 @@ function event(args, res) { // eslint-disable-line no-unused-vars
     SELECT *
     FROM fortis.events
     WHERE eventid = ?
-    AND pipelinekey = 'all'
     LIMIT 2
     `.trim();
 
@@ -248,10 +223,13 @@ function event(args, res) { // eslint-disable-line no-unused-vars
     ];
 
     cassandraConnector.executeQuery(eventQuery, eventParams)
-    .then(eventRows => {
-      if (eventRows.length > 1) return reject(`Got more ${eventRows.length} events with id ${args.messageId}`);
+    .then(rows => {
+      if (!rows.length) return reject(`No event matching id ${args.messageId} found`);
+      if (rows.length > 1) return reject(`Got more than one event with id ${args.messageId}`);
 
-      resolve(eventToFeature(eventRows[0]));
+      const feature = eventToFeature(rows[0]);
+
+      resolve(feature);
     })
     .catch(reject);
   });
@@ -264,8 +242,16 @@ function event(args, res) { // eslint-disable-line no-unused-vars
 function translate(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     translatorService.translate(args.sentence, args.fromLanguage, args.toLanguage)
-      .then(result => resolve({ translatedSentence: result.translatedSentence, originalSentence: args.sentence }))
-      .catch(reject);
+    .then(result => {
+      const translatedSentence = result.translatedSentence;
+      const originalSentence = args.sentence;
+
+      resolve({
+        translatedSentence,
+        originalSentence
+      });
+    })
+    .catch(reject);
   });
 }
 
@@ -276,8 +262,14 @@ function translate(args, res) { // eslint-disable-line no-unused-vars
 function translateWords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)
-      .then(result => resolve({ words: result.translatedSentence }))
-      .catch(reject);
+    .then(result => {
+      const words = result.translatedSentence;
+
+      resolve({
+        words
+      });
+    })
+    .catch(reject);
   });
 }
 
