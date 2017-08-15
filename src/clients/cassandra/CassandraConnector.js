@@ -28,6 +28,9 @@ const options = {
     fetchSize: FETCH_SIZE
   }
 };
+if (process.env.CASSANDRA_USERNAME && process.env.CASSANDRA_PASSWORD) {
+  options.authProvider = new cassandra.auth.PlainTextAuthProvider(process.env.CASSANDRA_USERNAME, process.env.CASSANDRA_PASSWORD);
+}
 const client = new cassandra.Client(options);
 
 /**
