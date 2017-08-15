@@ -35,8 +35,6 @@ app.use(function(req, res, next) {
   }
 });
 
-console.log('PORT: ' + port);
-
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
@@ -64,6 +62,14 @@ app.use('/api/settings', graphqlHTTP({
   graphiql: true
 }));
 
-const server = http.createServer(app);
+function startServer() {
+  console.log(`PORT: ${port}`);
+  const server = http.createServer(app);
+  server.listen(port, function () {});
+}
 
-server.listen(port, function () {});
+const serverStartBlocker = process.env.ENABLE_V2
+  ? require('./src/clients/cassandra/CassandraConnector').initialize()
+  : require('promise').resolve();
+
+serverStartBlocker.then(startServer).catch(console.error);

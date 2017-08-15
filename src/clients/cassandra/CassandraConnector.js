@@ -108,7 +108,17 @@ function executeQueries(queries) {
   });
 }
 
+/**
+ * Should be called on server start to warm up the connection to
+ * Cassandra so that subsequent calls are fast.
+ * @returns {Promise}
+ */
+function intialize() {
+  return executeQuery('select sitename from fortis.sitesettings limit 1', []);
+}
+
 module.exports = {
+  initialize: trackDependency(intialize, 'Cassandra', 'initialize'),
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
   executeQueries: trackDependency(executeQueries, 'Cassandra', 'executeQueries'),
   executeQuery: trackDependency(executeQuery, 'Cassandra', 'executeQuery')
