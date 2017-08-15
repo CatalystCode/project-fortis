@@ -195,10 +195,10 @@ CREATE TABLE popularplaces (
 CREATE TABLE eventtopics(
     eventid text,
     topic text,
-    eventime timestamp,
+    eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((topic, pipelinekey, externalsourceid), eventime, eventid)
+    PRIMARY KEY ((topic, pipelinekey, externalsourceid), eventtime, eventid)
 );
 
 CREATE TABLE eventplaces(
@@ -210,10 +210,10 @@ CREATE TABLE eventplaces(
     centroidlon double,
     placeid text,
     insertiontime timestamp,
-    eventime timestamp,
+    eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid), centroidlat, centroidlon, eventime, eventid)
+    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid), centroidlat, centroidlon, eventtime, eventid)
 );
 
 CREATE TABLE events(
