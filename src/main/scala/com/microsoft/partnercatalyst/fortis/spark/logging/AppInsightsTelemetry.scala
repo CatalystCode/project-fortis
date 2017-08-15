@@ -17,13 +17,13 @@ class AppInsightsTelemetry extends FortisTelemetry {
     client.trackEvent("batch.receive", properties, metrics)
   }
 
-  def logEventBatchAggregation(duration: Long, batchSize: Long): Unit = {
+  def logCassandraEventsSink(duration: Long, batchSize: Long): Unit = {
     val properties = new HashMap[String, String](0)
 
     val metrics = new HashMap[String, java.lang.Double](2)
     metrics.put("batchSize", batchSize.toDouble)
     metrics.put("duration", duration.toDouble)
 
-    client.trackEvent("batch.aggregate", properties, metrics)
+    client.trackEvent("sink.cassandra", properties, metrics)
   }
 }
