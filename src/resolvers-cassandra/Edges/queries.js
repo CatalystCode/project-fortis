@@ -24,9 +24,10 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     cassandraConnector.executeQuery(query, params)
     .then(rows => {
       const topics = makeSet(rows, row => row.topic);
+      const edges = Array.from(topics).map(topic => ({name: topic}));
 
       return {
-        edges: topics.map(topic => ({name: topic}))
+        edges
       };
     })
     .catch(reject);
