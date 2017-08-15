@@ -38,7 +38,12 @@ object CassandraEventsSink{
             val batchid = UUID.randomUUID().toString
             val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
             writeFortisEvents(fortisEventsRDD, batchid)
-            val aggregators = Seq(new PopularPlacesAggregator, new PopularTopicAggregator, new ComputedTilesAggregator).par
+            val aggregators = Seq(
+              new ConjunctiveTopicsAggregator,
+              new PopularPlacesAggregator,
+              new PopularTopicAggregator,
+              new ComputedTilesAggregator
+            ).par
             val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
               .appName(eventsRDD.sparkContext.appName)
               .getOrCreate()
