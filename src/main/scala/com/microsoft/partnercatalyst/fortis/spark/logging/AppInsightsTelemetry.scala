@@ -24,6 +24,6 @@ class AppInsightsTelemetry extends FortisTelemetry {
     metrics.put("batchSize", batchSize.toDouble)
     metrics.put("duration", duration.toDouble)
 
-    client.trackEvent("sink.cassandra", properties, metrics)
+    client.trackEvent("batch.sink", properties, metrics)
   }
 }
