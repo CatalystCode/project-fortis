@@ -57,13 +57,13 @@ class PopularPlacesAggregator extends FortisAggregatorBase with Serializable{
 
     popularPlacesDF
   }
-
   override def flattenEvents(session: SparkSession, eventDS: Dataset[Event]): DataFrame = {
     import session.implicits._
     eventDS.flatMap(CassandraPopularPlaces(_)).toDF()
   }
 
   override def IncrementalUpdate(session: SparkSession, aggregatedDS: DataFrame): DataFrame = {
+    aggregatedDS.createOrReplaceTempView(FortisTargetTablename)
     val cassandraSave = session.sqlContext.sql(IncrementalUpdateQuery)
 
     cassandraSave

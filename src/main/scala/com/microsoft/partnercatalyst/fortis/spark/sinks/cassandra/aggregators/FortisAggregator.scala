@@ -25,7 +25,15 @@ trait FortisAggregator {
 }
 
 abstract class FortisAggregatorBase extends FortisAggregator {
-  override def DfTableNameFlattenedEvents: String = s"$DataFrameNameFlattenedEvents$FortisTargetTablename"
+ override def DfTableNameFlattenedEvents: String = s"$DataFrameNameFlattenedEvents$FortisTargetTablename"
 
-  override def DfTableNameComputedAggregates: String = s"$DataFrameNameComputed$FortisTargetTablename"
+ override def FortisTargetTableDataFrame(session: SparkSession): DataFrame = {
+  val targetTableDF = session.sqlContext.read.format(CassandraFormat)
+    .options(Map("keyspace" -> KeyspaceName, "table" -> FortisTargetTablename))
+    .load()
+
+  targetTableDF
+ }
+
+ override def DfTableNameComputedAggregates: String = s"$DataFrameNameComputed$FortisTargetTablename"
 }
