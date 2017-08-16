@@ -27,4 +27,14 @@ class AppInsightsTelemetry extends FortisTelemetry {
 
     client.trackEvent("batch.sink", properties, metrics)
   }
+
+  def logLanguageDetection(language: Option[String]): Unit = {
+    val properties = new util.HashMap[String, String](2)
+    properties.put("success", language.isDefined.toString)
+    properties.put("detectedLanguage", language.getOrElse(""))
+
+    val metrics = new util.HashMap[String, java.lang.Double](0)
+
+    client.trackEvent("transforms.language", properties, metrics)
+  }
 }

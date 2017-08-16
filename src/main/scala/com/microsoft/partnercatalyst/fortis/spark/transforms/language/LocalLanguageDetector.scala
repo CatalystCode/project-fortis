@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.language
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import com.optimaize.langdetect.LanguageDetectorBuilder
 import com.optimaize.langdetect.ngram.NgramExtractors
 import com.optimaize.langdetect.profiles.LanguageProfileReader
@@ -16,11 +17,8 @@ class LocalLanguageDetector extends LanguageDetector {
       return None
     }
 
-    val language = languageDetector.detect(textObjectFactory.forText(text))
-    if (!language.isPresent) {
-      return None
-    }
-
-    Some(language.get.getLanguage)
+    val language = Option(languageDetector.detect(textObjectFactory.forText(text)).orNull).map(_.getLanguage)
+    FortisTelemetry.get().logLanguageDetection(language)
+    language
   }
 }
