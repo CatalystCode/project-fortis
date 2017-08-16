@@ -18,8 +18,7 @@ class LocalLanguageDetector extends LanguageDetector {
       return None
     }
 
-    var language = detectWithFactory(text, shortTextFactory)
-    if (language.isEmpty) language = detectWithFactory(text, largeTextFactory)
+    val language = detectWithFactory(text, if (text.length <= 200) shortTextFactory else largeTextFactory)
 
     FortisTelemetry.get().logLanguageDetection(language)
     language
