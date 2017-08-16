@@ -171,7 +171,7 @@ CREATE TABLE computedtiles (
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
-    PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, period), tilex, tiley, periodstartdate, periodenddate, pipelinekey, externalsourceid)
+    PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, period), pipelinekey, externalsourceid, tilex, tiley, periodstartdate, periodenddate)
 );
 
 CREATE TABLE popularplaces (
