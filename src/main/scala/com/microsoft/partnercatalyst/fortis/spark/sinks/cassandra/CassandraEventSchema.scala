@@ -24,6 +24,7 @@ object CassandraEventSchema {
       placeids = item.analysis.locations.map(_.wofId),
       eventlangcode = item.analysis.language.orNull,
       eventid = item.details.eventid,
+      sourceeventid = item.details.sourceeventid,
       insertiontime = new Date().getTime,
       body = item.details.body,
       sourceurl = item.details.sourceurl,
