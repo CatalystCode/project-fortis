@@ -67,6 +67,10 @@ function tilesForBbox(bbox, zoomLevel) {
   return geotile.tileIdsForBoundingBox(fence, zoomLevel).map(geotile.decodeTileId);
 }
 
+function tilesForLocations(locations, zoomLevel) {
+  return locations.map(([lat, lon]) => geotile.tileIdFromLatLong(lat, lon, zoomLevel)).map(geotile.decodeTileId);
+}
+
 function parseTimespan(timespan) {
   // TODO: implement
   return {
@@ -96,6 +100,7 @@ module.exports = {
   toPipelineKey,
   toConjunctionTopics,
   tilesForBbox,
+  tilesForLocations,
   limitForInClause,
   withRunTime: withRunTime
 };
