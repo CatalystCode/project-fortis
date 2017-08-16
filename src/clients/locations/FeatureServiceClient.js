@@ -6,27 +6,27 @@ const trackDependency = require('../appinsights/AppInsightsClient').trackDepende
 
 const apiUrlBase = process.env.FORTIS_FEATURE_SERVICE_HOST;
 
-function formatIdsUri(ids, include) {
+function formatIdsUri(ids, extraFields) {
   let uri = `${apiUrlBase}/features/id/${ids.map(encodeURIComponent).join(',')}`;
-  if (include) uri += `?include=${include}`;
+  if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
-function formatBboxUri(north, west, south, east, include) {
+function formatBboxUri(north, west, south, east, extraFields) {
   let uri = `${apiUrlBase}/features/bbox/${north}/${west}/${south}/${east}`;
-  if (include) uri += `?include=${include}`;
+  if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
-function formatPointUri(latitude, longitude, include) {
+function formatPointUri(latitude, longitude, extraFields) {
   let uri = `${apiUrlBase}/features/point/${latitude}/${longitude}`;
-  if (include) uri += `?include=${include}`;
+  if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
-function formatNameUri(names, include) {
+function formatNameUri(names, extraFields) {
   let uri = `${apiUrlBase}/features/name/${names.map(encodeURIComponent).join(',')}`;
-  if (include) uri += `?include=${include}`;
+  if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
@@ -56,40 +56,40 @@ function callFeatureService(uri) {
 
 /**
  * @param {{north: number, west: number, south: number, east: number}} fence 
- * @param {string} include
+ * @param {string} extraFields
  * @returns {Promise.<Array<{id: string, name: string, layer: string}>>}
  */
-function fetchByBbox(fence, include) {
-  return callFeatureService(formatBboxUri(fence.north, fence.west, fence.south, fence.east, include));
+function fetchByBbox(fence, extraFields) {
+  return callFeatureService(formatBboxUri(fence.north, fence.west, fence.south, fence.east, extraFields));
 }
 
 /**
  * @param {{latitude: number, longitude: number}} point 
- * @param {string} include
+ * @param {string} extraFields
  * @returns {Promise.<Array<{id: string, name: string, layer: string}>>}
  */
-function fetchByPoint(point, include) {
-  return callFeatureService(formatPointUri(point.latitude, point.longitude, include));
+function fetchByPoint(point, extraFields) {
+  return callFeatureService(formatPointUri(point.latitude, point.longitude, extraFields));
 }
 
 /**
  * @param {string|string[]} name
- * @param {string} include
+ * @param {string} extraFields
  * @returns {Promise.<Array<{id: string, name: string, layer: string}>>}
  */
-function fetchByName(name, include) {
+function fetchByName(name, extraFields) {
   const names = name.constructor === Array ? name : [name];
-  return callFeatureService(formatNameUri(names, include));
+  return callFeatureService(formatNameUri(names, extraFields));
 }
 
 /**
  * @param {string|string[]} id
- * @param {string} include
+ * @param {string} extraFields
  * @returns {Promise.<Array<{id: string, name: string, layer: string, bbox: number[]}>>}
  */
-function fetchById(id, include) {
+function fetchById(id, extraFields) {
   const ids = id.constructor === Array ? id : [id];
-  return callFeatureService(formatIdsUri(ids, include));
+  return callFeatureService(formatIdsUri(ids, extraFields));
 }
 
 module.exports = {
