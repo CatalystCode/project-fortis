@@ -59,7 +59,7 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
       if (!rows[0].geofence || rows[0].geofence.length !== 4) return reject(`Bad geofence for site ${args.site}`);
 
       const bbox = rows[0].geofence;
-      return featureServiceClient.fetchByBbox({north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]});
+      return featureServiceClient.fetchByBbox({north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]}, 'bbox');
     })
     .then(locations => {
       const edges = locations.map(location => ({name: location.name, coordinates: location.bbox}));
