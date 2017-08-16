@@ -4,7 +4,7 @@ module.exports = graphql.buildSchema(`
   type Query {
     locations(site: String!): LocationCollection
     terms(site: String!, fromDate: String, toDate: String, sourceFilter: [String]): TermCollection
-    popularLocations(site: String!, timespan: String!, sourceFilter: [String], mainEdge: String, originalSource: String): TopNLocationCollection
+    popularLocations(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], bbox: [Float], mainEdge: String, originalSource: String): TopNLocationCollection
     timeSeries(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], mainEdge: String, bbox: [Float], zoomLevel: Int, originalSource: String): EdgeTimeSeriesCollection
     topSources(site: String!, fromDate: String!, toDate: String!, sourceFilter: [String], mainTerm: String, limit: Int!, bbox: [Float], zoomLevel: Int, originalSource: String): TopSourcesCollection
   }
