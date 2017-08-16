@@ -114,10 +114,6 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
       const placeIds = Array.from(makeSet(rows, row => row.placeid));
-      if (!placeIds.length) {
-        return reject('No locations match query');
-      }
-
       featureServiceClient.fetchById(placeIds)
       .then(features => {
         const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);

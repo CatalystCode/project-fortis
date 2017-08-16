@@ -79,6 +79,7 @@ function fetchByPoint(point, extraFields) {
  */
 function fetchByName(name, extraFields) {
   const names = name.constructor === Array ? name : [name];
+  if (!names.length) return Promise.reject('No names specified to fetch; no places match query');
   return callFeatureService(formatNameUri(names, extraFields));
 }
 
@@ -89,6 +90,7 @@ function fetchByName(name, extraFields) {
  */
 function fetchById(id, extraFields) {
   const ids = id.constructor === Array ? id : [id];
+  if (!ids.length) return Promise.reject('No ids specified to fetch; no places match query');
   return callFeatureService(formatIdsUri(ids, extraFields));
 }
 
