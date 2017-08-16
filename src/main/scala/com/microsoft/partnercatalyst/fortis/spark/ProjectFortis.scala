@@ -8,9 +8,9 @@ import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformCont
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.{SparkConf}
+import org.apache.spark.SparkConf
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraEventsSink}
-import org.apache.spark.sql.{SparkSession}
+import org.apache.spark.sql.SparkSession
 
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Properties.{envOrElse, envOrNone}

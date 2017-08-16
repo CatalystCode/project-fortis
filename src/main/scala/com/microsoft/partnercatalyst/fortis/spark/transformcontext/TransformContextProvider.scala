@@ -21,8 +21,8 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
 
   // Do not serialize these values. The transformContext would otherwise contain stale Broadcast
   // instances, so we rebuild it on recovery from checkpoint.
-  @volatile @transient private var transformContext: TransformContext = null
-  @volatile @transient private var queueClient: QueueClient = null
+  @volatile @transient private var transformContext: TransformContext = _
+  @volatile @transient private var queueClient: QueueClient = _
 
   def getOrUpdateContext(sparkContext: SparkContext): TransformContext = {
     ensureInitialized(sparkContext)

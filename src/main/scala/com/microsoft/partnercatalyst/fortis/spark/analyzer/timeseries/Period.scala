@@ -40,17 +40,17 @@ class Period(timestamp: Long, periodType: PeriodType) extends Serializable {
 
 object PeriodType {
 
-  val Minute = PeriodType("minute", Minutes.minutes(_), "yyyy-MM-dd HH:mm", Set())
+  val Minute = PeriodType("minute", Minutes.minutes, "yyyy-MM-dd HH:mm", Set())
 
-  val Hour = PeriodType("hour", Hours.hours(_), "yyyy-MM-dd HH", Set(Calendar.MINUTE))
+  val Hour = PeriodType("hour", Hours.hours, "yyyy-MM-dd HH", Set(Calendar.MINUTE))
 
-  val Day = PeriodType("day", Days.days(_), "yyyy-MM-dd", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY))
+  val Day = PeriodType("day", Days.days, "yyyy-MM-dd", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY))
 
-  val Week = PeriodType("week", Weeks.weeks(_), "yyyy-w", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.WEEK_OF_YEAR))
+  val Week = PeriodType("week", Weeks.weeks, "yyyy-w", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.WEEK_OF_YEAR))
 
-  val Month = PeriodType("month", Months.months(_), "yyyy-MM", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH))
+  val Month = PeriodType("month", Months.months, "yyyy-MM", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH))
 
-  val Year = PeriodType("year", Years.years(_), "yyyy", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH, Calendar.MONTH))
+  val Year = PeriodType("year", Years.years, "yyyy", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH, Calendar.MONTH))
 
   val all: Set[PeriodType] = Set(Minute, Hour, Day, Week, Month, Year)
 
@@ -90,7 +90,7 @@ case class PeriodType(periodTypeName: String, increment: Int=>ReadablePeriod, fo
   }
 
   def periodAfter(from: Long, timeZone: TimeZone = defaultTimeZone): Long = {
-    var currentDateTime = new DateTime(truncate(from))
+    val currentDateTime = new DateTime(truncate(from))
     currentDateTime.plus(increment(1)).getMillis
   }
 
@@ -118,8 +118,8 @@ case class PeriodType(periodTypeName: String, increment: Int=>ReadablePeriod, fo
     val periodCountPerType = config.retrospectivePeriodCountPerType()
     val periodWindowSize = periodCountPerType.getOrElse(this.periodTypeName, 1)
 
-    var endPeriod = new DateTime(referenceTime)
-    var startPeriod = endPeriod.minus(this.increment(periodWindowSize-1))
+    val endPeriod = new DateTime(referenceTime)
+    val startPeriod = endPeriod.minus(this.increment(periodWindowSize-1))
 
     this.periodsBetween(startPeriod.getMillis, endPeriod.getMillis).toList
   }

@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs
 
-import org.apache.spark.sql.{Row}
-import org.apache.spark.sql.expressions.{Aggregator, MutableAggregationBuffer, UserDefinedAggregateFunction}
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
 import org.apache.spark.sql.types._
 
 case class Average(var sum: Double, var count: BigInt)

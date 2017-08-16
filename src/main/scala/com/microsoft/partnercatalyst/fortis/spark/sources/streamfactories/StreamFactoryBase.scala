@@ -15,7 +15,7 @@ abstract class StreamFactoryBase[A: ClassTag] extends StreamFactory[A]{
       stream.transform(rdd => {
         rdd.cache()
         val batchSize = rdd.count()
-        val streamId = config.parameters.get("streamId").get.toString
+        val streamId = config.parameters("streamId").toString
         val connectorName = config.name
         val telemetry = FortisTelemetry.get()
         telemetry.logIncomingEventBatch(streamId, connectorName, batchSize)

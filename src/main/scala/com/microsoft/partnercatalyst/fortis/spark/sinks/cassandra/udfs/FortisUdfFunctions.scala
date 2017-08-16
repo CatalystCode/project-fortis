@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs
 
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.HeatmapEntry
-import net.liftweb.json.{parse}
+import net.liftweb.json.parse
 import net.liftweb.json.Extraction.decompose
 import net.liftweb.json.DefaultFormats
 import net.liftweb.json.JsonAST.{JValue, RenderSettings, render}
