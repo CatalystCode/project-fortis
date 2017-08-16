@@ -182,7 +182,6 @@ CREATE TABLE popularplaces (
     pipelinekey text,
     externalsourceid text,
     placeid text,
-    placename text,
     centroidlat double,
     centroidlon double,
     conjunctiontopic1 text,
@@ -190,7 +189,7 @@ CREATE TABLE popularplaces (
     conjunctiontopic3 text,
     mentioncount counter,
     avgsentimentnumerator counter,
-    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), periodstartdate, periodenddate, centroidlat, centroidlon, placeid, placename)
+    PRIMARY KEY ((period, periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), periodstartdate, periodenddate, centroidlat, centroidlon, placeid)
 );
 
 CREATE TABLE eventtopics(
