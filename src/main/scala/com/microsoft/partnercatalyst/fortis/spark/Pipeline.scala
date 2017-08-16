@@ -45,6 +45,7 @@ object Pipeline {
 
       val imageAnalyzer = transformContext.imageAnalyzer
       val sentimentDetectorAuth = transformContext.sentimentDetectorAuth
+      val languageDetector = new LocalLanguageDetector()
 
       // Broadcast variables
       val langToKeywordExtractor = transformContext.langToKeywordExtractor
@@ -57,7 +58,7 @@ object Pipeline {
       }
 
       def addLanguage(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
-        val language = analyzer.detectLanguage(event.details, new LocalLanguageDetector)
+        val language = analyzer.detectLanguage(event.details, languageDetector)
         event.copy(analysis = Analysis(language = language))
       }
 
