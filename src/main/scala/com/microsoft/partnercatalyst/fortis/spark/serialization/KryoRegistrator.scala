@@ -24,6 +24,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalysisAuth])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.language.LocalLanguageDetector])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.language.CognitiveServicesLanguageDetector])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.language.CognitiveServicesLanguageDetectorAuth])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector])
