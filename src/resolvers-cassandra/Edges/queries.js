@@ -3,7 +3,7 @@
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
+const { tilesForBbox, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
 const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
@@ -78,7 +78,8 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
  */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const { period, periodType, fromDate, toDate } = parseTimespan(args.timespan);
+    const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    const [north, west, south, east] = args.bbox;
 
     const query = `
     SELECT placeid, mentioncount, centroidlat, centroidlon
@@ -90,8 +91,8 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     AND conjunctiontopic1 = ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
-    AND (periodstartdate, periodenddate) <= (?, ?)
-    AND (periodstartdate, periodenddate) >= (?, ?)
+    AND (periodstartdate, periodenddate, centroidlat, centroidlon) <= (?, ?, ?, ?)
+    AND (periodstartdate, periodenddate, centroidlat, centroidlon) >= (?, ?, ?, ?)
     `.trim();
 
     const params = [
@@ -102,13 +103,21 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       ...toConjunctionTopics(args.mainEdge),
       toDate,
       toDate,
+      north,
+      east,
       fromDate,
-      fromDate
+      fromDate,
+      south,
+      west
     ];
 
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
       const placeIds = Array.from(makeSet(rows, row => row.placeid));
+      if (!placeIds.length) {
+        return reject('No locations match query');
+      }
+
       featureServiceClient.fetchById(placeIds)
       .then(features => {
         const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);
@@ -121,7 +130,8 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
         resolve({
           edges
         });
-      });
+      })
+      .catch(reject);
     })
     .catch(reject);
   });
