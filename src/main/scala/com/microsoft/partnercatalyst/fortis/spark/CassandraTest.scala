@@ -15,20 +15,21 @@ import scala.util.Properties.envOrElse
 
 object CassandraTest {
   case class TestFortisEvent(
-                              details: Details,
-                              analysis: Analysis
-                            ) extends FortisEvent
+    details: Details,
+    analysis: Analysis
+  ) extends FortisEvent
 
   case class TestFortisDetails(
-                                eventid: String,
-                                eventtime: Long,
-                                body: String,
-                                externalsourceid: String,
-                                title: String,
-                                pipelinekey: String,
-                                sourceurl: String,
-                                sharedLocations: List[Location] = List()
-                              ) extends Details
+    sourceeventid: String,
+    eventid: String,
+    eventtime: Long,
+    body: String,
+    externalsourceid: String,
+    title: String,
+    pipelinekey: String,
+    sourceurl: String,
+    sharedLocations: List[Location] = List()
+  ) extends Details
 
   def main(args: Array[String]): Unit = {
     val appName = this.getClass.getSimpleName
@@ -49,6 +50,7 @@ object CassandraTest {
       details = TestFortisDetails(
         eventtime = new Date().getTime,
         eventid = "235",
+        sourceeventid = "original-235",
         sourceurl = "http://cnn.com",
         pipelinekey = "twitter",
         sharedLocations = List(),
@@ -67,6 +69,7 @@ object CassandraTest {
         details = TestFortisDetails(
           eventtime = new Date().getTime,
           eventid = "434",
+          sourceeventid = "original-434",
           sourceurl = "http://bbc.com",
           pipelinekey = "twitter",
           sharedLocations = List(),

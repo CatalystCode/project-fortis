@@ -7,6 +7,7 @@ trait FortisEvent {
 
 trait Details {
   val eventid: String
+  val sourceeventid: String
   val eventtime: Long
   val body: String
   val title: String

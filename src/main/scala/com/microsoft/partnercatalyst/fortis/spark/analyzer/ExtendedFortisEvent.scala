@@ -9,6 +9,7 @@ case class ExtendedFortisEvent[T](
 
 case class ExtendedDetails[T](
   eventid: String,
+  sourceeventid: String,
   eventtime: Long,
   body: String,
   title: String,
