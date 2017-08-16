@@ -218,6 +218,7 @@ CREATE TABLE eventplaces(
 
 CREATE TABLE events(
     eventid text,
+    sourceeventid text,
     batchid uuid,
     pipelinekey text,
     title text,
@@ -231,7 +232,8 @@ CREATE TABLE events(
     topics frozen<set<text>>,
     placeids frozen<set<text>>,
     fulltext text, /* conjunction of title and body to enable querying of both at the same time */
-    PRIMARY KEY ((pipelinekey, eventid)));
+    PRIMARY KEY (eventid)
+);
 
 /**
  * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
