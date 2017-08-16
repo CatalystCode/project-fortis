@@ -2,7 +2,6 @@ package com.microsoft.partnercatalyst.fortis.spark.transformcontext
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
-import com.microsoft.partnercatalyst.fortis.spark.transforms.language.{CognitiveServicesLanguageDetector, CognitiveServicesLanguageDetectorAuth, LanguageDetector}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
@@ -18,12 +17,11 @@ private[transformcontext] class Delta private(
   val blacklist: Option[Seq[BlacklistedTerm]],
   val locationsExtractorFactory: Option[LocationsExtractorFactory],
   val imageAnalyzer: Option[ImageAnalyzer],
-  val languageDetector: Option[LanguageDetector],
   val sentimentDetectorAuth: Option[SentimentDetectorAuth]
 )
 
 private[transformcontext] object Delta {
-  def apply() = new Delta(None, None, None, None, None, None, None)
+  def apply() = new Delta(None, None, None, None, None, None)
 
   /**
     * Creates a delta against the provided transform context.
@@ -60,10 +58,6 @@ private[transformcontext] object Delta {
       imageAnalyzer = updatedField(
         siteSettings.get.cogVisionSvcToken != transformContext.siteSettings.cogVisionSvcToken,
         new ImageAnalyzer(ImageAnalysisAuth(siteSettings.get.cogVisionSvcToken), featureServiceClient)
-      ),
-      languageDetector = updatedField(
-        siteSettings.get.translationSvcToken != transformContext.siteSettings.translationSvcToken,
-        new CognitiveServicesLanguageDetector(CognitiveServicesLanguageDetectorAuth(siteSettings.get.translationSvcToken))
       ),
       sentimentDetectorAuth = updatedField(
         siteSettings.get.translationSvcToken != transformContext.siteSettings.translationSvcToken,
