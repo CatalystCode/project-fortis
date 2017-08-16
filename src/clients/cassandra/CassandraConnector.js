@@ -4,7 +4,6 @@ const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
-const flatten = require('lodash/flatten');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
 const FETCH_SIZE = process.env.FETCH_SIZE || 1000;
@@ -94,21 +93,6 @@ function executeQuery(query, params, options) {
 }
 
 /**
- * @param {Array<{query: string, params: string[]}} queries
- * @returns {Promise.<object[]>}
- */
-function executeQueries(queries) {
-  return new Promise((resolve, reject) => {
-    Promise.all(queries.map(query => executeQuery(query.query, query.params)))
-    .then(nestedRows => {
-      const rows = flatten(nestedRows.filter(rowBunch => rowBunch && rowBunch.length));
-      resolve(rows);
-    })
-    .catch(reject);
-  });
-}
-
-/**
  * Should be called on server start to warm up the connection to
  * Cassandra so that subsequent calls are fast.
  * @returns {Promise}
@@ -120,6 +104,5 @@ function intialize() {
 module.exports = {
   initialize: trackDependency(intialize, 'Cassandra', 'initialize'),
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
-  executeQueries: trackDependency(executeQueries, 'Cassandra', 'executeQueries'),
   executeQuery: trackDependency(executeQuery, 'Cassandra', 'executeQuery')
 };
