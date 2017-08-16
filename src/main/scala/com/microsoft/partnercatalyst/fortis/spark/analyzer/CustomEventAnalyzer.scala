@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
+import java.util.UUID.randomUUID
+
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.customevents.CustomEvent
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 
@@ -8,7 +10,8 @@ class CustomEventAnalyzer extends Analyzer[CustomEvent] with Serializable
   with AnalysisDefaults.EnableAll[CustomEvent] {
   override def toSchema(item: CustomEvent, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[CustomEvent] = {
     ExtendedDetails(
-      eventid = item.RowKey,
+      eventid = randomUUID().toString,
+      sourceeventid = item.RowKey,
       externalsourceid = item.source.getOrElse("N/A"),
       eventtime = item.created_at.toLong,
       body = item.message,
