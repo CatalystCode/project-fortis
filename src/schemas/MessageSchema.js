@@ -3,8 +3,8 @@ const graphql = require('graphql');
 module.exports = graphql.buildSchema(`
   type Query {
     byBbox(site: String!, originalSource: String, bbox: [Float]!, mainTerm: String, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
-    byLocation(site: String!, originalSource: String, coordinates: [Float]!, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
-    byEdges(site: String!, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
+    byLocation(site: String!, originalSource: String, coordinates: [Float]!, mainTerm: String, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
+    byEdges(site: String!, mainTerm: String, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
     event(site: String!, messageId: String!): Feature,
     translate(sentence: String!, fromLanguage: String!, toLanguage: String!): TranslationResult
     translateWords(words: [String]!, fromLanguage: String!, toLanguage: String!): TranslatedWords

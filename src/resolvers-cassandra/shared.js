@@ -85,7 +85,12 @@ function parseFromToDate(fromDate, toDate) {
   };
 }
 
+function parseLimit(limit) {
+  return limit > 0 ? limit : 15;
+}
+
 module.exports = {
+  parseLimit,
   parseFromToDate,
   parseTimespan,
   toPipelineKey,
