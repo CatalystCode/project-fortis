@@ -218,6 +218,7 @@ CREATE TABLE eventplaces(
 
 CREATE TABLE events(
     eventid text,
+    sourceeventid text,
     batchid uuid,
     pipelinekey text,
     title text,
