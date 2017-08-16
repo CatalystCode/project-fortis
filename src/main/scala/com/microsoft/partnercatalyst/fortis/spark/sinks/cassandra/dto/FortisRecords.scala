@@ -1,20 +1,22 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto
 
 case class Event(
-                  pipelinekey: String,
-                  computedfeatures: Features,
-                  eventtime: Long,
-                  eventlangcode: String,
-                  eventid: String,
-                  insertiontime: Long,
-                  body: String,
-                  fulltext: String,
-                  batchid: String,
-                  externalsourceid: String,
-                  topics: Seq[String],
-                  placeids: Seq[String],
-                  sourceurl: String,
-                  title: String) extends Serializable
+  pipelinekey: String,
+  computedfeatures: Features,
+  eventtime: Long,
+  eventlangcode: String,
+  eventid: String,
+  sourceeventid: String,
+  insertiontime: Long,
+  body: String,
+  fulltext: String,
+  batchid: String,
+  externalsourceid: String,
+  topics: Seq[String],
+  placeids: Seq[String],
+  sourceurl: String,
+  title: String
+) extends Serializable
 
 case class EventBatchEntry(
                             eventid: String,
