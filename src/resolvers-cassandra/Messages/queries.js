@@ -93,8 +93,8 @@ function byLocation(args, res) { // eslint-disable-line no-unused-vars
     AND externalsourceid = ?
     AND centroidlat = ?
     AND centroidlon = ?
-    AND eventime >= ?
-    AND eventime <= ?
+    AND eventtime >= ?
+    AND eventtime <= ?
     LIMIT ?
     `.trim();
 
