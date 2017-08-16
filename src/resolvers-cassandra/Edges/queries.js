@@ -4,7 +4,7 @@ const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { tilesForBbox, parseTimespan, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
-const { makeSet, makeMultiMap } = require('../../utils/collections');
+const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 /**
@@ -81,7 +81,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     const { period, periodType, fromDate, toDate } = parseTimespan(args.timespan);
 
     const query = `
-    SELECT placename, mentioncount, centroidlat, centroidlon
+    SELECT placeid, mentioncount, centroidlat, centroidlon
     FROM fortis.popularplaces
     WHERE period = ?
     AND periodtype = ?
@@ -108,10 +108,19 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
 
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const edges = rows.map(row => ({name: row.placename, mentions: row.mentioncount, coordinates: [row.centroidlat, row.centroidlon]}));
+      const placeIds = Array.from(makeSet(rows, row => row.placeid));
+      featureServiceClient.fetchById(placeIds)
+      .then(features => {
+        const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);
+        const edges = rows.map(row => ({
+          name: placeIdToFeature[row.placeid].name,
+          mentions: row.mentioncount,
+          coordinates: [row.centroidlat, row.centroidlon]
+        }));
 
-      resolve({
-        edges
+        resolve({
+          edges
+        });
       });
     })
     .catch(reject);
