@@ -51,7 +51,7 @@ object CassandraEventsSink{
             registerUDFs(session)
             val eventBatchDF = fetchEventBatch(batchid, fortisEventsRDD, session)
             writeEventBatchToEventTagTables(eventBatchDF, session)
-            aggregators.map(aggregator => {
+            aggregators.foreach(aggregator => {
               aggregateEventBatch(eventBatchDF, session, aggregator)
             })
           }
@@ -97,7 +97,7 @@ object CassandraEventsSink{
     Try(rdd.saveToCassandra(keyspace, table)) match {
       case Success(_) => None
       case Failure(ex) =>
-        ex.printStackTrace
+        ex.printStackTrace()
         Thread.sleep(CassandraRetryIntervalMS * attempt)
         attempt match {
           case retry if attempt < CassandraMaxRetryAttempts => saveRddToCassandra(keyspace, table, rdd, attempt + 1)
@@ -121,11 +121,10 @@ object CassandraEventsSink{
       .mode(SaveMode.Append)
       .options(Map("keyspace" -> KeyspaceName, "table" -> aggregator.FortisTargetTablename)).save
   } catch {
-    case ex if attempt < CassandraMaxRetryAttempts => {
+    case ex if attempt < CassandraMaxRetryAttempts =>
       ex.printStackTrace()
       Thread.sleep(CassandraRetryIntervalMS * attempt)
       aggregateEventBatch(eventDS, session, aggregator, attempt + 1)
-    }
     case ex : Throwable => ex.printStackTrace()
       throw ex
   }

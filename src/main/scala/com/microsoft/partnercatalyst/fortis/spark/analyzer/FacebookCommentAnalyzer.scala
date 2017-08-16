@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.github.catalystcode.fortis.spark.streaming.facebook.dto.{FacebookComment}
+import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookComment
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 
