@@ -246,7 +246,7 @@ AS SELECT batchid, eventid, pipelinekey, eventtime, computedfeatures, externalso
      AND pipelinekey IS NOT NULL
      AND eventtime IS NOT NULL
      AND externalsourceid IS NOT NULL
-PRIMARY KEY (batchid, eventid, pipelinekey);
+PRIMARY KEY (batchid, eventid);
 
 /**
  * Allows for fetching trending topics given a pipeline, period and zoom level.
