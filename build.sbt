@@ -45,6 +45,7 @@ libraryDependencies ++= Seq(
   "org.scalaj" %% "scalaj-http" % "2.3.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0",
   "net.lingala.zip4j" % "zip4j" % "1.3.2",
+  "com.optimaize.languagedetector" % "language-detector" % "0.6",
   "eus.ixa" % "ixa-pipe-pos" % "1.5.2",
   "eus.ixa" % "ixa-pipe-tok" % "1.8.6",
   "eus.ixa" % "ixa-pipe-nerc" % "1.6.1"

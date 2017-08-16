@@ -6,6 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
+import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LocalLanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
@@ -43,8 +44,8 @@ object Pipeline {
       val supportedLanguages = transformContext.siteSettings.languages
 
       val imageAnalyzer = transformContext.imageAnalyzer
-      val languageDetector = transformContext.languageDetector
       val sentimentDetectorAuth = transformContext.sentimentDetectorAuth
+      val languageDetector = new LocalLanguageDetector()
 
       // Broadcast variables
       val langToKeywordExtractor = transformContext.langToKeywordExtractor

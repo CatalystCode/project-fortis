@@ -107,7 +107,6 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
         case None => transformContext.locationsExtractorFactory
       },
       imageAnalyzer = delta.imageAnalyzer.getOrElse(transformContext.imageAnalyzer),
-      languageDetector = delta.languageDetector.getOrElse(transformContext.languageDetector),
       sentimentDetectorAuth = delta.sentimentDetectorAuth.getOrElse(transformContext.sentimentDetectorAuth)
     )
   }
