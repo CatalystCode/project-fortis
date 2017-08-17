@@ -49,27 +49,13 @@ module.exports = graphql.buildSchema(`
   }
 
   type StreamProperties {
-    pipelineKey: String!,
+    pipelineKey: String,
     pipelineLabel: String,
     pipelineIcon: String,
     streamFactory: String
   }
 
-  input StreamDefinition {
-    pipelineKey: String!,
-    pipelineLabel: String,
-    pipelineIcon: String,
-    streamFactory: String,
-    params: [ParamsEntry]
-  }
-
-  input ParamsEntry {   
-    key: String!,    
-    value: String!  
-  }
-
   type Stream {
-    name: String!, 
     properties: StreamProperties!
   }
 
@@ -143,6 +129,18 @@ module.exports = graphql.buildSchema(`
     supportedLanguages: [String]
   }
 
+  input ParamsEntry {   
+    key: String!,    
+    value: String!  
+  }
+  
+  input StreamDefinition {
+    pipelineKey: String!
+    pipelineLabel: String
+    pipelineIcon: String
+    streamFactory: String
+    params: [ParamsEntry]
+  }
 
   input TwitterAccountDefintion {
     accounts: [TwitterAccountInput]!
