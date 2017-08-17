@@ -5,6 +5,10 @@ Deploy your own Fortis pipeline to an azure subscription through a single click.
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.svg)](https://deploy.azure.com/?repository=https://github.com/catalystcode/fortis-containers/tree/master?ptmpl=azuredeploy.parameters.json)
 
+## Pipeline Architecture
+A fully containerized realtime spark pipeline powered off Kubernetes. 
+![fortis_overview](https://user-images.githubusercontent.com/7635865/29438127-927a70e8-8369-11e7-9158-85d78ceb16c9.png)
+
 ## Background
 Project Fortis is a data ingestion, analysis and visualization pipeline. The Fortis pipeline collects social media conversations and postings from the public web and darknet data sources. 
 
