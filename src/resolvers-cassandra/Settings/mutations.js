@@ -144,7 +144,10 @@ function createStream(args, res) { // eslint-disable-line no-unused-vars
     const pipelineKey = args && args.input && args.input.pipelineKey;
     if (!pipelineKey || !pipelineKey.length) return reject('No pipelineKey specified.');
     
-    const params = paramEntryToMap(args.input.params);
+    let params = {};
+    const paramEntry = args && args.input && args.input.params;
+    if (paramEntry && paramEntry.length) params = paramEntryToMap(paramEntry);
+    
     cassandraConnector.executeBatchMutations([{
       query: 'DELETE FROM fortis.streams WHERE pipelinekey = ?',
       params: [pipelineKey]
