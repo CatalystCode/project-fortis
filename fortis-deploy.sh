@@ -268,4 +268,5 @@ chmod 752 create-cluster.sh
     "${app_insights_id}" \
     "${site_name}" \
     "${eh_conn_str}" \
-    "${sb_conn_str}"
+    "${sb_conn_str}" \
+    "${site_type}"

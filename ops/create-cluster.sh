@@ -9,6 +9,7 @@ readonly app_insights_id="$6"
 readonly site_name="$7"
 readonly eh_conn_str="$8"
 readonly sb_conn_str="$9"
+readonly site_type="${10}"
 
 chmod -R 752 .
 
@@ -34,7 +35,7 @@ echo "Finished. Now deploying"
 ./deis-apps/fortis-interface/deploy-app.sh
 echo "Finished. Now installing DEIS feature service"
 ./deis-apps/feature-service/create-app.sh
-echo "Finished."
+echo "Finished. Now deploying"
 ./deis-apps/feature-service/deploy-app.sh
 
 sleep 10
@@ -58,6 +59,9 @@ readonly feature_service_db_conn_str="${FEATURE_SERVICE_DB_CONNECTION_STRING}"
 readonly feature_service_host="http://feature-service.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
+
+echo "Finished. Now setting up site entry"
+./create-site.sh "${graphql_service_host}" "${site_name}" "${site_type}"
 
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
