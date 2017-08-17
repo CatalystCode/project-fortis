@@ -161,7 +161,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 
     const params = [
       periodType,
-      ...toConjunctionTopics(args.mainTerm),
+      ...toConjunctionTopics(args.mainEdge),
       args.zoomLevel,
       period,
       toPipelineKey(args.sourceFilter),
