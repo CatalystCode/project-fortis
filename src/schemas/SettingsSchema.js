@@ -137,10 +137,10 @@ module.exports = graphql.buildSchema(`
   
   input StreamDefinition {
     pipelineKey: String!
-    pipelineLabel: String
+    pipelineLabel: String!
     pipelineIcon: String
-    streamFactory: String
-    params: [ParamsEntry]
+    streamFactory: String!
+    params: [ParamsEntry]!
   }
 
   input TwitterAccountDefintion {
