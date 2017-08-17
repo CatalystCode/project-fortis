@@ -141,29 +141,38 @@ function paramEntryToMap(paramEntry) {
  */
 function createStream(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
+    const pipelineKey = args && args.input && args.input.pipelineKey;
+    if (!pipelineKey && !pipelineKey.length) return reject('No pipelineKey specified.');
+    
     const params = paramEntryToMap(args.input.params);
     cassandraConnector.executeBatchMutations([{
-      query: `INSERT INTO fortis.streams (
-      streamid, 
-      pipelinekey,
-      pipelinelabel,
-      pipelineicon,
-      streamfactory,
-      params
-      ) VALUES (?, ?, ?, ?, ?, ?)`,
-      params: [
-        uuid(), 
-        args.input.pipelineKey,
-        args.input.pipelineLabel,
-        args.input.pipelineIcon,
-        args.input.streamFactory,
-        params
-      ]
+      query: 'DELETE FROM fortis.streams WHERE pipelinekey = ?',
+      params: [pipelineKey]
     }])
+    .then(() => {
+      return cassandraConnector.executeBatchMutations([{
+        query: `INSERT INTO fortis.streams (
+        streamid, 
+        pipelinekey,
+        pipelinelabel,
+        pipelineicon,
+        streamfactory,
+        params
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
+        params: [
+          uuid(), 
+          pipelineKey,
+          args.input.pipelineLabel,
+          args.input.pipelineIcon,
+          args.input.streamFactory,
+          params
+        ]
+      }]);
+    })
     .then(() => {
       resolve({
         properties: {
-          pipelineKey: args.input.pipelineKey,
+          pipelineKey: pipelineKey,
           pipelineLabel: args.input.pipelineLabel,
           pipelineIcon: args.input.pipelineIcon,
           streamFactory: args.input.streamFactory
