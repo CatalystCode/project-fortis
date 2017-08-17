@@ -131,6 +131,52 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+/**
+ * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{key: String, value: String}>}}} args
+ * @returns {Promise}
+ */
+function createStream(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    console.log('entered create stream');
+    const pipelineKey = args && args.input && args.input.pipelinekey;
+    console.log(pipelineKey);
+    if (!pipelineKey && !pipelineKey.length) return reject('pipelinekey required to create stream.');
+
+    cassandraConnector.executeBatchMutations([{
+      query: `INSERT INTO fortis.streams 
+      (streamid, 
+      pipelinekey, 
+      pipelinelabel, 
+      pipelineicon, 
+      streamfactory, 
+      ) 
+      VALUES (?, ?, ?, ?, ?)`, //add params and ? 
+      params: [
+        uuid(), 
+        pipelineKey, 
+        args.input.pipelineLabel, 
+        args.input.pipelineIcon, 
+        args.input.streamFactory
+        //args.input.params[0]
+      ]
+    }])
+    .then(() => { 
+      const name = args.input.pipelineLabel;
+      const properties = {
+        pipelineKey: pipelineKey,
+        pipelineLabel: args.input.pipelineLabel,
+        pipelineIcon: args.input.pipelineIcon,
+        streamFactory: args.input.streamFactory
+      };
+
+      resolve({
+        name
+      });
+    })
+    .catch(reject);
+  });
+}
+
 function facebookPagePrimaryKeyValuesToRowKey(values) {
   return [TRUSTED_SOURCES_CONNECTOR_FACEBOOK, values[1], values[2]];
 }
@@ -391,6 +437,7 @@ module.exports = {
   createOrReplaceSite: createOrReplaceSite,
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
+  createStream: trackEvent(createStream, 'createStream'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
   modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
