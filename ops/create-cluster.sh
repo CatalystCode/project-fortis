@@ -11,7 +11,10 @@ readonly eh_conn_str="$8"
 readonly sb_conn_str="$9"
 readonly storage_account_key="${10}"
 readonly checkpointfileshare="${11}"
+<<<<<<< HEAD
 readonly site_type="${12}"
+=======
+>>>>>>> Integrating azure file storage PVC mount to fortis deployment.
 
 chmod -R 752 .
 
