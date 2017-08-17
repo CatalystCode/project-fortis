@@ -9,12 +9,12 @@ const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { makeSet } = require('../../utils/collections');
 
 /**
- * @param {{tilex: number, tiley: number, tilez: number, avgsentiment: number, mentioncount: number}} rows
+ * @param {{tilex: number, tiley: number, tilez: number, avgsentimentnumerator: number, mentioncount: number}} rows
  */
 function computedtileToTile(row) {
   const coordinates = [geotile.longitudeFromColumn(row.tiley, row.tilez), geotile.latitudeFromRow(row.tilex, row.tilez)];
   const mentionCount = row.mentioncount;
-  const neg_sentiment = row.avgsentiment;
+  const neg_sentiment = row.mentioncount > 0 ? row.avgsentimentnumerator / row.mentioncount : null;
   const tileId = geotile.tileIdFromRowColumn(row.tilex, row.tiley, row.tilez);
 
   return {
@@ -32,7 +32,7 @@ function queryComputedTiles(tiles, args) {
     const tiley = makeSet(tiles, tile => tile.column);
 
     const query = `
-    SELECT tilex, tiley, tilez, avgsentiment, mentioncount
+    SELECT tilex, tiley, tilez, avgsentimentnumerator, mentioncount
     FROM fortis.computedtiles
     WHERE periodtype = ?
     AND conjunctiontopic1 = ?
