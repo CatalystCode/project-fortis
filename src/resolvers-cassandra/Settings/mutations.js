@@ -183,6 +183,30 @@ function createStream(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+/**
+ * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>}}} args
+ * @returns {Promise}
+ */
+function removeStream(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const pipelineKey = args && args.input && args.input.pipelineKey;
+    if (!pipelineKey || !pipelineKey.length) return reject('No pipelineKey specified.');
+    
+    cassandraConnector.executeBatchMutations([{
+      query: 'DELETE FROM fortis.streams WHERE pipelinekey = ?',
+      params: [pipelineKey]
+    }])      
+    .then(() => {
+      resolve({
+        properties: {
+          pipelineKey
+        }
+      });
+    })
+    .catch(reject);
+  });
+}
+
 function facebookPagePrimaryKeyValuesToRowKey(values) {
   return [TRUSTED_SOURCES_CONNECTOR_FACEBOOK, values[1], values[2]];
 }
@@ -444,6 +468,7 @@ module.exports = {
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
   createStream: trackEvent(createStream, 'createStream'),
+  removeStream: trackEvent(removeStream, 'removeStream'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
   modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
