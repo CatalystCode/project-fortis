@@ -7,6 +7,7 @@ module.exports = {
   createSite: mutations.createSite,
   removeSite: mutations.removeSite,
   createStream: mutations.createStream,
+  removeStream: mutations.removeStream,
   modifyFacebookPages: mutations.modifyFacebookPages,
   removeFacebookPages: mutations.removeFacebookPages,
   modifyTrustedTwitterAccounts: mutations.modifyTrustedTwitterAccounts,

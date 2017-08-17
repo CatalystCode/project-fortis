@@ -14,6 +14,7 @@ module.exports = graphql.buildSchema(`
     createSite(input: SiteDefinition!): Site
     removeSite(input: SiteDefinition!): Site
     createStream(input: StreamDefinition!): Stream
+    removeStream(input: StreamDefinition!): Stream
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     createOrReplaceSite(input: SiteDefinition!): Site
