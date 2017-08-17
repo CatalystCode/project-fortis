@@ -75,7 +75,7 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
           title,
           sitename,
           languages,
-          insertion_time
+          insertiontime
         ) VALUES (?,?,?,?,?,?,toTimestamp(now()))`,
         params: [
           args.input.targetBbox,
@@ -217,7 +217,7 @@ function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
       const params = facebookPagePrimaryKeyValuesToRowKey([TRUSTED_SOURCES_CONNECTOR_FACEBOOK, page.pageUrl, 'FacebookPost']);
       params.push(TRUSTED_SOURCES_RANK_DEFAULT);
       mutations.push({
-        query: 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertion_time, rank) VALUES (?, ?, ?, dateof(now()), ?)',
+        query: 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertiontime, rank) VALUES (?, ?, ?, dateof(now()), ?)',
         params: params
       });
       expectedRecords.push(normalizedFacebookPage(params));
@@ -279,7 +279,7 @@ function modifyTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unu
     const accounts = args && args.input && args.input.accounts;
     if (!accounts || !accounts.length) return reject('No accounts specified');
     
-    const statement = 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertion_time, rank) VALUES (?, ?, ?, dateof(now()), ?)';
+    const statement = 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertiontime, rank) VALUES (?, ?, ?, dateof(now()), ?)';
     const queries = accounts.map(account => {
       const params = trustedTwitterAccountRowKeyToPrimaryKey(account);
       params.push(TRUSTED_SOURCES_RANK_DEFAULT);
