@@ -13,6 +13,7 @@ module.exports = graphql.buildSchema(`
   type Mutation {
     createSite(input: SiteDefinition!): Site
     removeSite(input: SiteDefinition!): Site
+    createStream(input: StreamDefinition!): Stream
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     createOrReplaceSite(input: SiteDefinition!): Site
@@ -45,6 +46,17 @@ module.exports = graphql.buildSchema(`
   type SiteCollection {
     runTime: String,
     sites: [Site]!,
+  }
+
+  type StreamProperties {
+    pipelineKey: String,
+    pipelineLabel: String,
+    pipelineIcon: String,
+    streamFactory: String
+  }
+
+  type Stream {
+    properties: StreamProperties!
   }
 
   type TwitterAccountCollection {
@@ -115,6 +127,19 @@ module.exports = graphql.buildSchema(`
     mapzenApiKey: String,
     fbToken: String,
     supportedLanguages: [String]
+  }
+
+  input ParamsEntry {   
+    key: String!,    
+    value: String!  
+  }
+  
+  input StreamDefinition {
+    pipelineKey: String!
+    pipelineLabel: String
+    pipelineIcon: String
+    streamFactory: String
+    params: [ParamsEntry]
   }
 
   input TwitterAccountDefintion {

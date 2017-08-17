@@ -131,6 +131,58 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function paramEntryToMap(paramEntry) {
+  return paramEntry.reduce((obj, item) => (obj[item.key] = item.value, obj) , {});
+}
+
+/**
+ * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>}}} args
+ * @returns {Promise}
+ */
+function createStream(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const pipelineKey = args && args.input && args.input.pipelineKey;
+    if (!pipelineKey || !pipelineKey.length) return reject('No pipelineKey specified.');
+    
+    const params = paramEntryToMap(args.input.params);
+    cassandraConnector.executeBatchMutations([{
+      query: 'DELETE FROM fortis.streams WHERE pipelinekey = ?',
+      params: [pipelineKey]
+    }])
+    .then(() => {
+      return cassandraConnector.executeBatchMutations([{
+        query: `INSERT INTO fortis.streams (
+        streamid, 
+        pipelinekey,
+        pipelinelabel,
+        pipelineicon,
+        streamfactory,
+        params
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
+        params: [
+          uuid(), 
+          pipelineKey,
+          args.input.pipelineLabel,
+          args.input.pipelineIcon,
+          args.input.streamFactory,
+          params
+        ]
+      }]);
+    })
+    .then(() => {
+      resolve({
+        properties: {
+          pipelineKey: pipelineKey,
+          pipelineLabel: args.input.pipelineLabel,
+          pipelineIcon: args.input.pipelineIcon,
+          streamFactory: args.input.streamFactory
+        }
+      });
+    })
+    .catch(reject);
+  });
+}
+
 function facebookPagePrimaryKeyValuesToRowKey(values) {
   return [TRUSTED_SOURCES_CONNECTOR_FACEBOOK, values[1], values[2]];
 }
@@ -391,6 +443,7 @@ module.exports = {
   createOrReplaceSite: createOrReplaceSite,
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
+  createStream: trackEvent(createStream, 'createStream'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
   modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
