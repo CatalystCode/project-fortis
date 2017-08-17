@@ -14,7 +14,7 @@ const { makeSet } = require('../../utils/collections');
 function computedtileToTile(row) {
   const coordinates = [geotile.longitudeFromColumn(row.tiley, row.tilez), geotile.latitudeFromRow(row.tilex, row.tilez)];
   const mentionCount = row.mentioncount;
-  const neg_sentiment = row.avgsentimentnumerator / row.mentioncount;
+  const neg_sentiment = row.mentioncount > 0 ? row.avgsentimentnumerator / row.mentioncount : null;
   const tileId = geotile.tileIdFromRowColumn(row.tilex, row.tiley, row.tilez);
 
   return {
