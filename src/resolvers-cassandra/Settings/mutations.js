@@ -31,7 +31,7 @@ function _insertTopics(siteType) {
     blobStorageClient.fetchJson(uri)
     .then(response => {
       return response.map(topic => ({
-        query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertion_time) 
+        query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertiontime) 
                 VALUES (?, ?, ?, ?, toTimestamp(now()));`,
         params: [uuid(), topic.topic, topic.lang_code, topic.translations]
       }));
@@ -131,46 +131,43 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function paramEntryToMap(paramEntry) {
+  return paramEntry.reduce((obj, item) => (obj[item.key] = item.value, obj) , {});
+}
+
 /**
- * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{key: String, value: String}>}}} args
+ * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>}}} args
  * @returns {Promise}
  */
 function createStream(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    console.log('entered create stream');
-    const pipelineKey = args && args.input && args.input.pipelinekey;
-    console.log(pipelineKey);
-    if (!pipelineKey && !pipelineKey.length) return reject('pipelinekey required to create stream.');
-
+    const params = paramEntryToMap(args.input.params);
     cassandraConnector.executeBatchMutations([{
-      query: `INSERT INTO fortis.streams 
-      (streamid, 
-      pipelinekey, 
-      pipelinelabel, 
-      pipelineicon, 
-      streamfactory, 
-      ) 
-      VALUES (?, ?, ?, ?, ?)`, //add params and ? 
+      query: `INSERT INTO fortis.streams (
+      streamid, 
+      pipelinekey,
+      pipelinelabel,
+      pipelineicon,
+      streamfactory,
+      params
+      ) VALUES (?, ?, ?, ?, ?, ?)`,
       params: [
         uuid(), 
-        pipelineKey, 
-        args.input.pipelineLabel, 
-        args.input.pipelineIcon, 
-        args.input.streamFactory
-        //args.input.params[0]
+        args.input.pipelineKey,
+        args.input.pipelineLabel,
+        args.input.pipelineIcon,
+        args.input.streamFactory,
+        params
       ]
     }])
-    .then(() => { 
-      const name = args.input.pipelineLabel;
-      const properties = {
-        pipelineKey: pipelineKey,
-        pipelineLabel: args.input.pipelineLabel,
-        pipelineIcon: args.input.pipelineIcon,
-        streamFactory: args.input.streamFactory
-      };
-
+    .then(() => {
       resolve({
-        name
+        properties: {
+          pipelineKey: args.input.pipelineKey,
+          pipelineLabel: args.input.pipelineLabel,
+          pipelineIcon: args.input.pipelineIcon,
+          streamFactory: args.input.streamFactory
+        }
       });
     })
     .catch(reject);
