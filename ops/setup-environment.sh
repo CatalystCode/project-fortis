@@ -15,6 +15,7 @@ readonly eh_conn_str="${9}"
 readonly feature_service_db_conn_str="${10}"
 readonly fortis_central_directory="${11}"
 readonly sb_conn_str="${12}"
+readonly storage_account_name="${13}"
 
 readonly fortis_admin_interface="http://${fortis_interface_host}/#/site/${site_name}/admin"
 readonly default_language="en"
@@ -67,4 +68,4 @@ deis config:set DEFAULT_SITE_NAME="${site_name}"
 cd ../../ || exit 2
 
 #Set the deployed service host url tag so we can output that on the deployment console to the user
-sudo az resource tag --tags FORTIS_INTERFACE_HOST="${fortis_interface_host}" FORTIS_ADMIN_INTERFACE_HOST="${fortis_admin_interface}" FORTIS_SERVICE_HOST="${graphql_service_host}" -g "${k8resource_group}" -n k8deisstorage --resource-type "Microsoft.Storage/storageAccounts"
+sudo az resource tag --tags FORTIS_INTERFACE_HOST="${fortis_interface_host}" FORTIS_ADMIN_INTERFACE_HOST="${fortis_admin_interface}" FORTIS_SERVICE_HOST="${graphql_service_host}" -g "${k8resource_group}" -n "${storage_account_name}" --resource-type "Microsoft.Storage/storageAccounts"

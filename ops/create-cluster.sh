@@ -9,12 +9,11 @@ readonly app_insights_id="$6"
 readonly site_name="$7"
 readonly eh_conn_str="$8"
 readonly sb_conn_str="$9"
-readonly site_type="${10}"
+readonly storage_account_key="${10}"
+readonly checkpointfileshare="${11}"
+readonly site_type="${12}"
 
 chmod -R 752 .
-
-./create-disk.sh "${k8location}" "${storage_account_name}"
-sleep 10
 
 git clone https://github.com/CatalystCode/charts.git
 
@@ -24,7 +23,7 @@ echo "Finished. Now installing feature service DB"
 # shellcheck disable=SC1091
 . ./install-feature-service-db.sh "${k8location}" "${k8resource_group}"
 echo "Finished. Now installing DEIS"
-./install-deis.sh "${k8location}" "${k8resource_group}"
+./install-deis.sh "${k8location}" "${k8resource_group}" "${storage_account_name}" "${storage_account_key}"
 echo "Finished. Now installing DEIS fortis graphql service"
 ./deis-apps/fortis-services/create-app.sh
 echo "Finished. Now deploying"
@@ -79,10 +78,11 @@ echo "Finished. Deploying environment settings to cluster."
     "${eh_conn_str}" \
     "${feature_service_db_conn_str}" \
     "${fortis_central_directory}" \
-    "${sb_conn_str}"
+    "${sb_conn_str}" \
+    "${storage_account_name}"
 
 echo "Finished. Installing spark cluster."
-./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}" "${fortis_central_directory}"
+./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}" "${fortis_central_directory}" "${storage_account_name}" "${storage_account_key}" "${checkpointfileshare}"
 
 #./install-elasticsearch
 #./install-kibana

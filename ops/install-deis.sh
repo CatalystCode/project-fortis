@@ -2,7 +2,8 @@
 
 readonly k8location="$1"
 readonly k8resource_group="$2"
-readonly DEIS_STORAGE_ACCOUNT_NAME=k8deisstorage
+readonly storage_account_name="$3"
+readonly storage_account_key="$4"
 
 curl -sSL http://deis.io/deis-cli/install-v2.sh | bash
 sudo ln -fs "${PWD}/deis" /usr/local/bin/deis
@@ -10,14 +11,12 @@ sudo ln -fs "${PWD}/deis" /usr/local/bin/deis
 echo "creating deis storage account ${k8location}"
 id
 
-DEIS_STORAGE_ACCOUNT_KEY="$(az storage account keys list -n "${DEIS_STORAGE_ACCOUNT_NAME}" -g "${k8resource_group}" --query [0].value --output tsv)"
-
 echo "starting deis installation using helm"
 helm repo add deis https://charts.deis.com/workflow
 
 echo "Installing Deis on Cluster"
 
-helm install deis/workflow --name deis --namespace=deis --set global.storage=azure,azure.accountname="${DEIS_STORAGE_ACCOUNT_NAME}",azure.accountkey="${DEIS_STORAGE_ACCOUNT_KEY}",azure.registry_container=registry,azure.database_container=database,azure.builder_container=builder
+helm install deis/workflow --name deis --namespace=deis --set global.storage=azure,azure.accountname="${storage_account_name}",azure.accountkey="${storage_account_key}",azure.registry_container=registry,azure.database_container=database,azure.builder_container=builder
 
 echo "Looking up DEIS_ROUTER_HOST_ROOT"
 sleep 250

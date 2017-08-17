@@ -13,7 +13,7 @@ Arguments
   --user_name|-un                    [Required] : Admin user name for the Kubernetes cluster
   --resource_group|-rg               [Required] : Resource group containing your Kubernetes cluster
   --master_fqdn|-mf                  [Required] : Master FQDN of your Kubernetes cluster
-  --storage_account_name|-san        [Required] : Premium Storage Account name used for Kubernetes's persistent storage
+  --storage_account_name|-san        [Required] : Storage Account name used for Kubernetes's persistent storage
   --storage_account_key|-sak         [Required] : Storage Account key used for Kubernetes persistent storage
   --spark_worker_count|-sw           [Required] : Spark Worker Node Count
   --cassandra_node_count|-cn         [Required] : Port used for Front50, defaulted to 8080
@@ -240,11 +240,13 @@ if ! (command -v helm >/dev/null); then
   install_helm
 fi
 
-echo "Installed Helm. Adding premium storage accounts."
+echo "Installed Helm. Adding storage share for spark checkpointing."
 
-#Create the K8 vhds storage container
-echo "creating vhds container"
-sudo az storage container create --name vhds --account-key="${storage_account_key}" --account-name="${storage_account_name}"
+#Create the K8 azure file storage container
+echo "creating azure file share"
+readonly checkpointfileshare="checkpoint"
+
+sudo az storage share create --name ${checkpointfileshare} --account-key="${storage_account_key}" --account-name="${storage_account_name}"
 
 sleep 10
 
@@ -269,4 +271,6 @@ chmod 752 create-cluster.sh
     "${site_name}" \
     "${eh_conn_str}" \
     "${sb_conn_str}" \
+    "${storage_account_key}" \
+    "${checkpointfileshare}" \
     "${site_type}"

@@ -111,7 +111,6 @@
         "deploymentVmSize": "Standard_D2_v2",
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
         "imagePublisher": "Canonical",
-        "deisStorageAcctName": "k8deisstorage",
         "imageOffer": "UbuntuServer",
         "vmStorageAccountContainerName": "vhds",
         "nicName": "fortisVMNic",
@@ -163,17 +162,6 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageAccountName')]",
-            "apiVersion": "2016-01-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "[variables('premStorageSku')]"
-            },
-            "kind": "Storage",
-            "properties": {}
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('deisStorageAcctName')]",
             "apiVersion": "2016-01-01",
             "location": "[resourceGroup().location]",
             "sku": {
@@ -510,7 +498,7 @@
         },
         "fortisAdminSiteURL": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('deisStorageAcctName'))).tags.FORTIS_ADMIN_INTERFACE_HOST]"
+            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).tags.FORTIS_ADMIN_INTERFACE_HOST]"
         },
         "agentFQDN": {
             "type": "string",
