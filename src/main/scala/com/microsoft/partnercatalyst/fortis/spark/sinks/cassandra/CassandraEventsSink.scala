@@ -12,7 +12,7 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs._
 import org.apache.spark.streaming.Time
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Telemetry}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Timer
 
 import scala.util.{Failure, Success, Try}
@@ -28,7 +28,7 @@ object CassandraEventsSink{
   private val CassandraMaxRetryAttempts = 3
 
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession): Unit = {
-    val batchStream = dstream.foreachRDD{ (eventsRDD, time: Time) => {
+    dstream.foreachRDD{ (eventsRDD, time: Time) => {
       eventsRDD.cache()
 
       if(!eventsRDD.isEmpty) {
@@ -36,7 +36,7 @@ object CassandraEventsSink{
         val batchid = UUID.randomUUID().toString
         val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
 
-        Timer.time(FortisTelemetry.get().logSink("save", _, batchSize)) {
+        Timer.time(Telemetry.logSinkPhase("writeEvents", _, _, batchSize)) {
           writeFortisEvents(fortisEventsRDD, batchid)
         }
 
@@ -53,18 +53,18 @@ object CassandraEventsSink{
 
         registerUDFs(session)
 
-        val eventBatchDF = Timer.time(FortisTelemetry.get().logSink("fetch", _, batchSize)) {
+        val eventBatchDF = Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
           fetchEventBatch(batchid, fortisEventsRDD, session)
         }
 
-        Timer.time(FortisTelemetry.get().logSink("tagtables", _, batchSize)) {
+        Timer.time(Telemetry.logSinkPhase("writeTagTables", _, _, batchSize)) {
           writeEventBatchToEventTagTables(eventBatchDF, session)
         }
 
         aggregators.foreach(aggregator => {
           val eventName = aggregator.FortisTargetTablename
 
-          Timer.time(FortisTelemetry.get().logSink(eventName, _, batchSize)) {
+          Timer.time(Telemetry.logSinkPhase(s"aggregate_$eventName", _, _, batchSize)) {
             aggregateEventBatch(eventBatchDF, session, aggregator)
           }
         })

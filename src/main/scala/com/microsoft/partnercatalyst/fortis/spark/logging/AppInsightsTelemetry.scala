@@ -18,8 +18,9 @@ class AppInsightsTelemetry extends FortisTelemetry {
     client.trackEvent("batch.receive", properties, metrics)
   }
 
-  def logSink(eventName: String, duration: Long, batchSize: Long): Unit = {
-    val properties = new util.HashMap[String, String](0)
+  def logSinkPhase(eventName: String, succeeded: Boolean, duration: Long, batchSize: Long): Unit = {
+    val properties = new util.HashMap[String, String](1)
+    properties.put("succeeded", succeeded.toString)
 
     val metrics = new util.HashMap[String, java.lang.Double](2)
     metrics.put("batchSize", batchSize.toDouble)
