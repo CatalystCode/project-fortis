@@ -12,8 +12,8 @@ object Timer {
     callback(result.isSuccess, duration)
 
     result match {
-      case Success(r) => r
-      case Failure(t) => throw t
+      case Success(res) => res
+      case Failure(th) => throw th
     }
   }
 }

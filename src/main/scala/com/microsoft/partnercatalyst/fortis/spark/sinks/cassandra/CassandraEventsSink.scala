@@ -26,7 +26,7 @@ object CassandraEventsSink{
     dstream.foreachRDD{ (eventsRDD, time: Time) => {
       eventsRDD.cache()
 
-      if(!eventsRDD.isEmpty) {
+      if (!eventsRDD.isEmpty) {
         val batchSize = eventsRDD.count()
         val batchid = UUID.randomUUID().toString
         val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
