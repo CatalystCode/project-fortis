@@ -24,8 +24,6 @@ object CassandraEventsSink{
   private val TableEventPlaces = "eventplaces"
   private val TableEventBatches = "eventbatches"
   private val CassandraFormat = "org.apache.spark.sql.cassandra"
-  private val CassandraRetryIntervalMS = 2000
-  private val CassandraMaxRetryAttempts = 3
 
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession): Unit = {
     dstream.foreachRDD{ (eventsRDD, time: Time) => {
@@ -100,28 +98,11 @@ object CassandraEventsSink{
 
   private def writeEventBatchToEventTagTables(eventDS: Dataset[Event], session: SparkSession): Unit = {
     import session.implicits._
-    saveRddToCassandra[EventTopics](KeyspaceName, TableEventTopics, eventDS.flatMap(CassandraEventTopicSchema(_)).rdd)
-    saveRddToCassandra[EventPlaces](KeyspaceName, TableEventPlaces, eventDS.flatMap(CassandraEventPlacesSchema(_)).rdd)
+    eventDS.flatMap(CassandraEventTopicSchema(_)).rdd.saveToCassandra(KeyspaceName, TableEventTopics)
+    eventDS.flatMap(CassandraEventPlacesSchema(_)).rdd.saveToCassandra(KeyspaceName, TableEventPlaces)
   }
 
-  private def saveRddToCassandra[T](keyspace: String, table: String, rdd: RDD[T], attempt: Int = 0)(
-                                      implicit rwf: RowWriterFactory[T], columnMapper: ColumnMapper[T]
-                                 ): Unit = {
-    Try(rdd.saveToCassandra(keyspace, table)) match {
-      case Success(_) => None
-      case Failure(ex) =>
-        ex.printStackTrace()
-        Thread.sleep(CassandraRetryIntervalMS * attempt)
-        attempt match {
-          case retry if attempt < CassandraMaxRetryAttempts => saveRddToCassandra(keyspace, table, rdd, attempt + 1)
-          case(_) => throw ex
-        }
-    }
-  }
-
-  private def aggregateEventBatch(eventDS: Dataset[Event], session: SparkSession,
-                                  aggregator: FortisAggregator, attempt: Int = 0): Unit = {
-  try {
+  private def aggregateEventBatch(eventDS: Dataset[Event], session: SparkSession, aggregator: FortisAggregator): Unit = {
     val flattenedDF = aggregator.flattenEvents(session, eventDS)
     flattenedDF.createOrReplaceTempView(aggregator.DfTableNameFlattenedEvents)
 
@@ -133,13 +114,6 @@ object CassandraEventsSink{
       .format(CassandraFormat)
       .mode(SaveMode.Append)
       .options(Map("keyspace" -> KeyspaceName, "table" -> aggregator.FortisTargetTablename)).save
-  } catch {
-    case ex if attempt < CassandraMaxRetryAttempts =>
-      ex.printStackTrace()
-      Thread.sleep(CassandraRetryIntervalMS * attempt)
-      aggregateEventBatch(eventDS, session, aggregator, attempt + 1)
-    case ex : Throwable => ex.printStackTrace()
-      throw ex
-  }
+
   }
 }
