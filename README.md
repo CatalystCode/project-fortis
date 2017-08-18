@@ -12,6 +12,12 @@ A fully containerized realtime spark pipeline powered off Kubernetes.
 ## Background
 Project Fortis is a data ingestion, analysis and visualization pipeline. The Fortis pipeline collects social media conversations and postings from the public web and darknet data sources. 
 
+## Related Repositories
+* Spark-based Pipeline: https://github.com/CatalystCode/project-fortis-spark
+* Dashboard Interface: https://github.com/CatalystCode/project-fortis-interfaces
+* Graphql Services: https://github.com/CatalystCode/project-fortis-services
+
+
 ![image](https://user-images.githubusercontent.com/7635865/27882830-e785819c-6193-11e7-9b27-5fc452f23b1a.png)
 
 ## Deployment Prerequisites
