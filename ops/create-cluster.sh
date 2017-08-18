@@ -20,8 +20,8 @@ git clone https://github.com/CatalystCode/charts.git
 echo "Installing Cassandra chart"
 ./install-cassandra.sh "${k8cassandra_node_count}"
 echo "Finished. Now installing feature service DB"
-# shellcheck disable=SC1091
-. ./install-feature-service-db.sh "${k8location}" "${k8resource_group}"
+## shellcheck disable=SC1091
+#. ./install-feature-service-db.sh "${k8location}" "${k8resource_group}"
 echo "Finished. Now installing DEIS"
 ./install-deis.sh "${k8location}" "${k8resource_group}" "${storage_account_name}" "${storage_account_key}"
 echo "Finished. Now installing DEIS fortis graphql service"
@@ -32,10 +32,10 @@ echo "Finished. Now installing DEIS fortis interface"
 ./deis-apps/fortis-interface/create-app.sh
 echo "Finished. Now deploying"
 ./deis-apps/fortis-interface/deploy-app.sh
-echo "Finished. Now installing DEIS feature service"
-./deis-apps/feature-service/create-app.sh
-echo "Finished. Now deploying"
-./deis-apps/feature-service/deploy-app.sh
+#echo "Finished. Now installing DEIS feature service"
+#./deis-apps/feature-service/create-app.sh
+#echo "Finished. Now deploying"
+#./deis-apps/feature-service/deploy-app.sh
 
 sleep 10
 readonly max_retry_count=50
@@ -55,7 +55,8 @@ done
 readonly graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly feature_service_db_conn_str="${FEATURE_SERVICE_DB_CONNECTION_STRING}"
-readonly feature_service_host="http://feature-service.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+#readonly feature_service_host="http://feature-service.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+readonly feature_service_host="http://13.72.77.67"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
 
