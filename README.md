@@ -16,6 +16,7 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
 * Spark-based Pipeline: https://github.com/CatalystCode/project-fortis-spark
 * Dashboard Interface: https://github.com/CatalystCode/project-fortis-interfaces
 * Graphql Services: https://github.com/CatalystCode/project-fortis-services
+* Kubernetes Helm Charts: https://github.com/CatalystCode/charts
 
 
 ![image](https://user-images.githubusercontent.com/7635865/27882830-e785819c-6193-11e7-9b27-5fc452f23b1a.png)
