@@ -1,12 +1,11 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import java.util.UUID
-import com.datastax.spark.connector.writer.{RowWriterFactory, WriteConf}
+import com.datastax.spark.connector.writer.WriteConf
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
 import com.datastax.spark.connector._
-import com.datastax.spark.connector.mapper.ColumnMapper
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
@@ -14,8 +13,6 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs._
 import org.apache.spark.streaming.Time
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Telemetry}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Timer
-
-import scala.util.{Failure, Success, Try}
 
 object CassandraEventsSink{
   private val KeyspaceName = "fortis"
@@ -91,9 +88,10 @@ object CassandraEventsSink{
     addedEventsDF.createOrReplaceTempView(TableEventBatches)
     val ds = session.sqlContext.sql(s"select eventid, pipelinekey from $TableEventBatches where batchid = '$batchid'")
     val eventsDS = events.toDF().as[Event]
-    val filteredEvents = eventsDS.join(ds, Seq("eventid", "pipelinekey"))
+    val filteredEvents = eventsDS.join(ds, Seq("eventid", "pipelinekey")).as[Event]
+
     filteredEvents.cache()
-    filteredEvents.as[Event]
+    filteredEvents
   }
 
   private def writeEventBatchToEventTagTables(eventDS: Dataset[Event], session: SparkSession): Unit = {
@@ -114,6 +112,5 @@ object CassandraEventsSink{
       .format(CassandraFormat)
       .mode(SaveMode.Append)
       .options(Map("keyspace" -> KeyspaceName, "table" -> aggregator.FortisTargetTablename)).save
-
   }
 }
