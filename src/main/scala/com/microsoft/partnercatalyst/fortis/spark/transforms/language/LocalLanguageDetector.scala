@@ -20,7 +20,7 @@ class LocalLanguageDetector extends LanguageDetector {
 
     val language = detectWithFactory(text, if (text.length <= 200) shortTextFactory else largeTextFactory)
 
-    FortisTelemetry.get().logLanguageDetection(language)
+    FortisTelemetry.get.logLanguageDetection(language)
     language
   }
 
