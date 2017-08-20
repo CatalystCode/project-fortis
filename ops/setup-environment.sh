@@ -48,27 +48,35 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 #deis config:set FEATURES_CONNECTION_STRING="${feature_service_db_conn_str}"
 
 cd deis-apps/fortis-services || exit 2
-echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" >> .env
-echo FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" >> .env
-echo CASSANDRA_CONTACT_POINTS="${cassandra_host}" >> .env
-echo DEFAULT_SITE_NAME="${site_name}" >> .env
-echo FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" >> .env
-echo PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" >> .env
-echo PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" >> .env
-echo PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}" >> .env
-echo FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" >> .env
-echo FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" >> .env
-echo FORTIS_SB_CONN_STR="${sb_conn_str}" >> .env
-echo CASSANDRA_USERNAME="cassandra" >> .env
-echo CASSANDRA_PASSWORD="cassandra" >> .env
-echo CASSANDRA_KEYSPACE="fortis" >> .env
-echo ENABLE_V2=1 >> .env
+
+{
+echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
+echo FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}"
+echo CASSANDRA_CONTACT_POINTS="${cassandra_host}"
+echo DEFAULT_SITE_NAME="${site_name}"
+echo FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}"
+echo PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}"
+echo PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}"
+echo PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
+echo FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}"
+echo FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}"
+echo FORTIS_SB_CONN_STR="${sb_conn_str}"
+echo CASSANDRA_USERNAME="cassandra"
+echo CASSANDRA_PASSWORD="cassandra"
+echo CASSANDRA_KEYSPACE="fortis"
+echo ENABLE_V2=1
+} >> .env
+
 deis config:push
 
 cd ../fortis-interface || exit 2
-echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" >> .env
-echo FORTIS_SERVICE_HOST="${graphql_service_host}" >> .env
-echo DEFAULT_SITE_NAME="${site_name}" >> .env
+
+{
+echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
+echo FORTIS_SERVICE_HOST="${graphql_service_host}"
+echo DEFAULT_SITE_NAME="${site_name}"
+} >> .env
+
 deis config:push
 
 cd ../../ || exit 2
