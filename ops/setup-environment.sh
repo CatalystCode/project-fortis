@@ -19,7 +19,7 @@ readonly storage_account_name="${13}"
 
 readonly fortis_admin_interface="http://${fortis_interface_host}/#/site/${site_name}/admin"
 readonly default_language="en"
-readonly checkpoint_directory="HDFS://"
+readonly checkpoint_directory="/opt/checkpoint"
 readonly eh_path="published-messages"
 readonly eh_consumer_group="\$Default"
 readonly sb_queue_config="configuration"
@@ -43,27 +43,33 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
 
-cd deis-apps/feature-service || exit 2
-deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
-deis config:set FEATURES_CONNECTION_STRING="${feature_service_db_conn_str}"
+#cd deis-apps/feature-service || exit 2
+#deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
+#deis config:set FEATURES_CONNECTION_STRING="${feature_service_db_conn_str}"
 
-cd ../fortis-services || exit 2
-deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
-deis config:set FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}"
-deis config:set CASSANDRA_CONTACT_POINTS="${cassandra_host}"
-deis config:set DEFAULT_SITE_NAME="${site_name}"
-deis config:set FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}"
-deis config:set PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}"
-deis config:set PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}"
-deis config:set PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
-deis config:set FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}"
-deis config:set FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}"
-deis config:set FORTIS_SB_CONN_STR="${sb_conn_str}"
+cd deis-apps/fortis-services || exit 2
+echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" >> .env
+echo FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" >> .env
+echo CASSANDRA_CONTACT_POINTS="${cassandra_host}" >> .env
+echo DEFAULT_SITE_NAME="${site_name}" >> .env
+echo FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" >> .env
+echo PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" >> .env
+echo PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" >> .env
+echo PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}" >> .env
+echo FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" >> .env
+echo FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" >> .env
+echo FORTIS_SB_CONN_STR="${sb_conn_str}" >> .env
+echo CASSANDRA_USERNAME="cassandra" >> .env
+echo CASSANDRA_PASSWORD="cassandra" >> .env
+echo CASSANDRA_KEYSPACE="fortis" >> .env
+echo ENABLE_V2=1 >> .env
+deis config:push
 
 cd ../fortis-interface || exit 2
-deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
-deis config:set FORTIS_SERVICE_HOST="${graphql_service_host}"
-deis config:set DEFAULT_SITE_NAME="${site_name}"
+echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" >> .env
+echo FORTIS_SERVICE_HOST="${graphql_service_host}" >> .env
+echo DEFAULT_SITE_NAME="${site_name}" >> .env
+deis config:push
 
 cd ../../ || exit 2
 
