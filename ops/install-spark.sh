@@ -11,7 +11,6 @@ readonly checkpointfileshare="$6"
 readonly gh_fortis_spark_repo_name="project-fortis-spark"
 readonly latest_version=$(curl "https://api.github.com/repos/catalystcode/${gh_fortis_spark_repo_name}/releases/latest" | jq -r '.tag_name')
 readonly fortis_jar="fortis-${latest_version}.jar"
-
 readonly SparkCommand="spark-submit --deploy-mode cluster --driver-memory 4g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/${fortis_jar}\""
 
 cd charts || exit -2

@@ -56,7 +56,7 @@ readonly graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly feature_service_db_conn_str="${FEATURE_SERVICE_DB_CONNECTION_STRING}"
 #readonly feature_service_host="http://feature-service.${DEIS_ROUTER_HOST_ROOT}.nip.io"
-readonly feature_service_host="http://13.72.77.67"
+readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
 
