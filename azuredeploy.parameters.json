@@ -6,13 +6,13 @@
             "value": "enter-your-fortis-site-name"
         },
         "acsMasterCount": {
-            "value": "1"
+            "value": 1
         },
         "acsAgentCount": {
-            "value": "6"
+            "value": 6
         },
         "agentVMSize": {
-            "value": "Standard_D2_v2"
+            "value": "Standard_DS2"
         },
         "dnsNamePrefix": {
             "value": "fortis"
@@ -21,10 +21,10 @@
             "value": "fortisadmin"
         },
         "sparkWorkers": {
-            "value": "6"
+            "value": 6
         },
         "cassandraNodes": {
-            "value": "5"
+            "value": 5
         },
         "siteType": {
             "value": "humanitarian"
@@ -32,10 +32,10 @@
         "sshPublicKey": {
             "value": "GEN-UNIQUE"
         },
-        "servicePrincipalClientId": {
+        "servicePrincipalAppId": {
             "value": "GEN-UNIQUE"
         },
-        "servicePrincipalClientSecret": {
+        "servicePrincipalAppKey": {
             "value": "GEN-UNIQUE"
         }
     }
