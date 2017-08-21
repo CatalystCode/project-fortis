@@ -1,4 +1,4 @@
-const appInsightsKey = process.env.FORTIS_SERVICES_APPINSIGHTS_KEY;
+const appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 
 let client;
 let consoleLog = console.log;
