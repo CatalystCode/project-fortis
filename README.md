@@ -7,6 +7,8 @@ A node-based azure web app meant to host express web services
 ## Environment variables
 
 ```sh
+ENABLE_V2=1  # switch to new Cassandra backend instead of old Postgres backend
+
 PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="..."
 PUBLISH_EVENTS_EVENTHUB_PATH="..."
 PUBLISH_EVENTS_EVENTHUB_PARTITION="..."
