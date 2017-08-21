@@ -61,7 +61,8 @@ readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
 
 echo "Finished. Now setting up site entry"
-./create-site.sh "${graphql_service_host}" "${site_name}" "${site_type}"
+if ! (command -v python >/dev/null); then sudo apt-get install -y python; fi
+./create_site.py "http://${graphql_service_host}" "${site_name}" "${site_type}"
 
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
