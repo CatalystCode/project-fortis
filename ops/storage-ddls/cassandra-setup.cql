@@ -225,6 +225,7 @@ CREATE TABLE events(
     externalsourceid text,
     eventlangcode text,
     body text,
+    summary text,
     computedfeatures frozen<features>,
     insertiontime timestamp,
     eventtime timestamp,
