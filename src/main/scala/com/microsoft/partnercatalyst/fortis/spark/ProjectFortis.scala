@@ -2,20 +2,20 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.CassandraConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
+import com.microsoft.partnercatalyst.fortis.spark.logging.{AppInsights, Loggable}
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraEventsSink}
 import org.apache.spark.sql.SparkSession
 
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Properties.{envOrElse, envOrNone}
 
-object ProjectFortis extends App {
+object ProjectFortis extends App with Loggable {
   private implicit val fortisSettings: FortisSettings = {
     def envOrFail(name: String): String = {
       envOrNone(name) match {
@@ -30,6 +30,7 @@ object ProjectFortis extends App {
       progressDir = envOrFail(Constants.Env.HighlyAvailableProgressDir),
       featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase),
       cassandraHosts = envOrFail(Constants.Env.CassandraHost),
+      contextStopWaitTimeMillis = envOrElse(Constants.Env.ContextStopWaitTimeMillis, Constants.ContextStopWaitTimeMillis.toString).toLong,
       managementBusConnectionString = envOrFail(Constants.Env.ManagementBusConnectionString),
       managementBusConfigQueueName = envOrFail(Constants.Env.ManagementBusConfigQueueName),
       managementBusCommandQueueName = envOrFail(Constants.Env.ManagementBusCommandQueueName),
@@ -37,6 +38,7 @@ object ProjectFortis extends App {
       // Optional
       blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net"),
       appInsightsKey = envOrNone(Constants.Env.AppInsightsKey),
+      pipelineInitWaitTimeMillis = envOrElse(Constants.Env.PipeplineInitWaitTimeMillis, Constants.PipeplineInitWaitTimeMillis.toString).toLong,
       modelsDir = envOrNone(Constants.Env.LanguageModelDir)
     )
   }
@@ -61,8 +63,13 @@ object ProjectFortis extends App {
       .set("spark.kryoserializer.buffer.max", "64m")
     CassandraConfig.init(conf, batchDuration, fortisSettings)
 
-    val sparksession = SparkSession.builder().config(conf).getOrCreate()
-    val ssc = new StreamingContext(sparksession.sparkContext, batchDuration)
+    val sparkContext = SparkContext.getOrCreate(conf)
+    val ssc = new StreamingContext(sparkContext, batchDuration)
+    ssc.checkpoint(fortisSettings.progressDir)
+    ssc
+  }
+
+  private def attachToContext(ssc:StreamingContext): Boolean = {
     val streamProvider = StreamProviderFactory.create()
 
     val configManager = new CassandraConfigurationManager
@@ -85,14 +92,28 @@ object ProjectFortis extends App {
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
-    CassandraEventsSink(fortisEvents.get, sparksession)
-    ssc.checkpoint(fortisSettings.progressDir)
-    ssc
+
+    if (fortisEvents.isEmpty) return false
+
+    val session = SparkSession.builder().config(ssc.sparkContext.getConf).getOrCreate()
+    CassandraEventsSink(fortisEvents.get, session)
+    StreamsChangeListener(ssc, fortisSettings)
+
+    true
   }
 
   // Main starts here
-  val ssc = StreamingContext.getOrCreate(fortisSettings.progressDir, createStreamingContext)
+  while(true) {
+    logInfo("Creating streaming context.")
+    val ssc = StreamingContext.getOrCreate(fortisSettings.progressDir, createStreamingContext)
+    var didAttach = attachToContext(ssc)
+    while (!didAttach) {
+      logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.pipelineInitWaitTimeMillis} milliseconds.")
+      Thread.sleep(fortisSettings.pipelineInitWaitTimeMillis)
+      didAttach = attachToContext(ssc)
+    }
+    ssc.start()
+    ssc.awaitTermination()
+  }
 
-  ssc.start()
-  ssc.awaitTermination()
 }

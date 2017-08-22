@@ -5,9 +5,11 @@ case class FortisSettings(
   featureServiceUrlBase: String,
   blobUrlBase: String,
   cassandraHosts: String,
+  contextStopWaitTimeMillis: Long,
   managementBusConnectionString: String,
   managementBusConfigQueueName: String,
   managementBusCommandQueueName: String,
   appInsightsKey: Option[String],
+  pipelineInitWaitTimeMillis: Long,
   modelsDir: Option[String]
 )

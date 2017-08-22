@@ -6,6 +6,8 @@ object Constants {
   val SparkStreamingBatchSizeDefault = 5
 
   val EventHubProgressDir = "eventhubProgress"
+  val ContextStopWaitTimeMillis = 5000
+  val PipeplineInitWaitTimeMillis = 5000
 
   object Env {
     val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
@@ -18,5 +20,7 @@ object Constants {
     val ManagementBusConnectionString = "FORTIS_SB_CONN_STR"
     val ManagementBusConfigQueueName = "FORTIS_SB_CONFIG_QUEUE"
     val ManagementBusCommandQueueName = "FORTIS_SB_COMMAND_QUEUE"
+    val ContextStopWaitTimeMillis = "FORTIS_CONTEXT_STOP_WAIT_TIME_MILLIS"
+    val PipeplineInitWaitTimeMillis = "FORTIS_PIPELINE_INIT_WAIT_TIME_MILLIS"
   }
 }
