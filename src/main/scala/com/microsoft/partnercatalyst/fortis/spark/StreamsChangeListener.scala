@@ -1,8 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
 import java.time.Duration
-import java.util.concurrent.CompletableFuture
-import java.util.{Timer, TimerTask}
+import java.util.concurrent.{CompletableFuture, Executors, ScheduledFuture, TimeUnit}
 
 import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
@@ -11,26 +10,48 @@ import org.apache.spark.streaming.StreamingContext
 
 object StreamsChangeListener {
 
-  @volatile @transient private var queueClient: QueueClient = _
+  var queueClient: Option[QueueClient] = None
+  var messageHandler: Option[CommandMessageHandler] = None
 
   def apply(ssc: StreamingContext, settings: FortisSettings): Unit = {
-    queueClient = new QueueClient(
-      new ConnectionStringBuilder(settings.managementBusConnectionString, settings.managementBusCommandQueueName),
-      ReceiveMode.PeekLock
-    )
-    queueClient.registerMessageHandler(
-      new CommandMessageHandler(ssc, settings),
-      new MessageHandlerOptions(
-        1, // Max concurrent calls
-        true,
-        Duration.ofMinutes(5)
-      )
-    )
+    this.messageHandler match {
+      case Some(handler) => {
+        handler.currentContext = Some(ssc)
+      }
+      case None => {
+        val handler = new CommandMessageHandler(settings)
+        handler.currentContext = Some(ssc)
+        messageHandler = Some(handler)
+      }
+    }
+
+    this.queueClient match {
+      case Some(client) => {
+        // Do nothing.
+      }
+      case None => {
+        val client = new QueueClient(
+          new ConnectionStringBuilder(settings.managementBusConnectionString, settings.managementBusCommandQueueName),
+          ReceiveMode.PeekLock
+        )
+        client.registerMessageHandler(
+          this.messageHandler.get,
+          new MessageHandlerOptions(
+            1 /*maxConcurrentCalls*/,
+            true /*autoComplete*/,
+            Duration.ofMinutes(5) /*maxAutoRenewDuration*/
+          )
+        )
+        queueClient = Some(client)
+      }
+    }
   }
 
-  private class CommandMessageHandler(ssc: StreamingContext, settings: FortisSettings) extends IMessageHandler with Loggable {
+  class CommandMessageHandler(settings: FortisSettings) extends IMessageHandler with Loggable {
 
-    var timer: Option[Timer] = None
+    private val scheduler = Executors.newScheduledThreadPool(1)
+    private var scheduledTask : Option[ScheduledFuture[_]] = None
+    var currentContext: Option[StreamingContext] = None
 
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
       logError("Service Bus client threw error while processing message.", exception)
@@ -41,25 +62,37 @@ object StreamsChangeListener {
         return CompletableFuture.completedFuture(null)
       }
 
-      val contextStopWaitTimeMillis = settings.contextStopWaitTimeMillis
-
-      if (this.timer.isDefined) {
-        logInfo(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${contextStopWaitTimeMillis} milliseconds from now.")
-        this.timer.get.cancel()
-      } else {
-        logInfo(s"Service Bus message for updated streams received; Requesting streaming context stop in ${contextStopWaitTimeMillis} milliseconds.")
+      this.scheduledTask match {
+        case Some(task) => {
+          logInfo(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.contextStopWaitTimeMillis} milliseconds from now.")
+          task.cancel(false)
+        }
+        case None => {
+          logInfo(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.contextStopWaitTimeMillis} milliseconds.")
+        }
       }
 
-      val t = new Timer()
-      t.schedule(new TimerTask {
-        override def run(): Unit = {
-          logInfo(s"Requesting streaming context stop now.")
-          ssc.stop(stopSparkContext = true, stopGracefully = true)
+      this.currentContext match {
+        case Some(context) => {
+          this.scheduledTask = Some(this.scheduler.schedule(
+            new ContextStopRunnable(context),
+            settings.contextStopWaitTimeMillis,
+            TimeUnit.MILLISECONDS
+          ))
         }
-      }, contextStopWaitTimeMillis)
-      this.timer = Some(t)
+        case None => {
+          logError(s"No streaming context set; Nothing to stop.")
+        }
+      }
 
       CompletableFuture.completedFuture(null)
+    }
+  }
+
+  private class ContextStopRunnable(ssc: StreamingContext) extends Runnable with Loggable {
+    override def run(): Unit = {
+      logInfo(s"Requesting streaming context stop now.")
+      ssc.stop(stopSparkContext = true, stopGracefully = true)
     }
   }
 
