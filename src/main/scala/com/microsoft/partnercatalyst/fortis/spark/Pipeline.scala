@@ -10,6 +10,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LocalLangu
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.PlaceRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
+import com.microsoft.partnercatalyst.fortis.spark.transforms.summary.KeywordSummarizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.Blacklist
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
@@ -113,6 +114,11 @@ object Pipeline {
         event.copy(analysis = event.analysis.copy(locations = locations))
       }
 
+      def addSummary(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
+        val summary = analyzer.createSummary(event.details, new KeywordSummarizer(event.analysis.keywords.map(_.name)))
+        event.copy(analysis = event.analysis.copy(summary = summary))
+      }
+
       // Configure analysis pipeline
       rdd
         .map(convertToSchema)
@@ -122,7 +128,7 @@ object Pipeline {
         .filter(item => isLanguageSupported(item.analysis))
         .map(addKeywords)
         .filter(item => hasKeywords(item.analysis))
-        .map(item => addLocations(addSentiments(addEntities(item))))
+        .map(item => addLocations(addSentiments(addEntities(addSummary(item)))))
     }))
   }
 }

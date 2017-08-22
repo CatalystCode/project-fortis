@@ -71,5 +71,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
 
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObject])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObjectData])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.summary.Summarizer])
+    kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.summary.KeywordSummarizer])
   }
 }

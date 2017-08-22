@@ -9,6 +9,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
+import com.microsoft.partnercatalyst.fortis.spark.transforms.summary.Summarizer
 
 @SerialVersionUID(100L)
 class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
@@ -38,4 +39,8 @@ class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
   override def detectSentiment(details: ExtendedDetails[InstagramItem], sentimentDetector: SentimentDetector): List[Double] = List()
   override def extractLocations(details: ExtendedDetails[InstagramItem], locationsExtractor: LocationsExtractor): List[Location] = List()
   override def extractEntities(details: ExtendedDetails[InstagramItem], peopleRecognizer: PeopleRecognizer): List[Tag] = List()
+
+  override def createSummary(details: ExtendedDetails[InstagramItem], summarizer: Summarizer): Option[String] = {
+    Option(details.body)  // this is the image description we got back from cognitive services
+  }
 }

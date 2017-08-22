@@ -9,6 +9,7 @@ case class Event(
   sourceeventid: String,
   insertiontime: Long,
   body: String,
+  summary: String,
   fulltext: String,
   batchid: String,
   externalsourceid: String,

@@ -6,6 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector
+import com.microsoft.partnercatalyst.fortis.spark.transforms.summary.Summarizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{Blacklist, KeywordExtractor}
 
 trait Analyzer[T] {
@@ -18,4 +19,5 @@ trait Analyzer[T] {
   def extractEntities(details: ExtendedDetails[T], peopleRecognizer: PeopleRecognizer): List[Tag]
   def detectLanguage(details: ExtendedDetails[T], languageDetector: LanguageDetector): Option[String]
   def detectSentiment(details: ExtendedDetails[T], sentimentDetector: SentimentDetector): List[Double]
+  def createSummary(details: ExtendedDetails[T], summarizer: Summarizer): Option[String]
 }
