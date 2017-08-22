@@ -27,6 +27,7 @@ object CassandraEventSchema {
       sourceeventid = item.details.sourceeventid,
       insertiontime = new Date().getTime,
       body = item.details.body,
+      summary = item.analysis.summary.getOrElse(""),
       sourceurl = item.details.sourceurl,
       title = item.details.title)
   }
