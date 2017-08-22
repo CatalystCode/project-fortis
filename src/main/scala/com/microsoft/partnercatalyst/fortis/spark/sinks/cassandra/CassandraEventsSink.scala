@@ -32,7 +32,7 @@ object CassandraEventsSink{
         val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
 
         Timer.time(Telemetry.logSinkPhase("writeEvents", _, _, batchSize)) {
-          writeFortisEvents(fortisEventsRDD, batchid)
+          writeFortisEvents(fortisEventsRDD)
         }
 
         val aggregators = Seq(
@@ -67,7 +67,7 @@ object CassandraEventsSink{
     }}
   }
 
-  private def writeFortisEvents(events: RDD[Event], batchId: String ): Unit = {
+  private def writeFortisEvents(events: RDD[Event]): Unit = {
     events.saveToCassandra(KeyspaceName, TableEvent, writeConf = WriteConf(ifNotExists = true))
   }
 
