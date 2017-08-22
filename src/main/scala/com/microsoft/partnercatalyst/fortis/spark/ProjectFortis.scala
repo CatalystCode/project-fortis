@@ -30,7 +30,7 @@ object ProjectFortis extends App with Loggable {
       progressDir = envOrFail(Constants.Env.HighlyAvailableProgressDir),
       featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase),
       cassandraHosts = envOrFail(Constants.Env.CassandraHost),
-      contextStopWaitTimeMillis = envOrElse(Constants.Env.ContextStopWaitTimeMillis, Constants.ContextStopWaitTimeMillis.toString).toLong,
+      contextStopWaitTimeMillis = envOrElse(Constants.Env.SscShutdownDelayMillis, Constants.SscShutdownDelayMillis.toString).toLong,
       managementBusConnectionString = envOrFail(Constants.Env.ManagementBusConnectionString),
       managementBusConfigQueueName = envOrFail(Constants.Env.ManagementBusConfigQueueName),
       managementBusCommandQueueName = envOrFail(Constants.Env.ManagementBusCommandQueueName),
@@ -38,7 +38,7 @@ object ProjectFortis extends App with Loggable {
       // Optional
       blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net"),
       appInsightsKey = envOrNone(Constants.Env.AppInsightsKey),
-      pipelineInitWaitTimeMillis = envOrElse(Constants.Env.PipeplineInitWaitTimeMillis, Constants.PipeplineInitWaitTimeMillis.toString).toLong,
+      pipelineInitWaitTimeMillis = envOrElse(Constants.Env.SscInitRetryAfterMillis, Constants.SscInitRetryAfterMillis.toString).toLong,
       modelsDir = envOrNone(Constants.Env.LanguageModelDir)
     )
   }
@@ -106,11 +106,9 @@ object ProjectFortis extends App with Loggable {
   while(true) {
     logInfo("Creating streaming context.")
     val ssc = StreamingContext.getOrCreate(fortisSettings.progressDir, createStreamingContext)
-    var didAttach = attachToContext(ssc)
-    while (!didAttach) {
+    while (!attachToContext(ssc)) {
       logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.pipelineInitWaitTimeMillis} milliseconds.")
       Thread.sleep(fortisSettings.pipelineInitWaitTimeMillis)
-      didAttach = attachToContext(ssc)
     }
     ssc.start()
     ssc.awaitTermination()
