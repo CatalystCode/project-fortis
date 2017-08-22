@@ -73,7 +73,7 @@ cd ../fortis-interface || exit 2
 
 {
 echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
-echo FORTIS_SERVICE_HOST="${graphql_service_host}"
+echo REACT_APP_SERVICE_HOST="${graphql_service_host}"
 echo DEFAULT_SITE_NAME="${site_name}"
 } >> .env
 

@@ -9,6 +9,8 @@ USE fortis;
 DROP MATERIALIZED VIEW IF EXISTS eventbatches;
 DROP MATERIALIZED VIEW IF EXISTS popularsources;
 DROP MATERIALIZED VIEW IF EXISTS timeseries;
+DROP MATERIALIZED VIEW IF EXISTS eventplacesbysource;
+
 DROP INDEX IF EXISTS events_fulltext_idx;
 
 DROP TABLE IF EXISTS watchlist;
@@ -198,7 +200,7 @@ CREATE TABLE eventtopics(
     pipelinekey text,
     externalsourceid text,
     PRIMARY KEY ((topic, pipelinekey, externalsourceid), eventtime, eventid)
-);
+) WITH CLUSTERING ORDER BY (eventtime DESC);
 
 CREATE TABLE eventplaces(
     eventid text,
@@ -212,8 +214,23 @@ CREATE TABLE eventplaces(
     eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid), centroidlat, centroidlon, eventtime, eventid)
-);
+    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey), eventtime, centroidlat, centroidlon, eventid)
+) WITH CLUSTERING ORDER BY (eventtime DESC);
+
+CREATE MATERIALIZED VIEW eventplacesbysource
+AS SELECT eventid, pipelinekey, eventtime, centroidlat, centroidlon, placeid, conjunctiontopic1, 
+          conjunctiontopic2, conjunctiontopic3, externalsourceid
+   FROM eventplaces
+   WHERE eventid IS NOT NULL
+     AND pipelinekey IS NOT NULL
+     AND eventtime IS NOT NULL
+     AND externalsourceid IS NOT NULL
+     AND conjunctiontopic1 IS NOT NULL
+     AND conjunctiontopic2 IS NOT NULL
+     AND conjunctiontopic3 IS NOT NULL
+     AND centroidlat IS NOT NULL
+     AND centroidlon IS NOT NULL
+PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, externalsourceid), eventtime, centroidlat, centroidlon, eventid);
 
 CREATE TABLE events(
     eventid text,
@@ -231,8 +248,8 @@ CREATE TABLE events(
     topics frozen<set<text>>,
     placeids frozen<set<text>>,
     fulltext text, /* conjunction of title and body to enable querying of both at the same time */
-    PRIMARY KEY (eventid)
-);
+    PRIMARY KEY (eventid, eventtime)
+) WITH CLUSTERING ORDER BY (eventtime DESC);
 
 /**
  * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
@@ -245,7 +262,7 @@ AS SELECT batchid, eventid, pipelinekey, eventtime, computedfeatures, externalso
      AND pipelinekey IS NOT NULL
      AND eventtime IS NOT NULL
      AND externalsourceid IS NOT NULL
-PRIMARY KEY (batchid, eventid);
+PRIMARY KEY (batchid, eventid, eventtime);
 
 /**
  * Allows for fetching trending topics given a pipeline, period and zoom level.
