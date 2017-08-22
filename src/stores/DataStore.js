@@ -62,10 +62,12 @@ export const DataStore = Fluxxor.createStore({
                 const {locations, terms} = graphqlResponse.edges;
                 const fullEdgeList = locations.edges.concat(terms.edges);
                 const settings = graphqlResponse.settings.siteDefinition.sites[0];
+                const languages = settings.properties.supportedLanguages || ['en'];
+
                 this.dataStore.trustedSources = graphqlResponse.trustedSources.accounts;
 
                 fullEdgeList.forEach(edge=>{
-                    settings.properties.supportedLanguages.forEach(language=>{
+                    languages.forEach(language=>{
                         let languageMap = this.dataStore.allEdges.get(language);
                         if(!languageMap){
                             languageMap = new Map();

@@ -317,22 +317,12 @@ export const SERVICES = {
         }
     },
 
-    getSiteDefintion(siteId, retrieveSiteList, callback) {
-        const fragment = `${siteSettingsFragment}
-                        ${retrieveSiteList ? `fragment FortisSitesListView on SiteCollection {
-                            sites {
-                                name
-                            }
-                        }`: ``}`;
-
-        const query = `  ${fragment}
+    getSiteDefintion(siteId, callback) {
+        const query = `  ${siteSettingsFragment}
                         query Sites($siteId: String) {
                             siteDefinition: sites(siteId: $siteId) {
                                 ...FortisSiteDefinitionView
                             }
-                            ${retrieveSiteList ? `siteList: sites(siteId: "") {
-                                ...FortisSitesListView
-                            }`: ``}
                         }`;
 
         const variables = { siteId };
@@ -518,9 +508,9 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    createOrReplaceSite(siteName, siteDefinition, callback) {
-        let query = `  mutation CreateOrReplaceSite($input: SiteDefinition!) {
-                            createOrReplaceSite(input: $input) {
+    editSite(siteName, siteDefinition, callback) {
+        let query = `  mutation EditSite($input: EditableSiteSettings!) {
+                            editSite(input: $input) {
                                 name
                             }
                         }`;

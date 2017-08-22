@@ -132,7 +132,7 @@ const methods = {
     APP : {
         loadSettings(siteName){
             let self = this;
-            SERVICES.getSiteDefintion(siteName, false, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+            SERVICES.getSiteDefintion(siteName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
                 if (graphqlResponse && !error) {
                     self.dispatch(constants.APP.INITIALIZE, graphqlResponse.siteDefinition.sites[0]);
                 }else{
@@ -153,7 +153,7 @@ const methods = {
 
             parallelAsync({
                 settings: callback => {
-                        SERVICES.getSiteDefintion(siteId, false, (error, response, body) => ResponseHandler(error, response, body, callback))
+                        SERVICES.getSiteDefintion(siteId, (error, response, body) => ResponseHandler(error, response, body, callback))
                 },
                 trustedSources : callback => {
                         SERVICES.getTrustedTwitterAccounts(siteId, (err, response, body) => ResponseHandler(err, response, body, callback))
@@ -291,7 +291,7 @@ const methods = {
         },
         load_settings(siteName){
             let self = this;
-            SERVICES.getSiteDefintion(siteName, false, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+            SERVICES.getSiteDefintion(siteName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
                 console.log(constants.FACTS.INITIALIZE);
                 if (graphqlResponse && !error) {
                     self.dispatch(constants.FACTS.INITIALIZE, graphqlResponse.siteDefinition.sites[0]);
@@ -310,16 +310,14 @@ const methods = {
     ADMIN: {
         load_settings: function(siteName){
             let self = this;
-            const LOAD_SITE_LIST = true;
 
-           SERVICES.getSiteDefintion(siteName, LOAD_SITE_LIST, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+           SERVICES.getSiteDefintion(siteName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
                     if(graphqlResponse) {
                         if(graphqlResponse.siteDefinition.sites.length > 0){
                             const action = false;
                             self.dispatch(constants.ADMIN.LOAD_SETTINGS, {settings: graphqlResponse.siteDefinition.sites[0],
                                                                           action: action,
-                                                                          originalSiteName: siteName,
-                                                                          siteList: graphqlResponse.siteList.sites});
+                                                                          originalSiteName: siteName});
                         }else{
                             console.error(`error [${error}] occured. site [${siteName}] does not exist.`);
                         }
@@ -331,8 +329,8 @@ const methods = {
         save_settings: function(siteName, modifiedSettings){
             let self = this;
 
-            SERVICES.createOrReplaceSite(siteName, modifiedSettings, (error, response, body) => {
-                if(!error && response.statusCode === 200 && body.data && body.data.createOrReplaceSite) {
+            SERVICES.editSite(siteName, modifiedSettings, (error, response, body) => {
+                if(!error && response.statusCode === 200 && body.data && body.data.editSite) {
                     const action = 'saved';
                     let mutatedSettings = Object.assign({}, {name: modifiedSettings.name}, {properties: modifiedSettings});
                     delete mutatedSettings.properties.name;
@@ -340,18 +338,6 @@ const methods = {
                     self.dispatch(constants.ADMIN.LOAD_SETTINGS, {settings: mutatedSettings,
                                                                   originalSiteName: siteName,
                                                                   action: action});
-                }else{
-                    console.error(`[${error}] occured while processing message request`);
-                }
-            });
-        },
-        create_site: function(siteName, modifiedSettings){
-            let self = this;
-
-            SERVICES.createOrReplaceSite(siteName, modifiedSettings, (error, response, body) => {
-                if(!error && response.statusCode === 200 && body.data && body.data.createOrReplaceSite) {
-                    const action = 'saved';
-                    self.dispatch(constants.ADMIN.CREATE_SITE, {siteName, action});
                 }else{
                     console.error(`[${error}] occured while processing message request`);
                 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import Fluxxor from 'fluxxor';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import {AdminSiteList} from './AdminSiteList';
 import {AdminSettings} from './AdminSettings';
 import {AdminWatchlist} from './AdminWatchlist';
 import {CustomEventsEditor} from './CustomEventsEditor';
@@ -58,9 +57,6 @@ export const Admin = React.createClass({
          <div className="container-fluid">
              <div className="col-lg-12">
                 <div className="panel panel-primary" style={styles.container.panel}>
-                    <div className="panel-heading" style={styles.container.panelHeading}>
-                        <AdminSiteList {...this.props} />
-                    </div>
                     <div className="panel-body">
                         <div className="row adminContainer">
                                 <Tabs

@@ -59,8 +59,8 @@ export const AdminSettings = React.createClass({
     },
 
     handleSaveSettings(){
-        const {targetBbox, defaultLocation, defaultZoomLevel, featuresConnectionString, storageConnectionString} = this.props.siteSettings.properties;
-        const {name, title, logo, fbToken, supportedLanguages, mapzenApiKey} = this.refs;
+        const {targetBbox, defaultLocation, defaultZoomLevel} = this.props.siteSettings.properties;
+        const {name, title, logo, supportedLanguages} = this.refs;
         const languageArray = supportedLanguages.value.split(",");
         const languageJSON = `["${languageArray.join('","')}"]`;
         const siteDefintion = {
@@ -70,11 +70,7 @@ export const AdminSettings = React.createClass({
                                defaultLocation:defaultLocation, 
                                defaultZoomLevel:defaultZoomLevel, 
                                supportedLanguages: JSON.parse(languageJSON), 
-                               title:title.value, 
-                               featuresConnectionString:featuresConnectionString, 
-                               storageConnectionString:storageConnectionString, 
-                               fbToken:fbToken.value,
-                               mapzenApiKey: mapzenApiKey.value
+                               title:title.value
                             };
 
         this.getFlux().actions.ADMIN.save_settings(this.props.siteKey, siteDefintion);
@@ -122,16 +118,6 @@ export const AdminSettings = React.createClass({
                         <div className="form-group">
                             <label>Supported Languages(<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
                             <input onChange={this.handleChange} required name="supportedLanguages" ref="supportedLanguages" value={this.state.siteSettings.properties.supportedLanguages} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
-                            <div className="validation"></div>
-                        </div>
-                        <div className="form-group">
-                            <label>Facebook Graph API <a href="https://developers.facebook.com/apps/" target="blank">Access Token</a><span>*</span></label>
-                            <input onChange={this.handleChange} required name="fbToken" ref="fbToken" value={this.state.siteSettings.properties.fbToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
-                            <div className="validation"></div>
-                        </div>
-                        <div className="form-group">
-                            <label>Mapzen API <a href="https://mapzen.com/developers/" target="blank">Key</a><span>*</span></label>
-                            <input onChange={this.handleChange} required name="mapzenApiKey" ref="mapzenApiKey" value={this.state.siteSettings.properties.mapzenApiKey} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                             <div className="validation"></div>
                         </div>
                         <div className="form-group">
