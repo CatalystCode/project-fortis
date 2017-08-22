@@ -101,11 +101,7 @@ object CassandraTest {
           sourceurl = "http://bloomberg.com",
           pipelinekey = "twitter",
           sharedLocations = List(),
-<<<<<<< HEAD
           externalsourceid = "bloomberg",
-=======
-          externalsourceid = "bbc",
->>>>>>> Computed Tiles Aggregated fixes
           body = "This is a another test message from bloomberg",
           title = "twitter post" ),
         analysis = Analysis(
