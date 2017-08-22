@@ -23,7 +23,7 @@ def _main(graphql_service_host, site_name, site_type):
           storageConnectionString: "",
           mapzenApiKey: "",
           fbToken: "",
-          supportedLanguages: []
+          supportedLanguages: ["en"]
         }
       ) { name }
     }''' % (site_type, site_name)
