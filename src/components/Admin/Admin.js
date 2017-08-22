@@ -13,7 +13,16 @@ import '../../styles/Admin/Admin.css'
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
-const SETTINGS_TAB = 0, WATCHLIST_TAB = 1, LOCATIONS_TAB = 2, CUSTOM_EVENTS_TAB = 3, FB_PAGES_TAB = 4, TRUSTED_TWITTER_ACCTS = 5, TWITTER_ACCOUNTS_TAB = 6, BLACKLIST_TAB = 7;
+
+const SETTINGS_TAB = 0;
+const WATCHLIST_TAB = 1;
+const LOCATIONS_TAB = 2;
+const CUSTOM_EVENTS_TAB = 3;
+const FB_PAGES_TAB = 4;
+const TRUSTED_TWITTER_ACCTS = 5; 
+const TWITTER_ACCOUNTS_TAB = 6;
+const BLACKLIST_TAB = 7;
+
 const styles = {
   container: {
     panel: {
