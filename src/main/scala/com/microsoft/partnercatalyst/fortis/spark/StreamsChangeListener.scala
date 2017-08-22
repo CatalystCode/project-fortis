@@ -53,6 +53,7 @@ object StreamsChangeListener {
       val t = new Timer()
       t.schedule(new TimerTask {
         override def run(): Unit = {
+          logInfo(s"Requesting streaming context stop now.")
           ssc.stop(stopSparkContext = true, stopGracefully = true)
         }
       }, contextStopWaitTimeMillis)

@@ -6,7 +6,7 @@ object Constants {
   val SparkStreamingBatchSizeDefault = 5
 
   val EventHubProgressDir = "eventhubProgress"
-  val ContextStopWaitTimeMillis = 5000
+  val ContextStopWaitTimeMillis = 60000
   val PipeplineInitWaitTimeMillis = 5000
 
   object Env {
