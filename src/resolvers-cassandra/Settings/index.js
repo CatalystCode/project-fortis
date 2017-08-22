@@ -6,6 +6,7 @@ const queries = require('./queries');
 module.exports = {
   createSite: mutations.createSite,
   removeSite: mutations.removeSite,
+  editSite: mutations.editSite,
   createStream: mutations.createStream,
   removeStream: mutations.removeStream,
   modifyFacebookPages: mutations.modifyFacebookPages,

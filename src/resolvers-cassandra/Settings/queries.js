@@ -35,12 +35,12 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
     if (!siteId) {
       return reject('No site id to fetch specified');
     }
-
-    const siteById = 'SELECT * FROM fortis.sitesettings WHERE id = ?';
+    
+    const siteById = 'SELECT * FROM fortis.sitesettings WHERE sitename = ?';
     cassandraConnector.executeQuery(siteById, [siteId])
     .then(rows => {
-      if (rows.length < 1) return reject(`Could not find site with id ${siteId}`);
-      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with id '${siteId}'`);
+      if (rows.length < 1) return reject(`Could not find site with sitename ${siteId}`);
+      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename '${siteId}'`);
 
       const site = cassandraRowToSite(rows[0]);
       resolve({sites: [site]});

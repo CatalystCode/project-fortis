@@ -11,8 +11,9 @@ module.exports = graphql.buildSchema(`
   }
 
   type Mutation {
-    createSite(input: SiteDefinition!): Site
-    removeSite(input: SiteDefinition!): Site
+    createSite(input: EditableSiteSettings!): Site
+    removeSite(input: EditableSiteSettings!): Site
+    editSite(input: EditableSiteSettings!): Site
     createStream(input: StreamDefinition!): Stream
     removeStream(input: StreamDefinition!): Stream
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
@@ -127,6 +128,16 @@ module.exports = graphql.buildSchema(`
     featuresConnectionString: String,
     mapzenApiKey: String,
     fbToken: String,
+    supportedLanguages: [String]
+  }
+
+  input EditableSiteSettings {
+    targetBbox: [Float],
+    defaultZoomLevel: Int,
+    logo: String,
+    title: String,
+    name: String,
+    defaultLocation: [Float],
     supportedLanguages: [String]
   }
 

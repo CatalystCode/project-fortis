@@ -52,6 +52,56 @@ function _insertTopics(siteType) {
 const insertTopics = trackEvent(_insertTopics, 'Settings.Topics.Insert', (response, err) => ({numTopicsInserted: err ? 0 : response.numTopicsInserted}));
 
 /**
+ * @param {{input: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], supportedLanguages: string[]}}} args
+ * @returns {Promise}
+ */
+function editSite(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const siteName = args && args.input && args.input.name;
+    if (!siteName || !siteName.length) return reject('sitename is not defined');
+
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?;', [siteName])
+    .then(rows => {
+      if (rows.length !== 1) return reject(`Site with sitename ${siteName} does not exist.`);
+    })
+    .then(() => {
+      return cassandraConnector.executeBatchMutations([{
+        query: `INSERT INTO fortis.sitesettings (
+          geofence,
+          defaultzoom,
+          logo,
+          title,
+          sitename,
+          languages
+        ) VALUES (?,?,?,?,?,?)`,
+        params: [
+          args.input.targetBbox,
+          args.input.defaultZoomLevel,
+          args.input.logo,
+          args.input.title,
+          args.input.name,
+          args.input.supportedLanguages
+        ]
+      }]);
+    })
+    .then(() => { 
+      resolve({
+        name: args.input.name,
+        properties: {
+          targetBbox: args.input.targetBbox,
+          defaultZoomLevel: args.input.defaultZoomLevel,
+          logo: args.input.logo,
+          title: args.input.title,
+          defaultLocation: args.input.defaultLocation,
+          supportedLanguages:args.input.supportedLanguages
+        }
+      });
+    })
+    .catch(reject);
+  });
+}
+
+/**
  * @param {{input: {siteType: string, targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, name: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}} args
  * @returns {Promise}
  */
@@ -468,6 +518,7 @@ module.exports = {
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
   createStream: trackEvent(createStream, 'createStream'),
+  editSite: trackEvent(withRunTime(editSite), 'editSite'),
   removeStream: trackEvent(removeStream, 'removeStream'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
