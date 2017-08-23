@@ -72,21 +72,21 @@ object CassandraEventsSink{
   }
 
   private def registerUDFs(session: SparkSession): Unit ={
-    session.sqlContext.udf.register("MeanAverage", FortisUdfFunctions.MeanAverage)
-    session.sqlContext.udf.register("SumMentions", FortisUdfFunctions.OptionalSummation)
-    session.sqlContext.udf.register("MergeHeatMap", FortisUdfFunctions.MergeHeatMap)
-    session.sqlContext.udf.register("SentimentWeightedAvg", SentimentWeightedAvg)
+    session.udf.register("MeanAverage", FortisUdfFunctions.MeanAverage)
+    session.udf.register("SumMentions", FortisUdfFunctions.OptionalSummation)
+    session.udf.register("MergeHeatMap", FortisUdfFunctions.MergeHeatMap)
+    session.udf.register("SentimentWeightedAvg", SentimentWeightedAvg)
   }
 
   private def fetchEventBatch(batchid: String, events: RDD[Event], session: SparkSession): Dataset[Event] = {
-    import session.sqlContext.implicits._
+    import session.implicits._
 
-    val addedEventsDF = session.sqlContext.read.format(CassandraFormat)
+    val addedEventsDF = session.read.format(CassandraFormat)
       .options(Map("keyspace" -> KeyspaceName, "table" -> TableEventBatches))
       .load()
 
     addedEventsDF.createOrReplaceTempView(TableEventBatches)
-    val ds = session.sqlContext.sql(s"select eventid, pipelinekey from $TableEventBatches where batchid = '$batchid'")
+    val ds = session.sql(s"select eventid, pipelinekey from $TableEventBatches where batchid = '$batchid'")
     val eventsDS = events.toDF().as[Event]
     val filteredEvents = eventsDS.join(ds, Seq("eventid", "pipelinekey")).as[Event]
 
