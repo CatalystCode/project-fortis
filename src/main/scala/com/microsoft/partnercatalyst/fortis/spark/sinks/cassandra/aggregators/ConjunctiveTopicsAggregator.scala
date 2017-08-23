@@ -10,7 +10,7 @@ class ConjunctiveTopicsAggregator extends FortisAggregatorBase with Serializable
   override def FortisTargetTablename: String = "conjunctivetopics"
 
   override def FortisTargetTableDataFrame(session: SparkSession): DataFrame = {
-    session.sqlContext.read.format(CassandraFormat)
+    session.read.format(CassandraFormat)
       .options(Map("keyspace" -> KeyspaceName, "table" -> FortisTargetTablename))
       .load()
   }
@@ -21,7 +21,7 @@ class ConjunctiveTopicsAggregator extends FortisAggregatorBase with Serializable
   }
 
   override def IncrementalUpdate(session: SparkSession, aggregatedDS: DataFrame): DataFrame = {
-    session.sqlContext.sql(IncrementalUpdateQuery)
+    session.sql(IncrementalUpdateQuery)
   }
 
   private def IncrementalUpdateQuery: String = {
@@ -33,9 +33,9 @@ class ConjunctiveTopicsAggregator extends FortisAggregatorBase with Serializable
   }
 
   override def AggregateEventBatches(session: SparkSession, flattenedEvents: DataFrame): DataFrame = {
-    val detailedAggDF = session.sqlContext.sql(DetailedAggregateViewQuery)
-    val allSourcesAggDF = session.sqlContext.sql(AllSourcesAggregateViewQuery)
-    val allPipelinesAggDF = session.sqlContext.sql(AllPipelineKeysAggregateViewQuery)
+    val detailedAggDF = session.sql(DetailedAggregateViewQuery)
+    val allSourcesAggDF = session.sql(AllSourcesAggregateViewQuery)
+    val allPipelinesAggDF = session.sql(AllPipelineKeysAggregateViewQuery)
     detailedAggDF.union(allSourcesAggDF).union(allPipelinesAggDF)
   }
 
