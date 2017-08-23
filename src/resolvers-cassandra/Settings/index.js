@@ -19,6 +19,7 @@ module.exports = {
   removeBlacklist: mutations.removeBlacklist,
 
   sites: queries.sites,
+  streams: queries.streams,
   twitterAccounts: queries.twitterAccounts,
   trustedTwitterAccounts: queries.trustedTwitterAccounts,
   facebookPages: queries.facebookPages,
