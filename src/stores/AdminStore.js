@@ -12,6 +12,8 @@ const POPULATED_CITY = 100000;
 export const AdminStore = Fluxxor.createStore({
     initialize() {
         this.dataStore = {
+            streams: [],
+            streamGridColumns: [],
             settings: {},
             siteList: [],
             loading: false,
@@ -29,6 +31,7 @@ export const AdminStore = Fluxxor.createStore({
         };
 
         this.bindActions(
+            Actions.constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
             Actions.constants.ADMIN.LOAD_KEYWORDS, this.handleLoadTerms,
             Actions.constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             Actions.constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
@@ -45,6 +48,28 @@ export const AdminStore = Fluxxor.createStore({
 
     getState() {
         return this.dataStore;
+    },
+
+    handleLoadStreams(response) {
+      this.dataStore.streams = response.response.streams.streams || [];
+      this.dataStore.action = response.action || false;
+      this.loadStreamsColumns(this.dataStore.streams);
+      this.emit("change");
+    },
+
+    loadStreamsColumns() {
+      const defaultColumn = {
+        editable: true,
+        filterable: true,
+        resizable: true
+      };
+
+      let columns = [];
+      columns.push(Object.assign({}, defaultColumn, {editable: false, key: "pipelineKey", name: "Pipeline Key"}));
+      columns.push(Object.assign({}, defaultColumn, {editable: false, key: "pipelineLabel", name: "Pipeline Label"}));
+      columns.push(Object.assign({}, defaultColumn, {editable: false, key: "streamFactory", name: "Stream Factory"}));
+            
+      this.dataStore.streamGridColumns = columns;
     },
 
     handleLoadPayload(payload) {
