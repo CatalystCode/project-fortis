@@ -49,6 +49,32 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+/**
+ * @param {{siteId: string}} args
+ * @returns {Promise.<{runTime: string, sites: Array<{pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string}>}>}
+ */
+function streams(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    cassandraConnector.executeQuery('SELECT * FROM fortis.streams', [])
+    .then(rows => {
+      const streams = rows.map(cassandraRowToStream);
+      resolve({
+        streams
+      });
+    })
+    .catch(reject);
+  });
+}
+
+function cassandraRowToStream(row) {
+  return {
+    pipelineKey: row.pipelinekey,
+    pipelineLabel: row.pipelinelabel,
+    pipelineIcon: row.pipelineicon,
+    streamFactory: row.streamfactory
+  };
+}
+
 function cassandraRowToTwitterAccount(row) {
   return {
     accountName: row.params.accountName,
@@ -172,6 +198,7 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 module.exports = {
   sites: trackEvent(withRunTime(sites), 'sites'),
+  streams: trackEvent(withRunTime(streams), 'streams'),
   twitterAccounts: trackEvent(withRunTime(twitterAccounts), 'twitterAccounts'),
   trustedTwitterAccounts: trackEvent(withRunTime(trustedTwitterAccounts), 'trustedTwitterAccounts'),
   facebookPages: trackEvent(withRunTime(facebookPages), 'facebookPages'),
