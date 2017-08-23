@@ -55,10 +55,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
  */
 function streams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const pipelineKey = args.pipelineKey;
-    const streamId = args.streamId;
-    
-    cassandraConnector.executeQuery('SELECT * FROM fortis.streams WHERE pipelinekey = ? AND streamid = ?', [pipelineKey, streamId])
+    cassandraConnector.executeQuery('SELECT * FROM fortis.streams', [])
     .then(rows => {
       const streams = rows.map(cassandraRowToStream);
       resolve({

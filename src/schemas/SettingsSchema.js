@@ -3,7 +3,7 @@ const graphql = require('graphql');
 module.exports = graphql.buildSchema(`
   type Query {
     sites(siteId: String): SiteCollection
-    streams(pipelineKey: String, streamId: String): StreamCollection
+    streams: StreamCollection
     twitterAccounts(siteId: String!): TwitterAccountCollection
     trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
     facebookPages(siteId: String!): FacebookPageCollection
