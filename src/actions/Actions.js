@@ -86,6 +86,8 @@ const constants = {
                CHANGE_LANGUAGE: "FACTS:CHANGE_LANGUAGE",
            },
            ADMIN : {
+               LOAD_STREAMS: "LOAD:STREAMS",
+               REMOVE_STREAMS: "REMOVE:STREAMS",
                LOAD_KEYWORDS: "LOAD:KEYWORDS",
                LOAD_SETTINGS: "LOAD:SETTINGS",
                LOAD_BLACKLIST: "LOAD:BLACKLIST",
@@ -100,6 +102,7 @@ const constants = {
                LOAD_LOCALITIES: "LOAD:LOCALITIES",
                PUBLISHED_EVENTS: "SAVE:EVENT_PUBLISH",
                LOAD_FAIL: "LOAD:FAIL",
+               REMOVE_FAIL: "REMOVE:FAIL"
            },
 };
 
@@ -311,6 +314,24 @@ const methods = {
         }
     },
     ADMIN: {
+        load_streams: function() {
+          const self = this;
+          const dataStore = this.flux.stores.AdminStore.dataStore;
+
+          if (!dataStore.loading) {
+            SERVICES.fetchStreams((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+              if (graphqlResponse) {
+                const response = graphqlResponse ? graphqlResponse : [];
+                const action = false;
+                self.dispatch(constants.ADMIN.LOAD_STREAMS, {response, action});
+              } else {
+                const error = 'Error, could not load streams for admin page';
+                self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+              }
+            }))
+          }
+        },
+
         load_settings: function(siteName){
             let self = this;
 
