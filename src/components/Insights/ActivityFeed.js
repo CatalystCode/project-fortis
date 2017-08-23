@@ -13,7 +13,7 @@ import DialogBox from '../dialogs/DialogBox';
 const FluxMixin = Fluxxor.FluxMixin(React),
       StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-const OFFSET_INCREMENT = 18;
+const OFFSET_INCREMENT = 28;
 const DEFAULT_LANGUAGE = "en";
 const ELEMENT_ITEM_HEIGHT = 80;
 const NEWS_FEED_SEARCH_CONTAINER_HEIGHT = 115;
@@ -220,12 +220,14 @@ export const ActivityFeed = React.createClass({
   },
 
   getInitialState() {
-        return {
-            elements: [],
-            offset: 0,
-            filteredSource: "all",
-            isInfiniteLoading: false
-        }
+    this.lastRenderedElementLength = 0;
+
+    return {
+        elements: [],
+        filteredSource: "all",
+        processedEventids: new Set(),
+        isInfiniteLoading: false
+    }
   },
 
   handleInfiniteLoad() {
@@ -235,13 +237,17 @@ export const ActivityFeed = React.createClass({
         });
         
         setTimeout(() => {
-                const params = {...self.props, elementStartList: self.state.elements, offset: self.state.offset, filteredSource: this.state.filteredSource};
+                const params = {
+                    ...self.props, 
+                    elementStartList: self.state.elements,
+                    filteredSource: this.state.filteredSource
+                };
                 self.processNewsFeed(params);
         }, INFINITE_LOAD_DELAY_MS);
   },
 
   fetchSentences(requestPayload, callback){
-      let {mainEdge, timespanType, searchValue, limit, offset, edges, siteKey,
+      let {mainEdge, timespanType, searchValue, limit, edges, 
            categoryType, filteredSource, bbox, datetimeSelection, originalSource} = requestPayload;
       let location = [];
 
@@ -250,9 +256,9 @@ export const ActivityFeed = React.createClass({
           location = this.state.selectedLocationCoordinates;
       }
 
-      SERVICES.FetchMessageSentences(siteKey, originalSource, bbox, datetimeSelection, timespanType, 
-                                     limit, offset, edges, DEFAULT_LANGUAGE, Actions.DataSources(filteredSource), 
-                                     mainEdge, searchValue, location, callback);
+      SERVICES.FetchMessageSentences(originalSource, bbox, datetimeSelection, timespanType, 
+                                     limit, requestPayload.pageState, [mainEdge].concat(edges), Actions.DataSources(filteredSource), 
+                                     searchValue, location, callback);
   },
 
   renderDataSourceTabs(iconStyle){
@@ -294,8 +300,13 @@ export const ActivityFeed = React.createClass({
        ||  this.props.originalSource !== nextProps.originalSource
        ||  this.hasChanged(nextProps, "timespanType") || this.hasChanged(nextProps, this.props, "edges") ||  this.hasChanged(nextProps, this.props, "language")
        ||  this.hasChanged(nextProps, this.props, "mainEdge") || this.hasChanged(nextProps, this.props, "dataSource")){
-          const params = {...nextProps, elementStartList: [], offset: 0, filteredSource: nextProps.dataSource};
-          this.setState({filteredSource: params.filteredSource, elements: []});
+          const params = {
+              ...nextProps, 
+              processedEventids: new Set(),
+              elementStartList: [], 
+              filteredSource: nextProps.dataSource
+            };
+          this.setState({filteredSource: params.filteredSource, elements: [], pageState: undefined});
           this.lastRenderedElementLength = 0;
           
           this.processNewsFeed(params);
@@ -308,7 +319,7 @@ export const ActivityFeed = React.createClass({
     this.lastRenderedElementLength = 0;
 
     if(targetElement > -1){
-        elements[targetElement].sentence = translatedSentence;
+        elements[targetElement].summary = translatedSentence;
     }else{
         console.error(`Unexpected error occured where the translation request for event ${eventId} failed.`);
     }
@@ -319,29 +330,25 @@ export const ActivityFeed = React.createClass({
   buildElements(requestPayload) {
         let elements = [];
         let self = this;
-        let nextOffset = requestPayload.start + OFFSET_INCREMENT;
 
         this.fetchSentences(requestPayload,
             (error, response, body) => {
-                if(!error && response.statusCode === 200 && body.data) {
+                let pageState, processedEventIds = this.state.processedEventids;
+
+                if(!error && response.statusCode === 200 && body.data) {    
                     const graphQLResponse = body.data[Object.keys(body.data)[0]];
-                    const trustedAccounts = this.state.trustedSources.accounts;
+
                     if(graphQLResponse && graphQLResponse.features && Array.isArray(graphQLResponse.features)){
-                        elements = requestPayload.elementStartList.concat(graphQLResponse.features.filter(feature=>feature.properties.sentence && feature.properties.sentence.length > 2)
+                        elements = requestPayload.elementStartList.concat(graphQLResponse.features.filter(feature=>feature.properties.summary.length && !processedEventIds.has(feature.properties.messageid))
                                                                                                   .map(feature => {
-                                const { messageid, sentence, source, createdtime, sentiment, edges, language } = feature.properties;
-                                const { title, originalSources, link } = feature.properties.properties;
+                                const { messageid, title, externalsourceid, link, summary, pipelinekey, eventtime, sentiment, edges, language } = feature.properties;
                                 const { searchValue } = requestPayload;
                                 const { coordinates } = feature;
-                                let trusted = source !== "twitter";
+                                pageState = graphQLResponse.pageState;
+                                processedEventIds.add(messageid);
+                                let trusted = false;//todo: this needs to be properly implemented as this only works for twitter. 
 
-                                if (!trusted) {
-                                    for (var i = 0; i < trustedAccounts.length; i++) {
-                                        if (trustedAccounts[i].acctUrl === originalSources[0]) { trusted = true; break; }
-                                    }
-                                }
-
-                                return Object.assign({}, { coordinates, messageid, sentence, trusted, searchValue, source, createdtime, link, sentiment, edges, language, title, originalSources }, { eventEdges: requestPayload.edges });
+                                return Object.assign({}, { coordinates, messageid, externalsourceid, summary, trusted, searchValue, pipelinekey, eventtime, link, sentiment, edges, language, title }, { eventEdges: requestPayload.edges });
                             }));                        
                     }
                 }else{
@@ -362,10 +369,11 @@ export const ActivityFeed = React.createClass({
                     else nonTrustedArray.push(element);
                 }, this);
                 elements = trustedArray.concat(nonTrustedArray);
-               
+
                 self.setState({
-                     offset: nextOffset,
                      isInfiniteLoading: false,
+                     processedEventIds: processedEventIds,
+                     pageState: pageState,
                      filteredSource: requestPayload.filteredSource,
                      elements: elements
                 });
@@ -373,11 +381,11 @@ export const ActivityFeed = React.createClass({
   },
 
   processNewsFeed(filteredSources){
-      const params = {...filteredSources, limit: OFFSET_INCREMENT, start: filteredSources.offset};
-      const elements = this.state.elements;
+      const params = {...filteredSources, limit: OFFSET_INCREMENT};
+      const { pageState, elements } = this.state;
 
       //if the rendered items are less than the increment count then avoid unnecessary service calls.
-      if((this.lastRenderedElementLength || 0) === 0 || (elements.length > 0 && elements.length % OFFSET_INCREMENT === 0)){
+      if(pageState || this.lastRenderedElementLength === 0){
         this.setState({
             isInfiniteLoading: true
         });
@@ -404,7 +412,7 @@ export const ActivityFeed = React.createClass({
   },
 
   sourceOnClickHandler(filteredSource){
-      const params = {...this.props, elementStartList: [], offset: 0, filteredSource: filteredSource};
+      const params = {...this.props, elementStartList: [], filteredSource: filteredSource};
       
       this.lastRenderedElementLength = 0;
       this.processNewsFeed(params);
@@ -412,7 +420,7 @@ export const ActivityFeed = React.createClass({
 
   searchSubmit(){
       const params = {...this.props, limit: OFFSET_INCREMENT, searchValue: this.refs.filterTextInput.value, filteredSource: this.state.filteredSource,
-                      elementStartList: [], offset: 0};
+                      elementStartList: []};
       event.preventDefault();
       this.processNewsFeed(params);
   },
@@ -479,10 +487,10 @@ export const ActivityFeed = React.createClass({
                      this.state.elements ? this.state.elements.map(feature => 
                         <FortisEvent key={feature.messageid}
                                      id={feature.messageid}
-                                     sentence={feature.sentence}
-                                     source={feature.source}
-                                     originalSource={feature.originalSources && feature.originalSources.length > 0 ? feature.originalSources[0] : ""}
-                                     postedTime={feature.createdtime}
+                                     sentence={feature.summary}
+                                     source={feature.pipelinekey}
+                                     originalSource={feature.externalsourceid ? feature.feature.originalSources : ""}
+                                     postedTime={feature.eventtime}
                                      sentiment={feature.sentiment}
                                      coordinates={feature.coordinates}
                                      trusted={feature.trusted}

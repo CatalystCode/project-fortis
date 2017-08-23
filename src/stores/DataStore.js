@@ -9,7 +9,7 @@ export const DataStore = Fluxxor.createStore({
       
       this.dataStore = {
           userProfile: profile,
-          timespanType: 'months',
+          timespanType: 'month',
           datetimeSelection: moment().format("YYYY-MM"),
           categoryType: '',
           dataSource: 'all',

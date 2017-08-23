@@ -9,17 +9,20 @@ const constants = {
                 "1": 5
            },
            TIMESPAN_TYPES : {
-                'hours': {
+                'hour': {
                     format: "MM/DD/YYYY HH:00", blobFormat: "[hour]-YYYY-MM-DDHH:00", rangeFormat: "hour"
                 },
-                'days': {
+                'day': {
                     format: "MM/DD/YYYY", blobFormat: "[day]-YYYY-MM-DD", rangeFormat: "day"
                 },
-                'months': {
+                'month': {
                     format: "YYYY-MM", blobFormat: "[month]-YYYY-MM", rangeFormat: "month"
                 },
-                'weeks': {
+                'week': {
                     format: "YYYY-WW", blobFormat: "[week]-YYYY-WW", rangeFormat: "isoweek"
+                },
+                'year': {
+                    format: "YYYY", blobFormat: "[year]-YYYY", rangeFormat: "year"
                 },
                 'customDate': {
                     format: "MM/DD/YYYY", reactWidgetFormat: "MMM Do YYYY", blobFormat: "[day]-YYYY-MM-DD", rangeFormat: "day"

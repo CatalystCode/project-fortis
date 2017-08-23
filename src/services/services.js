@@ -1,4 +1,9 @@
 import { Actions } from '../actions/Actions';
+import * as DashboardFragments from './graphql/fragments/Dashboard';
+import * as DashboardQueries from './graphql/queries/Dashboard';
+import * as AdminFragments from './graphql/fragments/Admin';
+import * as AdminQueries from './graphql/queries/Admin';
+import * as AdminMutations from './graphql/mutations/Admin';
 import { momentToggleFormats, momentGetFromToRange } from '../utils/Utils.js';
 import request from 'request';
 
@@ -50,24 +55,6 @@ const trustedTwitterFragment = `fragment FortisTrustedTwitterAcctView on Trusted
                             accounts {
                                     RowKey
                                     acctUrl
-                            }
-                        }`;
-
-const siteSettingsFragment = `fragment FortisSiteDefinitionView on SiteCollection {
-                            sites {
-                                name
-                                properties {
-                                    targetBbox
-                                    defaultZoomLevel
-                                    logo
-                                    title
-                                    fbToken
-                                    mapzenApiKey
-                                    defaultLocation
-                                    storageConnectionString
-                                    featuresConnectionString
-                                    supportedLanguages
-                                }
                             }
                         }`;
 
@@ -318,12 +305,8 @@ export const SERVICES = {
     },
 
     getSiteDefintion(siteId, callback) {
-        const query = `  ${siteSettingsFragment}
-                        query Sites($siteId: String) {
-                            siteDefinition: sites(siteId: $siteId) {
-                                ...FortisSiteDefinitionView
-                            }
-                        }`;
+        const query = ` ${AdminFragments.siteSettingsFragment}
+                        ${AdminQueries.getAdminSiteDefinition} `;
 
         const variables = { siteId };
         const host = process.env.REACT_APP_SERVICE_HOST
@@ -509,12 +492,7 @@ export const SERVICES = {
     },
 
     editSite(siteName, siteDefinition, callback) {
-        let query = `  mutation EditSite($input: EditableSiteSettings!) {
-                            editSite(input: $input) {
-                                name
-                            }
-                        }`;
-
+        let query = `${AdminMutations.editSite}`;
         let variables = { input: siteDefinition };
 
         let host = process.env.REACT_APP_SERVICE_HOST
@@ -663,53 +641,26 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    FetchMessageSentences(site, originalSource, bbox, datetimeSelection, timespanType, limit, offset, filteredEdges, langCode, sourceFilter, mainTerm, fulltextTerm, coordinates, callback) {
+    FetchMessageSentences(externalsourceid, bbox, period, timespanType, limit, pageState, conjunctivetopics, pipelinekeys, fulltextTerm, coordinates, callback) {
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
-        let dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
+        let dates = momentGetFromToRange(period, formatter.format, formatter.rangeFormat);
         let fromDate = dates.fromDate, toDate = dates.toDate;
 
         if (bbox && Array.isArray(bbox) && bbox.length === 4) {
-            let fragmentView = `fragment FortisDashboardView on FeatureCollection {
-                                type
-                                runTime
-                                    features {
-                                        type
-                                        coordinates
-                                        properties {
-                                            messageid,
-                                            sentence,
-                                            edges,
-                                            createdtime,
-                                            sentiment,
-                                            language,
-                                            source
-                                            properties {
-                                                originalSources
-                                                title
-                                                link
-                                            }
-                                        }
-                                    }
-                                }`;
-
             let query, variables;
 
             if (coordinates && coordinates.length === 2) {
-                query = `  ${fragmentView}
+                query = `  ${DashboardFragments.getMessagesByBbox}
                        query ByLocation($site: String!, $originalSource: String, $coordinates: [Float]!, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) { 
                              byLocation(site: $site, originalSource: $originalSource, coordinates: $coordinates, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
                                 ...FortisDashboardView 
                             }
                         }`;
-                variables = { site, coordinates, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
+                variables = { coordinates, conjunctivetopics, limit, fromDate, toDate, pipelinekeys, fulltextTerm, externalsourceid, pageState};
             } else {
-                query = `  ${fragmentView}
-                       query ByBbox($site: String!, $originalSource: String, $bbox: [Float]!, $mainTerm: String, $filteredEdges: [String]!, $langCode: String!, $limit: Int!, $offset: Int!, $fromDate: String!, $toDate: String!, $sourceFilter: [String], $fulltextTerm: String) { 
-                             byBbox(site: $site, originalSource: $originalSource, bbox: $bbox, mainTerm: $mainTerm, filteredEdges: $filteredEdges, langCode: $langCode, limit: $limit, offset: $offset, fromDate: $fromDate, toDate: $toDate, sourceFilter: $sourceFilter, fulltextTerm: $fulltextTerm) {
-                                ...FortisDashboardView 
-                            }
-                        }`;
-                variables = { site, originalSource, bbox, mainTerm, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
+                query = ` ${DashboardFragments.getMessagesByBbox}
+                          ${DashboardQueries.getMessagesByBbox}`;
+                variables = { bbox, conjunctivetopics, limit, pageState, fromDate, toDate, externalsourceid, pipelinekeys, fulltextTerm };
             }
 
             let host = process.env.REACT_APP_SERVICE_HOST
