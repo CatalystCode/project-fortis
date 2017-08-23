@@ -40,7 +40,7 @@ object CassandraEventsSink{
           new PopularPlacesAggregator,
           new PopularTopicAggregator,
           new ComputedTilesAggregator
-        ).par
+        )
 
         val session = SparkSession.builder().config(eventsRDD.sparkContext.getConf)
           .appName(eventsRDD.sparkContext.appName)
