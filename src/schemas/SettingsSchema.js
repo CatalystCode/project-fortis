@@ -132,6 +132,7 @@ module.exports = graphql.buildSchema(`
   }
 
   input EditableSiteSettings {
+    siteType: String
     targetBbox: [Float],
     defaultZoomLevel: Int,
     logo: String,
