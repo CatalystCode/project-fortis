@@ -17,11 +17,11 @@ export const StreamEditor = React.createClass({
   },
 
   handleSave(mutatedRows, columns){
-    this.getFlux().actions.ADMIN.save_keywords(this.props.siteKey, mutatedRows);
+    
   },
   
   handleRemove(deletedRows){
-    this.getFlux().actions.ADMIN.remove_streams(this.props.siteKey, deletedRows);
+    
   },
 
   render(){
