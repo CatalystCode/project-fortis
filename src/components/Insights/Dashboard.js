@@ -199,9 +199,15 @@ export default class Dashboard extends React.Component {
   }
 
   renderedGridCards(heatMapFullScreen) {
+<<<<<<< HEAD
     return heatMapFullScreen ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()] :
       [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
   }
+=======
+     return heatMapFullScreen ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()] :
+                                [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
+  },
+>>>>>>> Integrating the V2 byBBox service
 
   render() {
     const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
