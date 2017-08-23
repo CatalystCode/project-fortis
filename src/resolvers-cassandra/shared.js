@@ -44,6 +44,21 @@ function toPipelineKey(sourceFilter) {
   return sourceFilter[0];
 }
 
+function fromTopicListToConjunctionTopics(topicTerms) {
+  const conjunctiveTopicLimit = 3;
+  let selectedFilters = topicTerms.filter(edge => !!edge).slice(0, conjunctiveTopicLimit).sort();
+
+  if (topicTerms.length > conjunctiveTopicLimit) {
+    console.warn(`Only ${conjunctiveTopicLimit} terms supported, ignoring: ${topicTerms.slice(conjunctiveTopicLimit).join(', ')}`);
+  }
+
+  while (selectedFilters.length < conjunctiveTopicLimit) {
+    selectedFilters.push('');
+  }
+
+  return selectedFilters;
+}
+
 function toConjunctionTopics(mainEdge, filteredEdges) {
   if (!mainEdge) {
     console.warn('mainEdge not set');
@@ -53,18 +68,8 @@ function toConjunctionTopics(mainEdge, filteredEdges) {
   if (!filteredEdges || !filteredEdges.length) {
     return [mainEdge, '', ''];
   }
-
-  const extraFilters = filteredEdges.filter(edge => !!edge).slice(0, 2);
-  if (filteredEdges.length > 2) {
-    console.warn(`Only two filtered edges supported, ignoring: ${filteredEdges.slice(2).join(', ')}`);
-  }
-
-  const selectedFilters = [mainEdge].concat(extraFilters).sort();
-  while (selectedFilters.length < 3) {
-    selectedFilters.push('');
-  }
-
-  return selectedFilters;
+  
+  return fromTopicListToConjunctionTopics([mainEdge].concat(filteredEdges));
 }
 
 function tilesForBbox(bbox, zoomLevel) {
@@ -87,7 +92,9 @@ function parseFromToDate(fromDate, toDate) { // eslint-disable-line no-unused-va
 }
 
 function parseLimit(limit) {
-  return limit > 0 ? limit : 15;
+  const DEFAULT_LIMIT = 15;
+
+  return limit > 0 ? limit : DEFAULT_LIMIT;
 }
 
 module.exports = {
@@ -98,5 +105,6 @@ module.exports = {
   tilesForBbox,
   tilesForLocations,
   limitForInClause,
+  fromTopicListToConjunctionTopics,
   withRunTime: withRunTime
 };

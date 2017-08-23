@@ -2,10 +2,15 @@ const graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
   type Query {
-    byBbox(site: String!, originalSource: String, bbox: [Float]!, mainTerm: String, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
+    byBbox(externalsourceid: String, bbox: [Float]!, conjunctivetopics: [String]!, 
+           limit: Int, pageState: String, fromDate: String!, toDate: String!,  
+           pipelinekeys: [String]!, fulltextTerm: String): FeatureCollection
     byLocation(site: String!, originalSource: String, coordinates: [Float]!, mainTerm: String, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
-    byEdges(site: String!, mainTerm: String, filteredEdges: [String]!, langCode: String!, limit: Int, offset: Int, fromDate: String!, toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
-    event(site: String!, messageId: String!): Feature,
+    byEdges(site: String!, mainTerm: String, 
+            filteredEdges: [String]!, langCode: String!, 
+            limit: Int, offset: Int, fromDate: String!, 
+            toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
+    event(site: String!, messageId: String!): Feature
     translate(sentence: String!, fromLanguage: String!, toLanguage: String!): TranslationResult
     translateWords(words: [String]!, fromLanguage: String!, toLanguage: String!): TranslatedWords
   }
@@ -55,12 +60,14 @@ module.exports = graphql.buildSchema(`
   type FeatureCollection {
     runTime: String,
     type: TypeEnum!,
+    pageState: String,
     bbox: [Float],
     features: [Feature]!,
   }
 
   enum FeatureType {
-    MultiPoint
+    MultiPoint,
+    Point
   }
 
   type Feature {
@@ -72,30 +79,16 @@ module.exports = graphql.buildSchema(`
   type Message {
     edges: [String],
     messageid: ID,
-    createdtime: String,
+    eventtime: String,
+    sourceeventid: String,
     sentiment: Float,
+    entities: [String],
     title: String,
-    originalSources: [String],
-    sentence: String,
+    externalsourceid: String,
+    summary: String,
     language: String,
-    source: String,
-    properties: MessageProperties,
-    fullText: String
-  }
-
-  type MessageProperties {
-    retweetCount: Int,
-    fatalaties: Int,
-    userConnecionCount: Int,
-    actor1: String,
-    actor2: String,
-    actor1Type: String,
-    actor2Type: String,
-    incidentType: String,
-    allyActor1: String,
-    allyActor2: String,
-    title: String,
-    link: String,
-    originalSources: [String]
+    pipelinekey: String,
+    fullText: String,
+    link: String
   }
 `);

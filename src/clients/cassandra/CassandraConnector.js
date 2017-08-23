@@ -93,6 +93,34 @@ function executeQuery(query, params, options) {
 }
 
 /**
+ * @param {string} query
+ * @param {string[]} params
+ * @param {int} fetchSize
+ * @param {string} pageState
+ * @returns {Promise.<object[]>}
+ */
+function executeQueryWithPageState(query, params, pageState, fetchSize) {
+  return new Promise((resolve, reject) => {
+    const DEFAULT_FETCH = 15;
+
+    let options = {
+      fetchSize: fetchSize > 0 ? fetchSize : DEFAULT_FETCH
+    };
+
+    if (pageState) {
+      options.pageState = pageState;
+    }
+
+    client.execute(query, params, options)
+    .then(result => resolve({
+      pageState: result.pageState, 
+      rows: result.rows
+    }))
+    .catch(reject);
+  });
+}
+
+/**
  * Should be called on server start to warm up the connection to
  * Cassandra so that subsequent calls are fast.
  * @returns {Promise}
@@ -104,5 +132,6 @@ function intialize() {
 module.exports = {
   initialize: trackDependency(intialize, 'Cassandra', 'initialize'),
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
+  executeQueryWithPageState: trackDependency(executeQueryWithPageState, 'Cassandra', 'executeQueryWithPageState'),
   executeQuery: trackDependency(executeQuery, 'Cassandra', 'executeQuery')
 };
