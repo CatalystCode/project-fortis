@@ -131,6 +131,31 @@ const visualizationChartFragments = `fragment FortisDashboardTimeSeriesView on E
                                         }`;
 
 export const SERVICES = {
+    fetchStreams(callback) {
+      const query = `
+      query Streams {
+        streams {
+          streams {
+            pipelineKey
+            pipelineLabel
+            pipelineIcon
+            streamFactory
+          }
+        }
+      }`;
+
+      const host = process.env.REACT_APP_SERVICE_HOST;
+      const POST = {
+        url: `${host}/api/settings`,
+        method: 'POST',
+        json: true,
+        withCredentials: false,
+        body: { query }
+      };
+
+      request(POST, callback);
+    },
+
     getChartVisualizationData(site, datetimeSelection, timespanType, selectedEntity, unpopularSelectedTerm, mainEdge, dataSource, fromDate, toDate, bbox, zoomLevel, originalSource, callback){
         let formatter = Actions.constants.TIMESPAN_TYPES[timespanType];
         let timespan = momentToggleFormats(datetimeSelection, formatter.format, formatter.blobFormat);
