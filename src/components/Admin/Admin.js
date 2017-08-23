@@ -7,6 +7,7 @@ import { CustomEventsEditor } from './CustomEventsEditor';
 import { FacebookPagesEditor } from './FacebookPagesEditor';
 import { AdminTrustedTwitterAcc } from './AdminTrustedTwitterAcc';
 import { BlacklistEditor } from './BlacklistEditor';
+import { StreamEditor } from './StreamEditor';
 import { AdminTwitterAccounts } from './AdminTwitterAccounts';
 import { AdminLocations } from './AdminLocations';
 import '../../styles/Admin/Admin.css'
@@ -22,6 +23,7 @@ const FB_PAGES_TAB = 4;
 const TRUSTED_TWITTER_ACCTS = 5; 
 const TWITTER_ACCOUNTS_TAB = 6;
 const BLACKLIST_TAB = 7;
+const STREAM_TAB = 8;
 
 const styles = {
   container: {
@@ -80,6 +82,7 @@ export const Admin = React.createClass({
                     <Tab>Trusted Twitter Accounts</Tab>
                     <Tab>Twitter API Accounts</Tab>
                     <Tab>Blacklisted Term(s)</Tab>
+                    <Tab>Stream(s)</Tab>
                   </TabList>
                   <TabPanel>
                     <h2>Settings</h2>
@@ -154,6 +157,15 @@ export const Admin = React.createClass({
                       {
                         this.state.settings && this.state.settings.properties && this.state.index === BLACKLIST_TAB ? 
                         <BlacklistEditor {...this.props}/> : undefined
+                      }
+                    </div>
+                  </TabPanel>
+                  <TabPanel> 
+                    <h2>Stream(s)</h2>
+                    <div className="adminTable">
+                      {
+                        this.state.settings && this.state.settings.properties && this.state.index === STREAM_TAB ? 
+                        <StreamEditor {...this.props}/> : undefined
                       }
                     </div>
                   </TabPanel>
