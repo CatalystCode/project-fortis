@@ -12,7 +12,7 @@ scalacOptions ++= Seq(
   "-feature"
 )
 
-val sparkVersion = "2.1.0"
+val sparkVersion = "2.2.0"
 
 parallelExecution in Test := false
 
@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.twitter4j" % "twitter4j-stream" % "4.0.4",
   "org.apache.commons" % "commons-collections4" % "4.1",
-  "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.0.5" exclude("com.microsoft.azure", "azure-eventhubs"),
+  "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.1.2" exclude("com.microsoft.azure", "azure-eventhubs"),
   "com.microsoft.azure" % "azure-servicebus" % "1.0.0-PREVIEW-3",
   "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
   "com.github.benfradet" %% "spark-kafka-0-10-writer" % "0.3.0",
@@ -72,8 +72,8 @@ addArtifact(artifact in (Compile, assembly), assembly)
 //       Once this is done, spark-streaming-eventhubs needs to publish an updated lib containing this change (since they distribute a fat JAR), and then
 //       we can update to that package and remove this shading.
 assemblyShadeRules in assembly := Seq(
-  ShadeRule.rename("com.microsoft.azure.servicebus.**" -> "com.microsoft.azure.eventhub.servicebus.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.0.5", "com.microsoft.azure" % "azure-eventhubs" % "0.13.1"),
-  ShadeRule.rename("scalaj.http.**" -> "eventhub.scalaj.http.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.0.5")
+  ShadeRule.rename("com.microsoft.azure.servicebus.**" -> "com.microsoft.azure.eventhub.servicebus.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.1.2", "com.microsoft.azure" % "azure-eventhubs" % "0.13.1"),
+  ShadeRule.rename("scalaj.http.**" -> "eventhub.scalaj.http.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.1.2")
 )
 
 assemblyMergeStrategy in assembly := {
