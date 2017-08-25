@@ -1,11 +1,13 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import java.util.UUID
+
 import com.datastax.spark.connector.writer.WriteConf
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
 import com.datastax.spark.connector._
+import com.datastax.spark.connector.cql.CassandraConnector
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
@@ -23,6 +25,8 @@ object CassandraEventsSink{
   private val CassandraFormat = "org.apache.spark.sql.cassandra"
 
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession): Unit = {
+    implicit lazy val connector: CassandraConnector = CassandraConnector(sparkSession.sparkContext)
+
     dstream.foreachRDD{ (eventsRDD, time: Time) => {
       eventsRDD.cache()
 
