@@ -296,12 +296,14 @@ CREATE TABLE computedtrends(
  *************************************/
 
 CREATE MATERIALIZED VIEW popularsources
-AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period, pipelinekey, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount
+AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period, pipelinekey, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentimentnumerator
    FROM computedtiles
    WHERE periodtype IS NOT NULL
      AND conjunctiontopic1 IS NOT NULL
      AND conjunctiontopic2 IS NOT NULL
      AND conjunctiontopic3 IS NOT NULL
+     AND avgsentimentnumerator IS NOT NULL
+     AND mentioncount IS NOT NULL
      AND tilez IS NOT NULL
      AND externalsourceid IS NOT NULL
      AND period IS NOT NULL
@@ -313,7 +315,8 @@ AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, t
      AND tiley IS NOT NULL
      AND periodstartdate IS NOT NULL
      AND periodenddate IS NOT NULL
-PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period), pipelinekey, tilex, tiley, periodstartdate, periodenddate);
+PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey), mentioncount, tilex, tiley, periodstartdate, periodenddate, externalsourceid, period)
+WITH CLUSTERING ORDER BY (mentioncount DESC);
 
 CREATE MATERIALIZED VIEW timeseries
 AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, period, pipelinekey, periodtype, tilez, period, tilex, tiley, periodstartdate, periodenddate, mentioncount, avgsentimentnumerator
@@ -333,7 +336,7 @@ AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, t
      AND tiley IS NOT NULL
      AND periodstartdate IS NOT NULL
      AND periodenddate IS NOT NULL
-PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, period), pipelinekey, externalsourceid, tilex, tiley, periodstartdate, periodenddate);
+PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, externalsourceid), tilex, tiley, periodstartdate, periodenddate, period);
 
 /**************************************
  * Indices
