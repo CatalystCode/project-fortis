@@ -8,71 +8,6 @@ const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[]}} args
- * @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
- */
-function terms(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const query = `
-    SELECT topic
-    FROM fortis.watchlist
-    `.trim();
-
-    const params = [
-    ];
-
-    cassandraConnector.executeQuery(query, params)
-    .then(rows => {
-      const topics = makeSet(rows, row => row.topic);
-      const edges = Array.from(topics).map(topic => ({name: topic}));
-
-      resolve({
-        edges
-      });
-    })
-    .catch(reject);
-  });
-}
-
-/**
- * @param {{site: string}} args
- * @returns {Promise.<{runTime: string, edges: Array<{name: string, coordinates: number[]}>}>}
- */
-function locations(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    if (!args || !args.site) return reject('No site specified for which to lookup locations');
-
-    const query = `
-    SELECT geofence
-    FROM fortis.sitesettings
-    WHERE sitename = ?
-    `.trim();
-
-    const params = [
-      args.site
-    ];
-
-    cassandraConnector.executeQuery(query, params)
-    .then(rows => {
-      if (!rows || !rows.length) return reject(`No geofence configured for site ${args.site}`);
-      if (rows.length > 1) return reject(`More than one geofence configured for site ${args.site}`);
-      if (!rows[0].geofence || rows[0].geofence.length !== 4) return reject(`Bad geofence for site ${args.site}`);
-
-      const bbox = rows[0].geofence;
-      return featureServiceClient.fetchByBbox({north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]}, 'bbox');
-    })
-    .then(locations => {
-      const edges = locations.map(location => ({name: location.name, coordinates: location.bbox}));
-
-      resolve({
-        edges
-      });
-    })
-    .catch(reject);
-  });
-}
-
-/**
  * @param {{site: string, timespan: string, sourceFilter: string[], mainEdge: string, originalSource: string}} args
  * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, coordinates: number[], population: number}>}>}
  */
@@ -251,8 +186,6 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  terms: trackEvent(withRunTime(terms), 'terms'),
-  locations: trackEvent(withRunTime(locations), 'locations'),
   popularLocations: trackEvent(withRunTime(popularLocations), 'popularLocations'),
   timeSeries: trackEvent(timeSeries, 'timeSeries'),
   topSources: trackEvent(topSources, 'topSources')

@@ -25,6 +25,40 @@ function cassandraRowToSite(row) {
   };
 }
 
+function transformWatchlist(item, translatedlanguage){
+  const DefaultLanguage = 'en';
+
+  return {
+    name: item.topic,
+    translatedname: (item.translations || {})[translatedlanguage || DefaultLanguage],
+    translatednamelang: translatedlanguage,
+    namelang: item.lang_code
+  };
+}
+
+/**
+* @param {{input: {translationLanguage: string}}} args
+* @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
+*/
+function terms(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const query = `
+    SELECT topic, translations, lang_code
+    FROM fortis.watchlist
+    `.trim();
+
+    const params = [
+    ];
+
+    cassandraConnector.executeQuery(query, params)
+    .then(rows => 
+      resolve({
+        edges: rows.map(item=>transformWatchlist(item, args.translationLanguage))
+      })
+    ).catch(reject);
+  });
+}
+
 /**
  * @param {{siteId: string}} args
  * @returns {Promise.<{runTime: string, sites: Array<{name: string, properties: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}>}

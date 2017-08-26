@@ -9,10 +9,13 @@ module.exports = graphql.buildSchema(`
     facebookPages(siteId: String!): FacebookPageCollection
     facebookAnalytics(siteId: String!, days: Int!): FacebookPageAnalyticsCollection
     termBlacklist(siteId: String!): BlacklistCollection
+    terms(translationLanguage: String): TermCollection
   }
 
   type Mutation {
     createSite(input: EditableSiteSettings!): Site
+    removeKeywords(input: MutatedTerms): TermCollection
+    addKeywords(input: MutatedTerms): TermCollection
     removeSite(input: EditableSiteSettings!): Site
     editSite(input: EditableSiteSettings!): Site
     createStream(input: StreamDefinition!): Stream
@@ -39,6 +42,30 @@ module.exports = graphql.buildSchema(`
     mapzenApiKey: String,
     fbToken: String,
     supportedLanguages: [String]
+  }
+
+  input Term {
+    name: String!
+    translatedname: String
+    namelang: String
+    translatednamelang: String
+  }
+
+  type SiteTerm {
+    name: String!
+    translatedname: String
+    namelang: String
+    translatednamelang: String
+  }
+
+  input MutatedTerms {
+    edges: [Term]!
+    site: String!
+  }
+
+  type TermCollection {
+    runTime: String
+    edges: [SiteTerm]!
   }
 
   type Site {

@@ -17,7 +17,10 @@ module.exports = {
   removeTwitterAccounts: mutations.removeTwitterAccounts,
   modifyBlacklist: mutations.modifyBlacklist,
   removeBlacklist: mutations.removeBlacklist,
+  removeKeywords: mutations.removeKeywords,
+  addKeywords: mutations.addKeywords,
 
+  terms: queries.terms,
   sites: queries.sites,
   streams: queries.streams,
   twitterAccounts: queries.twitterAccounts,
