@@ -8,6 +8,8 @@ import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import org.apache.spark.streaming.StreamingContext
 
+import scala.reflect.io.Path
+
 object StreamsChangeListener {
 
   var queueClient: Option[QueueClient] = None
@@ -58,9 +60,7 @@ object StreamsChangeListener {
     }
 
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      if (message.getLabel != "streamsDidChange") {
-        return CompletableFuture.completedFuture(null)
-      }
+      logInfo(s"Service Bus message received ${message}.")
 
       this.scheduledTask match {
         case Some(task) => {
@@ -75,7 +75,7 @@ object StreamsChangeListener {
       this.currentContext match {
         case Some(context) => {
           this.scheduledTask = Some(this.scheduler.schedule(
-            new ContextStopRunnable(context),
+            new ContextStopRunnable(settings, context),
             settings.contextStopWaitTimeMillis,
             TimeUnit.MILLISECONDS
           ))
@@ -89,10 +89,16 @@ object StreamsChangeListener {
     }
   }
 
-  private class ContextStopRunnable(ssc: StreamingContext) extends Runnable with Loggable {
+  private class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext) extends Runnable with Loggable {
     override def run(): Unit = {
       logInfo(s"Requesting streaming context stop now.")
+      val sparkContext = ssc.sparkContext
       ssc.stop(stopSparkContext = true, stopGracefully = true)
+      logInfo(s"Streaming context stop complete; requesting Spark context stop ...")
+      sparkContext.stop()
+      logInfo(s"Spark context stop complete; deleting progress dir ${settings.progressDir} ...")
+      Path(settings.progressDir).deleteRecursively()
+      logInfo("Deleted progress dir.")
     }
   }
 

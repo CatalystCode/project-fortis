@@ -63,7 +63,7 @@ object ProjectFortis extends App with Loggable {
       .set("spark.kryoserializer.buffer.max", "64m")
     CassandraConfig.init(conf, batchDuration, fortisSettings)
 
-    val sparkContext = SparkContext.getOrCreate(conf)
+    val sparkContext = new SparkContext(conf)
     val ssc = new StreamingContext(sparkContext, batchDuration)
     ssc.checkpoint(fortisSettings.progressDir)
     ssc
@@ -110,8 +110,10 @@ object ProjectFortis extends App with Loggable {
       logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.pipelineInitWaitTimeMillis} milliseconds.")
       Thread.sleep(fortisSettings.pipelineInitWaitTimeMillis)
     }
+    logInfo("Starting streaming context.")
     ssc.start()
     ssc.awaitTermination()
+    logInfo("Streaming context terminated.")
   }
 
 }
