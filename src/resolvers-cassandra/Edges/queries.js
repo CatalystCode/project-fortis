@@ -1,9 +1,10 @@
 'use strict';
 
 const Promise = require('promise');
+const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, parseFromToDate, withRunTime, toPipelineKey, toConjunctionTopics } = require('../shared');
+const { tilesForBbox, parseFromToDate, withRunTime, toPipelineKey, aggregateBy, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
 const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
@@ -128,57 +129,65 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainTerm: string, limit: number, bbox: number[], zoomLevel: number, originalSource: string}} args
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: String!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int}} args
  * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
  */
 function topSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const MaxFetchedRows = 10000;
+    const MinMentionCount = 1;
+    const MaxMentionCount = 1000000000;
     const tilex = makeSet(tiles, tile => tile.row);
     const tiley = makeSet(tiles, tile => tile.column);
-    const limit = args.limit || 1000;
+    const fetchSize = 400;
+    const responseSize = args.limit || 5;
 
     const query = `
-    SELECT mentioncount, pipelinekey
+    SELECT mentioncount, pipelinekey, externalsourceid, avgsentimentnumerator
     FROM fortis.popularsources
     WHERE periodtype = ?
     AND conjunctiontopic1 = ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
     AND tilez = ?
-    AND externalsourceid = ?
-    AND period = ?
-    AND pipelinekey = ?
-    AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
-    AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
+    AND pipelinekey IN ?
+    AND (mentioncount, tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?, ?)
+    AND (mentioncount, tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?, ?)
     LIMIT ?
     `.trim();
 
     const params = [
-      periodType,
-      ...toConjunctionTopics(args.mainTerm),
+      args.periodType,
+      ...fromTopicListToConjunctionTopics(args.conjunctivetopics),
       args.zoomLevel,
-      args.originalSource || 'all',
-      period,
-      toPipelineKey(args.sourceFilter),
+      args.pipelinekeys,
+      MaxMentionCount,
       Math.max(...tilex),
       Math.max(...tiley),
-      toDate,
-      toDate,
+      args.toDate,
+      args.toDate,
+      MinMentionCount,
       Math.min(...tilex),
       Math.min(...tiley),
-      fromDate,
-      fromDate,
-      limit
+      args.fromDate,
+      args.fromDate,
+      MaxFetchedRows
     ];
 
-    return cassandraConnector.executeQuery(query, params)
+    return cassandraConnector.executeQuery(query, params, { fetchSize })
     .then(rows => {
-      const sources = rows.map(row => ({Name: row.pipelinekey, Count: row.mentioncount, Source: row.pipelinekey}));
+      const filteredRows = rows.filter(row=>row.pipelinekey !== 'all' || row.externalsourceid !== 'all');//filter all aggregates as we're interested in named sources only
+      const edges = aggregateBy(filteredRows, row => `${row.pipelinekey}_${row.externalsourceid}`, row => ( { 
+        pipelinekey: row.pipelinekey, 
+        name: row.externalsourceid, 
+        mentions: Long.ZERO, 
+        avgsentimentnumerator: Long.ZERO 
+      } ) )
+      .slice(0, responseSize);
 
       resolve({
-        sources
+        edges
       });
     })
     .catch(reject);

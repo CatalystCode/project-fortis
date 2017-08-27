@@ -3,10 +3,10 @@ const graphql = require('graphql');
 module.exports = graphql.buildSchema(`
   type Query {
     conjunctiveterms(fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, mainTerm: String!, bbox: [Float], zoomLevel: Int, externalsourceid: String): TermCollection
-    timeSeries(fromDate: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int, externalsourceid: String): FeatureTimeSeriesCollection
-    topLocations(limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int, externalsourceid: String): TopPlacesCollection
-    topSources(limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int, externalsourceid: String): TopSourcesCollection
-    topTerms(limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int, externalsourceid: String): TopTermsCollection
+    timeSeries(fromDate: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String): FeatureTimeSeriesCollection
+    topLocations(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String): TopPlacesCollection
+    topSources(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!): TopSourcesCollection
+    topTerms(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekey: String!, externalsourceid: String!, bbox: [Float]!, zoomLevel: Int!): TopTermsCollection
   }
 
   type Term {
@@ -24,6 +24,7 @@ module.exports = graphql.buildSchema(`
 
   type ExternalSource {
     name: String!
+    pipelinekey: String
     mentions: Int
     avgsentiment: Float
   }
