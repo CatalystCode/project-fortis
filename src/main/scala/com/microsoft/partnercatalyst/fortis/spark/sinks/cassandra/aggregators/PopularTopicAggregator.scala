@@ -17,10 +17,10 @@ class PopularTopicAggregator extends FortisAggregatorBase with Serializable{
   }
 
   private def AllSourcesAggregateViewQuery: String = {
-    val GroupedColumns = GroupedBaseColumnNames ++ Seq("pipelinekey")
+    val GroupedColumns = GroupedBaseColumnNames ++ Seq("externalsourceid")
     val SelectClause = GroupedColumns.mkString(",")
 
-    s"SELECT $SelectClause, 'all' as externalsourceid, $AggregateFunctions " +
+    s"SELECT $SelectClause, 'all' as pipelinekey, $AggregateFunctions " +
     s"FROM   $DfTableNameFlattenedEvents " +
     s"GROUP BY $SelectClause"
   }
