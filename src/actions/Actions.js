@@ -34,8 +34,8 @@ const constants = {
                     format: "MMMM YYYY", reactWidgetFormat: "MMMM YYYY", blobFormat: "[month]-YYYY-MM", rangeFormat: "month"
                 }
            },
-           DATA_SOURCES: new Map([["all", {"display": "All", "sourceValues":[], "icon": "fa fa-share-alt", "label": "All"}],
-                            ["facebook", {"display": "Facebook", "sourceValues":["facebook-messages", "facebook-comments"], "icon": "fa fa-facebook-official", "label": ""}],
+           DATA_SOURCES: new Map([["all", {"display": "All", "sourceValues":["twitter", "facebook", "acled", "reddit", "bing"], "icon": "fa fa-share-alt", "label": "All"}],
+                            ["facebook", {"display": "Facebook", "sourceValues":["facebook"], "icon": "fa fa-facebook-official", "label": ""}],
                             ["twitter", {"display": "Twitter", "sourceValues":["twitter"], "label": "", "icon": "fa fa-twitter"}],
                             ["acled", {"display": "acled", "sourceValues":["acled"], "label": "", "icon": "fa fa-font"}],
                             ["tadaweb", {"display": "Tadaweb", "sourceValues":["tadaweb"], "label": "", "icon": "fa fa-text-width"}],
@@ -59,6 +59,8 @@ const constants = {
              'sec': 'sector',
              'st': 'status'
            },
+           DEFAULT_TIMESERIES_PERIOD: "hour",
+           ANNUAL_TIMESERIES_PERIOD: "day",
            APP : {
                INITIALIZE: "APP:LOAD_SETTINGS",
                CHANGE_LANGUAGE: "APP:CHANGE_LANGUAGE",

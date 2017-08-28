@@ -28,19 +28,6 @@ const locationEdgeFragment = `fragment FortisDashboardLocationEdges on LocationC
                                         }
                                     }`;
 
-const termsEdgeFragment = ` fragment FortisDashboardTermEdges on TermCollection {
-                                    runTime
-                                    edges {
-                                        name
-                                        type
-                                        name_ar
-                                        name_de
-                                        name_ur
-                                        name_id
-                                        RowKey
-                                    }
-                                }`;
-
 const twitterFragment = `fragment FortisTwitterAcctView on TwitterAccountCollection {
                             accounts {
                                     accountName
@@ -98,37 +85,6 @@ const placeCollectiontFragment = `fragment FortisDashboardLocations on PlaceColl
                                             population
                                         }
                                   }`;
-
-const topSourcesFragment = `fragment FortisTopSourcesView on TopSourcesCollection {
-                                            sources {
-                                                Name,
-                                                Count,
-                                                Source
-                                            }
-                                        }
-                                        `;
-
-const visualizationChartFragments = `fragment FortisDashboardTimeSeriesView on EdgeTimeSeriesCollection {
-                                            labels {
-                                                name
-                                                mentions
-                                            }
-                                            graphData {
-                                                edges
-                                                mentions
-                                                date
-                                            }
-                                        }
-
-                                        fragment FortisDashboardLocationView on TopNLocationCollection {
-                                        runTime
-                                        edges {
-                                                name
-                                                mentions
-                                                coordinates
-                                                population
-                                            }
-                                        }`;
 
 export const SERVICES = {
     fetchStreams(callback) {
@@ -194,12 +150,8 @@ export const SERVICES = {
     getTopSourcesChartData(site, datetimeSelection, selectedTerm, fromDate, toDate, dataSource, callback){
         let limit = 5;
         let sourceFilter = Actions.DataSources(dataSource);
-        let query = `${topSourcesFragment}
-                      query TopSources($site: String!, $limit: Int!, $fromDate: String!, $toDate: String!, $selectedTerm: String, $sourceFilter: [String]) {
-                            topSources(site: $site, fromDate: $fromDate, toDate: $toDate, limit: $limit, mainTerm: $selectedTerm, sourceFilter: $sourceFilter) {
-                            ... FortisTopSourcesView
-                            }
-                       }`;
+        let query = `${DashboardFragments.topSourcesFragment}
+                     ${DashboardQueries.getTopSourcesQuery}`;
 
         let variables = { site, selectedTerm, limit, fromDate, toDate, sourceFilter };
         let host = process.env.REACT_APP_SERVICE_HOST;
@@ -219,12 +171,10 @@ export const SERVICES = {
                                 ...FortisDashboardLocationEdges
                             }`;
 
-        const termsQuery = `terms: terms(site: $site) {
-                                ...FortisDashboardTermEdges
-                         }`;
+        const termsQuery = `${DashboardQueries.getPopularTerms}`;
 
         const fragments = `${edgeType === "All" || edgeType === "Location" ? locationEdgeFragment : ``}
-                        ${edgeType === "All" || edgeType === "Term" ? termsEdgeFragment : ``}`;
+                        ${edgeType === "All" || edgeType === "Term" ? DashboardFragments.termsFragment : ``}`;
 
         const queries = `${edgeType === "All" || edgeType === "Location" ? locationsQuery : ``}
                       ${edgeType === "All" || edgeType === "Term" ? termsQuery : ``}`;
