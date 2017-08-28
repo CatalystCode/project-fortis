@@ -15,5 +15,6 @@ object CassandraConfig {
       .setIfMissing("spark.cassandra.auth.username", CassandraUsername)
       .setIfMissing("spark.cassandra.auth.password", CassandraPassword)
       .setIfMissing("spark.cassandra.connection.keep_alive_ms", envOrElse("CASSANDRA_KEEP_ALIVE_MS", (batchDuration.milliseconds * 2).toString))
+      .setIfMissing("spark.cassandra.connection.factory", "com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.FortisConnectionFactory")
   }
 }
