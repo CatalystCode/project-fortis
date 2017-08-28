@@ -14,6 +14,6 @@ object CassandraConfig {
     conf.setIfMissing("spark.cassandra.connection.host", fortisSettings.cassandraHosts)
       .setIfMissing("spark.cassandra.auth.username", CassandraUsername)
       .setIfMissing("spark.cassandra.auth.password", CassandraPassword)
-      .setIfMissing("spark.cassandra.connection.keep_alive_ms", (batchDuration.milliseconds * 2).toString)
+      .setIfMissing("spark.cassandra.connection.keep_alive_ms", envOrElse("CASSANDRA_KEEP_ALIVE_MS", (batchDuration.milliseconds * 2).toString))
   }
 }

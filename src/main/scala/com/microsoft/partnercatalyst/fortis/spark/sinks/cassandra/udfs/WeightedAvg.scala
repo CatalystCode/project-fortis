@@ -44,6 +44,10 @@ abstract class WeightedAvg extends UserDefinedAggregateFunction {
 }
 
 object SentimentWeightedAvg extends WeightedAvg with Serializable{
+  override def evaluate(buffer: Row): Double = {
+    getDoubleValue(Option(buffer.getDouble(0))) / getLongValue(Option(buffer.getLong(1))).toDouble
+  }
+
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
     val sentiment = getDoubleValue(Option(input.getDouble(0)))
     val count = getLongValue(Option(input.getLong(1)))
@@ -52,10 +56,6 @@ object SentimentWeightedAvg extends WeightedAvg with Serializable{
 
     buffer.update(0, currentSentiment + (sentiment * count.toDouble))
     buffer.update(1, currentCount + count)
-  }
-
-  override def evaluate(buffer: Row): Double = {
-    getDoubleValue(Option(buffer.getDouble(0))) / getLongValue(Option(buffer.getLong(1))).toDouble
   }
 
   override def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {

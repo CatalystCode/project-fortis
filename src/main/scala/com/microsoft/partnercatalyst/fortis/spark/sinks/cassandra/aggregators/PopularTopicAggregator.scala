@@ -45,7 +45,7 @@ class PopularTopicAggregator extends FortisAggregatorBase with Serializable{
   override def FortisTargetTablename: String = "populartopics"
 
   override def FortisTargetTableDataFrame(session: SparkSession): DataFrame = {
-    val popularTopicsDF = session.sqlContext.read.format(CassandraFormat)
+    val popularTopicsDF = session.read.format(CassandraFormat)
       .options(Map("keyspace" -> KeyspaceName, "table" -> FortisTargetTablename))
       .load()
 
@@ -58,15 +58,15 @@ class PopularTopicAggregator extends FortisAggregatorBase with Serializable{
   }
 
   override def IncrementalUpdate(session: SparkSession, aggregatedDS: DataFrame): DataFrame = {
-    val cassandraSave = session.sqlContext.sql(IncrementalUpdateQuery)
+    val cassandraSave = session.sql(IncrementalUpdateQuery)
 
     cassandraSave
   }
 
   override def AggregateEventBatches(session: SparkSession, flattenedEvents: DataFrame): DataFrame = {
-    val detailedAggDF = session.sqlContext.sql(DetailedAggregateViewQuery)
-    val allSourcesAggDF = session.sqlContext.sql(AllSourcesAggregateViewQuery)
-    val allPipelinesAggDF = session.sqlContext.sql(AllPipelineKeysAggregateViewQuery)
+    val detailedAggDF = session.sql(DetailedAggregateViewQuery)
+    val allSourcesAggDF = session.sql(AllSourcesAggregateViewQuery)
+    val allPipelinesAggDF = session.sql(AllPipelineKeysAggregateViewQuery)
     val unionedResults = detailedAggDF.union(allSourcesAggDF).union(allPipelinesAggDF)
 
     unionedResults

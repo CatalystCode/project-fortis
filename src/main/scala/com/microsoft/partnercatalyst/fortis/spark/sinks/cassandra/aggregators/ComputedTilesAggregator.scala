@@ -10,19 +10,19 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
   private val SelectableColumnNames = Seq("periodtype", "period", "conjunctiontopic1", "conjunctiontopic2", "conjunctiontopic3", "periodstartdate", "periodenddate", "tilex", "tiley", "tilez")
   private val ExternalSourceColumnName = "externalsourceid"
   private val PipelineKeyColumnName = "pipelinekey"
-  private val DetilaTileIdColumnName = "detailtileid"
+  private val DetailTileIdColumnName = "detailtileid"
 
   private def ParseColumnSelect(column: String, display: Boolean): String = {
-      if (display) {
-        column
-      } else {
-        s"'all' as $column"
-      }
+    if (display) {
+      column
+    } else {
+      s"'all' as ${column}"
+    }
   }
 
   private def DetailedTileAggregateViewQuery(includeExternalSource: Boolean, includePipelinekey: Boolean): String = {
-    val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includeExternalSource), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource), DetilaTileIdColumnName)).mkString(",")
-    val GroupedColumns =  (GroupedBaseColumnNames ++ Seq(DetilaTileIdColumnName)).mkString(",")
+    val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includeExternalSource), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource), DetailTileIdColumnName)).mkString(",")
+    val GroupedColumns =  (GroupedBaseColumnNames ++ Seq(DetailTileIdColumnName)).mkString(",")
 
     s"SELECT $SelectClause, $AggregateFunctions " +
       s"FROM $DfTableNameFlattenedEvents " +
@@ -31,11 +31,11 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
 
   private def ParentTileAggregateViewQuery(sourceTablename: String, includeExternalSource: Boolean, includePipelinekey: Boolean): String = {
     val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includeExternalSource), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource))).mkString(",")
-    val GroupedColumns =  (GroupedBaseColumnNames ++ Seq(DetilaTileIdColumnName)).mkString(",")
+    val GroupedColumns =  (GroupedBaseColumnNames ++ Seq(DetailTileIdColumnName)).mkString(",")
 
     s"SELECT $SelectClause, sum(mentioncountagg) as mentioncountagg, " +
       s"     SentimentWeightedAvg(IF(IsNull(avgsentimentagg), 0, avgsentimentagg), IF(IsNull(mentioncountagg), 0, mentioncountagg)) as avgsentimentagg, " +
-      s"     collect_list(struct($DetilaTileIdColumnName, mentioncountagg, avgsentimentagg)) as heatmap " +
+      s"     collect_list(struct(${DetailTileIdColumnName}, mentioncountagg, avgsentimentagg)) as heatmap " +
       s"FROM $sourceTablename " +
       s"GROUP BY $GroupedColumns"
   }
@@ -64,20 +64,20 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
   }
 
   override def IncrementalUpdate(session: SparkSession, aggregatedDS: DataFrame): DataFrame = {
-      val computedTilesSourceDF = session.sqlContext.read.format(CassandraFormat)
+      val computedTilesSourceDF = session.read.format(CassandraFormat)
         .options(Map("keyspace" -> KeyspaceName, "table" -> FortisTargetTablename))
         .load()
 
       computedTilesSourceDF.createOrReplaceTempView(FortisTargetTablename)
-      val cassandraSave = session.sqlContext.sql(IncrementalUpdateQuery)
+      val cassandraSave = session.sql(IncrementalUpdateQuery)
 
       cassandraSave
   }
 
   private def AggregateComputedTiles(session: SparkSession, sourceTablename: String, includeExternalSource: Boolean, includePipelinekey: Boolean): DataFrame = {
-    val detailedTileAggDF = session.sqlContext.sql(DetailedTileAggregateViewQuery(includeExternalSource, includePipelinekey))
+    val detailedTileAggDF = session.sql(DetailedTileAggregateViewQuery(includeExternalSource, includePipelinekey))
     detailedTileAggDF.createOrReplaceTempView(sourceTablename)
-    val parentTileAggDF = session.sqlContext.sql(ParentTileAggregateViewQuery(sourceTablename, includeExternalSource, includePipelinekey))
+    val parentTileAggDF = session.sql(ParentTileAggregateViewQuery(sourceTablename, includeExternalSource, includePipelinekey))
 
     parentTileAggDF
   }
