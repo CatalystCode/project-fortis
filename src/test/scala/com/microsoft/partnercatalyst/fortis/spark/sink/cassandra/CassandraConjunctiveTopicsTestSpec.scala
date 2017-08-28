@@ -35,9 +35,9 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       sourceurl = "",
       title = ""
     ))
-    assert(topics.size == 90)
+    assert(topics.size == 180)
     assert(topics.head == ConjunctiveTopicAggregate(
-      conjunctivetopic = "humanitarian",
+      conjunctivetopic = "",
       externalsourceid = "HamillHimself",
       mentioncount = 1,
       period = period.toString,
