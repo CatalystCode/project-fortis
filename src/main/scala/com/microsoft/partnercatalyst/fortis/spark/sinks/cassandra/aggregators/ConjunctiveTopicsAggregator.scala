@@ -49,10 +49,10 @@ class ConjunctiveTopicsAggregator extends FortisAggregatorBase with Serializable
   }
 
   private def AllSourcesAggregateViewQuery: String = {
-    val GroupedColumns = GroupedBaseColumnNames ++ Seq("pipelinekey")
+    val GroupedColumns = GroupedBaseColumnNames ++ Seq("externalsourceid")
     val SelectClause = GroupedColumns.mkString(",")
 
-    s"SELECT $SelectClause, 'all' as externalsourceid, sum(mentioncount) as mentioncountagg " +
+    s"SELECT $SelectClause, 'all' as pipelinekey, sum(mentioncount) as mentioncountagg " +
       s"FROM   $DfTableNameFlattenedEvents " +
       s"GROUP BY $SelectClause"
   }
