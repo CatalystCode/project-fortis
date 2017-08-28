@@ -51,7 +51,6 @@ object CassandraEventsSink{
           val aggregators = Seq(
             new ConjunctiveTopicsAggregator,
             new PopularPlacesAggregator,
-            new PopularTopicAggregator,
             new ComputedTilesAggregator
           )
 

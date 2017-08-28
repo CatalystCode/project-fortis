@@ -21,23 +21,23 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
   }
 
   private def DetailedTileAggregateViewQuery(includeExternalSource: Boolean, includePipelinekey: Boolean): String = {
-    val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includeExternalSource), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource), DetailTileIdColumnName)).mkString(",")
+    val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includePipelinekey), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource), DetailTileIdColumnName)).mkString(",")
     val GroupedColumns =  (GroupedBaseColumnNames ++ Seq(DetailTileIdColumnName)).mkString(",")
 
     s"SELECT $SelectClause, $AggregateFunctions " +
-      s"FROM $DfTableNameFlattenedEvents " +
-      s"GROUP BY $GroupedColumns"
+    s"FROM $DfTableNameFlattenedEvents " +
+    s"GROUP BY $GroupedColumns"
   }
 
   private def ParentTileAggregateViewQuery(sourceTablename: String, includeExternalSource: Boolean, includePipelinekey: Boolean): String = {
-    val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includeExternalSource), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource))).mkString(",")
+    val SelectClause = (SelectableColumnNames ++ Seq(ParseColumnSelect(PipelineKeyColumnName, includePipelinekey), ParseColumnSelect(ExternalSourceColumnName, includeExternalSource))).mkString(",")
     val GroupedColumns =  (GroupedBaseColumnNames ++ Seq(DetailTileIdColumnName)).mkString(",")
 
     s"SELECT $SelectClause, sum(mentioncountagg) as mentioncountagg, " +
-      s"     SentimentWeightedAvg(IF(IsNull(avgsentimentagg), 0, avgsentimentagg), IF(IsNull(mentioncountagg), 0, mentioncountagg)) as avgsentimentagg, " +
-      s"     collect_list(struct(${DetailTileIdColumnName}, mentioncountagg, avgsentimentagg)) as heatmap " +
-      s"FROM $sourceTablename " +
-      s"GROUP BY $GroupedColumns"
+    s"     SentimentWeightedAvg(IF(IsNull(avgsentimentagg), 0, avgsentimentagg), IF(IsNull(mentioncountagg), 0, mentioncountagg)) as avgsentimentagg, " +
+    s"     collect_list(struct(${DetailTileIdColumnName}, mentioncountagg, avgsentimentagg)) as heatmap " +
+    s"FROM $sourceTablename " +
+    s"GROUP BY $GroupedColumns"
   }
 
   private def IncrementalUpdateQuery: String = {
@@ -64,14 +64,14 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
   }
 
   override def IncrementalUpdate(session: SparkSession, aggregatedDS: DataFrame): DataFrame = {
-      val computedTilesSourceDF = session.read.format(CassandraFormat)
-        .options(Map("keyspace" -> KeyspaceName, "table" -> FortisTargetTablename))
-        .load()
+    val computedTilesSourceDF = session.read.format(CassandraFormat)
+      .options(Map("keyspace" -> KeyspaceName, "table" -> FortisTargetTablename))
+      .load()
 
-      computedTilesSourceDF.createOrReplaceTempView(FortisTargetTablename)
-      val cassandraSave = session.sql(IncrementalUpdateQuery)
+    computedTilesSourceDF.createOrReplaceTempView(FortisTargetTablename)
+    val cassandraSave = session.sql(IncrementalUpdateQuery)
 
-      cassandraSave
+    cassandraSave
   }
 
   private def AggregateComputedTiles(session: SparkSession, sourceTablename: String, includeExternalSource: Boolean, includePipelinekey: Boolean): DataFrame = {
