@@ -2,20 +2,20 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.CassandraConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.logging.AppInsights
+import com.microsoft.partnercatalyst.fortis.spark.logging.{AppInsights, Loggable}
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraEventsSink}
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.SparkConf
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraEventsSink}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Properties.{envOrElse, envOrNone}
 
-object ProjectFortis extends App {
+object ProjectFortis extends App with Loggable {
   private implicit val fortisSettings: FortisSettings = {
     def envOrFail(name: String): String = {
       envOrNone(name) match {
@@ -37,6 +37,7 @@ object ProjectFortis extends App {
       // Optional
       blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net"),
       appInsightsKey = envOrNone(Constants.Env.AppInsightsKey),
+      sscInitRetryAfterMillis = envOrElse(Constants.Env.SscInitRetryAfterMillis, Constants.SscInitRetryAfterMillis.toString).toLong,
       modelsDir = envOrNone(Constants.Env.LanguageModelDir)
     )
   }
@@ -61,8 +62,13 @@ object ProjectFortis extends App {
       .set("spark.kryoserializer.buffer.max", "64m")
     CassandraConfig.init(conf, batchDuration, fortisSettings)
 
-    val sparksession = SparkSession.builder().config(conf).getOrCreate()
-    val ssc = new StreamingContext(sparksession.sparkContext, batchDuration)
+    val sparkContext = new SparkContext(conf)
+    val ssc = new StreamingContext(sparkContext, batchDuration)
+    ssc.checkpoint(fortisSettings.progressDir)
+    ssc
+  }
+
+  private def attachToContext(ssc:StreamingContext): Boolean = {
     val streamProvider = StreamProviderFactory.create()
 
     val configManager = new CassandraConfigurationManager
@@ -85,14 +91,24 @@ object ProjectFortis extends App {
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
-    CassandraEventsSink(fortisEvents.get, sparksession)
-    ssc.checkpoint(fortisSettings.progressDir)
-    ssc
+
+    if (fortisEvents.isEmpty) return false
+
+    val session = SparkSession.builder().config(ssc.sparkContext.getConf).getOrCreate()
+    CassandraEventsSink(fortisEvents.get, session)
+
+    true
   }
 
   // Main starts here
+  logInfo("Creating streaming context.")
   val ssc = StreamingContext.getOrCreate(fortisSettings.progressDir, createStreamingContext)
 
+  while (!attachToContext(ssc)) {
+    logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.sscInitRetryAfterMillis} milliseconds.")
+    Thread.sleep(fortisSettings.sscInitRetryAfterMillis)
+  }
+  logInfo("Starting streaming context.")
   ssc.start()
   ssc.awaitTermination()
 }
