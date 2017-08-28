@@ -4,50 +4,55 @@ const Promise = require('promise');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, parseFromToDate, withRunTime, toPipelineKey, aggregateBy, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
-const { makeSet, makeMap, makeMultiMap } = require('../../utils/collections');
+const { tilesForBbox, withRunTime, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
+const MaxFetchedRows = 10000;
+const MinMentionCount = 1;
+const MaxMentionCount = 1000000000;
+
 /**
- * @param {{site: string, timespan: string, sourceFilter: string[], mainEdge: string, originalSource: string}} args
- * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, coordinates: number[], population: number}>}>}
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, bbox: [Float]}} args
+ * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, placeid: string, avgsentiment: float}>}>}
  */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
+    const fetchSize = 400;
+    const responseSize = args.limit || 5;
     const [north, west, south, east] = args.bbox;
 
     const query = `
-    SELECT placeid, mentioncount, centroidlat, centroidlon
+    SELECT mentioncount, placeid, mentioncount, avgsentimentnumerator, centroidlat, centroidlon
     FROM fortis.popularplaces
-    WHERE period = ?
-    AND periodtype = ?
-    AND pipelinekey = ?
-    AND externalsourceid = ?
+    WHERE periodtype = ?
     AND conjunctiontopic1 = ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
+    AND pipelinekey IN ?
+    AND externalsourceid = ?
     AND (periodstartdate, periodenddate, centroidlat, centroidlon) <= (?, ?, ?, ?)
     AND (periodstartdate, periodenddate, centroidlat, centroidlon) >= (?, ?, ?, ?)
+    LIMIT ?
     `.trim();
 
     const params = [
-      period,
-      periodType,
-      toPipelineKey(args.sourceFilter),
-      args.originalSource || 'all',
-      ...toConjunctionTopics(args.mainEdge),
-      toDate,
-      toDate,
+      args.periodType,
+      ...toConjunctionTopics(args.maintopic, args.conjunctivetopics),
+      args.pipelinekeys,
+      args.externalsourceid,
+      args.toDate,
+      args.toDate,
       north,
       east,
-      fromDate,
-      fromDate,
+      args.fromDate,
+      args.fromDate,
       south,
-      west
+      west,
+      MaxFetchedRows
     ];
 
-    return cassandraConnector.executeQuery(query, params)
+    return cassandraConnector.executeQuery(query, params, { fetchSize })
     .then(rows => {
       const placeIds = Array.from(makeSet(rows, row => row.placeid));
       featureServiceClient.fetchById(placeIds)
@@ -55,70 +60,82 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
         const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);
         const edges = rows.map(row => ({
           name: placeIdToFeature[row.placeid].name,
-          mentions: row.mentioncount,
+          mentioncount: row.mentioncount,
+          layer: placeIdToFeature[row.placeid].layer,
+          placeid: row.placeid,
+          avgsentimentnumerator: row.avgsentimentnumerator,
           coordinates: [row.centroidlat, row.centroidlon]
         }));
 
         resolve({
-          edges
+          edges: aggregateBy(edges, row => `${row.placeid}`, row => ( { 
+            name: row.name,
+            coordinates: row.coordinates,
+            placeid: row.placeid,
+            mentions: Long.ZERO, 
+            layer: row.layer,
+            avgsentimentnumerator: Long.ZERO 
+          } ) )
+        .slice(0, responseSize)
         });
       })
-      .catch(reject);
-    })
     .catch(reject);
+    });
   });
 }
 
 /**
- * @param {{site: string, fromDate: string, toDate: string, sourceFilter: string[], mainEdge: string, bbox: number[], zoomLevel: number, originalSource: string}} args
+ * @param {{fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, maintopics: [String]!, conjunctivetopics: [String], bbox: [Float], zoomLevel: Int, externalsourceid: String!}} args
  * @returns {Promise.<{labels: Array<{name: string, mentions: number}>, graphData: Array<{date: string, edges: string[], mentions: number[]}>}>}
  */
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const { period, periodType, fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    const tilex = makeSet(tiles, tile => tile.row);
-    const tiley = makeSet(tiles, tile => tile.column);
+    const tilex = makeSet(tiles, tile => tile.column);
+    const tiley = makeSet(tiles, tile => tile.row);
+    const conjunctivetopics = args.maintopics.length > 1 ? [] : args.conjunctivetopics;
+    const MaxConjunctiveTopicsAllowed = 2;
 
     const query = `
-    SELECT conjunctiontopic1, periodstartdate, mentioncount
+    SELECT conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, periodstartdate, mentioncount, avgsentimentnumerator
     FROM fortis.timeseries
     WHERE periodtype = ?
-    AND conjunctiontopic1 = ?
+    AND conjunctiontopic1 IN ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
     AND tilez = ?
-    AND period = ?
-    AND pipelinekey = ?
+    AND pipelinekey IN ?
     AND externalsourceid = ?
     AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
     AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
     `.trim();
 
     const params = [
-      periodType,
-      ...toConjunctionTopics(args.mainEdge),
+      args.periodType,
+      args.maintopics,//handle case for including popular terms in time series
+      ...fromTopicListToConjunctionTopics(conjunctivetopics, MaxConjunctiveTopicsAllowed),
       args.zoomLevel,
-      period,
-      toPipelineKey(args.sourceFilter),
-      args.originalSource || 'all',
+      args.pipelinekeys,
+      args.externalsourceid,
       Math.max(...tilex),
       Math.max(...tiley),
-      toDate,
-      toDate,
+      args.toDate,
+      args.toDate,
       Math.min(...tilex),
       Math.min(...tiley),
-      fromDate,
-      fromDate
+      args.fromDate,
+      args.fromDate
     ];
 
     return cassandraConnector.executeQuery(query, params)
     .then(rows => {
-      const topicToCounts = makeMultiMap(rows, row => row.conjunctiontopic1, row => row.mentioncount);
-      const labels = Object.keys(topicToCounts).map(topic => ({name: topic, mentions: topicToCounts[topic].reduce((a, b) => a + b, 0)}));
-      const dateToRows = makeMultiMap(rows, row => row.periodstartdate, row => row);
-      const graphData = Object.keys(dateToRows).map(date => ({date, edges: rows.map(row => row.conjunctiontopic1), mentions: rows.map(row => row.mentioncount)}));
-
+      const labels = Array.from(makeSet(rows, row => row.conjunctiontopic1)).map(row=>( { name: row}));
+      const graphData = aggregateBy(rows, row => `${row.conjunctiontopic1}_${row.periodstartdate}`, row => ( { 
+        date: row.periodstartdate, 
+        name: row.conjunctiontopic1, 
+        mentions: Long.ZERO, 
+        avgsentimentnumerator: Long.ZERO 
+      } ) );
       resolve({
         labels,
         graphData
@@ -129,17 +146,71 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 }
 
 /**
- * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: String!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int}} args
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, bbox: [Float], zoomLevel: Int}} args
+ * @returns {Promise.<{edges: Array<{name: string, mentions: number, avgsentiment: float}>}>}
+ */
+function topTerms(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const tilex = makeSet(tiles, tile => tile.column);
+    const tiley = makeSet(tiles, tile => tile.row);
+    const fetchSize = 400;
+    const responseSize = args.limit || 5;
+
+    const query = `
+    SELECT mentioncount, conjunctiontopic1, avgsentimentnumerator
+    FROM fortis.populartopics
+    WHERE periodtype = ?
+    AND tilez = ?
+    AND pipelinekey IN ?
+    AND externalsourceid = ?
+    AND (mentioncount, tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?, ?)
+    AND (mentioncount, tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?, ?)
+    LIMIT ?
+    `.trim();
+
+    const params = [
+      args.periodType,
+      args.zoomLevel,
+      args.pipelinekeys,
+      args.externalsourceid,
+      MaxMentionCount,
+      Math.max(...tilex),
+      Math.max(...tiley),
+      args.toDate,
+      args.toDate,
+      MinMentionCount,
+      Math.min(...tilex),
+      Math.min(...tiley),
+      args.fromDate,
+      args.fromDate,
+      MaxFetchedRows
+    ];
+
+    return cassandraConnector.executeQuery(query, params, { fetchSize })
+    .then(rows => 
+      resolve({
+        edges: aggregateBy(rows, row => `${row.conjunctiontopic1}`, row => ( { 
+          name: row.conjunctiontopic1, 
+          mentions: Long.ZERO, 
+          avgsentimentnumerator: Long.ZERO 
+        } ) )
+        .slice(0, responseSize)
+      })
+    )
+    .catch(reject);
+  });
+}
+
+/**
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int}} args
  * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
  */
 function topSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const tiles = tilesForBbox(args.bbox, args.zoomLevel);
-    const MaxFetchedRows = 10000;
-    const MinMentionCount = 1;
-    const MaxMentionCount = 1000000000;
-    const tilex = makeSet(tiles, tile => tile.row);
-    const tiley = makeSet(tiles, tile => tile.column);
+    const tilex = makeSet(tiles, tile => tile.column);
+    const tiley = makeSet(tiles, tile => tile.row);
     const fetchSize = 400;
     const responseSize = args.limit || 5;
 
@@ -159,7 +230,7 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
 
     const params = [
       args.periodType,
-      ...fromTopicListToConjunctionTopics(args.conjunctivetopics),
+      ...toConjunctionTopics(args.maintopic, args.conjunctivetopics),
       args.zoomLevel,
       args.pipelinekeys,
       MaxMentionCount,
@@ -177,7 +248,7 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
 
     return cassandraConnector.executeQuery(query, params, { fetchSize })
     .then(rows => {
-      const filteredRows = rows.filter(row=>row.pipelinekey !== 'all' || row.externalsourceid !== 'all');//filter all aggregates as we're interested in named sources only
+      const filteredRows = rows.filter(row=>row.pipelinekey !== 'all' && row.externalsourceid !== 'all');//filter all aggregates as we're interested in named sources only
       const edges = aggregateBy(filteredRows, row => `${row.pipelinekey}_${row.externalsourceid}`, row => ( { 
         pipelinekey: row.pipelinekey, 
         name: row.externalsourceid, 
@@ -194,8 +265,70 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+/**
+ * @param {{fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, maintopic: String!, bbox: [Float], zoomLevel: Int!}} args
+ * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
+ */
+function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel);
+    const tilex = makeSet(tiles, tile => tile.column);
+    const tiley = makeSet(tiles, tile => tile.row);
+    const fetchSize = 400;
+
+    const query = `
+    SELECT mentioncount, conjunctivetopic, topic
+    FROM fortis.conjunctivetopics
+    WHERE periodtype = ?
+    AND topic = ?
+    AND tilez = ?
+    AND pipelinekey IN ?
+    AND externalsourceid = ?
+    AND (tilex, tiley, periodstartdate, periodenddate) <= (?, ?, ?, ?)
+    AND (tilex, tiley, periodstartdate, periodenddate) >= (?, ?, ?, ?)
+    LIMIT ?
+    `.trim();
+
+    const params = [
+      args.periodType,
+      args.maintopic,
+      args.zoomLevel,
+      args.pipelinekeys,
+      args.externalsourceid,
+      Math.max(...tilex),
+      Math.max(...tiley),
+      args.toDate,
+      args.toDate,
+      Math.min(...tilex),
+      Math.min(...tiley),
+      args.fromDate,
+      args.fromDate,
+      MaxFetchedRows
+    ];
+
+    return cassandraConnector.executeQuery(query, params, { fetchSize })
+    .then(rows => {
+      console.log('results');
+      console.log(rows);
+      //todo: need to add sentiment field to the conjunctivetopics table
+      const edges = aggregateBy(rows, row => `${row.conjunctivetopic}`, row => ( { 
+        conjunctionterm: row.conjunctivetopic, 
+        name: row.topic, 
+        mentions: Long.ZERO
+      } ) );
+
+      resolve({
+        edges
+      });
+    })
+    .catch(reject);
+  });
+}
+
 module.exports = {
   popularLocations: trackEvent(withRunTime(popularLocations), 'popularLocations'),
   timeSeries: trackEvent(timeSeries, 'timeSeries'),
+  topTerms: trackEvent(topTerms, 'topTerms'),
+  conjunctiveTopics: trackEvent(conjunctiveTopics, 'conjunctiveTopics'),
   topSources: trackEvent(topSources, 'topSources')
 };

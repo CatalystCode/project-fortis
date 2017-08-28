@@ -2,11 +2,11 @@ const graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
   type Query {
-    conjunctiveterms(fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, mainTerm: String!, bbox: [Float], zoomLevel: Int, externalsourceid: String): TermCollection
-    timeSeries(fromDate: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String): FeatureTimeSeriesCollection
-    topLocations(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String): TopPlacesCollection
-    topSources(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!): TopSourcesCollection
-    topTerms(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekey: String!, externalsourceid: String!, bbox: [Float]!, zoomLevel: Int!): TopTermsCollection
+    conjunctiveTerms(maintopic: String!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String!): ConjunctionTermCollection
+    timeSeries(maintopics: [String]!, fromDate: String!, toDate: String!, periodType: String!, pipelinekeys: [String]!, maintopics: [String]!, conjunctivetopics: [String], bbox: [Float]!, zoomLevel: Int!, bbox: [Float]!, externalsourceid: String!): FeatureTimeSeriesCollection
+    topLocations(maintopic: String!, limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, externalsourceid: String!): TopPlacesCollection
+    topSources(maintopic: String!, limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!): TopSourcesCollection
+    topTerms(limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, externalsourceid: String!, bbox: [Float]!, zoomLevel: Int!): TopTermsCollection
   }
 
   type Term {
@@ -17,9 +17,11 @@ module.exports = graphql.buildSchema(`
 
   type Place {
     name: String!
+    placeid: String
+    layer: String
     mentions: Int
     avgsentiment: Float
-    population: Float
+    coordinates: [Float]
   }
 
   type ExternalSource {
@@ -41,28 +43,34 @@ module.exports = graphql.buildSchema(`
 
   type TopTermsCollection{
     runTime: String,
-    edges: [ExternalSource]!
-  }
-
-  type TermCollection {
-    runTime: String
     edges: [Term]!
   }
 
-  type FeatureProperties {
+  type ConjuntiveTerm {
     name: String!
+    conjunctionterm: String!
     mentions: Int
     avgsentiment: Float
   }
 
+  type ConjunctionTermCollection {
+    runTime: String
+    edges: [ConjuntiveTerm]!
+  }
+
+  type TimeSeriesLabel {
+    name: String!
+  }
+
   type FeatureTimeSeriesCollection {
-    labels: [FeatureProperties]!
+    labels: [TimeSeriesLabel]!
     graphData: [TimeSeriesEntry]!
   }
 
   type TimeSeriesEntry{
     date: String!,
-    edges: [String]!
-    mentions: [Int]!
+    name: String!
+    avgsentiment: Float
+    mentions: Int!
   }
 `);

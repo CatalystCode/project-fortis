@@ -3,8 +3,9 @@
 const queries = require('./queries');
 
 module.exports = {
-  locations: queries.locations,
-  popularLocations: queries.popularLocations,
+  topLocations: queries.popularLocations,
   timeSeries: queries.timeSeries,
-  topSources: queries.topSources
+  topSources: queries.topSources,
+  topTerms: queries.topTerms,
+  conjunctiveTerms: queries.conjunctiveTopics
 };
