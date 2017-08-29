@@ -5,10 +5,10 @@ function _sortByMentionCount(rows) {
 }
 
 function _computeWeightedSentiment(rows) {
-  return rows.map(row => Object.assign({}, row, { avgsentiment:  _computeWeightedAvg(row.mentions, row.avgsentimentnumerator) }));
+  return rows.map(row => Object.assign({}, row, { avgsentiment:  computeWeightedAvg(row.mentions, row.avgsentimentnumerator) }));
 }
 
-function _computeWeightedAvg(mentioncount, weightedavgnumerator) {
+function computeWeightedAvg(mentioncount, weightedavgnumerator) {
   const DoubleToLongConversionFactor = 1000;
 
   return !mentioncount.isZero() ? (weightedavgnumerator / DoubleToLongConversionFactor) / mentioncount : 0;
@@ -79,5 +79,6 @@ module.exports = {
   makeMap: makeMap,
   aggregateBy,
   makeMultiMap,
-  makeSet: makeSet
+  makeSet: makeSet,
+  computeWeightedAvg
 };
