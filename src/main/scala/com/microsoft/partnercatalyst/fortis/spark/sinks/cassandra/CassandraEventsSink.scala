@@ -2,19 +2,19 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import java.util.UUID
 
-import com.datastax.spark.connector.writer.WriteConf
-import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
-import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
-import org.apache.spark.streaming.dstream.DStream
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
-import org.apache.spark.rdd.RDD
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs._
-import org.apache.spark.streaming.Time
+import com.datastax.spark.connector.writer.{SqlRowWriter, WriteConf}
+import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Telemetry}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Timer
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs._
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
+import org.apache.spark.streaming.Time
+import org.apache.spark.streaming.dstream.DStream
 
 object CassandraEventsSink{
   private val KeyspaceName = "fortis"
@@ -49,9 +49,12 @@ object CassandraEventsSink{
           }
 
           val aggregators = Seq(
-            new ConjunctiveTopicsAggregator,
             new PopularPlacesAggregator,
             new ComputedTilesAggregator
+          )
+
+          val offlineAggregators = Seq[OfflineAggregator[_]](
+            new ConjunctiveTopicsOffineAggregator
           )
 
           val eventBatchDF = Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
@@ -65,8 +68,24 @@ object CassandraEventsSink{
           aggregators.foreach(aggregator => {
             val eventName = aggregator.FortisTargetTablename
 
-            Timer.time(Telemetry.logSinkPhase(s"aggregate_$eventName", _, _, batchSize)) {
+            Timer.time((completed, time)=> println(s"Ran aggregator ${aggregator.getClass.getSimpleName} in ${time} nanoseconds.")) {
               aggregateEventBatch(eventBatchDF, sparkSession, aggregator)
+            }
+          })
+
+          val appName = sparkSession.sparkContext.appName
+          val events = eventBatchDF.rdd.collect()
+          offlineAggregators.par.foreach(aggregator => {
+            val sparkSession = SparkSession.builder().appName(appName).getOrCreate()
+            val aggregatorName = aggregator.getClass.getSimpleName
+            Timer.time((completed, time)=> println(s"Ran black box aggregator ${aggregatorName} in ${time} nanoseconds.")) {
+              val records = aggregator.aggregate(sparkSession.sparkContext.parallelize(events))
+              if (records.isEmpty()) {
+                println(s"WARNING: Generated empty aggregation RDD from ${aggregatorName}, nothing to do.")
+              } else {
+                implicit val rowWriter = SqlRowWriter.Factory
+                records.saveToCassandra("fortis", aggregator.targetTableName())
+              }
             }
           })
         }
@@ -138,7 +157,7 @@ object CassandraEventsSink{
         incrementallyUpdatedDF
       }
 
-      Timer.time(Telemetry.logSinkPhase(s"incrementallyUpdatedDF.write-${aggregator.FortisTargetTablename}", _, _, -1)) {
+      Timer.time((success,time)=>println(s"incrementallyUpdatedDF.write-${aggregator.FortisTargetTablename} ${time} nanosecons")) {
         incrementallyUpdatedDF.write
           .format(CassandraFormat)
           .mode(SaveMode.Append)

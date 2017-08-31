@@ -105,7 +105,7 @@ case class PopularTopicAggregate(
   topic: String
 ) extends AggregationRecordTile with Serializable
 
-case class ConjunctiveTopicAggregate(
+case class ConjunctiveTopic(
   conjunctivetopic: String,
   externalsourceid: String,
   mentioncount: Long,
