@@ -49,12 +49,12 @@ object CassandraEventsSink extends Loggable {
           }
 
           val aggregators = Seq(
-            new PopularPlacesAggregator,
             new ComputedTilesAggregator
           )
 
           val offlineAggregators = Seq[OfflineAggregator[_]](
-            new ConjunctiveTopicsOffineAggregator
+            new ConjunctiveTopicsOffineAggregator,
+            new PopularPlacesOfflineAggregator
           )
 
           val eventBatchDF = Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
@@ -73,18 +73,15 @@ object CassandraEventsSink extends Loggable {
             }
           })
 
-          val appName = sparkSession.sparkContext.appName
-          val events = eventBatchDF.rdd.collect()
-          offlineAggregators.par.foreach(aggregator => {
-            val sparkSession = SparkSession.builder().appName(appName).getOrCreate()
+          offlineAggregators.foreach(aggregator => {
             val aggregatorName = aggregator.getClass.getSimpleName
             Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.${aggregatorName}", _, _, -1)) {
-              val records = aggregator.aggregate(sparkSession.sparkContext.parallelize(events))
-              if (records.isEmpty()) {
-                logError(s"Generated empty aggregation RDD from ${aggregatorName}, nothing to do.")
-              } else {
-                implicit val rowWriter = SqlRowWriter.Factory
-                records.saveToCassandra("fortis", aggregator.targetTableName())
+              try {
+                aggregator.aggregateAndSave(fortisEventsRDD.cache(), KeyspaceName)
+              } catch {
+                case e: Exception => {
+                  logError(s"Failed performing offline aggregation ${aggregatorName}", e)
+                }
               }
             }
           })
