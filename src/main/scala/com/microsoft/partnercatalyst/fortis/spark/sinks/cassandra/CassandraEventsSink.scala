@@ -77,7 +77,7 @@ object CassandraEventsSink extends Loggable {
             val aggregatorName = aggregator.getClass.getSimpleName
             Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.${aggregatorName}", _, _, -1)) {
               try {
-                aggregator.aggregateAndSave(fortisEventsRDD.cache(), KeyspaceName)
+                aggregator.aggregateAndSave(fortisEventsRDD, KeyspaceName)
               } catch {
                 case e: Exception => {
                   logError(s"Failed performing offline aggregation ${aggregatorName}", e)
