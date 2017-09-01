@@ -27,7 +27,6 @@ object ProjectFortis extends App with Loggable {
 
     FortisSettings(
       // Required
-      progressDir = envOrFail(Constants.Env.HighlyAvailableProgressDir),
       featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase),
       cassandraHosts = envOrFail(Constants.Env.CassandraHost),
       managementBusConnectionString = envOrFail(Constants.Env.ManagementBusConnectionString),
@@ -35,6 +34,7 @@ object ProjectFortis extends App with Loggable {
       managementBusCommandQueueName = envOrFail(Constants.Env.ManagementBusCommandQueueName),
 
       // Optional
+      progressDir = envOrElse(Constants.Env.HighlyAvailableProgressDir, ""),
       blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net"),
       appInsightsKey = envOrNone(Constants.Env.AppInsightsKey),
       sscInitRetryAfterMillis = envOrElse(Constants.Env.SscInitRetryAfterMillis, Constants.SscInitRetryAfterMillis.toString).toLong,
@@ -64,7 +64,9 @@ object ProjectFortis extends App with Loggable {
 
     val sparkContext = new SparkContext(conf)
     val ssc = new StreamingContext(sparkContext, batchDuration)
-    ssc.checkpoint(fortisSettings.progressDir)
+    if (!fortisSettings.progressDir.isEmpty) {
+      ssc.checkpoint(fortisSettings.progressDir)
+    }
     ssc
   }
 
@@ -102,7 +104,7 @@ object ProjectFortis extends App with Loggable {
 
   // Main starts here
   logInfo("Creating streaming context.")
-  val ssc = StreamingContext.getOrCreate(fortisSettings.progressDir, createStreamingContext)
+  val ssc = createStreamingContext()
 
   while (!attachToContext(ssc)) {
     logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.sscInitRetryAfterMillis} milliseconds.")

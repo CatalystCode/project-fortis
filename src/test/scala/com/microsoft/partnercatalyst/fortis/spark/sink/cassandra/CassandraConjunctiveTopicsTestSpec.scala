@@ -36,7 +36,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       title = ""
     ))
     assert(topics.size == 180)
-    assert(topics.head == ConjunctiveTopicAggregate(
+    assert(topics.head == ConjunctiveTopic(
       conjunctivetopic = "",
       externalsourceid = "HamillHimself",
       mentioncount = 1,
@@ -79,7 +79,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       title = ""
     ))
     assert(topics.size == 45)
-    assert(topics.head == ConjunctiveTopicAggregate(
+    assert(topics.head == ConjunctiveTopic(
       conjunctivetopic = "",
       externalsourceid = "HamillHimself",
       mentioncount = 1,

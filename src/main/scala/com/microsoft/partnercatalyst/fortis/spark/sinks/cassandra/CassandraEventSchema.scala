@@ -84,7 +84,7 @@ object CassandraPopularTopics {
 }
 
 object CassandraConjunctiveTopics {
-  def apply(item: Event): Seq[ConjunctiveTopicAggregate] = {
+  def apply(item: Event): Seq[ConjunctiveTopic] = {
     val keywords = item.computedfeatures.keywords
     val keywordPairs = if (keywords.isEmpty) Seq() else keywords.map(k=>(k, "")) ++ keywords.combinations(2).flatMap(combination => Seq(
       (combination(0), combination(1)),
@@ -97,7 +97,7 @@ object CassandraConjunctiveTopics {
       kwPair <- keywordPairs
       tileid <- tiles
       periodType <- Utils.getCassandraPeriodTypes
-    } yield ConjunctiveTopicAggregate(
+    } yield ConjunctiveTopic(
       topic = kwPair._1,
       conjunctivetopic = kwPair._2,
       externalsourceid = item.externalsourceid,
