@@ -28,6 +28,7 @@ function _insertTopics(siteType) {
     if (!siteType || !siteType.length) return reject('insertTopics: siteType is not defined');
 
     const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+    let mutations = [];
     blobStorageClient.fetchJson(uri)
     .then(response => {
       return response.map(topic => ({
@@ -36,14 +37,14 @@ function _insertTopics(siteType) {
         params: [uuid(), topic.topic, topic.lang_code, topic.translations]
       }));
     })
-    .then(mutations => {
-      cassandraConnector.executeBatchMutations(mutations)
-      .then(() => {
-        resolve({
-          numTopicsInserted: mutations.length
-        });
-      })
-      .catch(reject);
+    .then(response => {
+      mutations = response;
+      return cassandraConnector.executeBatchMutations(response);
+    })
+    .then(() => {
+      resolve({
+        numTopicsInserted: mutations.length
+      });
     })
     .catch(reject);
   });
