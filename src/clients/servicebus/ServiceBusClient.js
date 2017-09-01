@@ -12,24 +12,19 @@ let client = azure.createServiceBusService(SERVICE_BUS_CONNECTION_STRING);
  * @param {string} message
  * @returns {Promise}
  */
-function sendMessage(queue, message) {
+function sendStringMessage(queue, message) {
   return new Promise((resolve, reject) => {
-    if (!client) return reject('Failed to create service bus service. No service bus connection string provided.');
-
+    if (typeof message !== 'string') return reject('Message must be of type string.');
     if (!message || !message.length) {
       return reject('No message to be sent to service bus.');
     }
 
+    if (!client) return reject('Failed to create service bus service. No service bus connection string provided.');
+    const serviceBusMessage = { body: message };
     try {
-      message => ({ body: JSON.stringify(message) });
-    } catch (exception) {
-      return reject(exception);
-    }
-
-    try {
-      client.sendQueueMessage(queue, message, (error) => {
+      client.sendQueueMessage(queue, serviceBusMessage, (error) => {
         if (error) reject(error);
-        else resolve(message);
+        else resolve(serviceBusMessage);
       });
     } catch (exception) {
       reject(exception);
@@ -38,5 +33,5 @@ function sendMessage(queue, message) {
 }
 
 module.exports = {
-  sendMessages: trackDependency(sendMessage, 'ServiceBus', 'send')
+  sendMessages: trackDependency(sendStringMessage, 'ServiceBus', 'send')
 };
