@@ -34,8 +34,14 @@ class PopularPlacesOfflineAggregator extends OfflineAggregator[PopularPlace] {
   }
 
   override def aggregateAndSave(events: RDD[Event], keyspace: String): Unit = {
-    implicit val rowWriter = SqlRowWriter.Factory
-    aggregate(events).saveToCassandra(keyspace, "popularplaces")
+    val places = aggregate(events).cache()
+    places.count() match {
+      case 0 => return
+      case _ => {
+        implicit val rowWriter = SqlRowWriter.Factory
+        places.saveToCassandra(keyspace, "popularplaces")
+      }
+    }
   }
 
 }

@@ -28,8 +28,14 @@ class ConjunctiveTopicsOffineAggregator extends OfflineAggregator[ConjunctiveTop
   }
 
   override def aggregateAndSave(events: RDD[Event], keyspace: String): Unit = {
-    implicit val rowWriter = SqlRowWriter.Factory
-    aggregate(events).saveToCassandra(keyspace, "conjunctivetopics")
+    val topics = aggregate(events).cache()
+    topics.count() match {
+      case 0 => return
+      case _ => {
+        implicit val rowWriter = SqlRowWriter.Factory
+        topics.saveToCassandra(keyspace, "conjunctivetopics")
+      }
+    }
   }
 
 }
