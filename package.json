@@ -19,6 +19,7 @@
     "applicationinsights": "^0.16.0",
     "async": "^2.1.2",
     "azure-event-hubs": "0.0.8",
+    "azure-sb": "^0.10.4",
     "azure-storage": "^1.3.2",
     "body-parser": "^1.15.0",
     "cassandra-driver": "^3.2.2",
