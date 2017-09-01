@@ -8,7 +8,7 @@ import net.liftweb.json.JsonAST.{JValue, RenderSettings, render}
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 
 object FortisUdfFunctions {
-  private val DoubleToLongConversionFactor = 1000
+  val DoubleToLongConversionFactor = 1000
 
   val MeanAverage: (Double, Long) => Long = (aggregationMean: Double, aggregationCount: Long) => {
     ((getDouble(aggregationMean) * getLong(aggregationCount, 0L)) * DoubleToLongConversionFactor).toLong

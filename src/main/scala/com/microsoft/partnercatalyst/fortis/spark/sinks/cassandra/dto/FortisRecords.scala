@@ -47,23 +47,22 @@ case class EventPlaces(
   placeid: String
 ) extends Serializable
 
-case class PopularPlaceAggregate(
-  override val periodstartdate: Long,
-  override val externalsourceid: String,
-  override val periodenddate: Long,
-  override val periodtype: String,
-  override val period: String,
-  override val pipelinekey: String,
-  override val mentioncount: Long,
-  override val avgsentimentnumerator: Long,
-  override val avgsentiment: Double,
-  placeid: String,
+case class PopularPlace(
+  avgsentimentnumerator: Long,
   centroidlat: Double,
   centroidlon: Double,
   conjunctiontopic1: String,
   conjunctiontopic2: String,
-  conjunctiontopic3: String
-) extends AggregationRecord with Serializable
+  conjunctiontopic3: String,
+  externalsourceid: String,
+  mentioncount: Long,
+  period: String,
+  periodenddate: Long,
+  periodstartdate: Long,
+  periodtype: String,
+  pipelinekey: String,
+  placeid: String = ""
+) extends Serializable
 
 case class ComputedTile(
   override val periodstartdate: Long,

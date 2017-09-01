@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
+import com.datastax.spark.connector._
+import com.datastax.spark.connector.writer.SqlRowWriter
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraConjunctiveTopics
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ConjunctiveTopic, Event}
 import org.apache.spark.rdd.RDD
@@ -7,11 +9,15 @@ import org.apache.spark.rdd.RDD
 class ConjunctiveTopicsOffineAggregator extends OfflineAggregator[ConjunctiveTopic] {
 
   override def aggregate(events: RDD[Event]): RDD[ConjunctiveTopic] = {
-    val conjunctiveTopics = events.flatMap(CassandraConjunctiveTopics(_))
-    val allSourcesTopics = conjunctiveTopics.map(_.copy(externalsourceid = "all"))
-    val allPipelinesTopics = conjunctiveTopics.map(_.copy(pipelinekey = "all", externalsourceid = "all"))
+    val conjunctiveTopics = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    }).flatMap(CassandraConjunctiveTopics(_))
 
-    val result = conjunctiveTopics.union(allSourcesTopics).union(allPipelinesTopics).keyBy(r=>{(
+    conjunctiveTopics.keyBy(r=>{(
       r.pipelinekey, r.externalsourceid,
       r.periodtype, r.period, r.periodstartdate, r.periodenddate,
       r.topic, r.conjunctivetopic,
@@ -19,9 +25,17 @@ class ConjunctiveTopicsOffineAggregator extends OfflineAggregator[ConjunctiveTop
     )}).reduceByKey((a,b)=>{
       a.copy(mentioncount = a.mentioncount+b.mentioncount)
     }).values
-    result
   }
 
-  override def targetTableName(): String = "conjunctivetopics"
+  override def aggregateAndSave(events: RDD[Event], keyspace: String): Unit = {
+    val topics = aggregate(events).cache()
+    topics.count() match {
+      case 0 => return
+      case _ => {
+        implicit val rowWriter = SqlRowWriter.Factory
+        topics.saveToCassandra(keyspace, "conjunctivetopics")
+      }
+    }
+  }
 
 }

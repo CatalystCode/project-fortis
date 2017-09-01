@@ -9,6 +9,7 @@ import java.util.Locale
 
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.TileUtils.{DETAIL_ZOOM_DELTA, MAX_ZOOM, MIN_ZOOM}
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.{Period, PeriodType}
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs.FortisUdfFunctions
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations._
 
 object CassandraEventSchema {
@@ -34,12 +35,12 @@ object CassandraEventSchema {
 }
 
 object CassandraPopularPlaces {
-  def apply(item: Event): Seq[PopularPlaceAggregate] = {
+  def apply(item: Event): Seq[PopularPlace] = {
     for {
       kw <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       location <- item.computedfeatures.places
       periodType <- Utils.getCassandraPeriodTypes
-    } yield PopularPlaceAggregate(
+    } yield PopularPlace(
       pipelinekey = item.pipelinekey,
       centroidlat = location.centroidlat,
       centroidlon = location.centroidlon,
@@ -53,8 +54,7 @@ object CassandraPopularPlaces {
       conjunctiontopic1 = kw._1,
       conjunctiontopic2 = kw._2,
       conjunctiontopic3 = kw._3,
-      avgsentimentnumerator = 0,
-      avgsentiment = item.computedfeatures.sentiment.neg_avg
+      avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * FortisUdfFunctions.DoubleToLongConversionFactor).toLong
     )
   }
 }
