@@ -15,14 +15,12 @@ def _main(graphql_service_host, site_name, site_type):
         input: {
           siteType: "%s",
           targetBbox: [],
-          defaultZoomLevel: 0,
+          defaultZoomLevel: 8,
           logo: "",
           title: "",
           name: "%s",
           defaultLocation: [],
-          storageConnectionString: "",
-          mapzenApiKey: "",
-          fbToken: "",
+          defaultLanguage: "en",
           supportedLanguages: ["en"]
         }
       ) { name }
