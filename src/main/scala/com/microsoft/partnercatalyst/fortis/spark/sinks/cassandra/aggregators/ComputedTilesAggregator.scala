@@ -60,7 +60,11 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
 
   override def flattenEvents(session: SparkSession, eventDS: Dataset[Event]): DataFrame = {
     import session.implicits._
-    eventDS.flatMap(CassandraComputedTiles(_)).toDF()
+    eventDS.flatMap(e=>Seq(
+      e,
+      e.copy(externalsourceid = "all"),
+      e.copy(pipelinekey = "all", externalsourceid = "all")
+    )).flatMap(CassandraComputedTiles(_)).toDF()
   }
 
   override def IncrementalUpdate(session: SparkSession, aggregatedDS: DataFrame): DataFrame = {
@@ -83,11 +87,6 @@ class ComputedTilesAggregator extends FortisAggregatorBase with Serializable {
   }
 
   override def AggregateEventBatches(session: SparkSession, flattenedEvents: DataFrame): DataFrame = {
-    val detailedAggDF = AggregateComputedTiles(session=session, sourceTablename="detailedTileView", includeExternalSource=true, includePipelinekey=true)
-    val pipelineKeyOnlyAggDF = AggregateComputedTiles(session=session, sourceTablename="sourcesOnlyTileView", includeExternalSource=false, includePipelinekey=true)
-    val tilesAndPeriodOnlyAggDF = AggregateComputedTiles(session=session, sourceTablename="onlyTilesView", includeExternalSource=false, includePipelinekey=false)
-    val unionedResults = detailedAggDF.union(pipelineKeyOnlyAggDF).union(tilesAndPeriodOnlyAggDF)
-
-    unionedResults
+    AggregateComputedTiles(session=session, sourceTablename="detailedTileView", includeExternalSource=true, includePipelinekey=true)
   }
 }
