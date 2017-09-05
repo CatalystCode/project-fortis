@@ -243,41 +243,30 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
     const streams = args && args.input && args.input.streams;
     if (!streams || !streams.length) return reject('No streams specified');
     
-    const deletions = [];
-    const insertions = [];
+    const mutations = [];
     streams.forEach(stream => {
-      deletions.push({
-        query: 'DELETE FROM fortis.streams WHERE streamid = ? AND pipelinekey = ?',
-        params: [stream.streamId, stream.pipelineKey]
-      });
-
       let params = paramEntryToMap(stream.params);
-      insertions.push({
-        query: `INSERT INTO fortis.streams (
-        streamid,
-        pipelinekey,
-        pipelinelabel,
-        pipelineicon,
-        streamfactory,
-        params,
-        enabled
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      mutations.push({
+        query: `UPDATE fortis.streams 
+        SET pipelinelabel = ?,
+        pipelineicon = ?,
+        streamfactory = ?,
+        params = ?,
+        enabled = ? 
+        WHERE streamid = ? AND pipelinekey = ?`,
         params: [
-          stream.streamId, 
-          stream.pipelineKey,
           stream.pipelineLabel,
           stream.pipelineIcon,
           stream.streamFactory,
           params,
-          stream.enabled
+          stream.enabled,
+          stream.streamId,
+          stream.pipelineKey
         ]
       });
     });
 
-    cassandraConnector.executeBatchMutations(deletions)
-    .then(() => {
-      return cassandraConnector.executeBatchMutations(insertions);
-    })
+    cassandraConnector.executeBatchMutations(mutations)
     .then(() => {
       resolve({
         streams
