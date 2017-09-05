@@ -54,42 +54,38 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     )))
 
     val popularPlaces = aggregator.aggregate(events).collect()
-    assert(popularPlaces.size == 15)
+    assert(popularPlaces.size == 135)
 
-    val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day")
+    val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
       PopularPlace(
-        periodstartdate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
+        perioddate = period.startTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "all",
         mentioncount = 1,
         avgsentimentnumerator = 500,
         placeid = "wof-101731037",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""
       )
     ))
 
-    val externalsourceidAll = popularPlaces.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day")
+    val externalsourceidAll = popularPlaces.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(externalsourceidAll.toSet == Set(
       PopularPlace(
-        periodstartdate = period.startTime(),
+        perioddate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "twitter",
         mentioncount = 1,
         avgsentimentnumerator = 500,
         placeid = "wof-101731037",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""
@@ -151,42 +147,38 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     ))
 
     val popularPlaces = aggregator.aggregate(events).collect()
-    assert(popularPlaces.size == 20)
+    assert(popularPlaces.size == 180)
 
-    val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day")
+    val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
       PopularPlace(
-        periodstartdate = period.startTime(),
+        perioddate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "all",
         mentioncount = 2,
         avgsentimentnumerator = 1200,
         placeid = "wof-907128885",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""
       )
     ))
 
-    val externalsourceidAll = popularPlaces.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day")
+    val externalsourceidAll = popularPlaces.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(externalsourceidAll.toSet == Set(
       PopularPlace(
-        periodstartdate = period.startTime(),
+        perioddate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "twitter",
         mentioncount = 2,
         avgsentimentnumerator = 1200,
         placeid = "wof-907128885",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""
@@ -248,58 +240,52 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     ))
 
     val popularPlaces = aggregator.aggregate(events).collect()
-    assert(popularPlaces.size == 25)
+    assert(popularPlaces.size == 225)
 
-    val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day")
+    val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
       PopularPlace(
-        periodstartdate = period.startTime(),
+        perioddate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "all",
         mentioncount = 2,
         avgsentimentnumerator = 1200,
         placeid = "wof-907128885",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""
       )
     ))
 
-    val externalsourceidAll = popularPlaces.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day")
+    val externalsourceidAll = popularPlaces.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(externalsourceidAll.toSet == Set(
       PopularPlace(
-        periodstartdate = period.startTime(),
+        perioddate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "twitter",
         mentioncount = 1,
         avgsentimentnumerator = 700,
         placeid = "wof-907128885",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""
       ),
       PopularPlace(
-        periodstartdate = period.startTime(),
+        perioddate = period.startTime(),
         externalsourceid = "all",
-        periodenddate = period.endTime(),
         periodtype = "day",
-        period = period.toString,
         pipelinekey = "facebook",
         mentioncount = 1,
         avgsentimentnumerator = 500,
         placeid = "wof-907128885",
-        centroidlat = 10,
-        centroidlon = 20,
+        tileid = "8_120_142",
+        tilez = 8,
         conjunctiontopic1 = "europe",
         conjunctiontopic2 = "",
         conjunctiontopic3 = ""

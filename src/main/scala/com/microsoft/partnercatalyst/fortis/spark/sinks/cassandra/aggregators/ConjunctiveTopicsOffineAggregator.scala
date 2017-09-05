@@ -19,9 +19,9 @@ class ConjunctiveTopicsOffineAggregator extends OfflineAggregator[ConjunctiveTop
 
     conjunctiveTopics.keyBy(r=>{(
       r.pipelinekey, r.externalsourceid,
-      r.periodtype, r.period, r.periodstartdate, r.periodenddate,
+      r.periodtype, r.perioddate,
       r.topic, r.conjunctivetopic,
-      r.tilex, r.tiley, r.tilez
+      r.tileid, r.tilez
     )}).reduceByKey((a,b)=>{
       a.copy(mentioncount = a.mentioncount+b.mentioncount)
     }).values

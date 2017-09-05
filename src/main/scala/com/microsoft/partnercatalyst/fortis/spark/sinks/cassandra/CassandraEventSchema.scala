@@ -36,19 +36,20 @@ object CassandraEventSchema {
 
 object CassandraPopularPlaces {
   def apply(item: Event): Seq[PopularPlace] = {
+    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
+
     for {
       kw <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       location <- item.computedfeatures.places
       periodType <- Utils.getCassandraPeriodTypes
+      tileid <- tiles
     } yield PopularPlace(
       pipelinekey = item.pipelinekey,
-      centroidlat = location.centroidlat,
-      centroidlon = location.centroidlon,
       placeid = location.placeid,
-      periodstartdate = Period(item.eventtime, periodType).startTime(),
-      periodenddate = Period(item.eventtime, periodType).endTime(),
+      tilez = tileid.zoom,
+      tileid = tileid.tileId,
+      perioddate = Period(item.eventtime, periodType).startTime(),
       periodtype = periodType.periodTypeName,
-      period = periodType.format(item.eventtime),
       externalsourceid = item.externalsourceid,
       mentioncount = item.computedfeatures.mentions,
       conjunctiontopic1 = kw._1,
@@ -59,41 +60,17 @@ object CassandraPopularPlaces {
   }
 }
 
-object CassandraPopularTopics {
-  def apply(item: Event): Seq[PopularTopicAggregate] = {
-    for {
-      kw <- item.computedfeatures.keywords
-      tileid <- TileUtils.tile_seq_from_places(item.computedfeatures.places)
-      periodType <- Utils.getCassandraPeriodTypes
-    } yield PopularTopicAggregate(
-      pipelinekey = item.pipelinekey,
-      periodstartdate = Period(item.eventtime, periodType).startTime(),
-      periodenddate = Period(item.eventtime, periodType).endTime(),
-      periodtype = periodType.periodTypeName,
-      period = periodType.format(item.eventtime),
-      tilex = tileid.column,
-      tiley = tileid.row,
-      tilez = tileid.zoom,
-      topic = kw,
-      externalsourceid = item.externalsourceid,
-      mentioncount = item.computedfeatures.mentions,
-      avgsentimentnumerator = 0,
-      avgsentiment = item.computedfeatures.sentiment.neg_avg
-    )
-  }
-}
-
 object CassandraConjunctiveTopics {
   def apply(item: Event): Seq[ConjunctiveTopic] = {
     val keywords = item.computedfeatures.keywords
     val keywordPairs = if (keywords.isEmpty) Seq() else keywords.map(k=>(k, "")) ++ keywords.combinations(2).flatMap(combination => Seq(
-      (combination(0), combination(1)),
-      (combination(1), combination(0))
-    ))
+      (combination.head, combination(1)),
+      (combination(1), combination.head
+    )))
 
     val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
 
-    (for {
+    for {
       kwPair <- keywordPairs
       tileid <- tiles
       periodType <- Utils.getCassandraPeriodTypes
@@ -102,43 +79,56 @@ object CassandraConjunctiveTopics {
       conjunctivetopic = kwPair._2,
       externalsourceid = item.externalsourceid,
       mentioncount = item.computedfeatures.mentions,
-      period = periodType.format(item.eventtime),
-      periodenddate = Period(item.eventtime, periodType).endTime(),
-      periodstartdate = Period(item.eventtime, periodType).startTime(),
+      perioddate = Period(item.eventtime, periodType).startTime(),
       periodtype = periodType.periodTypeName,
       pipelinekey = item.pipelinekey,
-      tilex = tileid.column,
-      tiley = tileid.row,
+      tileid = tileid.tileId,
       tilez = tileid.zoom
-    )).toSeq
+    )
   }
 }
 
-object CassandraComputedTiles {
-  def apply(item: Event): Seq[ComputedTile] = {
+object CassandraTileBucket {
+  def apply(item: HeatmapTile): ComputedTile = {
+    ComputedTile(
+      pipelinekey = item.pipelinekey,
+      mentioncount = item.mentioncount,
+      avgsentimentnumerator = item.avgsentimentnumerator,
+      externalsourceid = item.externalsourceid,
+      perioddate = item.perioddate,
+      period = item.period,
+      conjunctiontopic1 = item.conjunctiontopic1,
+      conjunctiontopic2 = item.conjunctiontopic2,
+      conjunctiontopic3 = item.conjunctiontopic3,
+      tilez = item.tilez,
+      tileid = item.tileid,
+      periodtype = item.periodtype
+    )
+  }
+}
+
+object CassandraHeatmapTiles {
+  def apply(item: Event): Seq[HeatmapTile] = {
     for {
       ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       place <- item.computedfeatures.places
       periodType <- Utils.getCassandraPeriodTypes
       zoom <- MAX_ZOOM to MIN_ZOOM by -1
       tileId = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
-    } yield ComputedTile(
+    } yield HeatmapTile(
         pipelinekey = item.pipelinekey,
-        periodstartdate = Period(item.eventtime, periodType).startTime(),
-        periodenddate = Period(item.eventtime, periodType).endTime(),
+        perioddate = Period(item.eventtime, periodType).startTime(),
         periodtype = periodType.periodTypeName,
         period = periodType.format(item.eventtime),
-        tilex = tileId.column,
-        tiley = tileId.row,
+        tileid = tileId.tileId,
         tilez = tileId.zoom,
-        detailtileid = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom + DETAIL_ZOOM_DELTA).tileId,
+        heatmaptileid = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom + DETAIL_ZOOM_DELTA).tileId,
         conjunctiontopic1 = ct._1,
         conjunctiontopic2 = ct._2,
         conjunctiontopic3 = ct._3,
         externalsourceid = item.externalsourceid,
         mentioncount = item.computedfeatures.mentions,
-        avgsentimentnumerator = 0,
-        avgsentiment = item.computedfeatures.sentiment.neg_avg
+        avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * FortisUdfFunctions.DoubleToLongConversionFactor).toLong
     )
   }
 }
@@ -160,15 +150,20 @@ object CassandraEventTopicSchema {
 
 object CassandraEventPlacesSchema {
   def apply(item: Event): Seq[EventPlaces] = {
+    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
+
     for {
       ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       location <- item.computedfeatures.places
+      tileid <- tiles
     } yield EventPlaces(
       pipelinekey = item.pipelinekey,
       centroidlat = location.centroidlat,
       centroidlon = location.centroidlon,
       eventid = item.eventid,
       eventtime = item.eventtime,
+      tileid = tileid.tileId,
+      tilez = tileid.zoom,
       conjunctiontopic1 = ct._1,
       conjunctiontopic2 = ct._2,
       conjunctiontopic3 = ct._3,

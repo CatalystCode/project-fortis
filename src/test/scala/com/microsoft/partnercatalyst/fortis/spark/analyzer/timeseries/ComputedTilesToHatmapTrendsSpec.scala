@@ -4,7 +4,7 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.ComputedTile
 import org.apache.spark.{SparkConf, SparkContext}
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 
-class ComputedTilesToComputedTrendsSpec extends FlatSpec with BeforeAndAfter {
+class ComputedTilesToHatmapTrendsSpec extends FlatSpec with BeforeAndAfter {
 
   private val conf = new SparkConf()
     .setAppName(this.getClass.getSimpleName)
