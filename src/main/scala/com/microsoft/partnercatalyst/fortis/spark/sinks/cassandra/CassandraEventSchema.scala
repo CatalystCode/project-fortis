@@ -212,10 +212,9 @@ object Utils {
   def getFeatures(item: FortisEvent): Features = {
     //todo val genderCounts = item.analysis.genders.map(_.name).groupBy(identity).mapValues(t=>t.size.toLong)
     val entityCounts = item.analysis.entities.map(_.name).groupBy(identity).mapValues(t=>t.size.toLong)
-    val zero = 0.toLong
     Features(
       mentions = 1,
-      places = item.analysis.locations.map(place => Place(placeid = place.wofId, centroidlat = place.latitude.getOrElse(-1), centroidlon = place.longitude.getOrElse(-1))),
+      places = item.analysis.locations.map(place => Place(placeid = place.wofId, centroidlat = place.latitude, centroidlon = place.longitude)),
       keywords = item.analysis.keywords.map(_.name),
       sentiment = Sentiment(neg_avg = getSentimentScore(item.analysis.sentiments)),
       entities = entityCounts.map(kv => Entities(

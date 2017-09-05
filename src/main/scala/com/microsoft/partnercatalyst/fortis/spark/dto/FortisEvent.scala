@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
+import java.util.Objects
+
 trait FortisEvent {
   val details: Details
   val analysis: Analysis
@@ -30,10 +32,20 @@ case class Analysis(
 
 case class Location(
   wofId: String,
-  confidence: Option[Double] = None,
-  latitude: Option[Double] = None,
-  longitude: Option[Double] = None
-)
+  latitude: Double,
+  longitude: Double,
+  confidence: Option[Double] = None
+) {
+
+  override def equals(obj: scala.Any): Boolean = {
+    if (obj == null) return false
+    if (!obj.isInstanceOf[Location]) return false
+    val location = obj.asInstanceOf[Location]
+    Objects.equals(wofId, location.wofId)
+  }
+
+  override def hashCode(): Int = wofId.hashCode
+}
 
 case class Tag(
   name: String,

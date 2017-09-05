@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature.toLocation
 import net.liftweb.json
 
 import scalaj.http.Http
@@ -49,6 +50,6 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
   protected def landmarksToLocations(marks: Iterable[dto.JsonImageLandmark]): Iterable[Location] = {
     val landmarks = marks.map(landmark => landmark.name -> landmark.confidence).toMap
     val features = featureServiceClient.name(landmarks.keys)
-    features.map(loc => Location(wofId = loc.id, confidence = landmarks.get(loc.name)))
+    features.map(loc => toLocation(loc).copy(confidence = landmarks.get(loc.name)))
   }
 }

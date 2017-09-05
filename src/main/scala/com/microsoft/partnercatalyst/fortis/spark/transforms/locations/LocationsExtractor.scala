@@ -6,7 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.Fe
 
 @SerialVersionUID(100L)
 class LocationsExtractor private[locations](
-  lookup: Map[String, Set[String]],
+  lookup: Map[String, Set[Location]],
   featureServiceClient: FeatureServiceClient,
   placeRecognizer: Option[PlaceRecognizer] = None,
   ngrams: Int = 3
@@ -19,7 +19,7 @@ class LocationsExtractor private[locations](
 
     val candidatePlaces = extractCandidatePlaces(text).toSet
     val locationsInGeofence = candidatePlaces.flatMap(place => lookup.get(place.toLowerCase)).flatten
-    locationsInGeofence.map(wofId => Location(wofId, confidence = Some(0.5)))
+    locationsInGeofence.map(_.copy(confidence = Some(0.5)))
   }
 
   private def extractCandidatePlaces(text: String): Iterable[String] = {

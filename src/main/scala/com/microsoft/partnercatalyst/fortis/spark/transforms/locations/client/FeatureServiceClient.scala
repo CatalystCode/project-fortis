@@ -40,17 +40,17 @@ class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggabl
   }
 
   protected def fetchBboxResponse(geofence: Geofence): Try[String] = {
-    val fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
+    val fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}?include=centroid"
     fetchResponse(fetch)
   }
 
   protected def fetchPointResponse(latitude: Double, longitude: Double): Try[String] = {
-    val fetch = s"$apiUrlBase/features/point/$latitude/$longitude"
+    val fetch = s"$apiUrlBase/features/point/$latitude/$longitude?include=centroid"
     fetchResponse(fetch)
   }
 
   protected def fetchNameResponse(names: Iterable[String]): Try[String] = {
-    val fetch = s"$apiUrlBase/features/name/${names.mkString(",")}"
+    val fetch = s"$apiUrlBase/features/name/${names.mkString(",")}?include=centroid"
     fetchResponse(fetch)
   }
 

@@ -1,16 +1,15 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
-import java.util.{Date, Locale, UUID}
+import java.util.{Date, UUID}
 
 import com.microsoft.partnercatalyst.fortis.spark.dto._
-import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.{SparkConf, SparkContext}
-
-import scala.collection.mutable
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra._
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.{Seconds, StreamingContext}
 
+import scala.collection.mutable
 import scala.util.Properties.{envOrElse, envOrNone}
 
 object CassandraTest {
@@ -66,7 +65,7 @@ object CassandraTest {
         title = "twitter post" ),
       analysis = Analysis(
         sentiments = List(.5),
-        locations = List(Location(wofId = "wof-85670485", confidence = Option(1.0), latitude = Option(12.21), longitude = Option(43.1)), Location(wofId = "wof-85680959", confidence = Option(1.0), latitude = Option(14.21), longitude = Option(43.1))),
+        locations = List(Location(wofId = "wof-85670485", confidence = Option(1.0), latitude = 12.21, longitude = 43.1), Location(wofId = "wof-85680959", confidence = Option(1.0), latitude = 14.21, longitude = 43.1)),
         keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="car", confidence = Option(1.0))),
        //todo genders = List(Tag(name = "male", confidence = Option(1.0)), Tag(name ="female", confidence = Option(1.0))),
         entities = List(Tag(name = "putin", confidence = Option(1.0))),
@@ -85,7 +84,7 @@ object CassandraTest {
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
-          locations = List(Location(wofId = "wof-85670485", confidence = Option(1.0), latitude = Option(12.21), longitude = Option(43.1))),
+          locations = List(Location(wofId = "wof-85670485", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
           keywords = List(Tag(name = "isis", confidence = Option(1.0)),
             Tag(name ="car", confidence = Option(1.0)),
             Tag(name ="bomb", confidence = Option(1.0)),
@@ -107,7 +106,7 @@ object CassandraTest {
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
-          locations = List(Location(wofId = "wof-85670485", confidence = Option(1.0), latitude = Option(12.21), longitude = Option(43.1))),
+          locations = List(Location(wofId = "wof-85670485", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
           keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="fear", confidence = Option(1.0)), Tag(name ="bomb", confidence = Option(1.0)), Tag(name ="fatalities", confidence = Option(1.0))),
           //todo genders = List(Tag(name = "male", confidence = Option(1.0)), Tag(name ="female", confidence = Option(1.0))),
           entities = List(Tag(name = "putin", confidence = Option(1.0))),
