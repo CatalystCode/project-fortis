@@ -165,8 +165,6 @@ CREATE TABLE popularplaces (
     placeid text,
     tilez int,
     tileid text,
-    centroidlat float,
-    centroidlon float,
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
