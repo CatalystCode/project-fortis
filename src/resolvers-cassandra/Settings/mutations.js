@@ -73,15 +73,17 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           logo,
           title,
           sitename,
-          languages
-        ) VALUES (?,?,?,?,?,?)`,
+          languages,
+          defaultLanguage
+        ) VALUES (?,?,?,?,?,?,?)`,
         params: [
           args.input.targetBbox,
           args.input.defaultZoomLevel,
           args.input.logo,
           args.input.title,
           args.input.name,
-          args.input.supportedLanguages
+          args.input.supportedLanguages,
+          args.input.defaultLanguage
         ]
       }]);
     })

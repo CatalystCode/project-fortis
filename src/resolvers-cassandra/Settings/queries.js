@@ -20,17 +20,17 @@ function cassandraRowToSite(row) {
       logo: row.logo,
       title: row.title,
       defaultLocation: row.geofence,
+      defaultLanguage: row.defaultlanguage,
       supportedLanguages: row.languages
     }
   };
 }
 
 function transformWatchlist(item, translatedlanguage){
-  const DefaultLanguage = 'en';
-
   return {
-    name: item.topic,
-    translatedname: (item.translations || {})[translatedlanguage || DefaultLanguage],
+    name: item.topic.toLowerCase(),
+    translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ? 
+    (item.translations || {})[translatedlanguage] : item.topic,
     translatednamelang: translatedlanguage,
     namelang: item.lang_code
   };
@@ -47,37 +47,31 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     FROM fortis.watchlist
     `.trim();
 
-    const params = [
-    ];
-
+    const params = [ ];
     cassandraConnector.executeQuery(query, params)
     .then(rows => 
       resolve({
-        edges: rows.map(item=>transformWatchlist(item, args.translationLanguage))
+        edges: rows
+        .map(item=>transformWatchlist(item, args.translationLanguage))
+        .filter(term=>term.translatedname)
       })
     ).catch(reject);
   });
 }
 
 /**
- * @param {{siteId: string}} args
+ * @param {{}} args
  * @returns {Promise.<{runTime: string, sites: Array<{name: string, properties: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}>}
  */
 function sites(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const siteId = args.siteId;
-    if (!siteId) {
-      return reject('No site id to fetch specified');
-    }
-    
-    const siteById = 'SELECT * FROM fortis.sitesettings WHERE sitename = ?';
-    cassandraConnector.executeQuery(siteById, [siteId])
+  return new Promise((resolve, reject) => {    
+    const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
+    cassandraConnector.executeQuery(siteByIdQuery, [])
     .then(rows => {
-      if (rows.length < 1) return reject(`Could not find site with sitename ${siteId}`);
-      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename '${siteId}'`);
+      if (rows.length < 1) return reject('Could not find site with sitename');
+      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
 
-      const site = cassandraRowToSite(rows[0]);
-      resolve({sites: [site]});
+      resolve({site: cassandraRowToSite(rows[0])});
     })
     .catch(reject);
   });
@@ -233,6 +227,7 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 module.exports = {
   sites: trackEvent(withRunTime(sites), 'sites'),
   streams: trackEvent(withRunTime(streams), 'streams'),
+  siteTerms: trackEvent(withRunTime(terms), 'terms'),
   twitterAccounts: trackEvent(withRunTime(twitterAccounts), 'twitterAccounts'),
   trustedTwitterAccounts: trackEvent(withRunTime(trustedTwitterAccounts), 'trustedTwitterAccounts'),
   facebookPages: trackEvent(withRunTime(facebookPages), 'facebookPages'),

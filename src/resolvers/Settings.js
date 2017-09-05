@@ -71,10 +71,7 @@ function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
 function modifyTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   const startTime = Date.now();
   const inputDefinition = args.input;
-  console.log(inputDefinition);
-  console.log('Modifying collection');
   const trustedAccts = inputDefinition.accounts.map(page => Object.assign({}, page, {PartitionKey: {'_': inputDefinition.site}, RowKey: {'_': page.RowKey}}));
-  console.log(trustedAccts);
   return new Promise((resolve, reject) => {
     azureTableService.ModifyTrustedTwitterAccounts(inputDefinition.site, trustedAccts, azureTableService.AZURE_TABLE_BATCH_ACTIONS.INSERT_OR_MODIFY,
     (error, results) => {

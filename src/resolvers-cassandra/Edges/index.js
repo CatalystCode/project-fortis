@@ -7,5 +7,6 @@ module.exports = {
   timeSeries: queries.timeSeries,
   topSources: queries.topSources,
   topTerms: queries.topTerms,
+  geofenceplaces: queries.geofenceplaces,
   conjunctiveTerms: queries.conjunctiveTopics
 };

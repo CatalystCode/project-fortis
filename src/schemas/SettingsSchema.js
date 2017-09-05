@@ -2,14 +2,14 @@ const graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
   type Query {
-    sites(siteId: String): SiteCollection
+    sites: SiteCollection
     streams: StreamCollection
+    siteTerms(translationLanguage: String): TermCollection
     twitterAccounts(siteId: String!): TwitterAccountCollection
     trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
     facebookPages(siteId: String!): FacebookPageCollection
     facebookAnalytics(siteId: String!, days: Int!): FacebookPageAnalyticsCollection
     termBlacklist(siteId: String!): BlacklistCollection
-    terms(translationLanguage: String): TermCollection
   }
 
   type Mutation {
@@ -37,6 +37,7 @@ module.exports = graphql.buildSchema(`
     logo: String,
     title: String,
     defaultLocation: [Float],
+    defaultLanguage: String,
     storageConnectionString: String,
     featuresConnectionString: String,
     mapzenApiKey: String,
@@ -75,7 +76,7 @@ module.exports = graphql.buildSchema(`
 
   type SiteCollection {
     runTime: String,
-    sites: [Site]!,
+    site: Site!,
   }
 
   type StreamCollection {
@@ -164,6 +165,7 @@ module.exports = graphql.buildSchema(`
     siteType: String,
     targetBbox: [Float],
     defaultZoomLevel: Int,
+    defaultLanguage: String,
     logo: String,
     title: String,
     name: String,

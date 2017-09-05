@@ -20,7 +20,7 @@ module.exports = {
   removeKeywords: mutations.removeKeywords,
   addKeywords: mutations.addKeywords,
 
-  terms: queries.terms,
+  siteTerms: queries.siteTerms,
   sites: queries.sites,
   streams: queries.streams,
   twitterAccounts: queries.twitterAccounts,

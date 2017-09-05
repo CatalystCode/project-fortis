@@ -2,7 +2,6 @@
 
 const Promise = require('promise');
 const geotile = require('geotile');
-const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 const { tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
@@ -12,22 +11,16 @@ const { computeWeightedAvg } = require('../../utils/collections');
 /**
  * @param {{tilex: number, tiley: number, tilez: number, avgsentimentnumerator: number, mentioncount: number}} rows
  */
-function heatmapToFeatures(feature) {
-  const heatmap = feature.heatmap ? JSON.parse(feature.heatmap) : {};
-  const tileIds = Object.keys(heatmap);
+function heatmapToFeatures(tiles) {
   const type = 'Point';
   
-  return tileIds.map(id => {
-    const { mentioncountagg, avgsentimentagg } = heatmap[id];
-    const mentions = Long.fromInt(mentioncountagg);
-    const avgsentiment = Long.fromInt(avgsentimentagg);
-    const date = feature.periodstartdate;
-    const { row, column, zoom } = geotile.tileFromTileId(id);
+  return tiles.map(tile => {
+    const { row, column, zoom, id } = geotile.tileFromTileId(tile.heatmaptileid);
     const coordinates = [geotile.longitudeFromColumn(column, zoom), geotile.latitudeFromRow(row, zoom)];
     const properties = {
-      mentions: mentioncountagg,
-      avgsentiment: computeWeightedAvg(mentions, avgsentiment),
-      date: date,
+      mentions: tile.mentioncount,
+      avgsentiment: computeWeightedAvg(tile.mentioncount, tile.avgsentimentnumerator),
+      date: tile.perioddate,
       tile: { row, zoom, column, id }
     };
 
@@ -39,39 +32,33 @@ function queryHeatmapTilesByParentTile(args) {
   return new Promise((resolve, reject) => {
     const type = 'FeatureCollection';
     const query = `
-    SELECT heatmap, periodstartdate
+    SELECT heatmaptileid, perioddate, mentioncount, avgsentimentnumerator
     FROM fortis.heatmap
     WHERE periodtype = ?
     AND conjunctiontopic1 = ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
     AND tilez = ?
-    AND tilex = ?
-    AND tiley = ?
     AND pipelinekey IN ?
     AND externalsourceid = ?
-    AND (periodstartdate, periodenddate) <= (?, ?)
-    AND (periodstartdate, periodenddate) >= (?, ?)
+    AND perioddate <= '${args.toDate}'
+    AND perioddate >= '${args.fromDate}'
+    AND tileid = ?
     `.trim();
 
     const params = [
       args.periodType,
       ...toConjunctionTopics(args.maintopic, args.conjunctivetopics),
       args.zoomLevel,
-      args.tilex,
-      args.tiley,
       args.pipelinekeys,
       args.externalsourceid,
-      args.toDate,
-      args.toDate,
-      args.fromDate,
-      args.fromDate
+      args.tileid
     ];
 
     cassandraConnector.executeQuery(query, params)
     .then(rows => resolve({
       type: type,
-      features: [].concat.apply([], rows.map(heatmapToFeatures))
+      features: [].concat.apply([], heatmapToFeatures(rows))
     }))
     .catch(reject);
   });
