@@ -20,10 +20,7 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with
       pipelinekey = "Facebook",
       sharedLocations = Option(item.post.getPlace).map(_.getLocation) match {
         case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
-        case None =>
-          val errorMsg = "Empty PageIds argument for Facebook connector stream"
-          logFatalError(errorMsg)
-          throw new IllegalArgumentException(errorMsg)
+        case None => List()
       },
       sourceurl = item.post.getPermalinkUrl.toString,
       original = item
