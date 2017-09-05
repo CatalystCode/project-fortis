@@ -231,56 +231,51 @@ function removeSite(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function paramEntryToMap(paramEntry) {
-  return paramEntry.reduce((obj, item) => (obj[item.key] = item.value, obj) , {});
+  return paramEntry.reduce((obj, item) => (obj[item.key] = item.value, obj), {});
 }
 
 /**
- * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>}}} args
+ * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>, enabled: boolean}}} args
  * @returns {Promise}
  */
-function createStream(args, res) { // eslint-disable-line no-unused-vars
+function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const pipelineKey = args && args.input && args.input.pipelineKey;
-    if (!pipelineKey || !pipelineKey.length) return reject('No pipelineKey specified.');
-    const params = paramEntryToMap(args.input.params);
-
-    cassandraConnector.executeBatchMutations([{
-      query: 'DELETE FROM fortis.streams WHERE pipelinekey = ?',
-      params: [pipelineKey]
-    }])
-    .then(() => {
-      return cassandraConnector.executeBatchMutations([{
-        query: `INSERT INTO fortis.streams (
-        streamid, 
-        pipelinekey,
-        pipelinelabel,
-        pipelineicon,
-        streamfactory,
-        params
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
+    const streams = args && args.input && args.input.streams;
+    if (!streams || !streams.length) return reject('No streams specified');
+    
+    const mutations = [];
+    streams.forEach(stream => {
+      let params = paramEntryToMap(stream.params);
+      mutations.push({
+        query: `UPDATE fortis.streams 
+        SET pipelinelabel = ?,
+        pipelineicon = ?,
+        streamfactory = ?,
+        params = ?,
+        enabled = ? 
+        WHERE streamid = ? AND pipelinekey = ?`,
         params: [
-          uuid(), 
-          pipelineKey,
-          args.input.pipelineLabel,
-          args.input.pipelineIcon,
-          args.input.streamFactory,
-          params
+          stream.pipelineLabel,
+          stream.pipelineIcon,
+          stream.streamFactory,
+          params,
+          stream.enabled,
+          stream.streamId,
+          stream.pipelineKey
         ]
-      }]);
-    })
+      });
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
     .then(() => {
       resolve({
-        properties: {
-          pipelineKey: pipelineKey,
-          pipelineLabel: args.input.pipelineLabel,
-          pipelineIcon: args.input.pipelineIcon,
-          streamFactory: args.input.streamFactory
-        }
+        streams
       });
     })
     .catch(reject);
   });
 }
+
 
 /**
  * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>}}} args
@@ -566,7 +561,7 @@ module.exports = {
   createOrReplaceSite: createOrReplaceSite,
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
-  createStream: trackEvent(createStream, 'createStream'),
+  modifyStreams: trackEvent(withRunTime(modifyStreams), 'modifyStreams'),
   removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords'),
   addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords'),
   editSite: trackEvent(withRunTime(editSite), 'editSite'),
