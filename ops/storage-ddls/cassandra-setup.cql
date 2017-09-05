@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS streams;
 DROP TABLE IF EXISTS trustedsources;
 DROP TABLE IF EXISTS conjunctivetopics;
 DROP TABLE IF EXISTS computedtiles;
+DROP TABLE IF EXISTS heatmap;
 DROP TABLE IF EXISTS popularplaces;
 DROP TABLE IF EXISTS eventtopics;
 DROP TABLE IF EXISTS eventplaces;
@@ -133,11 +134,27 @@ CREATE TABLE computedtiles (
     externalsourceid text,
     mentioncount bigint,
     avgsentimentnumerator bigint,
-    heatmap text,
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
     PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, externalsourceid, tileid), perioddate, period)
+);
+
+CREATE TABLE heatmap (
+    perioddate timestamp,
+    periodtype text,
+    pipelinekey text,
+    tilez int,
+    period text,
+    tileid text,
+    heatmaptileid text,
+    externalsourceid text,
+    mentioncount counter,
+    avgsentimentnumerator counter,
+    conjunctiontopic1 text,
+    conjunctiontopic2 text,
+    conjunctiontopic3 text,
+    PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, externalsourceid, tileid), perioddate, heatmaptileid, period)
 );
 
 CREATE TABLE popularplaces (
@@ -148,6 +165,8 @@ CREATE TABLE popularplaces (
     placeid text,
     tilez int,
     tileid text,
+    centroidlat float,
+    centroidlon float,
     conjunctiontopic1 text,
     conjunctiontopic2 text,
     conjunctiontopic3 text,
@@ -192,8 +211,8 @@ CREATE TABLE eventplaces(
     eventtime timestamp,
     pipelinekey text,
     externalsourceid text,
-    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez), eventtime, tileid, eventid, placeid)
-) WITH CLUSTERING ORDER BY (eventtime DESC);
+    PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez), tileid, eventtime, eventid, placeid)
+) WITH CLUSTERING ORDER BY (tileid DESC, eventtime DESC);
 
 /**
  * Allows for fetching trending topics given a pipeline, period and zoom level.
