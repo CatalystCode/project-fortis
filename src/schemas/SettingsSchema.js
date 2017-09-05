@@ -18,8 +18,8 @@ module.exports = graphql.buildSchema(`
     addKeywords(input: MutatedTerms): TermCollection
     removeSite(input: EditableSiteSettings!): Site
     editSite(input: EditableSiteSettings!): Site
-    createStream(input: StreamDefinition!): Stream
-    removeStream(input: StreamDefinition!): Stream
+    modifyStreams(input: StreamListInput!): StreamCollection
+    removeStream(input: StreamListInput!): StreamCollection
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     createOrReplaceSite(input: SiteDefinition!): Site
@@ -84,11 +84,19 @@ module.exports = graphql.buildSchema(`
     streams: [Stream]!
   }
 
+  type ParamsEntry {   
+    key: String!,    
+    value: String!  
+  }
+
   type Stream {
-    pipelineKey: String,
-    pipelineLabel: String,
-    pipelineIcon: String,
-    streamFactory: String
+    streamId: String!,
+    pipelineKey: String!,
+    pipelineLabel: String!,
+    pipelineIcon: String!,
+    streamFactory: String!,
+    params: [ParamsEntry]!,
+    enabled: Boolean!
   }
 
   type TwitterAccountCollection {
@@ -173,17 +181,23 @@ module.exports = graphql.buildSchema(`
     supportedLanguages: [String]
   }
 
-  input ParamsEntry {   
+  input ParamsEntryInput {   
     key: String!,    
     value: String!  
   }
-  
-  input StreamDefinition {
-    pipelineKey: String!
-    pipelineLabel: String!
-    pipelineIcon: String
-    streamFactory: String!
-    params: [ParamsEntry]!
+
+  input StreamInput {
+    streamId: String!,
+    pipelineKey: String!,
+    pipelineLabel: String!,
+    pipelineIcon: String!,
+    streamFactory: String!,
+    params: [ParamsEntryInput]!,
+    enabled: Boolean!
+  }
+
+  input StreamListInput {
+    streams: [StreamInput]!
   }
 
   input TwitterAccountDefintion {
