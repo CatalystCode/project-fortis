@@ -50,7 +50,7 @@ object CassandraEventsSink extends Loggable {
             new ConjunctiveTopicsOffineAggregator,
             new PopularPlacesOfflineAggregator,
             new HeatmapOfflineAggregator(sparkSession)
-          ).par
+          )
 
           val eventBatchDF = Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
             fetchEventBatch(batchid, fortisEventsRDD, sparkSession)
