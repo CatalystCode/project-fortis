@@ -15,10 +15,10 @@ class FacebookCommentAnalyzer extends Analyzer[FacebookComment] with Serializabl
       sourceeventid = item.comment.getId,
       eventtime = item.comment.getCreatedTime.getTime,
       body = item.comment.getMessage,
-      title = String.format("Post %s: Comment", item.postId),
+      title = s"Post ${item.postId}: Comment",
       externalsourceid = item.pageId,
       pipelinekey = "Facebook",
-      sourceurl = String.format("https://www.facebook.com/%s/posts/%s", item.pageId, item.postId),
+      sourceurl = s"https://www.facebook.com/${item.pageId}/posts/${item.postId}",
       original = item
     )
   }
