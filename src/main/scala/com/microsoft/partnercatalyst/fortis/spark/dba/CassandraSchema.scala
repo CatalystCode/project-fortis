@@ -13,6 +13,7 @@ object CassandraSchema {
     case class SiteSetting(
       sitename: String,
       geofence: Seq[Double],
+      defaultlanguage: Option[String],
       languages: Seq[String],
       defaultzoom: Int,
       title: String,

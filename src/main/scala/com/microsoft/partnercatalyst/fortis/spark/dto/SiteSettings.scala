@@ -3,6 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.dto
 case class SiteSettings(
   siteName: String,
   geofence: Geofence,
+  defaultlanguage: Option[String],
   languages: Seq[String],
   defaultZoom: Int,
   title: String,
