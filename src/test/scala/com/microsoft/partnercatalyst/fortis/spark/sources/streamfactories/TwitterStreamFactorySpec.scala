@@ -1,18 +1,147 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
-import org.scalatest.FlatSpec
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, SiteSettings}
+import org.apache.spark.{SparkConf, SparkContext}
+import org.mockito.Mockito
+import org.mockito.ArgumentMatchers
+import org.scalatest.{BeforeAndAfter, FlatSpec}
+import twitter4j.FilterQuery
 
-class TwitterStreamFactorySpec extends FlatSpec {
-  "The params parser" should "parse languages" in {
-    assert(TwitterStreamFactory.parseLanguages(Map("foo" -> "bar")).isEmpty)
-    assert(TwitterStreamFactory.parseLanguages(Map("languages" -> "en")).get sameElements Array("en"))
-    assert(TwitterStreamFactory.parseLanguages(Map("languages" -> "en|fr")).get sameElements Array("en", "fr"))
+class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
+
+  private val conf = new SparkConf()
+    .setAppName(this.getClass.getSimpleName)
+    .setMaster("local[*]")
+    .set("output.consistency.level", "LOCAL_ONE")
+
+  private var sc: SparkContext = _
+  private var factory: TwitterStreamFactory = _
+  private var configurationManager: ConfigurationManager = _
+  private var siteSettings: SiteSettings = _
+
+  before {
+    sc = new SparkContext(conf)
+    factory = new TwitterStreamFactory
+    configurationManager = Mockito.mock(classOf[ConfigurationManager])
+    siteSettings = new SiteSettings(
+      siteName = "Fortis",
+      geofence = Geofence(1, 2, 3, 4),
+      defaultlanguage = Some("en"),
+      languages = Seq("en", "es", "fr"),
+      defaultZoom = 8,
+      title = "Fortis",
+      logo = "",
+      translationSvcToken = "",
+      cogSpeechSvcToken = "",
+      cogVisionSvcToken = "",
+      cogTextSvcToken = "",
+      insertiontime = System.currentTimeMillis()
+    )
+    Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(siteSettings)
   }
 
-  it should "parse keywords" in {
-    assert(TwitterStreamFactory.parseKeywords(Map("foo" -> "bar")).isEmpty)
-    assert(TwitterStreamFactory.parseKeywords(Map("keywords" -> "foo")).get sameElements Array("foo"))
-    assert(TwitterStreamFactory.parseKeywords(Map("keywords" -> "foo|bar|baz")).get sameElements Array("foo", "bar", "baz"))
+  after {
+    sc.stop()
+  }
+
+  it should "append to query when watchlist is present" in {
+    Mockito.when(configurationManager.fetchWatchlist(ArgumentMatchers.any())).thenReturn(Map(
+      "en"->Seq("hello", "world"),
+      "es"->Seq("hola", "mundo"),
+      "fr"->Seq("salut", "monde")
+    ))
+    val query = new FilterQuery()
+    val watchlistAppended = factory.appendWatchlist(query, sc, configurationManager)
+    assert(watchlistAppended == true)
+    assert(query == new FilterQuery("hello", "hola", "monde", "mundo", "salut", "world"))
+  }
+
+  it should "append subset to query when watchlist count exceeds max term count" in {
+    Mockito.when(configurationManager.fetchWatchlist(ArgumentMatchers.any())).thenReturn(Map(
+      "en"->Seq("hello", "world"),
+      "es"->Seq("hola", "mundo"),
+      "fr"->Seq("salut", "monde")
+    ))
+
+    factory.twitterMaxTermCount = 2
+
+    val query0 = new FilterQuery()
+    assert(factory.appendWatchlist(query0, sc, configurationManager) == true)
+    assert(query0 == new FilterQuery("hello", "hola"))
+
+    val query1 = new FilterQuery()
+    assert(factory.appendWatchlist(query1, sc, configurationManager) == true)
+    assert(query1 == new FilterQuery("monde", "mundo"))
+
+    val query2 = new FilterQuery()
+    assert(factory.appendWatchlist(query2, sc, configurationManager) == true)
+    assert(query2 == new FilterQuery("salut", "world"))
+  }
+
+  it should "return false when watchlist is absent" in {
+    Mockito.when(configurationManager.fetchWatchlist(ArgumentMatchers.any())).thenReturn(Map[String, Seq[String]]())
+    val query = new FilterQuery()
+    val watchlistAppended = factory.appendWatchlist(query, sc, configurationManager)
+    assert(watchlistAppended == false)
+    assert(query == new FilterQuery())
+  }
+
+  it should "append to query when languages are present" in {
+    val query = new FilterQuery()
+    val languagesAdded = factory.addLanguages(query, sc, configurationManager)
+    assert(languagesAdded == true)
+    val expectedQuery = new FilterQuery()
+    expectedQuery.language("en", "es", "fr")
+    assert(query == expectedQuery)
+  }
+
+  it should "return true when languages are absent but defaultlanguage is present" in {
+    val noLanguageSiteSettings = new SiteSettings(
+      siteName = "Fortis",
+      geofence = Geofence(1, 2, 3, 4),
+      defaultlanguage = Some("en"),
+      languages = Seq(),
+      defaultZoom = 8,
+      title = "Fortis",
+      logo = "",
+      translationSvcToken = "",
+      cogSpeechSvcToken = "",
+      cogVisionSvcToken = "",
+      cogTextSvcToken = "",
+      insertiontime = System.currentTimeMillis()
+    )
+    Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(noLanguageSiteSettings)
+
+    val query = new FilterQuery()
+    val languagesAdded = factory.addLanguages(query, sc, configurationManager)
+    assert(languagesAdded == true)
+    val expectedQuery = new FilterQuery()
+    expectedQuery.language("en")
+    assert(query == expectedQuery)
+  }
+
+  it should "return false when both languages and defaultlanguage are absent" in {
+    val noLanguageSiteSettings = new SiteSettings(
+      siteName = "Fortis",
+      geofence = Geofence(1, 2, 3, 4),
+      defaultlanguage = None,
+      languages = Seq(),
+      defaultZoom = 8,
+      title = "Fortis",
+      logo = "",
+      translationSvcToken = "",
+      cogSpeechSvcToken = "",
+      cogVisionSvcToken = "",
+      cogTextSvcToken = "",
+      insertiontime = System.currentTimeMillis()
+    )
+    Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(noLanguageSiteSettings)
+
+    val query = new FilterQuery()
+    val languagesAdded = factory.addLanguages(query, sc, configurationManager)
+    assert(languagesAdded == false)
+    assert(query == new FilterQuery())
   }
 
   it should "parse user ids" in {

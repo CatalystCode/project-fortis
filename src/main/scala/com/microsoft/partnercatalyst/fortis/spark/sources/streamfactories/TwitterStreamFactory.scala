@@ -1,8 +1,11 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories.TwitterStreamFactory._
-import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
+import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter.TwitterUtils
@@ -10,18 +13,24 @@ import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 import twitter4j.{FilterQuery, Status}
 
+import scala.collection.mutable
+
 class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
+
+  private[streamfactories] var twitterMaxTermCount = sys.env.getOrElse("FORTIS_TWITTER_MAX_TERM_COUNT", 400.toString).toInt
+
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
     connectorConfig.name == "Twitter"
   }
 
-  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[Status] = {
+  override protected def buildStream(ssc: StreamingContext, configurationManager: ConfigurationManager, connectorConfig: ConnectorConfig): DStream[Status] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters
+    val consumerKey = params.getAs[String]("consumerKey")
     val auth = new OAuthAuthorization(
       new ConfigurationBuilder()
-        .setOAuthConsumerKey(params.getAs[String]("consumerKey"))
+        .setOAuthConsumerKey(consumerKey)
         .setOAuthConsumerSecret(params.getAs[String]("consumerSecret"))
         .setOAuthAccessToken(params.getAs[String]("accessToken"))
         .setOAuthAccessTokenSecret(params.getAs[String]("accessTokenSecret"))
@@ -29,14 +38,22 @@ class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
     )
 
     val query = new FilterQuery
-    val hasQuery =
-      addKeywords(query, params) ||
-        addUsers(query, params) ||
-        addLanguages(query, params) ||
-        addLocations(query, params)
 
-    if (!hasQuery) {
-      logInfo("No filter set for Twitter stream")
+    val keywordsAdded = appendWatchlist(query, ssc.sparkContext, configurationManager)
+    if (!keywordsAdded) {
+      logInfo(s"No keywords used for Twitter consumerKey $consumerKey. Returning empty stream.")
+      return ssc.queueStream(new mutable.Queue[RDD[Status]])
+    }
+
+    val languagesAdded = addLanguages(query, ssc.sparkContext, configurationManager)
+    if (!languagesAdded) {
+      logInfo(s"No languages set for Twitter consumerKey $consumerKey. Returning empty stream.")
+      return ssc.queueStream(new mutable.Queue[RDD[Status]])
+    }
+
+    val usersAdded = addUsers(query, params)
+    if (!usersAdded) {
+      logInfo(s"No users set for Twitter consumerKey $consumerKey")
     }
 
     TwitterUtils.createFilteredStream(
@@ -45,14 +62,27 @@ class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
       query = Some(query))
   }
 
-  private def addKeywords(query: FilterQuery, params: Map[String, Any]): Boolean = {
-    parseKeywords(params) match {
-      case Some(keywords) =>
-        query.track(keywords:_*)
-        true
-      case None =>
-        false
+  private[streamfactories] def appendWatchlist(query: FilterQuery, sparkContext: SparkContext, configurationManager: ConfigurationManager): Boolean = {
+    val watchlistCurrentOffsetKey = "TwitterStreamFactory.watchlistCurrentOffset"
+    val watchlistCurrentOffsetValue = sparkContext.getLocalProperty(watchlistCurrentOffsetKey) match {
+      case value:String => value.toInt
+      case _ => 0
     }
+
+    val watchlist = configurationManager.fetchWatchlist(sparkContext)
+    val sortedTerms = watchlist.values.flatMap(v=>v).toList.sorted
+
+    val terms = sortedTerms.drop(watchlistCurrentOffsetValue)
+    if (terms.isEmpty) return false
+
+    val maxTerms = twitterMaxTermCount
+    val updatedWatchlistCurrentOffsetValue = watchlistCurrentOffsetValue + maxTerms
+    val selectedTerms = terms.take(maxTerms)
+    query.track(selectedTerms:_*)
+
+    sparkContext.setLocalProperty(watchlistCurrentOffsetKey, updatedWatchlistCurrentOffsetValue.toString)
+
+    true
   }
 
   private def addUsers(query: FilterQuery, params: Map[String, Any]): Boolean = {
@@ -65,25 +95,23 @@ class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
     }
   }
 
-  private def addLanguages(query: FilterQuery, params: Map[String, Any]): Boolean = {
-    parseLanguages(params) match {
-      case Some(languages) =>
-        query.language(languages:_*)
+  private[streamfactories] def addLanguages(query: FilterQuery, sparkContext: SparkContext, configurationManager: ConfigurationManager): Boolean = {
+    val defaultlanguage = configurationManager.fetchSiteSettings(sparkContext).defaultlanguage
+    val languages = configurationManager.fetchSiteSettings(sparkContext).languages
+    val allLanguages = defaultlanguage match {
+      case None => languages
+      case Some(language) => (Set(language) ++ languages.toSet).toSeq
+    }
+
+    allLanguages.size match {
+      case 0 => false
+      case _ => {
+        query.language(allLanguages:_*)
         true
-      case None =>
-        false
+      }
     }
   }
 
-  private def addLocations(query: FilterQuery, params: Map[String, Any]): Boolean = {
-    parseLocations(params) match {
-      case Some(locations) =>
-        query.locations(locations:_*)
-        true
-      case None =>
-        false
-    }
-  }
 }
 
 object TwitterStreamFactory {
@@ -95,9 +123,7 @@ object TwitterStreamFactory {
     }
   }
 
-  def parseLanguages(params: Map[String, Any]): Option[Array[String]] = parseList(params, "languages")
   def parseUserIds(params: Map[String, Any]): Option[Array[Long]] = parseList(params, "userIds").map(_.map(_.toLong))
-  def parseKeywords(params: Map[String, Any]): Option[Array[String]] = parseList(params, "keywords")
 
   private def parseList(params: Map[String, Any], key: String): Option[Array[String]] = params.get(key).map(_.asInstanceOf[String].split('|'))
 }

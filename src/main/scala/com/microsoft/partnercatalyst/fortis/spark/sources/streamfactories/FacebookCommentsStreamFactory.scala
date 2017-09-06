@@ -3,6 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookComment
 import com.github.catalystcode.fortis.spark.streaming.facebook.{FacebookAuth, FacebookUtils}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -11,7 +12,7 @@ class FacebookCommentStreamFactory extends StreamFactoryBase[FacebookComment] {
     connectorConfig.name == "FacebookComment"
   }
 
-  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[FacebookComment] = {
+  override protected def buildStream(ssc: StreamingContext, configurationManager: ConfigurationManager, connectorConfig: ConnectorConfig): DStream[FacebookComment] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters

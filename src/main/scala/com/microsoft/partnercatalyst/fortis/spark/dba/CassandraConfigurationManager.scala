@@ -49,6 +49,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
           siteName = row.sitename,
           geofence = Geofence(row.geofence(0), row.geofence(1), row.geofence(2), row.geofence(3)),
           languages = row.languages,
+          defaultlanguage = row.defaultlanguage,
           defaultZoom = row.defaultzoom,
           title = row.title,
           logo = row.logo,
