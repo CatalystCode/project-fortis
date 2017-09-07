@@ -278,23 +278,26 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
 
 
 /**
- * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>}}} args
+ * @param {{input: {pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, params: Array<{String: String}>, enabled: boolean}}} args
  * @returns {Promise}
  */
-function removeStream(args, res) { // eslint-disable-line no-unused-vars
+function removeStreams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const pipelineKey = args && args.input && args.input.pipelineKey;
-    if (!pipelineKey || !pipelineKey.length) return reject('No pipelineKey specified.');
-    
-    cassandraConnector.executeBatchMutations([{
-      query: 'DELETE FROM fortis.streams WHERE pipelinekey = ?',
-      params: [pipelineKey]
-    }])      
+    const streams = args && args.input && args.input.streams;
+    if (!streams || !streams.length) return reject('No streams specified');
+
+    let deletions = [];
+    streams.forEach(stream => {
+      deletions.push({
+        query: 'DELETE FROM fortis.streams WHERE streamid = ? AND pipelinekey = ?',
+        params: [stream.streamId, stream.pipelineKey]
+      });
+    });
+
+    cassandraConnector.executeBatchMutations(deletions)
     .then(() => {
       resolve({
-        properties: {
-          pipelineKey
-        }
+        streams
       });
     })
     .catch(reject);
@@ -562,10 +565,10 @@ module.exports = {
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
   modifyStreams: trackEvent(withRunTime(modifyStreams), 'modifyStreams'),
+  removeStreams: trackEvent(removeStreams, 'removeStreams'),
   removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords'),
   addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords'),
   editSite: trackEvent(withRunTime(editSite), 'editSite'),
-  removeStream: trackEvent(removeStream, 'removeStream'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
   modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
