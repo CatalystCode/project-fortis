@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sources
 
 import java.io.File
 
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories._
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.customevents.CustomEventsAdapter
@@ -9,7 +10,7 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamwrappers.tadaweb
 import com.microsoft.partnercatalyst.fortis.spark.{Constants, FortisSettings}
 
 object StreamProviderFactory {
-  def create()(implicit settings: FortisSettings): StreamProvider = {
+  def create(configurationManager: ConfigurationManager)(implicit settings: FortisSettings): StreamProvider = {
     import EventHubStreamFactory.utf8ToString
     val streamProvider = StreamProvider()
       .withFactories(
@@ -35,7 +36,7 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
-          new TwitterStreamFactory
+          new TwitterStreamFactory(configurationManager)
         )
       )
       .withFactories(

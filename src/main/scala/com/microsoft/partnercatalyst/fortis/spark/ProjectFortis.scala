@@ -71,9 +71,8 @@ object ProjectFortis extends App with Loggable {
   }
 
   private def attachToContext(ssc:StreamingContext): Boolean = {
-    val streamProvider = StreamProviderFactory.create()
-
     val configManager = new CassandraConfigurationManager
+    val streamProvider = StreamProviderFactory.create(configManager)
     val featureServiceClient = new FeatureServiceClient(fortisSettings.featureServiceUrlBase)
     val transformContextProvider = new TransformContextProvider(configManager, featureServiceClient)
 
