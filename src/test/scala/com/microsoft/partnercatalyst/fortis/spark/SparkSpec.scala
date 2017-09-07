@@ -58,7 +58,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
     val provider = TestProviderWithTestFactory()
 
     assertResult(None) {
-      provider.buildStream[String](ssc, configurationManager, List())
+      provider.buildStream[String](ssc, List())
     }
   }
 
@@ -68,7 +68,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
       mutable.Queue(sc.makeRDD(Seq("B")))  // Data source 1 contains element "B"
     ))
 
-    val testStream = provider.buildStream[String](ssc, configurationManager, List(
+    val testStream = provider.buildStream[String](ssc, List(
       // Specify 2 configs, one that reads from data source 0, and one that reads from data source 1
       ConnectorConfig(TestStreamFactory.Name, Map(TestStreamFactory.paramIndex -> "0")),
       ConnectorConfig(TestStreamFactory.Name, Map(TestStreamFactory.paramIndex -> "1"))
@@ -95,7 +95,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
     val provider = TestProviderWithTestFactory()
 
     intercept[UnsupportedConnectorConfigException] {
-      provider.buildStream[String](ssc, configurationManager, List(
+      provider.buildStream[String](ssc, List(
         ConnectorConfig("InvalidName", Map())
       ))
     }
@@ -111,7 +111,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
     )
 
     intercept[AssertionError] {
-      provider.buildStream[String](ssc, configurationManager, List(
+      provider.buildStream[String](ssc, List(
         ConnectorConfig(TestStreamFactory.Name, Map())
       ))
     }

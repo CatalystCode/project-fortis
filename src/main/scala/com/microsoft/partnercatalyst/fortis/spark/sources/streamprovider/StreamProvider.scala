@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider
 
-import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -50,7 +49,6 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
     */
   def buildStream[A: TypeTag](
     streamingContext: StreamingContext,
-    configurationManager: ConfigurationManager,
     configs: List[ConnectorConfig],
     typeName: Option[String] = None): Option[DStream[A]] = {
 
