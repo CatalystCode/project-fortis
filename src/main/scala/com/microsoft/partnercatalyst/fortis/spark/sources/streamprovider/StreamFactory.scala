@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider
 
-import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -16,5 +15,5 @@ trait StreamFactory[A] {
     * @param streamingContext The Spark Streaming Context
     * @return A partial function for transforming a connector config
     */
-  def createStream(streamingContext: StreamingContext, configurationManager: ConfigurationManager): PartialFunction[ConnectorConfig, DStream[A]]
+  def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[A]]
 }

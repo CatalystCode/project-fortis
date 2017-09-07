@@ -27,7 +27,7 @@ class SparkSpec extends FlatSpec with BeforeAndAfter {
   }
 
   class TestStreamFactory(inputQueues: List[mutable.Queue[RDD[String]]]) extends StreamFactory[String] {
-    override def createStream(streamingContext: StreamingContext, configurationManager: ConfigurationManager): PartialFunction[ConnectorConfig, DStream[String]] = {
+    override def createStream(streamingContext: StreamingContext): PartialFunction[ConnectorConfig, DStream[String]] = {
       case ConnectorConfig(TestStreamFactory.Name, params) =>
         streamingContext.queueStream[String](inputQueues(params(TestStreamFactory.paramIndex).asInstanceOf[String].toInt))
     }
