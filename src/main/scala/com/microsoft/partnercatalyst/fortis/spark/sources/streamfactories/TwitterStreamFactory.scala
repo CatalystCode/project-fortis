@@ -15,7 +15,7 @@ import twitter4j.{FilterQuery, Status}
 
 import scala.collection.mutable
 
-class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
+class TwitterStreamFactory(configurationManager: ConfigurationManager) extends StreamFactoryBase[Status] with Loggable {
 
   private[streamfactories] var twitterMaxTermCount = sys.env.getOrElse("FORTIS_TWITTER_MAX_TERM_COUNT", 400.toString).toInt
 
@@ -23,7 +23,7 @@ class TwitterStreamFactory extends StreamFactoryBase[Status] with Loggable {
     connectorConfig.name == "Twitter"
   }
 
-  override protected def buildStream(ssc: StreamingContext, configurationManager: ConfigurationManager, connectorConfig: ConnectorConfig): DStream[Status] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[Status] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters

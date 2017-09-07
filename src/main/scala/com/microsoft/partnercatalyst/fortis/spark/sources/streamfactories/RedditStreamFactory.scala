@@ -2,8 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObject
 import com.github.catalystcode.fortis.spark.streaming.reddit.{RedditAuth, RedditUtils}
-import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory}
-import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -12,7 +11,7 @@ class RedditStreamFactory extends StreamFactoryBase[RedditObject] {
     connectorConfig.name == "RedditObject"
   }
 
-  override protected def buildStream(ssc: StreamingContext, configurationManager: ConfigurationManager, connectorConfig: ConnectorConfig): DStream[RedditObject] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[RedditObject] = {
     import ParameterExtensions._
 
     val params = connectorConfig.parameters

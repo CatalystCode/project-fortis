@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 object Constants {
   val SparkAppName = "project-fortis-spark"
   val SparkMasterDefault = "local[*]"
-  val SparkStreamingBatchSizeDefault = 5
+  val SparkStreamingBatchSizeDefault = 30
 
   val EventHubProgressDir = "eventhubProgress"
   val SscInitRetryAfterMillis = 60*1000

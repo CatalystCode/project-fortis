@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider
 
-import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
@@ -50,7 +49,6 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
     */
   def buildStream[A: TypeTag](
     streamingContext: StreamingContext,
-    configurationManager: ConfigurationManager,
     configs: List[ConnectorConfig],
     typeName: Option[String] = None): Option[DStream[A]] = {
 
@@ -59,7 +57,7 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
 
     val factories = typeToFactories(typeNameOrDefault[A](typeName)).map(_.asInstanceOf[StreamFactory[A]])
 
-    assert(!configs.exists(config => factories.count(_.createStream(streamingContext, configurationManager).isDefinedAt(config)) > 1),
+    assert(!configs.exists(config => factories.count(_.createStream(streamingContext).isDefinedAt(config)) > 1),
       s"stream creation must not be defined for more than 1 factory registered for type '$typeName' for a single config"
     )
 
@@ -67,7 +65,7 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
       case _ => throw new UnsupportedConnectorConfigException
     }
 
-    val createStream: PartialFunction[ConnectorConfig, DStream[A]] = factories.map(_.createStream(streamingContext, configurationManager)).reduceOption(_.orElse(_)) match {
+    val createStream: PartialFunction[ConnectorConfig, DStream[A]] = factories.map(_.createStream(streamingContext)).reduceOption(_.orElse(_)) match {
       case Some(pf) => pf.orElse(throwUnsupported)
       case None => throwUnsupported
     }

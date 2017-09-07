@@ -2,9 +2,8 @@ package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import java.nio.charset.StandardCharsets
 
-import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.{ConnectorConfig, StreamFactory}
+import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.log4j.LogManager
-import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.eventhubs.EventHubsUtils
@@ -19,7 +18,7 @@ class EventHubStreamFactory[A: ClassTag](identifier: String, adapter: (Array[Byt
     connectorConfig.name == identifier
   }
 
-  override protected def buildStream(ssc: StreamingContext, configurationManager: ConfigurationManager, connectorConfig: ConnectorConfig): DStream[A] = {
+  override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[A] = {
     import ParameterExtensions._
 
     // Copy adapter ref locally to avoid serializing entire EventHubStreamFactory instance

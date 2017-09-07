@@ -22,7 +22,7 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
 
   before {
     sc = new SparkContext(conf)
-    factory = new TwitterStreamFactory
+    factory = new TwitterStreamFactory(configurationManager)
     configurationManager = Mockito.mock(classOf[ConfigurationManager])
     siteSettings = new SiteSettings(
       siteName = "Fortis",
