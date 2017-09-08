@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import java.util.{Date, UUID}
 
+import com.microsoft.partnercatalyst.fortis.spark.dba.{CassandraConfigurationManager, ConfigurationManager}
 import com.microsoft.partnercatalyst.fortis.spark.dto._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra._
 import org.apache.spark.SparkConf
@@ -114,7 +115,8 @@ object CassandraTest {
         ))))
 
     val dstream = ssc.queueStream(mutable.Queue(testEventsRdd)).asInstanceOf[DStream[FortisEvent]]
-    CassandraEventsSink(dstream, sparksession)
+    val configurationManager: ConfigurationManager = new CassandraConfigurationManager()
+    CassandraEventsSink(dstream, sparksession, configurationManager)
     ssc.start()
     ssc.awaitTermination()
     /*   = "twitter",

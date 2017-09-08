@@ -97,7 +97,7 @@ object ProjectFortis extends App with Loggable {
     if (fortisEvents.isEmpty) return false
 
     val session = SparkSession.builder().config(ssc.sparkContext.getConf).getOrCreate()
-    CassandraEventsSink(fortisEvents.get, session)
+    CassandraEventsSink(fortisEvents.get, session, configManager)
 
     true
   }

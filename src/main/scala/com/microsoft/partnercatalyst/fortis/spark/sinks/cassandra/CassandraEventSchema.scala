@@ -1,15 +1,13 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
-import java.util.Date
+import java.text.Collator
+import java.util.{Date, Locale}
 
+import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.{Period, PeriodType}
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
-import java.text.Collator
-import java.util.Locale
-
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.TileUtils.{DETAIL_ZOOM_DELTA, MAX_ZOOM, MIN_ZOOM}
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.{Period, PeriodType}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs.FortisUdfFunctions
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.TileUtils.DETAIL_ZOOM_DELTA
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations._
 
 object CassandraEventSchema {
@@ -35,8 +33,8 @@ object CassandraEventSchema {
 }
 
 object CassandraPopularPlaces {
-  def apply(item: Event): Seq[PopularPlace] = {
-    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
+  def apply(item: Event, minZoom: Int): Seq[PopularPlace] = {
+    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
 
     for {
       kw <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
@@ -61,14 +59,14 @@ object CassandraPopularPlaces {
 }
 
 object CassandraConjunctiveTopics {
-  def apply(item: Event): Seq[ConjunctiveTopic] = {
+  def apply(item: Event, minZoom: Int): Seq[ConjunctiveTopic] = {
     val keywords = item.computedfeatures.keywords
     val keywordPairs = if (keywords.isEmpty) Seq() else keywords.map(k=>(k, "")) ++ keywords.combinations(2).flatMap(combination => Seq(
       (combination.head, combination(1)),
       (combination(1), combination.head
     )))
 
-    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
+    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
 
     for {
       kwPair <- keywordPairs
@@ -108,12 +106,12 @@ object CassandraTileBucket {
 }
 
 object CassandraHeatmapTiles {
-  def apply(item: Event): Seq[HeatmapTile] = {
+  def apply(item: Event, minZoom: Int): Seq[HeatmapTile] = {
     for {
       ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       place <- item.computedfeatures.places
       periodType <- Utils.getCassandraPeriodTypes
-      zoom <- MAX_ZOOM to MIN_ZOOM by -1
+      zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
       tileId = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
     } yield HeatmapTile(
         pipelinekey = item.pipelinekey,
@@ -149,8 +147,8 @@ object CassandraEventTopicSchema {
 }
 
 object CassandraEventPlacesSchema {
-  def apply(item: Event): Seq[EventPlaces] = {
-    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places)
+  def apply(item: Event, minZoom: Int): Seq[EventPlaces] = {
+    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
 
     for {
       ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))

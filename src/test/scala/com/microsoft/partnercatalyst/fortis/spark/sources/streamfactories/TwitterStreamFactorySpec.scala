@@ -25,17 +25,17 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
     factory = new TwitterStreamFactory(configurationManager)
     configurationManager = Mockito.mock(classOf[ConfigurationManager])
     siteSettings = new SiteSettings(
-      siteName = "Fortis",
-      geofence = Geofence(1, 2, 3, 4),
+      sitename = "Fortis",
+      geofence = Seq(1, 2, 3, 4),
       defaultlanguage = Some("en"),
       languages = Seq("en", "es", "fr"),
-      defaultZoom = 8,
+      defaultzoom = 8,
       title = "Fortis",
       logo = "",
-      translationSvcToken = "",
-      cogSpeechSvcToken = "",
-      cogVisionSvcToken = "",
-      cogTextSvcToken = "",
+      translationsvctoken = "",
+      cogspeechsvctoken = "",
+      cogvisionsvctoken = "",
+      cogtextsvctoken = "",
       insertiontime = System.currentTimeMillis()
     )
     Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(siteSettings)
@@ -98,17 +98,17 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
 
   it should "return true when languages are absent but defaultlanguage is present" in {
     val noLanguageSiteSettings = new SiteSettings(
-      siteName = "Fortis",
-      geofence = Geofence(1, 2, 3, 4),
+      sitename = "Fortis",
+      geofence = Seq(1, 2, 3, 4),
       defaultlanguage = Some("en"),
       languages = Seq(),
-      defaultZoom = 8,
+      defaultzoom = 8,
       title = "Fortis",
       logo = "",
-      translationSvcToken = "",
-      cogSpeechSvcToken = "",
-      cogVisionSvcToken = "",
-      cogTextSvcToken = "",
+      translationsvctoken = "",
+      cogspeechsvctoken = "",
+      cogvisionsvctoken = "",
+      cogtextsvctoken = "",
       insertiontime = System.currentTimeMillis()
     )
     Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(noLanguageSiteSettings)
@@ -123,17 +123,17 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
 
   it should "return false when both languages and defaultlanguage are absent" in {
     val noLanguageSiteSettings = new SiteSettings(
-      siteName = "Fortis",
-      geofence = Geofence(1, 2, 3, 4),
+      sitename = "Fortis",
+      geofence = Seq(1, 2, 3, 4),
       defaultlanguage = None,
       languages = Seq(),
-      defaultZoom = 8,
+      defaultzoom = 8,
       title = "Fortis",
       logo = "",
-      translationSvcToken = "",
-      cogSpeechSvcToken = "",
-      cogVisionSvcToken = "",
-      cogTextSvcToken = "",
+      translationsvctoken = "",
+      cogspeechsvctoken = "",
+      cogvisionsvctoken = "",
+      cogtextsvctoken = "",
       insertiontime = System.currentTimeMillis()
     )
     Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(noLanguageSiteSettings)

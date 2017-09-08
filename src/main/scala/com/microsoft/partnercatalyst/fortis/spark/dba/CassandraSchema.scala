@@ -10,21 +10,6 @@ object CassandraSchema {
     val StreamsName = "streams"
     val TrustedSourcesName = "trustedsources"
 
-    case class SiteSetting(
-      sitename: String,
-      geofence: Seq[Double],
-      defaultlanguage: Option[String],
-      languages: Seq[String],
-      defaultzoom: Int,
-      title: String,
-      logo: String,
-      translationsvctoken: String,
-      cogspeechsvctoken: String,
-      cogvisionsvctoken: String,
-      cogtextsvctoken: String,
-      insertiontime: Long
-    )
-
     case class Stream(
       pipelinekey: String,
       streamid: String,

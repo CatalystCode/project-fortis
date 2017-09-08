@@ -34,8 +34,8 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       placeids = Seq(),
       sourceurl = "",
       title = ""
-    ))
-    assert(topics.size == 180)
+    ), minZoom = 8)
+    assert(topics.size == 220)
     assert(topics.head == ConjunctiveTopic(
       conjunctivetopic = "",
       externalsourceid = "HamillHimself",
@@ -74,8 +74,8 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       placeids = Seq(),
       sourceurl = "",
       title = ""
-    ))
-    assert(topics.size == 45)
+    ), minZoom = 8)
+    assert(topics.size == 55)
     assert(topics.head == ConjunctiveTopic(
       conjunctivetopic = "",
       externalsourceid = "HamillHimself",
@@ -113,7 +113,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       placeids = Seq(),
       sourceurl = "",
       title = ""
-    ))
+    ), minZoom = 8)
     assert(topics == Seq())
   }
 
@@ -141,7 +141,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       placeids = Seq(),
       sourceurl = "",
       title = ""
-    ))
+    ), minZoom = 8)
     assert(topics == Seq())
   }
 }

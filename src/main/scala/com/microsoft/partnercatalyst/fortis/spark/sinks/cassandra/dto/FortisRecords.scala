@@ -125,20 +125,6 @@ case class ConjunctiveTopic(
   topic: String
 ) extends Serializable
 
-case class SiteSetting(
-  sitename: String,
-  geofence: Seq[Double],
-  languages: Set[String],
-  defaultzoom: Int,
-  title: String,
-  logo: String,
-  translationsvctoken: String,
-  cogspeechsvctoken: String,
-  cogvisionsvctoken: String,
-  cogtextsvctoken: String,
-  insertiontime: Long
-)
-
 case class Stream(
   pipeline: String,
   streamid: Long,

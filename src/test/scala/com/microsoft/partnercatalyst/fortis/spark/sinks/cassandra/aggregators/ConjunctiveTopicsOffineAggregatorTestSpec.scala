@@ -3,14 +3,19 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 import java.util.{Date, UUID}
 
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.Period
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 
 class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndAfter {
 
-  private val aggregator = new ConjunctiveTopicsOffineAggregator()
+  private var configurationManager: ConfigurationManager = _
+  private var aggregator: ConjunctiveTopicsOffineAggregator = _
+  private var siteSettings: SiteSettings = _
   private val conf = new SparkConf()
     .setAppName(this.getClass.getSimpleName)
     .setMaster("local[*]")
@@ -19,7 +24,24 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
   private var sc: SparkContext = _
 
   before {
+    configurationManager = Mockito.mock(classOf[ConfigurationManager])
+    aggregator = new ConjunctiveTopicsOffineAggregator(configurationManager)
     sc = new SparkContext(conf)
+    siteSettings = new SiteSettings(
+      sitename = "Fortis",
+      geofence = Seq(1, 2, 3, 4),
+      defaultlanguage = Some("en"),
+      languages = Seq("en", "es", "fr"),
+      defaultzoom = 8,
+      title = "Fortis",
+      logo = "",
+      translationsvctoken = "",
+      cogspeechsvctoken = "",
+      cogvisionsvctoken = "",
+      cogtextsvctoken = "",
+      insertiontime = System.currentTimeMillis()
+    )
+    Mockito.when(configurationManager.fetchSiteSettings(ArgumentMatchers.any())).thenReturn(siteSettings)
   }
 
   after {
@@ -54,7 +76,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     )))
 
     val topics = aggregator.aggregate(events).collect()
-    assert(topics.size == 135)
+    assert(topics.size == 165)
 
     val filteredTopics = topics.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(filteredTopics.size == 1)
@@ -125,7 +147,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     ))
 
     val topics = aggregator.aggregate(events).collect()
-    assert(topics.size == 180)
+    assert(topics.size == 220)
 
     val allSourcesTopics = topics.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allSourcesTopics.size == 1)
@@ -210,7 +232,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     ))
 
     val topics = aggregator.aggregate(events).collect()
-    assert(topics.size == 225)
+    assert(topics.size == 275)
 
     val allSourcesTopics = topics.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allSourcesTopics.size == 2)
