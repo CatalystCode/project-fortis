@@ -84,7 +84,8 @@ echo "Finished. Deploying environment settings to cluster."
     "${eh_conn_str}" \
     "${fortis_central_directory}" \
     "${sb_conn_str}" \
-    "${storage_account_name}"
+    "${storage_account_name}" \
+    "${storage_account_key}"
 
 echo "Finished. Installing spark cluster."
 ./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}" "${fortis_central_directory}" "${storage_account_name}" "${storage_account_key}" "${checkpointfileshare}"

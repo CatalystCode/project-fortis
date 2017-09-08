@@ -15,6 +15,7 @@ readonly eh_conn_str="${9}"
 readonly fortis_central_directory="${10}"
 readonly sb_conn_str="${11}"
 readonly storage_account_name="${12}"
+readonly storage_account_key="${13}"
 
 readonly fortis_admin_interface="http://${fortis_interface_host}/#/site/${site_name}/admin"
 readonly default_language="en"
@@ -58,6 +59,8 @@ echo FORTIS_SB_CONN_STR="${sb_conn_str}"
 echo CASSANDRA_USERNAME="cassandra"
 echo CASSANDRA_PASSWORD="cassandra"
 echo CASSANDRA_KEYSPACE="fortis"
+echo USER_FILES_BLOB_ACCOUNT_NAME="${storage_account_name}"
+echo USER_FILES_BLOB_ACCOUNT_KEY="${storage_account_key}"
 echo ENABLE_V2=1
 } >> .env
 
