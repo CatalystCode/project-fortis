@@ -95,6 +95,7 @@ CREATE TABLE sitesettings(
     languages set<text>,
     defaultlanguage text,
     defaultzoom int,
+    featureservicenamespace text,
     title text,
     logo text,
     translationsvctoken text,
