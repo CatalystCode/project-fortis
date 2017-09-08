@@ -2,6 +2,7 @@
 
 const Promise = require('promise');
 const geotile = require('geotile');
+const isObject = require('lodash/isObject');
 
 function withRunTime(promiseFunc) {
   function runTimer(...args) {
@@ -10,7 +11,9 @@ function withRunTime(promiseFunc) {
       promiseFunc(...args)
       .then(returnValue => {
         const endTime = Date.now();
-        returnValue.runTime = endTime - startTime;
+        if (isObject(returnValue)) {
+          returnValue.runTime = endTime - startTime;
+        }
         resolve(returnValue);
       })
       .catch(reject);
