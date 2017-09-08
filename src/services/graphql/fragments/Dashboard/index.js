@@ -12,10 +12,10 @@ export const getMessagesByBbox = `fragment FortisDashboardView on FeatureCollect
                 language,
                 pipelinekey,
                 link,
-                originalSource,
                 title,
                 link
             }
+            coordinates
         }
     }`;
 
@@ -29,7 +29,6 @@ export const topSourcesFragment = `fragment FortisTopSourcesView on TopSourcesCo
     }`;
 
 export const termsFragment = ` fragment FortisPopularTermsView on TopTermsCollection {
-        runTime
         edges {
             name
             avgsentiment
@@ -38,13 +37,13 @@ export const termsFragment = ` fragment FortisPopularTermsView on TopTermsCollec
     }`;
 
 export const popularPlacesFragment = ` fragment FortisPopularPlacesView on TopPlacesCollection {
-        runTime
         edges {
             name
             placeid
-            coordinates
             layer
+            bbox
             mentions
+            avgsentiment
         }
     }`;
 
@@ -55,8 +54,10 @@ export const visualizationChartFragment = `fragment FortisDashboardTimeSeriesVie
         graphData {
             name
             mentions
+            avgsentiment
             date
         }
+        tiles
     }`;
 
 export const conjunctiveTermsFragment = `fragment FortisDashboardConjunctiveTermsView on ConjunctionTermCollection {
@@ -66,3 +67,19 @@ export const conjunctiveTermsFragment = `fragment FortisDashboardConjunctiveTerm
             conjunctionterm
         }
     }`;
+
+export const heatmapFragment = `fragment FortisHeatmapViewFeatures on FeatureCollection {
+    features {
+        coordinates
+        properties {
+            mentions
+            date
+            avgsentiment
+            tile {
+                id
+                row
+                column
+            }
+        }
+    }
+ }`;

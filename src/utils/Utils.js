@@ -5,6 +5,8 @@ function InvalidPropException(propName) {
    this.name = "InvalidPropException";
 }
 
+export const FromToDateFormat = "YYYY-MM-DD HH:mm:ss";
+
 export function guid (){
     function _p8(s) {
         var p = (Math.random().toString(16)+"000000000").substr(2,8);
@@ -21,8 +23,8 @@ export function momentToggleFormats(dateString, fromFormat, targetFormat){
       let sourceMoment = moment(dateString, fromFormat);
       
       return {
-          fromDate: sourceMoment.startOf(rangeType).format(),
-          toDate: sourceMoment.endOf(rangeType).format(),
+          fromDate: sourceMoment.startOf(rangeType).format(FromToDateFormat),
+          toDate: sourceMoment.endOf(rangeType).format(FromToDateFormat),
       };
  }
 

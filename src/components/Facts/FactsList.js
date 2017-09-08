@@ -2,7 +2,7 @@ import React from 'react';
 import Fluxxor from 'fluxxor';
 import ListView from './ListView';
 import { Link } from 'react-router';
-import { SERVICES } from '../../services/services';
+import { SERVICES as DashboardServices } from '../../services/Dashboard';
 import { getHumanDate, containsEqualValues, UCWords, momentLastMonths } from '../../utils/Utils.js';
 import { fragmentToArray, changeFactsUrl } from '../../utils/Fact.js';
 import SuperSelectField from 'material-ui-superselectfield/lib/superSelectField'
@@ -148,7 +148,7 @@ export const FactsList = React.createClass({
 
   translate(sentence, fromLanguage, toLanguage, factId) {
     let self = this;
-    SERVICES.translateSentence(sentence, fromLanguage, toLanguage, (translatedSentence, error) => {
+    DashboardServices.translateSentence(sentence, fromLanguage, toLanguage, (translatedSentence, error) => {
       if (translatedSentence) {
         self.state.facts.forEach(fact => {
           if (fact.id === factId) {

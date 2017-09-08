@@ -1,6 +1,6 @@
 import React from 'react';
 import Fluxxor from 'fluxxor';
-import {Dashboard} from '../components/Insights/Dashboard';
+import Dashboard from '../components/Insights/Dashboard';
 
 const FluxMixin = Fluxxor.FluxMixin(React),
       StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
@@ -8,18 +8,29 @@ const FluxMixin = Fluxxor.FluxMixin(React),
 export const EntryPage = React.createClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
-  componentDidMount(){
-      this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
-  },
-  getStateFromFlux: function() {
+  getStateFromFlux() {
     return this.getFlux().store("DataStore").getState();
   },
+
+  propertyLiterals() {
+    const { dataSource, bbox, termFilters, maintopic, externalsourceid, datetimeSelection, 
+            fromDate, toDate, language, zoomLevel, settings, timespanType, 
+            conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
+            topSources, trustedSources, fullTermList } = this.state;
+
+    return Object.assign({}, { dataSource, maintopic, termFilters, bbox, 
+                               externalsourceid, datetimeSelection, fromDate, toDate, language,
+                               zoomLevel, settings, timespanType, heatmapTileIds, 
+                               conjunctivetopics, timeSeriesGraphData, popularLocations, popularTerms,
+                               topSources, trustedSources, fullTermList });
+  },
+
   render() {
     return (
-    this.state.settings.properties ? 
+    this.state.bbox.length ? 
       <div>
         <Dashboard flux={this.props.flux} 
-                {...this.props.params} />
+                {...this.propertyLiterals()} />
       </div>
     : <div />
   )}

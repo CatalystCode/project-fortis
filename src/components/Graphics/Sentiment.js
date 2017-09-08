@@ -35,13 +35,24 @@ export default class Sentiment extends React.Component {
 
   render() {
     const sentiment = this.getSentimentProperties();
+    const sentimentIcon = <span className={`material-icons sentimentIcon ${sentiment.style}Icon`}>{sentiment.icon}</span>;
+
     return (
-      <div className="sentimentGraph">
-        <div className={`sentimentGraphBar ${sentiment.style}`}>
-          {parseFloat(this.props.value * 10).toFixed(2)} / 10
+      <div>
+        {
+          this.props.showGraph ?
+          
+          <div className="sentimentGraph">
+            <div className={`sentimentGraphBar ${sentiment.style}`}>
+                {parseFloat(this.props.value * 10).toFixed(2)} / 10
+            </div>
+            {sentimentIcon}
           </div>
-        <span className={`material-icons sentimentIcon ${sentiment.style}Icon`}>{sentiment.icon}</span>
+            : undefined
+        }
+        {sentimentIcon}
       </div>
+
     );
   }
 
@@ -49,8 +60,10 @@ export default class Sentiment extends React.Component {
 
 Sentiment.defaultProps = {
   value: 0.5,
+  showGraph: true
 };
 
 Sentiment.propTypes = {
   value: React.PropTypes.number.isRequired,
+  showGraph: React.PropTypes.bool
 };

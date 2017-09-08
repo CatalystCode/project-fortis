@@ -1,11 +1,7 @@
 import RadioButton from 'material-ui/RadioButton';
 import RadioButtonGroup from 'material-ui/RadioButton/RadioButtonGroup';
 import React from 'react';
-import {Actions} from '../../actions/Actions';
-import Fluxxor from 'fluxxor';
-
-const FluxMixin = Fluxxor.FluxMixin(React),
-      StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
+import constants from '../../actions/constants';
 
 const styles={
     label: {
@@ -32,31 +28,26 @@ const styles={
     }
 };
 
-export const DataSourceFilter = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-  
-  getStateFromFlux() {
-    return this.getFlux().store("DataStore").getState();
-  },
-
+export default class DataSourceFilter extends React.Component {
   radioButtonChanged(e, value){
-      this.getFlux().actions.DASHBOARD.reloadVisualizationState(this.props.siteKey, this.state.datetimeSelection, 
-                                                                this.state.timespanType, value, this.state.categoryValue);
-  },
+      const { timespanType, datetimeSelection, fromDate, toDate, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid } = this.props;
+    
+      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, value, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid);
+  }
 
   renderDataSourceRadioOpts(iconStyle){
     let buttons = [];
-    for (let [source, value] of Actions.constants.DATA_SOURCES.entries()) {
+    for (let [source, value] of constants.DATA_SOURCES.entries()) {
         buttons.push(<RadioButton labelStyle={styles.radioLabel} style={styles.radioButton} key={source} value={source} label={<div style={styles.labelContainer}><i style={iconStyle} className={value.icon}></i><span style={styles.label}>{value.display}</span></div>} />)
     }
 
-    return <RadioButtonGroup onChange={this.radioButtonChanged} 
+    return <RadioButtonGroup onChange={(e, value)=>this.radioButtonChanged(e, value)} 
                              style={styles.buttonGroup} 
                              name="filters" 
-                             valueSelected={this.state.dataSource}>
+                             valueSelected={this.props.dataSource}>
             {buttons}
            </RadioButtonGroup>;
-  },
+  }
 
   render(){
       const iconStyle = {
@@ -65,5 +56,5 @@ export const DataSourceFilter = React.createClass({
 
       return this.renderDataSourceRadioOpts(iconStyle);
   }
-});
+}
 

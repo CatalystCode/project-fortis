@@ -59,7 +59,7 @@ export const AdminSettings = React.createClass({
     },
 
     handleSaveSettings(){
-        const {targetBbox, defaultLocation, defaultZoomLevel} = this.props.siteSettings.properties;
+        const {targetBbox, defaultLocation, defaultZoomLevel, defaultLanguage} = this.props.siteSettings.properties;
         const {name, title, logo, supportedLanguages} = this.refs;
         const languageArray = supportedLanguages.value.split(",");
         const languageJSON = `["${languageArray.join('","')}"]`;
@@ -67,7 +67,8 @@ export const AdminSettings = React.createClass({
                                name: name.value, 
                                targetBbox: targetBbox, 
                                logo:logo.value, 
-                               defaultLocation:defaultLocation, 
+                               defaultLocation:defaultLocation,
+                               defaultLanguage: defaultLanguage,
                                defaultZoomLevel:defaultZoomLevel, 
                                supportedLanguages: JSON.parse(languageJSON), 
                                title:title.value
@@ -118,6 +119,11 @@ export const AdminSettings = React.createClass({
                         <div className="form-group">
                             <label>Supported Languages(<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
                             <input onChange={this.handleChange} required name="supportedLanguages" ref="supportedLanguages" value={this.state.siteSettings.properties.supportedLanguages} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                            <div className="validation"></div>
+                        </div>
+                        <div className="form-group">
+                            <label>Default Languages(<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
+                            <input onChange={this.handleChange} required name="defaultLanguage" ref="defaultLanguage" value={this.state.siteSettings.properties.defaultLanguage} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                             <div className="validation"></div>
                         </div>
                         <div className="form-group">

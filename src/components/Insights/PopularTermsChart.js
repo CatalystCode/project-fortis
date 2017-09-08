@@ -1,97 +1,82 @@
-import Fluxxor from 'fluxxor';
 import React from 'react';
 import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
+import { fetchTermFromMap } from './shared';
+import Sentiment from '../Graphics/Sentiment';
+import constants from '../../actions/constants';
 
-const FluxMixin = Fluxxor.FluxMixin(React),
-      StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
+export default class PopularTermsChart extends React.Component {
+    constructor(props) {
+        super(props);
 
-const DEFAULT_LANGUAGE = "en";
-const BG_FILL = "#30303d";
+        this.state = {
+            activeIndex: 0,
+            dataProvider: [],
+            colorCells: []
+        };
+    }
 
-export const PopularTermsChart = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-  
-  getStateFromFlux() {
-    return this.getFlux().store("DataStore").getState();
-  },
+    handleClick(data) {
+        const { dataSource, bbox, timespanType, termFilters, datetimeSelection, zoomLevel, externalsourceid, fromDate, toDate } = this.props;
 
-  getInitialState(){
-      return {
-          activeIndex: 0,
-          dataProvider: [],
-          colorCells: []
-      };
-  },
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, data.defaultName, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+    }
 
-  handleClick(data, index) {
-    const {datetimeSelection, timespanType, dataSource} = this.state;
-  	this.getFlux().actions.DASHBOARD.reloadVisualizationState(this.props.siteKey, datetimeSelection, timespanType, dataSource, data);
-  },
+    refreshChart(props) {
+        const { allSiteTopics, popularTerms, defaultLanguage, maintopic, language } = props;
+        let activeIndex = -1;
+        let colorCells = [], dataProvider = [];
 
- refreshChart(summaryTerms){
-    const state = this.getStateFromFlux();
-    const edgeMap = state.allEdges.get(DEFAULT_LANGUAGE);
-    const selectedTopic = state.categoryValue["name_"+state.language];
-    let activeIndex = -1;
-    let colorCells = [], dataProvider = [];
+        popularTerms.forEach((term, index) => {
+            const edge = fetchTermFromMap(allSiteTopics, term.name, language, defaultLanguage);
 
-    if(summaryTerms){
-        summaryTerms.forEach((term, index) => {
-            const edge = edgeMap.get(term.name.toLowerCase());
-            if(edge){
-                let name = edge['name_'+state.language];
-                if(selectedTopic && name.toLowerCase() === selectedTopic.toLowerCase()){
-                    activeIndex = index;
-                }
-                let value = term.mentions;
-                let color = state.colorMap.get(edge.name);
-                colorCells.push(<Cell key={0} fill={color}/>);
-                
-                dataProvider.push(Object.assign({}, edge, { value, name}));
+            if (edge.name.toLowerCase() === maintopic.toLowerCase()) {
+                activeIndex = index;
             }
+
+            const value = term.mentions;
+            const icon = <Sentiment showGraph={false} value={term.avgsentiment} />;
+            const color = constants.CHART_STYLE.COLORS[index];
+            const name = edge.translatedname;
+            const defaultName = edge.name;
+
+            colorCells.push(<Cell key={0} fill={color} />);
+
+            dataProvider.push(Object.assign({}, { value, name, icon, defaultName }));
         });
 
-        this.setState({colorCells, dataProvider, activeIndex});
+        this.setState({ colorCells, dataProvider, activeIndex });
     }
- },
 
- hasChanged(nextProps, propertyName){
-      if(Array.isArray(nextProps[propertyName])){
-          return nextProps[propertyName].join(",") !== this.props[propertyName].join(",");
-      }
+    hasChanged(nextProps, propertyName) {
+        if (Array.isArray(nextProps[propertyName])) {
+            return nextProps[propertyName].join(",") !== this.props[propertyName].join(",");
+        }
 
-      if(this.props[propertyName] && nextProps[propertyName] && nextProps[propertyName] !== this.props[propertyName]){
-          return true;
-      }
+        if (this.props[propertyName] && nextProps[propertyName] && nextProps[propertyName] !== this.props[propertyName]) {
+            return true;
+        }
 
-      return false;
- },
-
- componentDidMount(){
-    const {popularTerms} = this.getStateFromFlux();
-
-    this.refreshChart(popularTerms);
- },
-
- componentWillReceiveProps(nextProps){
-    const {popularTerms} = this.getStateFromFlux();
-
-    if(this.props.datetimeSelection !== nextProps.datetimeSelection || this.props.dataSource !== nextProps.dataSource 
-            || this.props.language !== nextProps.language || this.props.mainEdge !== nextProps.mainEdge){
-        this.refreshChart(popularTerms);
+        return false;
     }
- },
 
- render() { 
-    return (
-        <DoughnutChart handleClick={this.handleClick} 
-                       fill={BG_FILL} 
-                       language={this.props.language}
-                       data={this.state.dataProvider}
-                       activeIndex={this.state.activeIndex}>
-            {this.state.colorCells}
-        </DoughnutChart>
-     );
-   }
-});
+    componentDidMount() {
+        this.refreshChart(this.props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.refreshChart(nextProps);
+    }
+
+    render() {
+        return (
+            <DoughnutChart handleClick={data=>this.handleClick(data)}
+                fill={constants.CHART_STYLE.BG_FILL}
+                language={this.props.language}
+                data={this.state.dataProvider}
+                activeIndex={this.state.activeIndex}>
+                {this.state.colorCells}
+            </DoughnutChart>
+        );
+    }
+}

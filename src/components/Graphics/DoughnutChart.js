@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { PieChart, Pie, Sector, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import numeralLibs from 'numeral';
 
-const CustomTooltip  = React.createClass({
+class CustomTooltip extends Component {
   render() {
     const { active } = this.props;
 
@@ -19,7 +19,7 @@ const CustomTooltip  = React.createClass({
 
     return null;
   }
-});
+}
 
 export default class DoughnutChart extends Component {
     renderActiveShape(props, activeIndex){

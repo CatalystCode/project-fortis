@@ -1,90 +1,116 @@
-import Fluxxor from 'fluxxor';
 import React from 'react';
-import {Line} from 'recharts';
+import { Area } from 'recharts';
 import moment from 'moment';
+import GraphCard from '../Graphics/GraphCard';
+import constants from '../../actions/constants';
+import { FromToDateFormat } from '../../utils/Utils';
+import { fetchTermFromMap } from './shared';
 import Timeline from '../Graphics/Timeline';
+import FlatButton from 'material-ui/FlatButton';
+import ActionTimeline from 'material-ui/svg-icons/action/timeline';
+import { fullWhite } from 'material-ui/styles/colors';
 
-const BG_FILL = "#30303d";
-const DEFAULT_LANGUAGE = "en";
-const FluxMixin = Fluxxor.FluxMixin(React),
-      StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
+export default class TimeSeriesGraph extends React.Component {
+    constructor(props) {
+        super(props);
+        this.range = {};
+        this.state = {
+            lines: []
+        };
+    }
 
-export const TimeSeriesGraph = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-  
-  getStateFromFlux() {
-    return this.getFlux().store("DataStore").getState();
-  },
+    refreshChart(props) {
+        const { timeSeriesGraphData, defaultLanguage, language, allSiteTopics } = props;
 
-  getInitialState(){
-      return {
-          lines: []
-      };
-  },
+        const lines = timeSeriesGraphData.labels.map((label, index) => {
+            const topic = fetchTermFromMap(allSiteTopics, label.name, language, defaultLanguage);
+            const localTopicName = topic.translatedname;
+            const color = constants.CHART_STYLE.COLORS[index];
 
- refreshChart(graphDataset){
-    const state = this.getStateFromFlux();
-    const {colorMap, language} = state;
-    let lines = [];
-    const edgeMap = state.allEdges.get(DEFAULT_LANGUAGE);
+            return <Area key={index}
+                name={localTopicName}
+                type="monotone"
+                connectNulls={true}
+                dataKey={topic.name}
+                stroke={color}
+                fill={color}
+                strokeWidth={3}
+                dot={false}
+                ticksCount={5} />
+        });
 
-    if(graphDataset && graphDataset.labels && graphDataset.graphData && colorMap){
-        //this.trendingTimeSeries.dataProvider = graphDataset.graphData;
-        if(graphDataset.labels){
-            graphDataset.labels.filter(label=>label.name.length > 1 && edgeMap.has(label.name.toLowerCase()))
-                               .forEach((label, index) => {
-                                            const edge = edgeMap.get(label.name.toLowerCase());
-                                            let name = edge['name_'+language];
-                                            lines.push(<Line key={index} name={name} type="linear" connectNulls={true} dataKey={edge.name} stroke={colorMap.get(edge.name)} strokeWidth={3} dot={false} ticksCount={5}/>);
-            });
+        const startIndex = 0, endIndex = timeSeriesGraphData.graphData.length - 1;
+        this.range = { startIndex, endIndex };
+
+        this.setState({ lines });
+    }
+
+    dateFormat(time) {
+        let validDatetimeTypes = ["day"];
+        let format = validDatetimeTypes.indexOf(this.props.timespanType || "") > -1 ? "h:mm a" : this.props.timespanType === "week" ? "ddd h a" : "MMM-DD";
+        return moment(time).format(format);
+    }
+
+    componentDidMount() {
+        this.refreshChart(this.props);
+    }
+
+    dateRangeChanged(range, obj) {
+        const { startIndex, endIndex } = range;
+        this.range = { startIndex, endIndex };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.refreshChart(nextProps);
+    }
+
+    momentFormat(dateString, format){
+        return moment(dateString).format(format);
+    }
+
+    resetTimeline(){
+        this.props.refreshDashboardFunction();
+    }
+
+    handleDataFetch() {
+        const { dataSource, timespanType, bbox, termFilters, timeSeriesGraphData, zoomLevel, externalsourceid, maintopic } = this.props;
+        const { startIndex, endIndex } = this.range;
+        const fromDateSlice = timeSeriesGraphData.graphData[startIndex];
+        const toDateSlice = timeSeriesGraphData.graphData[endIndex];
+
+        if(fromDateSlice && toDateSlice){
+            const datetimeSelectionFormat = "YY-MM-DD HH:mm";
+            const fromDate = this.momentFormat(fromDateSlice.date, FromToDateFormat);
+            const toDate =  this.momentFormat(toDateSlice.date, FromToDateFormat);
+            const datetimeSelection = `${this.momentFormat(fromDateSlice.date, datetimeSelectionFormat)} - ${this.momentFormat(toDateSlice.date, datetimeSelectionFormat)}`
+            const timeseriesType = constants.TIMESPAN_TYPES[timespanType].timeseriesType
+            this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timeseriesType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
         }
     }
 
-    this.setState({lines});
- },
+    render() {
+        const ActionButtons = [<FlatButton key="reload-button"
+                                           icon={<ActionTimeline color={fullWhite} />}
+                                           label="Reload with Range"
+                                           primary={true}
+                                           onClick={()=>this.handleDataFetch()} />,
+                               <FlatButton key="reset-button"
+                                           icon={<ActionTimeline color={fullWhite} />}
+                                           label="Reset Selection"
+                                           primary={true}
+                                           onClick={event => this.resetTimeline(event)} />
+        ];
 
- hasChanged(nextProps, propertyName){
-      if(Array.isArray(nextProps[propertyName])){
-          return nextProps[propertyName].join(",") !== this.props[propertyName].join(",");
-      }
-
-      if(this.props[propertyName] && nextProps[propertyName] && nextProps[propertyName] !== this.props[propertyName]){
-          return true;
-      }
-
-      return false;
- },
-
- dateFormat (time) {
-     let validDatetimeTypes = ["days", "customDate"];
-     let format = validDatetimeTypes.indexOf(this.props.timespanType || "") > -1 ? "h:mm a" : this.props.timespanType === "weeks" ? "ddd h a": "MMM-DD";
-    return moment(time).format(format);
- },
-
- componentDidMount(){
-    const {timeSeriesGraphData} = this.getStateFromFlux();
-    this.refreshChart(timeSeriesGraphData);
- },
-
- componentWillReceiveProps(nextProps){
-    const hasTimeSpanChanged = this.hasChanged(nextProps, "timespan");
-    const {timeSeriesGraphData} = this.getStateFromFlux();
-
-    if((this.hasChanged(nextProps, "mainEdge") && nextProps.edgeType === "Term") || hasTimeSpanChanged || this.hasChanged(nextProps, "dataSource") || this.hasChanged(nextProps, "language")){
-        this.refreshChart(timeSeriesGraphData);
+        return (
+            <GraphCard cardActions={ActionButtons}>
+                <Timeline fill={constants.CHART_STYLE.BG_FILL}
+                    data={this.props.timeSeriesGraphData.graphData}
+                    dataKey="date"
+                    dateRangeChanged={(range, ob) => this.dateRangeChanged(range, ob)}
+                    tickFormatter={time => this.dateFormat(time)}>
+                    {this.state.lines}
+                </Timeline>
+            </GraphCard>
+        );
     }
- },
-  
- render() {
-    const {timeSeriesGraphData} = this.getStateFromFlux();
-
-    return (
-        <Timeline fill={BG_FILL} 
-                  data={timeSeriesGraphData.graphData} 
-                  dataKey="date" 
-                  tickFormatter={this.dateFormat}>
-            {this.state.lines}
-        </Timeline>
-     );
-   }
- });
+}

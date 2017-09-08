@@ -1,13 +1,10 @@
 import Fluxxor from 'fluxxor';
-import { Actions } from '../actions/Actions';
+import constants from '../actions/constants';
 // eslint-disable-next-line
 import ReactDataGridPlugins from 'react-data-grid-addons';
 
 // eslint-disable-next-line
 const Filters = window.ReactDataGridPlugins.Filters;
-const POPULATED_TOWN = 50000;
-const PLACE_SOURCE_KEYS = {"openstreetmap.org": "osm", "naturalearthdata.com": "ned"};
-const POPULATED_CITY = 100000;
 
 export const AdminStore = Fluxxor.createStore({
     initialize() {
@@ -31,18 +28,17 @@ export const AdminStore = Fluxxor.createStore({
         };
 
         this.bindActions(
-            Actions.constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
-            Actions.constants.ADMIN.LOAD_KEYWORDS, this.handleLoadTerms,
-            Actions.constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
-            Actions.constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
-            Actions.constants.ADMIN.LOAD_SETTINGS, this.handleLoadSettings,
-            Actions.constants.ADMIN.LOAD_PLACES, this.handleLoadPlaces,
-            Actions.constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccts,
-            Actions.constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
-            Actions.constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
-            Actions.constants.ADMIN.CREATE_SITE, this.handleCreateSite,
-            Actions.constants.ADMIN.LOAD_BLACKLIST, this.handleLoadBlacklist,
-            Actions.constants.ADMIN.PUBLISHED_EVENTS, this.handlePublishedCustomEvents
+            constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
+            constants.ADMIN.LOAD_KEYWORDS, this.handleLoadTerms,
+            constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
+            constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
+            constants.ADMIN.LOAD_SETTINGS, this.handleLoadSettings,
+            constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccts,
+            constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
+            constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
+            constants.ADMIN.CREATE_SITE, this.handleCreateSite,
+            constants.ADMIN.LOAD_BLACKLIST, this.handleLoadBlacklist,
+            constants.ADMIN.PUBLISHED_EVENTS, this.handlePublishedCustomEvents
         );
     },
 
@@ -153,67 +149,6 @@ export const AdminStore = Fluxxor.createStore({
         
         this.loadTermColumns(settings.properties.supportedLanguages);
         this.loadLocalitiesColumns(settings.properties.supportedLanguages);
-        this.emit("change");
-    },
-
-    handleLoadPlaces(response){
-        this.dataStore.osmPlaceGroups.clear();
-
-        response.features.features.forEach(feature => {
-            let keyName = feature.kind;
-            const {population, source, kind, id, coordinates} = feature;
-            const originalsource = PLACE_SOURCE_KEYS[source];
-            const name = feature.name.toLowerCase();
-            const name_ar = feature.name_ar.toLowerCase();
-            const name_de = feature.name_de.toLowerCase();
-            const name_ur = feature.name_ur.toLowerCase();
-            const name_id = feature.name_id.toLowerCase();
-            const RowKey = `${id}`;
-            const properties = {population, RowKey, kind, name, name_ar, name_id, name_ur, originalsource};
-            const geometry = { "type": "Point", "coordinates": coordinates};
-
-            if(keyName === 'town' && population >= POPULATED_TOWN){
-                keyName = "Populated Towns";
-            }else if(keyName === 'city' && population >= POPULATED_CITY){
-                keyName = "Populated Cities";
-            }else if(keyName === 'town'){
-                keyName = "Small Towns";
-            }else if(keyName === 'city'){
-                keyName = "Small Cities";
-            }
-
-            let featureList = this.dataStore.osmPlaceGroups.get(keyName) || [];
-            featureList.push(Object.assign({}, {properties}, {geometry}, {"type": "Feature"}));
-            this.dataStore.osmPlaceGroups.set(keyName, featureList);
-        });
-
-        this.emit("change");
-    },
-
-    loadLocalitiesColumns(languages){
-        const defaultColDef = {
-                    editable:true,
-                    sortable : true,
-                    filterable: true,
-                    resizable: true
-        };
-        let columns = [];
-        columns.push(Object.assign({}, defaultColDef, {filterable: false, compositeKey: true, editable: false, key: "RowKey", name: "Id"}));
-        languages.forEach(lang => {
-            columns.push(Object.assign({}, defaultColDef, {
-                                                           key: lang !== "en" ? `name_${lang}` : 'name', 
-                                                           name: lang !== "en" ? `name_${lang}` : 'name'
-                                                          }))            
-        });
-        columns.push(Object.assign({}, defaultColDef, {filterable: true, editable: false, key: "originalsource", name: "Source"}));
-        columns.push(Object.assign({}, defaultColDef, {filterable: true, editable: true, key: "region", name: "Region"}));
-        columns.push(Object.assign({}, defaultColDef, {filterable: false, editable: true, key: "alternatenames", name: "Alternate Name(s)"}));
-        columns.push(Object.assign({}, defaultColDef, {filterable: true, editable: false, key: "country_iso", name: "Country Code"}));
-        columns.push(Object.assign({}, defaultColDef, {filterable: false, editable: false, key: "coordinates", name: "Coordinates"}));
-        columns.push(Object.assign({}, defaultColDef, {filterable: true, editable: true, key: "aciiname", name: "Ascii Name"}));
-        columns.push(Object.assign({}, defaultColDef, {key: "population", name: "Population", filterRenderer: Filters.NumericFilter}));
-
-        this.dataStore.locationGridColumns = columns;
         this.emit("change");
     },
 

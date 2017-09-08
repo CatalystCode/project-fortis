@@ -1,4 +1,4 @@
-import {SERVICES} from '../../services/services';
+import {SERVICES} from '../../services/Dashboard';
 import ReactDataGrid from 'react-data-grid';
 import React from 'react';
 import Fluxxor from 'fluxxor';

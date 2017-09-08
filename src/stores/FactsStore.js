@@ -1,5 +1,5 @@
 import Fluxxor from 'fluxxor';
-import { Actions } from '../actions/Actions';
+import constants from '../actions/constants';
 
 export const FactsStore = Fluxxor.createStore({
   initialize() {
@@ -17,12 +17,12 @@ export const FactsStore = Fluxxor.createStore({
     };
 
     this.bindActions(
-      Actions.constants.APP.CHANGE_LANGUAGE, this.handleLanguageChange,
-      Actions.constants.FACTS.INITIALIZE, this.intializeSettings,
-      Actions.constants.FACTS.LOAD_FACTS_SUCCESS, this.handleLoadFactsSuccess,
-      Actions.constants.FACTS.LOAD_FACTS_FAIL, this.handleLoadFactsFail,
-      Actions.constants.FACTS.LOAD_TAGS, this.handleLoadTags,
-      Actions.constants.FACTS.SAVE_PAGE_STATE, this.handleSavePageState,
+      constants.APP.CHANGE_LANGUAGE, this.handleLanguageChange,
+      constants.FACTS.INITIALIZE, this.intializeSettings,
+      constants.FACTS.LOAD_FACTS_SUCCESS, this.handleLoadFactsSuccess,
+      constants.FACTS.LOAD_FACTS_FAIL, this.handleLoadFactsFail,
+      constants.FACTS.LOAD_TAGS, this.handleLoadTags,
+      constants.FACTS.SAVE_PAGE_STATE, this.handleSavePageState,
     );
   },
 

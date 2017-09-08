@@ -1,214 +1,184 @@
 import Fluxxor from 'fluxxor';
-import {Actions} from '../actions/Actions';
+import constants from '../actions/constants';
+import { momentGetFromToRange } from '../utils/Utils.js';
 import moment from 'moment';
 
-const LANGUAGE_CODE_ENG='en';
+const LANGUAGE_CODE_ENG = 'en';
+
+function makeMap(items, keyFunc, valueFunc) {
+    let map = new Map();
+
+    items.forEach(item => {
+        const key = keyFunc(item);
+        const value = valueFunc(item);
+        map.set(key, Object.assign({}, (map.get(key) || {}), value));
+    });
+
+    return map;
+}
+
+function convertDateValueToRange(timeSelection, timeType){
+    const formatter = constants.TIMESPAN_TYPES[timeType];
+    return momentGetFromToRange(timeSelection, formatter.format, formatter.rangeFormat);
+}
 
 export const DataStore = Fluxxor.createStore({
     initialize(profile) {
-      
-      this.dataStore = {
-          userProfile: profile,
-          timespanType: 'month',
-          datetimeSelection: moment().format("YYYY-MM"),
-          categoryType: '',
-          dataSource: 'all',
-          fromDateRange: false,
-          toDateRange: false,
-          settings: {},
-          siteKey: '',
-          associatedKeywords: new Map(),
-          timeSeriesGraphData: {},
-          popularLocations: [],
-          popularTerms: [],
-          topSources: [],
-          trustedSources: [],
-          originalSource: '',
-          termFilters: new Set(),
-          allEdges: new Map(),
-          bbox: [],
-          zoomLevel: 8,
-          colorMap: new Map(),
-          selectedLocationCoordinates: [],
-          categoryValue: false,
-          language: 'en'
-      }
-      
-      this.bindActions(
-            Actions.constants.DASHBOARD.INITIALIZE, this.intializeSettings,
-            Actions.constants.DASHBOARD.RELOAD_TOP_SOURCES, this.syncTopSources,
-            Actions.constants.DASHBOARD.RELOAD_CHARTS, this.handleReloadChartData,
-            Actions.constants.DASHBOARD.ASSOCIATED_TERMS, this.mapDataUpdate,
-            Actions.constants.DASHBOARD.CHANGE_TERM_FILTERS, this.handleChangeTermFilters,
-            Actions.constants.DASHBOARD.CHANGE_TERM_FILTERS_TO_ONLY, this.handleChangeTermFiltersToOnly,
-            Actions.constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange,
-            Actions.constants.DASHBOARD.RELOAD_SOURCES, this.reloadTopSources,
-            Actions.constants.DASHBOARD.CLEAR_FILTERS, this.handleClearFilters
-      );
+
+        this.dataStore = {
+            userProfile: profile,
+            timespanType: constants.DEFAULT_TIMESPAN_TYPE,
+            datetimeSelection: moment().format(constants.DEFAULT_TIMEPERIOD_FORMAT),
+            dataSource: constants.DEFAULT_DATA_SOURCE,
+            fromDate: false,
+            toDate: false,
+            settings: {},
+            title: "",
+            logo: "",
+            conjunctivetopics: [],
+            externalsourceid: constants.DEFAULT_EXTERNAL_SOURCE,
+            placeid: "",
+            timeSeriesGraphData: {},
+            popularLocations: [],
+            targetBbox: [],
+            popularTerms: [],
+            topSources: [],
+            trustedSources: [],
+            supportedLanguages: [],
+            termFilters: new Set(),
+            heatmapTileIds: [],
+            fullTermList: new Map(),
+            bbox: [],
+            zoomLevel: constants.HEATMAP_DEFAULT_ZOOM,
+            maintopic: false,
+            language: LANGUAGE_CODE_ENG
+        }
+
+        this.bindActions(
+            constants.DASHBOARD.INITIALIZE, this.intializeSettings,
+            constants.DASHBOARD.RELOAD_CHARTS, this.handleReloadChartData,
+            constants.DASHBOARD.ASSOCIATED_TERMS, this.mapDataUpdate,
+            constants.DASHBOARD.CHANGE_TERM_FILTERS, this.handleChangeTermFilters,
+            constants.DASHBOARD.CHANGE_TERM_FILTERS_TO_ONLY, this.handleChangeTermFiltersToOnly,
+            constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange,
+            constants.DASHBOARD.CLEAR_FILTERS, this.handleClearFilters
+        );
     },
 
     getState() {
         return this.dataStore;
     },
 
-    handleLanguageChange(language){
+    handleLanguageChange(language) {
         this.dataStore.language = language;
         this.emit("change");
     },
 
-    intializeSettings(graphqlResponse){
-            if(graphqlResponse.settings.siteDefinition.sites && graphqlResponse.edges){
-                this.dataStore.allEdges = new Map();
-                const {locations, terms} = graphqlResponse.edges;
-                const fullEdgeList = locations.edges.concat(terms.edges);
-                const settings = graphqlResponse.settings.siteDefinition.sites[0];
-                const languages = settings.properties.supportedLanguages || ['en'];
-
-                this.dataStore.trustedSources = graphqlResponse.trustedSources.accounts;
-
-                fullEdgeList.forEach(edge=>{
-                    languages.forEach(language=>{
-                        let languageMap = this.dataStore.allEdges.get(language);
-                        if(!languageMap){
-                            languageMap = new Map();
-                        }
-                        
-                        const objectKey = language === LANGUAGE_CODE_ENG ? 'name' : `name_${language}`;
-                        const defaultEdgeDefintion = Object.assign({}, edge, {name_en: edge.name.toLowerCase(), name: edge.name.toLowerCase()});
-                        const edgeTranslations = Object.assign({}, (languageMap.get(edge[objectKey].toLowerCase()) || defaultEdgeDefintion));
-
-                        languageMap.set(edge[objectKey].toLowerCase(), edgeTranslations);
-
-                        this.dataStore.allEdges.set(language, languageMap);
-                    });
-                });
-
-                this.dataStore.settings = settings;
-                this.dataStore.dataSource = graphqlResponse.dataSource;
-                this.syncTimeSeriesData(graphqlResponse.timeSeries);
-                //set the initial primary term to the most popular.
-                if(graphqlResponse.timeSeries.labels && graphqlResponse.timeSeries.labels.length > 0){
-                    this.syncPrimaryEdgeData(this.dataStore.allEdges.get(LANGUAGE_CODE_ENG).get(graphqlResponse.timeSeries.labels[0].name), LANGUAGE_CODE_ENG);
-                }
-                
-                this.syncPopularTerms(graphqlResponse.timeSeries.labels || []);
-                this.dataStore.popularLocations = graphqlResponse.locations.edges;
-            }else{
-                console.error('Required data is not available');
-            }
-
-            this.emit("change");
+    syncChartDataToStore(graphqlResponse){
+        const { locations, topics, sources, timeSeries, conjunctiveterms } = graphqlResponse;
+        this.dataStore.popularLocations = locations && locations.edges ? locations.edges : [];
+        this.dataStore.popularTerms = topics && topics.edges ? topics.edges : [];
+        this.dataStore.conjunctivetopics = conjunctiveterms && conjunctiveterms.edges ? conjunctiveterms.edges : [];
+        this.dataStore.topSources = sources && sources.edges ? sources.edges : [];
+        this.syncTimeSeriesData(timeSeries || []);
     },
 
-    syncAssociatedTermsSelections(filterSet){
-        for (let [term, value] of this.dataStore.associatedKeywords.entries()) {
-                value.enabled = filterSet.has(term);
-        }
+    intializeSettings(graphqlResponse) {
+        const { terms, configuration, topics, timeSeries } = graphqlResponse;
+        const { datetimeSelection, timespanType } = this.dataStore;
+        const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
+        const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
+
+        this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
+        this.dataStore.title = title;
+        this.dataStore.fromDate = fromDate;
+        this.dataStore.toDate = toDate;
+        this.dataStore.logo = logo;
+        this.dataStore.language = defaultLanguage;
+        this.dataStore.zoomLevel = defaultZoomLevel;
+        this.dataStore.bbox = targetBbox || [];
+        this.dataStore.targetBbox = targetBbox;
+        this.dataStore.supportedLanguages = supportedLanguages;
+        this.dataStore.maintopic = topics.edges.length ? topics.edges[0].name : '';
+        this.dataStore.settings = configuration;
+        this.syncChartDataToStore(graphqlResponse);
+
+        this.dataStore.termFilters.clear();
+        this.emit("change");
     },
-    
-    handleChangeTermFilters(newFilters){
-        const filtersToRemove = newFilters.filter(filter=>filter.action === 'remove').map(filter=>filter.term);
-        const newFilterSet = new Set(newFilters.map(filter=>filter.term));
+
+    handleChangeTermFilters(newFilters) {
+        const filtersToRemove = newFilters.filter(filter => filter.action === 'remove').map(filter => filter.term);
+        const newFilterSet = new Set(newFilters.map(filter => filter.term));
         //merge the earlier filters with the newly added selections
-        this.dataStore.termFilters = new Set([...this.dataStore.termFilters, ...newFilterSet].filter(filter=>filtersToRemove.indexOf(filter) === -1));
-        this.syncAssociatedTermsSelections(this.dataStore.termFilters);
+        this.dataStore.termFilters = new Set([...this.dataStore.termFilters, ...newFilterSet].filter(filter => filtersToRemove.indexOf(filter) === -1));
         this.emit("change");
     },
 
-    handleChangeTermFiltersToOnly(newFilter){
+    handleChangeTermFiltersToOnly(newFilter) {
         this.dataStore.termFilters = new Set(newFilter);
-        this.syncAssociatedTermsSelections(this.dataStore.termFilters);
         this.emit("change");
     },
 
-    syncPrimaryEdgeData(selectedEntity, language){
-        let edgeMap = this.dataStore.allEdges.get(language);
-        //If the primary edge has changed then clear the filtered terms. 
-        if(this.dataStore.categoryValue.name && this.dataStore.categoryValue.name !== selectedEntity.name){
-            this.dataStore.termFilters.clear();
-        }
-
-        if(selectedEntity){
-            this.dataStore.categoryValue = edgeMap.get(selectedEntity[`name_${language}`]);
-            this.dataStore.selectedLocationCoordinates = selectedEntity.coordinates || [];
-            this.dataStore.categoryType = selectedEntity.type;
-        }
-    },
-
-    syncDatetimeState(datetimeSelection, timespanType){
+    syncDatetimeState(datetimeSelection, timespanType) {
         this.dataStore.datetimeSelection = datetimeSelection;
         this.dataStore.timespanType = timespanType;
     },
 
-    syncTimeSeriesData(mutatedTimeSeries){
-        this.dataStore.timeSeriesGraphData = {labels: [], graphData: []};
+    syncTimeSeriesData(mutatedTimeSeries) {
+        this.dataStore.timeSeriesGraphData = { labels: [], graphData: [] };
+        this.dataStore.heatmapTileIds = [];
 
-        if(mutatedTimeSeries && mutatedTimeSeries.graphData && mutatedTimeSeries.labels && mutatedTimeSeries.graphData.length > 0){
-            this.dataStore.timeSeriesGraphData = Object.assign({}, {labels: mutatedTimeSeries.labels});
-            this.dataStore.timeSeriesGraphData.graphData = mutatedTimeSeries.graphData.map(hourlyAggregate => {
-                let graphEntry = Object.assign({}, {date: hourlyAggregate.date});
-                hourlyAggregate.edges.forEach((edge, index) => {
-                    graphEntry[edge] = hourlyAggregate.mentions[index];
-                });
+        let test = [{ "date": "2017-08-30 17:00", "isis": 1, "bomb": 23, "car": 2, "fatalities": 2, "fear": 1 },
+        { "date": "2017-09-01 17:00", "isis": 1, "bomb": 15, "car": 2, "fatalities": 2, "fear": 1 },
+        { "date": "2017-09-02 17:00", "isis": 1, "bomb": 23, "car": 2, "fatalities": 2, "fear": 1 }
+        ];
 
-                return graphEntry;
+        if (mutatedTimeSeries && mutatedTimeSeries.graphData && mutatedTimeSeries.labels && mutatedTimeSeries.graphData.length) {
+            const { labels, graphData, tiles } = mutatedTimeSeries;
+            this.dataStore.timeSeriesGraphData = Object.assign({}, { labels });
+            
+            const timeseriesMap = makeMap(graphData, item=>item.date, item=>{
+                let timeSeriesEntry = {date: item.date};
+                timeSeriesEntry[item.name] = item.mentions;
+
+                return timeSeriesEntry;
             });
+
+            let sorted = Array.from(timeseriesMap.values()).concat(test).sort((a, b)=>moment(a.date).unix() > moment(b.date).unix());
+            this.dataStore.timeSeriesGraphData.graphData = sorted;
+            this.dataStore.heatmapTileIds = tiles;
         }
     },
 
-    syncPopularTerms(popularTerms){
-        let colorSlices = ['#fdd400', '#84b761', '#b6d2ff', '#CD0D74', '#2f4074', '#7e6596'];
-        this.dataStore.colorMap.clear();
-        this.dataStore.popularTerms = popularTerms;
-        this.dataStore.popularTerms.forEach(term=>{
-            this.dataStore.colorMap.set(term.name, colorSlices.pop());
-        });
+    syncFilterSelections(mutatedFilters){
+        const { fromDate, toDate, periodType, zoomLevel, dataSource, datetimeSelection, maintopic, externalsourceid, selectedconjunctiveterms } = mutatedFilters;
+
+        this.dataStore.fromDate = fromDate;
+        this.dataStore.toDate = toDate;
+        this.dataStore.timespanType = periodType;
+        this.dataStore.dataSource = dataSource;
+        this.dataStore.maintopic = maintopic;
+        this.dataStore.datetimeSelection = datetimeSelection;
+        this.dataStore.zoomLevel = zoomLevel;
+        this.dataStore.externalsourceid = externalsourceid;
+        this.dataStore.termFilters = new Set(selectedconjunctiveterms);
     },
 
-    syncTopSources(topSources){
-        if(topSources && topSources.sources){
-            this.dataStore.topSources = topSources.sources;
-        }
-    },
-
-    reloadTopSources(topSources){
-        this.syncTopSources(topSources);
-        this.emit("change");
-    },
-
-    handleClearFilters(){
+    handleClearFilters() {
         this.dataStore.termFilters.clear();
-        this.syncAssociatedTermsSelections(this.dataStore.termFilters);
         this.emit("change");
     },
 
-    handleReloadChartData(changedData){
-        const {selectedEntity, datetimeSelection, timespanType, 
-               mutatedTimeSeries, popularLocations, popularTerms, dataSource, topSources} = changedData;
-
-        if(selectedEntity.type === "Source")
-        {
-            this.dataStore.originalSource = selectedEntity.name;
-        }
-        else
-        {
-            this.dataStore.originalSource = '';
-            this.syncPrimaryEdgeData(selectedEntity, this.dataStore.language);
-            this.syncDatetimeState(datetimeSelection, timespanType);
-            this.syncTimeSeriesData(mutatedTimeSeries);
-            this.syncTopSources(topSources);
-            this.dataStore.dataSource = dataSource;
-            this.syncPopularTerms(popularTerms || []);
-            this.dataStore.popularLocations = popularLocations.edges || [];
-        }
-
+    handleReloadChartData(changedData) {
+        this.syncChartDataToStore(changedData);
+        this.syncFilterSelections(changedData);
         this.emit("change");
     },
-    
-    mapDataUpdate(heatmapData){
+
+    mapDataUpdate(heatmapData) {
         this.dataStore.associatedKeywords = new Map();
         this.dataStore.associatedKeywords = heatmapData.associatedKeywords;
-        this.syncAssociatedTermsSelections(this.dataStore.termFilters);
         this.dataStore.bbox = heatmapData.bbox;
         this.dataStore.zoomLevel = heatmapData.zoomLevel;
         this.emit("change");

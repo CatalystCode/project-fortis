@@ -1,6 +1,6 @@
 import React from 'react';
 import { getHumanDateFromNow, open } from '../../utils/Utils.js';
-import {SERVICES} from '../../services/services';
+import {SERVICES} from '../../services/Dashboard';
 import MapViewPort from './MapViewPort';
 import Sentiment from '../Graphics/Sentiment';
 import Avatar from 'material-ui/Avatar';

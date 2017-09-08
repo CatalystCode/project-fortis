@@ -1,77 +1,48 @@
-import Fluxxor from 'fluxxor';
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
+import { fromMapToArray } from './shared';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import '../../styles/Insights/TypeaheadSearch.css';
 
-const FluxMixin = Fluxxor.FluxMixin(React);
-//const maxDefaultResult = 12;
-const getSuggestionValue = (suggestion, lang) => {return suggestion[lang === 'en'? 'name': 'name_'+lang].trim();}
-const getSuggestions = (value, edgeMap) => {
-
-  const inputValue = value.trim().toLowerCase();
-  const inputLength = inputValue.length;
-  let filteredTerms = [];
-
-  if(inputLength === 0){
-      return [];
-  } else{
-      for (let key of edgeMap.keys()) {
-          if(key.indexOf(inputValue) > -1){
-                filteredTerms.push(edgeMap.get(key));
-          }
-      }
+export default class TypeaheadSearch extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      suggestions: [],
+      value: ''
+    };
   }
 
-  return filteredTerms;
-};
-
-export const TypeaheadSearch = React.createClass({
-  mixins: [FluxMixin],
-
-  getInitialState(){
-      return {
-          suggestions: [],
-          defaultResults: [],
-          value: ''
-      }
-  },
+  setTopicToState(value){
+    this.setState({ value });
+  }
 
   componentWillReceiveProps(nextProps) {
-       const value = nextProps.data;
+    this.setTopicToState(nextProps.maintopic);
+  }
 
-       if(value !== this.state.value){
-           this.setState({value});
-       }
-  },
+  onSuggestionSelected(event, { suggestion }) {
+    this.props.dashboardRefreshFunc(suggestion.name, []);
+  }
 
-  onSuggestionSelected(event, { suggestion }){
-    event.preventDefault();
-    this.getFlux().actions.DASHBOARD.reloadVisualizationState(this.props.siteKey, this.props.datetimeSelection, 
-                                                              this.props.timespanType, this.props.dataSource, suggestion);
-  },
+  onChange(event, { newValue }) {
+    this.setTopicToState(newValue);
+  }
 
-  onChange(event, { newValue }){
-    const value = newValue;
+  getSuggestionValue = suggestion => suggestion[this.getTopicFieldName()];
 
-    this.setState({value});
-  },
+  onSuggestionsFetchRequested({ value }) {
+    const { allSiteTopics } = this.props;
+    const suggestions = fromMapToArray(allSiteTopics, value);
 
-  getStateFromFlux() {
-    return this.getFlux().store("DataStore").getState();
-  },
+    this.setState({ suggestions });
+  }
 
-  onSuggestionsFetchRequested({ value }){
-    const state = this.getStateFromFlux();
+  getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'
 
-    this.setState({
-      suggestions: getSuggestions(value, state.allEdges.get(this.props.language))
-    });
-  },
-  
-  renderSuggestion(element, {query}) { 
-    const suggestionText = element[this.props.language === 'en'? 'name': 'name_'+this.props.language];
+  renderSuggestion(element, { query }) {
+    const suggestionText = element[this.getTopicFieldName()];
     const matches = match(suggestionText, query);
     const parts = parse(suggestionText, matches);
     const iconMap = new Map([["Location", "fa fa-map-marker fa-2x"], ["Term", "fa fa-tag fa-2x"]]);
@@ -94,40 +65,36 @@ export const TypeaheadSearch = React.createClass({
         </span>
       </span>
     );
-  },
+  }
 
-  onSuggestionsClearRequested(){
+  onSuggestionsClearRequested() {
     this.setState({
       suggestions: []
     });
-  },
-  
-  render: function(){
+  }
+
+  render() {
     const { suggestions, value } = this.state;
     const inputProps = {
       placeholder: 'Type \'c\'',
       value,
-      onChange: this.onChange
+      onChange: (event, { newValue })=>this.onChange(event, { newValue })
     };
 
     return (
-        <div className="input-group">
-                  <span className="input-group-addon">
-                      <i className="fa fa-search"></i>
-                  </span>
-                  { 
-                    this.props.data ? 
-                      <Autosuggest suggestions={suggestions}
-                                inputProps={inputProps}
-                                focusInputOnSuggestionClick={true}
-                                onSuggestionSelected={this.onSuggestionSelected}
-                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                                onSuggestionsClearRequested={this.onSuggestionsClearRequested}                               
-                                renderSuggestion={this.renderSuggestion}
-                                getSuggestionValue={(value)=>getSuggestionValue(value, this.props.language)} />
-                                : undefined
-                  }
-        </div>
+      <div className="input-group">
+        <span className="input-group-addon">
+          <i className="fa fa-search"></i>
+        </span>
+          <Autosuggest suggestions={suggestions}
+              inputProps={inputProps}
+              focusInputOnSuggestionClick={true}
+              onSuggestionSelected={(event, { suggestion })=>this.onSuggestionSelected(event, { suggestion })}
+              onSuggestionsFetchRequested={({value})=>this.onSuggestionsFetchRequested({value})}
+              onSuggestionsClearRequested={()=>this.onSuggestionsClearRequested()}
+              renderSuggestion={(element, query)=>this.renderSuggestion(element, query)}
+              getSuggestionValue={value => this.getSuggestionValue(value)} />
+      </div>
     );
   }
-});
+}

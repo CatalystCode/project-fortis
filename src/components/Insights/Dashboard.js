@@ -1,48 +1,33 @@
 import React from 'react';
-import Fluxxor from 'fluxxor';
-import { DataSelector } from './DataSelector';
-import { HeatMap } from './HeatMap';
-import { SentimentTreeview } from './SentimentTreeview';
+import DataSelector from './DataSelector';
+import HeatMap from './HeatMap';
+import SentimentTreeview from './SentimentTreeview';
 import GraphCard from '../Graphics/GraphCard';
-import { ActivityFeed } from './ActivityFeed';
-import { TimeSeriesGraph } from './TimeSeriesGraph';
-import { PopularTermsChart } from './PopularTermsChart';
-import { PopularLocationsChart } from './PopularLocationsChart';
-import { TopSourcesChart } from './TopSourcesChart';
+import ActivityFeed from './ActivityFeed';
+import TimeSeriesGraph from './TimeSeriesGraph';
+import PopularTermsChart from './PopularTermsChart';
+import PopularLocationsChart from './PopularLocationsChart';
+import PopularSourcesChart from './PopularSourcesChart';
 import ReactGridLayout from 'react-grid-layout';
+import { defaultLayout } from './Layouts';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
 
-const ResponsiveReactGridLayout = ReactGridLayout.Responsive;
+let ResponsiveReactGridLayout = ReactGridLayout.Responsive;
 const WidthProvider = ReactGridLayout.WidthProvider;
 ResponsiveReactGridLayout = WidthProvider(ResponsiveReactGridLayout);
 
 const DefaultToggleText = "Expand Heatmap";
-const FluxMixin = Fluxxor.FluxMixin(React);
-const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-const layout = {"lg": [
-  { "i": "locations", "x": 0, "y": 0, "w": 4, "h": 7, minH: 3, maxH: 7, minW: 1, maxW: 4 },
-  { "i": "topics",    "x": 4, "y": 0, "w": 4, "h": 7, minH: 3, maxH: 7, minW: 1, maxW: 4 },
-  { "i": "sources",   "x": 8, "y": 0, "w": 4, "h": 7, minH: 3, maxH: 7, minW: 1, maxW: 4 },
-  { "i": "timeline",  "x": 12, "y": 0, "w": 12, "h": 7, minH: 3, maxH: 7 },
-  { "i": "watchlist", "x": 0, "y": 9, "w": 6, "h": 16, minW: 6, maxW: 6 },
-  { "i": "heatmap",   "x": 6, "y": 6, "w": 12, "h": 16, static: true, resizable: true },
-  { "i": "newsfeed",  "x": 18, "y": 6, "w": 6, "h": 16, minW: 6, maxW: 12 }
-]};
+export default class Dashboard extends React.Component {
+  constructor(props) {
+    super(props);
 
-const layoutCollapsed = {"lg": [
-  { "i": "watchlist", "x": 0, "y": 0, "w": 4, "h": 22, static: true},
-  { "i": "heatmap",   "x": 4, "y": 0, "w": 14, "h": 22, static: true},
-  { "i": "newsfeed",  "x": 18, "y": 0, "w": 6, "h": 22, static: true}
-]};
+    
+    this.onResizeStop = this.onResizeStop.bind(this);
 
-export const Dashboard = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-
-  getInitialState() {
-    return {
+    this.state = {
       contentRowHeight: 0,
       newsfeedResizedHeight: 0,
       watchlistResizedHeight: 0,
@@ -50,21 +35,13 @@ export const Dashboard = React.createClass({
       mounted: false,
       heatmapToggleText: DefaultToggleText
     };
-  },
-
-  getStateFromFlux() {
-    return this.getFlux().store("DataStore").getState();
-  },
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.getStateFromFlux());
-  },
+  }
 
   componentDidMount() {
-    const rowInitialHeight = document.getElementById("leafletMap");
+    const rowInitialHeight = document.getElementById("leafletMap") || { clientHeight: 0 };
     const contentAreaHeight = document.getElementById("contentArea");
-    this.setState({contentRowHeight: rowInitialHeight.clientHeight, contentAreaHeight: contentAreaHeight.clientHeight, mounted: true});
-  },
+    this.setState({ contentRowHeight: rowInitialHeight.clientHeight, contentAreaHeight: contentAreaHeight.clientHeight, mounted: true });
+  }
 
   onResizeStop(item, oldItem, newItem, placeholder, e, element) {
     const height = e.toElement.clientHeight;
@@ -76,78 +53,59 @@ export const Dashboard = React.createClass({
       newState[resizedItemId + 'ResizedHeight'] = height;
       this.setState(newState);
     }
-  },
+  }
 
   toggleHeatmapSize() {
     const heatmapToggleText = this.state.heatmapToggleText === DefaultToggleText ? "Minimize Heatmap" : DefaultToggleText;
     const newsfeedResizedHeight = 0;
     const watchlistResizedHeight = 0;
-    this.setState({heatmapToggleText, newsfeedResizedHeight, watchlistResizedHeight});
-  },
+    this.setState({ heatmapToggleText, newsfeedResizedHeight, watchlistResizedHeight });
+  }
 
-  getEdges() {
-    return Array.from(this.state.termFilters);
-  },
-
-  getMainEdge() {
-    if (!this.state.categoryValue) {
-      return undefined;
-    }
-
-    return this.state.categoryValue[`name_${this.state.language}`] || this.state.categoryValue.name;
-  },
+  filterLiterals() {
+    const { dataSource, zoomLevel, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
+    const defaultLanguage = this.props.settings.defaultLanguage;
+    return Object.assign({}, { zoomLevel, dataSource, flux, maintopic, defaultLanguage, termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
+  }
 
   heatmapComponent() {
     const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
-    const {contentAreaHeight, contentRowHeight} = this.state;
+    const { contentAreaHeight, contentRowHeight } = this.state;
 
     return (
       <div key={'heatmap'} className="heatmapContainer">
         <div>
           <div id='leafletMap'></div>
           <HeatMap
-            bbox={this.state.bbox}
-            dataSource={this.state.dataSource}
-            height={HeatMapFullScreen ? contentAreaHeight : contentRowHeight}
-            timespanType={this.state.timespanType}
-            datetimeSelection={this.state.datetimeSelection}
-            mainEdge={this.getMainEdge()}
-            language={this.state.language}
-            categoryType={this.state.categoryType}
-            edges={this.getEdges()}
-            {...this.props}
+            targetBbox={this.props.settings.targetBbox}
+            heatmapTileIds={this.props.heatmapTileIds}
+            defaultZoom={parseInt(this.props.settings.defaultZoomLevel)}
+            {...this.filterLiterals() }
           />
         </div>
       </div>
     );
-  },
+  }
 
   newsfeedComponent() {
     const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
-    const {contentAreaHeight, contentRowHeight, newsfeedResizedHeight} = this.state;
+    const { bbox } = this.props;
+    const { contentAreaHeight, contentRowHeight, newsfeedResizedHeight } = this.state;
 
     return (
       <div key={'newsfeed'}>
         <div id="newsfeed-container">
-          {this.state.bbox && this.state.bbox.length > 0 && this.getMainEdge() ?
-          <ActivityFeed
-            bbox={this.state.bbox}
-            infiniteScrollHeight={HeatMapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
-            timespanType={this.state.timespanType}
-            datetimeSelection={this.state.datetimeSelection}
-            mainEdge={this.getMainEdge()}
-            dataSource={this.state.dataSource}
-            categoryType={this.state.categoryType}
-            originalSource={this.state.originalSource}
-            language={this.state.language}
-            edges={this.getEdges()}
-            {...this.props}
-          />
-          : undefined}
+          {bbox.length ?
+            <ActivityFeed
+              allSiteTopics={this.props.fullTermList}
+              infiniteScrollHeight={HeatMapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
+              {...this.filterLiterals() }
+            />
+            : undefined}
         </div>
       </div>
     );
-  },
+  }
 
   topLocationsComponent() {
     const cardHeader = {
@@ -158,17 +116,13 @@ export const Dashboard = React.createClass({
       <div key={'locations'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <PopularLocationsChart
-            mainEdge={this.getMainEdge()}
-            datetimeSelection={this.state.datetimeSelection}
-            timespanType={this.state.timespanType}
-            language={this.state.language}
-            dataSource={this.state.dataSource}
-            {...this.props}
+            popularLocations={this.props.popularLocations}
+            {...this.filterLiterals() }
           />
         </GraphCard>
       </div>
     );
-  },
+  }
 
   topTopicsComponent() {
     const cardHeader = {
@@ -179,18 +133,14 @@ export const Dashboard = React.createClass({
       <div key={'topics'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <PopularTermsChart
-            mainEdge={this.getMainEdge()}
-            edgeType={this.state.categoryType}
-            timespanType={this.state.timespanType}
-            datetimeSelection={this.state.datetimeSelection}
-            language={this.state.language}
-            dataSource={this.state.dataSource}
-            {...this.props}
+            allSiteTopics={this.props.fullTermList}
+            popularTerms={this.props.popularTerms}
+            {...this.filterLiterals() }
           />
         </GraphCard>
       </div>
     );
-  },
+  }
 
   topSourcesComponent() {
     const cardHeader = {
@@ -200,63 +150,55 @@ export const Dashboard = React.createClass({
     return (
       <div key={'sources'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
-          <TopSourcesChart
-            mainEdge={this.getMainEdge()}
-            originalSource={this.state.originalSource}
-            timespanType={this.state.timespanType}
-            datetimeSelection={this.state.datetimeSelection}
-            dataSource={this.state.dataSource}
-            {...this.props}
+          <PopularSourcesChart
+            topSources={this.props.topSources}
+            {...this.filterLiterals() }
           />
         </GraphCard>
       </div>
     );
-  },
+  }
+
+  refreshDashboard(){
+    const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, externalsourceid } = this.filterLiterals();
+    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+  }
 
   timelineComponent() {
-    const cardHeader = {
-      title: "Event Timeseries"
-    };
-
     return (
       <div key={'timeline'}>
-        <GraphCard cardHeader={cardHeader}>
           <TimeSeriesGraph
-            mainEdge={this.getMainEdge()}
-            edgeType={this.state.categoryType}
-            language={this.state.language}
-            timespanType={this.state.timespanType}
-            dataSource={this.state.dataSource}
-            timespan={this.state.datetimeSelection}
-            {...this.props}
+            allSiteTopics={this.props.fullTermList}
+            refreshDashboardFunction={()=>this.refreshDashboard()}
+            timeSeriesGraphData={this.props.timeSeriesGraphData}
+            {...this.filterLiterals() }
           />
-        </GraphCard>
       </div>
     );
-  },
+  }
 
   watchlistComponent() {
     const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
-    const {contentAreaHeight, contentRowHeight, watchlistResizedHeight} = this.state;
+    const { contentAreaHeight, contentRowHeight, watchlistResizedHeight } = this.state;
 
     return (
       <div key={'watchlist'}>
         <GraphCard>
           <SentimentTreeview
-            enabledTerms={this.getEdges()}
-            language={this.state.language}
-            height={HeatMapFullScreen ? contentAreaHeight : (watchlistResizedHeight > 0 ) ? watchlistResizedHeight : contentRowHeight}
-            {...this.props}
+            conjunctivetopics={this.props.conjunctivetopics}
+            allSiteTopics={this.props.fullTermList}
+            height={HeatMapFullScreen ? contentAreaHeight : (watchlistResizedHeight > 0) ? watchlistResizedHeight : contentRowHeight}
+            {...this.filterLiterals() }
           />
         </GraphCard>
       </div>
     );
-  },
+  }
 
   renderedGridCards(heatMapFullScreen) {
-     return heatMapFullScreen ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()] :
-                                [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
-  },
+    return heatMapFullScreen ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()] :
+      [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent()];//;, this.newsfeedComponent()];
+  }
 
   render() {
     const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
@@ -268,20 +210,22 @@ export const Dashboard = React.createClass({
             <DataSelector
               heatmapToggleText={this.state.heatmapToggleText}
               toggleHeatmapSize={this.toggleHeatmapSize}
-              {...this.props}
+              {...this.filterLiterals() }
             />
             <div className="row" id="contentArea">
               <div className="dashboard-grid">
                 <ResponsiveReactGridLayout
                   measureBeforeMount={false}
                   className="layout"
-                  layouts={HeatMapFullScreen ? layoutCollapsed : layout}
-                  cols={{lg: 24, md: 20, sm: 12, xs: 8, xxs: 4} }
-                  rowHeight={32}
+                  isDraggable={false}
+                  isDraggable={false}
+                  layouts={HeatMapFullScreen ? defaultLayout.layoutCollapsed : defaultLayout.layout}
+                  cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
+                  rowHeight={28}
                   onResizeStop={this.onResizeStop}
-                  breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
+                  breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                   useCSSTransforms={this.state.mounted}>
-                    {this.renderedGridCards(HeatMapFullScreen)}
+                  {this.renderedGridCards(HeatMapFullScreen)}
                 </ResponsiveReactGridLayout>
               </div>
             </div>
@@ -290,4 +234,4 @@ export const Dashboard = React.createClass({
       </div>
     );
   }
-});
+}

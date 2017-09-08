@@ -1,26 +1,27 @@
-import {AppSettingsStore} from './stores/AppSettingsStore';
 import {DataStore} from './stores/DataStore';
 import {FactsStore} from './stores/FactsStore';
 import {AdminStore} from './stores/AdminStore';
-import {Actions} from './actions/Actions';
+import {methods as DashboardActions} from './actions/Dashboard';
+import {methods as AdminActions} from './actions/Admin';
+import {methods as FactsActions} from './actions/Facts';
 import Fluxxor from 'fluxxor';
 import React from 'react';
 import {default as ReactDOM} from "react-dom";
 import { Router, hashHistory } from 'react-router';
 import {routes} from './routes/routes';
+import constants from './actions/constants';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
 
-let userProfile = Actions.constants.USER_PROFILE;
+let userProfile = constants.USER_PROFILE;
 
 let stores = {
-  AppSettingsStore: new AppSettingsStore(),
   DataStore: new DataStore(userProfile),
   FactsStore: new FactsStore(),
   AdminStore: new AdminStore(),
 };
 
-let flux = new Fluxxor.Flux(stores, Actions.methods);
+let flux = new Fluxxor.Flux(stores, Object.assign({}, DashboardActions, AdminActions, FactsActions));
 
 const createElement = (Component, props) => {
     props.flux = flux;

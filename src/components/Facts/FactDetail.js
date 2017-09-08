@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { getHumanDateFromNow, UCWords, open } from '../../utils/Utils.js';
 import { arrayToFragment, changeFactsUrl } from '../../utils/Fact.js';
-import { SERVICES } from '../../services/services';
+import { SERVICES } from '../../services/Dashboard';
 import Fluxxor from 'fluxxor';
 import { getAdjacentArticles } from '../../utils/Fact.js';
 import Chip from 'material-ui/Chip';

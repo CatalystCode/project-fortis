@@ -1,32 +1,18 @@
 import React from 'react';
 import '../styles/Header.css';
 import { Link } from 'react-router';
-import Fluxxor from 'fluxxor';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
-const FluxMixin = Fluxxor.FluxMixin(React),
-      StoreWatchMixin = Fluxxor.StoreWatchMixin("AppSettingsStore");
-
-export const Header = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-  
-  getStateFromFlux() {
-    return this.getFlux().store("AppSettingsStore").getState();
-  },
-
-  componentWillReceiveProps(nextProps) {
-       this.setState(this.getStateFromFlux());
-  },
-
+export default class Header extends React.Component {
   changeLanguage(event, index, value){
-      this.getFlux().actions.DASHBOARD.changeLanguage(value);
-  },
+    this.props.flux.actions.DASHBOARD.changeLanguage(value);
+  }
 
   render() {
-    const title = this.props.settings && this.props.settings.properties ? this.props.settings.properties.title : "";
+    const { title, logo, language }  = this.props;
     const nav = this.renderNav();
-    const logo = this.props.settings && this.props.settings.properties ? this.props.settings.properties.logo : false;
+
     return (
       <nav className="navbar navbar-trans" role="navigation">
           <div>
@@ -41,7 +27,7 @@ export const Header = React.createClass({
                      {
                          logo ? <img role="presentation" src={logo.startsWith("http:") ? logo : `${process.env.PUBLIC_URL}/images/${logo}`} style={{display: 'inline'}} height="48" /> 
                             : undefined 
-                     }                     
+                     }  
                      <span className="brandLabel">{title}</span>
                   </a>
               </div>
@@ -51,13 +37,11 @@ export const Header = React.createClass({
                  <ul className="nav navbar-nav navbar-right">
                      <SelectField underlineStyle={{ borderColor: '#337ab7', borderBottom: 'solid 3px' }}
                                 labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
-                                value={this.state.language}
+                                value={language}
                                 autoWidth={true}
                                 style={{maxWidth:'60px'}}
-                                onChange={this.changeLanguage}>
-                                {this.props.settings.properties.supportedLanguages.map(function (lang) {
-                                        return <MenuItem key={lang} value={lang} primaryText={lang} />                                
-                                })}
+                                onChange={(event, index, value)=>this.changeLanguage(event, index, value)}>
+                                {this.props.supportedLanguages.map(lang => <MenuItem key={lang} value={lang} primaryText={lang} />)}
                     </SelectField>
                   </ul>
                   }
@@ -65,7 +49,7 @@ export const Header = React.createClass({
           </div>
      </nav>
       );
-  },
+  }
 
   renderNav() {
       let siteKey = this.props.siteKey;
@@ -78,4 +62,4 @@ export const Header = React.createClass({
       );
   }
 
-});
+};

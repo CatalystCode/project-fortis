@@ -1,7 +1,7 @@
 import React from 'react';
 import { getHumanDateFromNow } from '../../utils/Utils.js';
 import Sentiment from '../Graphics/Sentiment';
-import {SERVICES} from '../../services/services';
+import {SERVICES} from '../../services/Dashboard';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import Highlighter from 'react-highlight-words';

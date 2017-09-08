@@ -4,40 +4,39 @@ import { Cell } from 'recharts';
 import constants from '../../actions/constants';
 import Sentiment from '../Graphics/Sentiment';
 
-export default class PopularLocationsChart extends React.Component {
+export default class PopularSourcesChart extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             activeIndex: 0,
             dataProvider: [],
-            selectedWofId: null,
             colorCells: []
         };
     }
 
     handleClick(data, activeIndex) {
-        const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, externalsourceid, fromDate, toDate } = this.props;
-        const { placeid, bbox } = data;
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
-        this.setState({ activeIndex: activeIndex, selectedWofId: placeid });
+        const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate } = this.props;
+        const { name } = data;
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), name);
+        this.setState({ activeIndex });
     }
 
     refreshChart(props) {
-        const { popularLocations } = props;
-        let { activeIndex,selectedWofId } = this.state;
+        const { topSources, externalsourceid } = props;
+        let { activeIndex } = this.state;
         let colorCells = [], dataProvider = [];
 
-        popularLocations.forEach((location, index) => {
-            const { name, mentions, bbox, placeid } = location;
+        topSources.forEach((source, index) => {
+            const { name, mentions, avgsentiment } = source;
             const value = mentions;
-            const icon = <Sentiment showGraph={false} value={location.avgsentiment} />;
-            if (placeid === selectedWofId) {
+            const icon = <Sentiment showGraph={false} value={avgsentiment} />;
+            if (name === externalsourceid) {
                 activeIndex = index;
             }
             let color = constants.CHART_STYLE.COLORS[index];
             colorCells.push(<Cell key={0} fill={color} />);
 
-            dataProvider.push(Object.assign({}, { value, name, icon, bbox, placeid }));
+            dataProvider.push(Object.assign({}, { value, name, icon }));
         });
 
         this.setState({ colorCells, dataProvider, activeIndex });
@@ -55,7 +54,6 @@ export default class PopularLocationsChart extends React.Component {
         return (
             <DoughnutChart handleClick={(data, activeIndex)=>this.handleClick(data, activeIndex)}
                 fill={constants.CHART_STYLE.BG_FILL}
-                language={this.props.language}
                 data={this.state.dataProvider}
                 activeIndex={this.state.activeIndex}>
                 {this.state.colorCells}
