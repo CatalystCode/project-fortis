@@ -10,7 +10,7 @@ class CustomEventAnalyzer extends Analyzer[CustomEvent] with Serializable
   with AnalysisDefaults.EnableAll[CustomEvent] {
   override def toSchema(item: CustomEvent, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[CustomEvent] = {
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"${item.source.getOrElse("CustomEvent")}.${randomUUID()}",
       sourceeventid = item.RowKey,
       externalsourceid = item.source.getOrElse("N/A"),
       eventtime = item.created_at.toLong,

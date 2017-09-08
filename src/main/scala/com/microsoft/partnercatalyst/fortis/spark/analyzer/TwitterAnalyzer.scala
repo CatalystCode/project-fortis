@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.util.UUID.randomUUID
-
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import twitter4j.{Status => TwitterStatus}
@@ -11,7 +9,7 @@ class TwitterAnalyzer extends Analyzer[TwitterStatus] with Serializable
   with AnalysisDefaults.EnableAll[TwitterStatus] {
   override def toSchema(item: TwitterStatus, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TwitterStatus] = {
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"Twitter.${item.getId}",
       sourceeventid = item.getId.toString,
       eventtime = item.getCreatedAt.getTime,
       body = item.getText,
