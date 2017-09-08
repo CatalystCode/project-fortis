@@ -176,16 +176,17 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
     ];
 
     return cassandraConnector.executeQuery(query, params, { fetchSize })
-      .then(rows =>
+      .then(rows => {
+        const edges = aggregateBy(rows, row => `${row.conjunctiontopic1}`, row => ({
+          name: row.conjunctiontopic1,
+          mentions: Long.ZERO,
+          avgsentimentnumerator: Long.ZERO
+        })).slice(0, responseSize);
+
         resolve({
-          edges: aggregateBy(rows, row => `${row.conjunctiontopic1}`, row => ({
-            name: row.conjunctiontopic1,
-            mentions: Long.ZERO,
-            avgsentimentnumerator: Long.ZERO
-          }))
-            .slice(0, responseSize)
-        })
-      )
+          edges
+        });
+      })
       .catch(reject);
   });
 }
@@ -227,8 +228,7 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
           name: row.externalsourceid,
           mentions: Long.ZERO,
           avgsentimentnumerator: Long.ZERO
-        }))
-          .slice(0, responseSize);
+        })).slice(0, responseSize);
 
         resolve({
           edges
