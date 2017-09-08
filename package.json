@@ -28,6 +28,7 @@
     "geopoint": "^1.0.1",
     "geotile": "^0.1.10",
     "graphql": "^0.7.2",
+    "json2csv": "^3.11.1",
     "jsonpath": "^0.2.7",
     "lodash": "^4.17.4",
     "moment": "^2.17.1",
