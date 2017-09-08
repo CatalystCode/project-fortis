@@ -2,7 +2,7 @@ const graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
   type Query {
-    geofenceplaces(bbox: [Float]!): [OsmPlace]
+    geofenceplaces(bbox: [Float]!, csv: Boolean): GeofencePlacesCollection
     conjunctiveTerms(maintopic: String!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String!): ConjunctionTermCollection
     timeSeries(maintopics: [String]!, fromDate: String!, toDate: String!, periodType: String!, pipelinekeys: [String]!, maintopics: [String]!, conjunctivetopics: [String], bbox: [Float]!, zoomLevel: Int!, externalsourceid: String!): FeatureTimeSeriesCollection
     topLocations(maintopic: String!, limit: Int, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float]!, zoomLevel: Int!, externalsourceid: String!): TopPlacesCollection
@@ -37,6 +37,10 @@ module.exports = graphql.buildSchema(`
     pipelinekey: String
     mentions: Int
     avgsentiment: Float
+  }
+
+  type GeofencePlacesCollection {
+    places: [OsmPlace]!
   }
 
   type TopSourcesCollection{

@@ -136,9 +136,13 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
     const { bbox } = args;
 
     featureServiceClient.fetchByBbox({ north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3] }, 'bbox')
-      .then(locations =>
-        resolve(locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox })))
-      )
+      .then(locations => {
+        const places = locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox }));
+
+        resolve({
+          places
+        });
+      })
       .catch(reject);
   });
 }
