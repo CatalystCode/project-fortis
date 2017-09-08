@@ -4,7 +4,7 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const isObject = require('lodash/isObject');
 const json2csv = require('json2csv');
-const crypto = require('crypto');
+const uuidv4 = require('uuid/v4');
 const { createFile } = require('../clients/storage/BlobStorageClient');
 
 function withRunTime(promiseFunc) {
@@ -109,10 +109,10 @@ function asCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes
   container = container || DEFAULT_CSV_CONTAINER;
   expiryMinutes = expiryMinutes || DEFAULT_CSV_EXPIRY_MINUTES;
 
-  function formatCsvFilename(provenance, content) {
-    const contentHash = content ? crypto.createHash('md5').update(content).digest('hex') : 'noresults';
+  function formatCsvFilename(provenance) {
+    const uniqueIdentifier = uuidv4();
     const now = new Date();
-    const folder = `${now.getUTCFullYear()}/${now.getUTCMonth()+1}/${now.getUTCDate()}/${now.getUTCHours()}/${now.getUTCMinutes()}/${contentHash}`;
+    const folder = `${now.getUTCFullYear()}/${now.getUTCMonth()+1}/${now.getUTCDate()}/${now.getUTCHours()}/${now.getUTCMinutes()}/${uniqueIdentifier}`;
     return `${folder}/${provenance}.csv`;
   }
 
@@ -122,7 +122,7 @@ function asCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes
       .then(returnValue => {
         const csvItems = returnValue && returnValue[exportPropertyName];
         const csvText = csvItems && csvItems.length ? json2csv({ data: csvItems, withBOM: true }) : '';
-        return createFile(container, formatCsvFilename(promiseFunc.name, csvText), csvText, expiryMinutes);
+        return createFile(container, formatCsvFilename(promiseFunc.name), csvText, expiryMinutes);
       })
       .then(resolve)
       .catch(reject);
