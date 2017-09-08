@@ -33,6 +33,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       defaultlanguage = Some("en"),
       languages = Seq("en", "es", "fr"),
       defaultzoom = 8,
+      featureservicenamespace = Some("somenamespace"),
       title = "Fortis",
       logo = "",
       translationsvctoken = "",

@@ -33,6 +33,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       defaultlanguage = Some("en"),
       languages = Seq("en", "es", "fr"),
       defaultzoom = 8,
+      featureservicenamespace = Some("somenamespace"),
       title = "Fortis",
       logo = "",
       translationsvctoken = "",

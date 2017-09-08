@@ -6,6 +6,7 @@ case class SiteSettings(
   defaultlanguage: Option[String],
   languages: Seq[String],
   defaultzoom: Int,
+  featureservicenamespace: Option[String],
   title: String,
   logo: String,
   translationsvctoken: String,
