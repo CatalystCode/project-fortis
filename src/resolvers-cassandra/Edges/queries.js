@@ -76,7 +76,8 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
         } else {
           resolve({ edges: [] });
         }
-      });
+      })
+      .catch(reject);
   });
 }
 
