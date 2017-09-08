@@ -38,6 +38,7 @@ object ProjectFortis extends App with Loggable {
       blobUrlBase = envOrElse(Constants.Env.BlobUrlBase, "https://fortiscentral.blob.core.windows.net"),
       appInsightsKey = envOrNone(Constants.Env.AppInsightsKey),
       sscInitRetryAfterMillis = envOrElse(Constants.Env.SscInitRetryAfterMillis, Constants.SscInitRetryAfterMillis.toString).toLong,
+      sscShutdownDelayMillis = envOrElse(Constants.Env.SscShutdownDelayMillis, Constants.SscShutdownDelayMillis.toString).toLong,
       modelsDir = envOrNone(Constants.Env.LanguageModelDir)
     )
   }
@@ -110,6 +111,9 @@ object ProjectFortis extends App with Loggable {
     Thread.sleep(fortisSettings.sscInitRetryAfterMillis)
   }
   logInfo("Starting streaming context.")
+  StreamsChangeListener(ssc, fortisSettings)
   ssc.start()
   ssc.awaitTermination()
+  logInfo(s"Streaming context stopped. Exiting with exit code ${StreamsChangeListener.suggestedExitCode}...")
+  sys.exit(StreamsChangeListener.suggestedExitCode)
 }

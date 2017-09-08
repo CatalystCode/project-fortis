@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.util.UUID.randomUUID
-
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookComment
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
@@ -11,7 +9,7 @@ class FacebookCommentAnalyzer extends Analyzer[FacebookComment] with Serializabl
   with AnalysisDefaults.EnableAll[FacebookComment] {
   override def toSchema(item: FacebookComment, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[FacebookComment] = {
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"Facebook.comment.${item.comment.getId}",
       sourceeventid = item.comment.getId,
       eventtime = item.comment.getCreatedTime.getTime,
       body = item.comment.getMessage,

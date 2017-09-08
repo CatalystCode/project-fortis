@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.util.UUID.randomUUID
-
 import com.github.catalystcode.fortis.spark.streaming.instagram.dto.InstagramItem
 import com.microsoft.partnercatalyst.fortis.spark.dto._
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
@@ -19,7 +17,7 @@ class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)
 
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"Instagram.${item.id}",
       sourceeventid = item.id,
       externalsourceid = item.user.username,
       eventtime = item.created_time.toLong,

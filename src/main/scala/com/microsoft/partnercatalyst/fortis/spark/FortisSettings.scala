@@ -10,5 +10,6 @@ case class FortisSettings(
   managementBusCommandQueueName: String,
   appInsightsKey: Option[String],
   sscInitRetryAfterMillis: Long,
+  sscShutdownDelayMillis: Long,
   modelsDir: Option[String]
 )
