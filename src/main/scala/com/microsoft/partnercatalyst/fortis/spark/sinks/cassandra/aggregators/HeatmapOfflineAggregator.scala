@@ -2,22 +2,24 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.writer.SqlRowWriter
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraPopularPlaces, CassandraTileBucket}
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ComputedTile, Event, HeatmapTile, PopularPlace}
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{Event, HeatmapTile}
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraTileBucket}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
-class HeatmapOfflineAggregator(session: SparkSession) extends OfflineAggregator[HeatmapTile] {
+class HeatmapOfflineAggregator(session: SparkSession, configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] {
   private val ComputedTilesTable = "computedtiles"
 
   override def aggregate(events: RDD[Event]): RDD[HeatmapTile] = {
+    val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
     val tiles = events.flatMap(event=>{
       Seq(
         event,
         event.copy(externalsourceid = "all"),
         event.copy(pipelinekey = "all", externalsourceid = "all")
       )
-    }).flatMap(CassandraHeatmapTiles(_))
+    }).flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
     tiles.keyBy(r=>{(
       r.heatmaptileid, r.period,
       r.periodtype, r.perioddate,

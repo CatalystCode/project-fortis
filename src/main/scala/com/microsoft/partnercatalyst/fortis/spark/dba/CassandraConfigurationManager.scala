@@ -40,25 +40,11 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
   }
 
   override def fetchSiteSettings(sparkContext: SparkContext): SiteSettings = {
-    val siteSettingRow = sparkContext.cassandraTable[CassandraSchema.Table.SiteSetting](CassandraSchema.KeyspaceName,
+    val siteSettingRow = sparkContext.cassandraTable[SiteSettings](CassandraSchema.KeyspaceName,
       CassandraSchema.Table.SiteSettingsName).collect().headOption
 
     siteSettingRow match {
-      case Some(row) =>
-        SiteSettings(
-          siteName = row.sitename,
-          geofence = Geofence(row.geofence(0), row.geofence(1), row.geofence(2), row.geofence(3)),
-          languages = row.languages,
-          defaultlanguage = row.defaultlanguage,
-          defaultZoom = row.defaultzoom,
-          title = row.title,
-          logo = row.logo,
-          translationSvcToken = row.translationsvctoken,
-          cogSpeechSvcToken = row.cogspeechsvctoken,
-          cogVisionSvcToken = row.cogvisionsvctoken,
-          cogTextSvcToken = row.cogtextsvctoken,
-          insertiontime = row.insertiontime
-        )
+      case Some(row) => row
       case None =>
         val ex = new Exception(s"Table '${CassandraSchema.Table.SiteSettingsName}' must have at least 1 entry.")
         logFatalError(ex.getMessage, ex)

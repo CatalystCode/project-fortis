@@ -52,16 +52,16 @@ private[transformcontext] object Delta {
     new Delta(
       siteSettings = siteSettings,
       locationsExtractorFactory = updatedField(
-        siteSettings.get.geofence != transformContext.siteSettings.geofence,
-        new LocationsExtractorFactory(featureServiceClient, siteSettings.get.geofence).buildLookup()
+        siteSettings.get.getGeofence() != transformContext.siteSettings.geofence,
+        new LocationsExtractorFactory(featureServiceClient, siteSettings.get.getGeofence()).buildLookup()
       ),
       imageAnalyzer = updatedField(
-        siteSettings.get.cogVisionSvcToken != transformContext.siteSettings.cogVisionSvcToken,
-        new ImageAnalyzer(ImageAnalysisAuth(siteSettings.get.cogVisionSvcToken), featureServiceClient)
+        siteSettings.get.cogvisionsvctoken != transformContext.siteSettings.cogvisionsvctoken,
+        new ImageAnalyzer(ImageAnalysisAuth(siteSettings.get.cogvisionsvctoken), featureServiceClient)
       ),
       sentimentDetectorAuth = updatedField(
-        siteSettings.get.translationSvcToken != transformContext.siteSettings.translationSvcToken,
-        SentimentDetectorAuth(siteSettings.get.translationSvcToken)
+        siteSettings.get.translationsvctoken != transformContext.siteSettings.translationsvctoken,
+        SentimentDetectorAuth(siteSettings.get.translationsvctoken)
       ),
       langToKeywordExtractor = langToWatchlist.map(_.mapValues(new KeywordExtractor(_))),
       blacklist = blacklist

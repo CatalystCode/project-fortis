@@ -1,16 +1,27 @@
 package com.microsoft.partnercatalyst.fortis.spark.dto
 
 case class SiteSettings(
-  siteName: String,
-  geofence: Geofence,
+  sitename: String,
+  geofence: Seq[Double],
   defaultlanguage: Option[String],
   languages: Seq[String],
-  defaultZoom: Int,
+  defaultzoom: Int,
+  featureservicenamespace: Option[String],
   title: String,
   logo: String,
-  translationSvcToken: String,
-  cogSpeechSvcToken: String,
-  cogVisionSvcToken: String,
-  cogTextSvcToken: String,
+  translationsvctoken: String,
+  cogspeechsvctoken: String,
+  cogvisionsvctoken: String,
+  cogtextsvctoken: String,
   insertiontime: Long
 )
+ {
+
+  def getGeofence(): Geofence = Geofence(
+    north = geofence(0),
+    west = geofence(1),
+    south = geofence(2),
+    east = geofence(3)
+  )
+
+}

@@ -2,20 +2,22 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.writer.SqlRowWriter
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraPopularPlaces
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{Event, PopularPlace}
 import org.apache.spark.rdd.RDD
 
-class PopularPlacesOfflineAggregator extends OfflineAggregator[PopularPlace] {
+class PopularPlacesOfflineAggregator(configurationManager: ConfigurationManager) extends OfflineAggregator[PopularPlace] {
 
   override def aggregate(events: RDD[Event]): RDD[PopularPlace] = {
+    val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
     val places = events.flatMap(event=>{
       Seq(
         event,
         event.copy(externalsourceid = "all"),
         event.copy(pipelinekey = "all", externalsourceid = "all")
       )
-    }).flatMap(CassandraPopularPlaces(_))
+    }).flatMap(CassandraPopularPlaces(_, siteSettings.defaultzoom))
 
     places.keyBy(r=>{(
       r.placeid,

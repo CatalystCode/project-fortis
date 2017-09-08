@@ -33,7 +33,7 @@ class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Dou
 }
 
 object TileUtils {
-  final val MAX_ZOOM = 16
+  final val ZOOM_LENGTH = sys.env.getOrElse("FORTIS_ZOOM_LENGTH", "10").toInt
   final val MIN_ZOOM = 8
   final val DETAIL_ZOOM_DELTA = 5
 
@@ -89,16 +89,18 @@ object TileUtils {
       (tile.tileId.tileId, tileTuple._2))
   }
 
-  def tile_seq_from_places(places: Seq[Place]): Seq[TileId] = {
+  def tile_seq_from_places(places: Seq[Place], minZoom: Int = MIN_ZOOM): Seq[TileId] = {
     for {
-      zoom <- MIN_ZOOM to MAX_ZOOM
+      zoom <- minZoom to maxZoom(minZoom)
       place <- places
     }
       yield tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
   }
 
-  def tile_id_mapper_with_zoom(location: (Double, Double)): List[(String, (String, Int))] = {
-    (for (zoom <- MIN_ZOOM to MAX_ZOOM)
+  def maxZoom(minZoom: Int) : Int = minZoom + ZOOM_LENGTH
+
+  def tile_id_mapper_with_zoom(location: (Double, Double), minZoom: Int = MIN_ZOOM): List[(String, (String, Int))] = {
+    (for (zoom <- minZoom to maxZoom(minZoom))
       yield (tile_id_from_lat_long(location._1, location._2, zoom).tileId,
         (tile_id_from_lat_long(location._1, location._2, zoom + DETAIL_ZOOM_DELTA).tileId, 1))).toList
   }
@@ -123,9 +125,9 @@ object TileUtils {
     tile_from_tile_id(parent_id(tile))
   }
 
-  def tile_ids_for_all_zoom_levels(tileId: TileId): IndexedSeq[TileId] = {
+  def tile_ids_for_all_zoom_levels(tileId: TileId, minZoom: Int = MIN_ZOOM): IndexedSeq[TileId] = {
     val tile = tile_from_tile_id(tileId)
-    for (zoom <- MIN_ZOOM to MAX_ZOOM) yield tile_id_from_lat_long(tile.centerLatitude(), tile.centerLongitude(), zoom)
+    for (zoom <- minZoom to maxZoom(minZoom)) yield tile_id_from_lat_long(tile.centerLatitude(), tile.centerLongitude(), zoom)
   }
 
   def children(tile: Tile): List[TileId] = {

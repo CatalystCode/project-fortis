@@ -4,15 +4,15 @@ import java.util.UUID
 
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
-import com.datastax.spark.connector.writer.{SqlRowWriter, WriteConf}
+import com.datastax.spark.connector.writer.WriteConf
+import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Telemetry}
 import com.microsoft.partnercatalyst.fortis.spark.logging.{Loggable, Timer}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs._
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
+import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.streaming.Time
 import org.apache.spark.streaming.dstream.DStream
 
@@ -24,7 +24,7 @@ object CassandraEventsSink extends Loggable {
   private val TableEventBatches = "eventbatches"
   private val CassandraFormat = "org.apache.spark.sql.cassandra"
 
-  def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession): Unit = {
+  def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession, configurationManager: ConfigurationManager): Unit = {
     implicit lazy val connector: CassandraConnector = CassandraConnector(sparkSession.sparkContext)
 
     dstream.foreachRDD { (eventsRDD, time: Time) => {
@@ -47,9 +47,9 @@ object CassandraEventsSink extends Loggable {
           }
 
           val offlineAggregators = Seq[OfflineAggregator[_]](
-            new ConjunctiveTopicsOffineAggregator,
-            new PopularPlacesOfflineAggregator,
-            new HeatmapOfflineAggregator(sparkSession)
+            new ConjunctiveTopicsOffineAggregator(configurationManager),
+            new PopularPlacesOfflineAggregator(configurationManager),
+            new HeatmapOfflineAggregator(sparkSession, configurationManager)
           )
 
           val eventBatchDF = Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
@@ -107,12 +107,14 @@ object CassandraEventsSink extends Loggable {
     def writeEventBatchToEventTagTables(eventDS: Dataset[Event], session: SparkSession): Unit = {
       import session.implicits._
 
+      val defaultZoom = configurationManager.fetchSiteSettings(session.sparkContext).defaultzoom
+
       Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventTopics", _, _, -1)) {
         eventDS.flatMap(CassandraEventTopicSchema(_)).rdd.saveToCassandra(KeyspaceName, TableEventTopics)
       }
 
       Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventPlaces", _, _, -1)) {
-        eventDS.flatMap(CassandraEventPlacesSchema(_)).rdd.saveToCassandra(KeyspaceName, TableEventPlaces)
+        eventDS.flatMap(CassandraEventPlacesSchema(_, defaultZoom)).rdd.saveToCassandra(KeyspaceName, TableEventPlaces)
       }
     }
   }
