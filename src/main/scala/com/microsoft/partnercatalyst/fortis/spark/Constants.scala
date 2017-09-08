@@ -7,6 +7,7 @@ object Constants {
 
   val EventHubProgressDir = "eventhubProgress"
   val SscInitRetryAfterMillis = 60*1000
+  val SscShutdownDelayMillis = 60*1000
 
   object Env {
     val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
@@ -20,5 +21,6 @@ object Constants {
     val ManagementBusConfigQueueName = "FORTIS_SB_CONFIG_QUEUE"
     val ManagementBusCommandQueueName = "FORTIS_SB_COMMAND_QUEUE"
     val SscInitRetryAfterMillis = "FORTIS_SSC_INIT_RETRY_AFTER_MILLIS"
+    val SscShutdownDelayMillis = "FORTIS_SSC_SHUTDOWN_DELAY_MILLIS"
   }
 }
