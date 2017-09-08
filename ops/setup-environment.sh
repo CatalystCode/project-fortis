@@ -32,7 +32,6 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=DEFAULT_SITE_NAME="${site_name}" \
 --from-literal=APPLICATION_INSIGHTS_IKEY="${app_insights_id}" \
 --from-literal=SPARK_DAEMON_MEMORY="${SPARK_DAEMON_MEMORY}" \
---from-literal=HA_PROGRESS_DIR="${checkpoint_directory}" \
 --from-literal=DEFAULT_LANGUAGE="${default_language}" \
 --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
 --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
