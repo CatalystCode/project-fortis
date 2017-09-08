@@ -1,7 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import java.util.UUID.randomUUID
-
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
@@ -11,7 +9,7 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with
   with AnalysisDefaults.EnableAll[FacebookPost] {
   override def toSchema(item: FacebookPost, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[FacebookPost] = {
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"Facebook.post.${item.post.getId}",
       sourceeventid = item.post.getId,
       eventtime = item.post.getUpdatedTime.getTime,
       body = item.post.getMessage,

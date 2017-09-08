@@ -10,13 +10,13 @@ class RedditAnalyzer extends Analyzer[RedditObject] with Serializable
   with AnalysisDefaults.EnableAll[RedditObject] {
   override def toSchema(item: RedditObject, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RedditObject] = {
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"Reddit.${item.data.id.getOrElse(randomUUID()).toString}",
       sourceeventid = item.data.id.getOrElse("").toString,
       eventtime = item.data.created_utc.get.toLong,
       body = item.data.description.getOrElse(""),
       title = item.data.title.getOrElse(""),
       externalsourceid = item.data.author.getOrElse(""),
-      pipelinekey = "reddit",
+      pipelinekey = "Reddit",
       sourceurl = item.data.url.getOrElse(""),
       original = item
     )

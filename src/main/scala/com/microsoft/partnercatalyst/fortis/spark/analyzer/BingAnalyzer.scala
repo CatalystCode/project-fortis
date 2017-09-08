@@ -1,9 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import java.net.URL
-import java.util.UUID.randomUUID
 
 import com.github.catalystcode.fortis.spark.streaming.bing.dto.BingPost
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
@@ -17,7 +16,7 @@ class BingAnalyzer extends Analyzer[BingPost] with Serializable
 
   override def toSchema(item: BingPost, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[BingPost] = {
     ExtendedDetails(
-      eventid = randomUUID().toString,
+      eventid = s"Bing.${item.url}",
       sourceeventid = item.url,
       eventtime = convertDatetimeStringToEpochLong(item.dateLastCrawled),
       externalsourceid = new URL(item.url).getHost,
