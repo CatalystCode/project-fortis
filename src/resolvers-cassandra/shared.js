@@ -102,9 +102,12 @@ function parseLimit(limit) {
   return limit > 0 ? limit : DEFAULT_LIMIT;
 }
 
+const DEFAULT_CSV_CONTAINER = 'csv-export';
+const DEFAULT_CSV_EXPIRY_MINUTES = 2 * 60;
+
 function asCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes) {
-  container = container || 'csv-export';
-  expiryMinutes = expiryMinutes || 2 * 60;
+  container = container || DEFAULT_CSV_CONTAINER;
+  expiryMinutes = expiryMinutes || DEFAULT_CSV_EXPIRY_MINUTES;
 
   function formatCsvFilename(provenance, content) {
     const contentHash = content ? crypto.createHash('md5').update(content).digest('hex') : 'noresults';
