@@ -42,7 +42,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       args.pipelinekeys,
       args.externalsourceid,
       args.zoomLevel,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile=>tile.id),
+      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       MaxFetchedRows
     ];
 
@@ -91,12 +91,12 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const conjunctivetopics = args.maintopics.length > 1 ? [] : args.conjunctivetopics;
-    
+
     const MaxConjunctiveTopicsAllowed = 2;
     const dateFormat = 'YYYY-MM-DD HH:mm';
 
     const query = `
-    SELECT conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, perioddate, mentioncount, avgsentimentnumerator
+    SELECT conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, perioddate, mentioncount, avgsentimentnumerator, tileid
     FROM fortis.computedtiles
     WHERE periodtype = ?
     AND conjunctiontopic1 IN ?
@@ -117,12 +117,13 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       args.pipelinekeys,
       args.externalsourceid,
       args.zoomLevel,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile=>tile.id)
+      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id)
     ];
 
     return cassandraConnector.executeQuery(query, params)
       .then(rows => {
         const labels = Array.from(makeSet(rows, row => row.conjunctiontopic1)).map(row => ({ name: row }));
+        const tiles = Array.from(makeSet(rows, row => row.tileid)).map(row => row);
         const graphData = aggregateBy(rows, row => `${row.conjunctiontopic1}_${row.perioddate}`, row => ({
           date: moment(row.perioddate).format(dateFormat),
           name: row.conjunctiontopic1,
@@ -131,7 +132,8 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
         }));
         resolve({
           labels,
-          graphData
+          graphData,
+          tiles
         });
       })
       .catch(reject);
@@ -182,7 +184,7 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
       args.pipelinekeys,
       args.externalsourceid,
       args.zoomLevel,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile=>tile.id),
+      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       MaxFetchedRows
     ];
 
@@ -230,7 +232,7 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
       ...toConjunctionTopics(args.maintopic, args.conjunctivetopics),
       args.pipelinekeys,
       args.zoomLevel,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile=>tile.id),
+      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       MaxFetchedRows
     ];
 
@@ -281,7 +283,7 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       args.pipelinekeys,
       args.externalsourceid,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile=>tile.id),
+      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       MaxFetchedRows
     ];
 

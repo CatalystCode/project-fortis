@@ -69,52 +69,6 @@ function queryEventsTable(eventIdResponse, args) {
 }
 
 /**
- * @param {site: string, originalSource: string, coordinates: number[], mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
- * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
- */
-function byLocation(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    if (!args.coordinates || args.coordinates.length !== 2) return reject('Invalid coordinates specified');
-
-    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-    const [lat, lon] = args.coordinates;
-
-    const tagsQuery = `
-    SELECT eventid
-    FROM fortis.eventplaces
-    WHERE conjunctiontopic1 = ?
-    AND conjunctiontopic2 = ?
-    AND conjunctiontopic3 = ?
-    AND pipelinekey = ?
-    AND externalsourceid = ?
-    AND centroidlat = ?
-    AND centroidlon = ?
-    AND eventtime >= ?
-    AND eventtime <= ?
-    LIMIT ?
-    `.trim();
-
-    const tagsParams = [
-      ...toConjunctionTopics(args.mainTerm, args.filteredEdges),
-      toPipelineKey(args.sourceFilter),
-      'all',
-      lat,
-      lon,
-      fromDate,
-      toDate,
-      parseLimit(args.limit)
-    ];
-
-    cassandraConnector.executeQuery(tagsQuery, tagsParams)
-    .then(rows => {
-      return queryEventsTable(rows, args);
-    })
-    .then(resolve)
-    .catch(reject);
-  });
-}
-
-/**
  * @param {externalsourceid: string, bbox: number[], conjunctivetopics: string[], limit: number, pageState: number, fromDate: string, toDate: string, pipelinekeys: string[], fulltextTerm: string} args
  * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
  **/
@@ -267,7 +221,6 @@ function translateWords(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  byLocation: trackEvent(withRunTime(byLocation), 'messagesForLocation'),
   byBbox: trackEvent(withRunTime(byBbox), 'messagesForBbox'),
   byEdges: trackEvent(withRunTime(byEdges), 'messagesForEdges'),
   event: trackEvent(event, 'messageForEvent'),

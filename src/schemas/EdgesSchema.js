@@ -73,10 +73,11 @@ module.exports = graphql.buildSchema(`
   type FeatureTimeSeriesCollection {
     labels: [TimeSeriesLabel]!
     graphData: [TimeSeriesEntry]!
+    tiles: [String]
   }
 
   type TimeSeriesEntry{
-    date: String!,
+    date: String!
     name: String!
     avgsentiment: Float
     mentions: Int!
