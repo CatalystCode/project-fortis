@@ -3,6 +3,9 @@
 const Promise = require('promise');
 const geotile = require('geotile');
 const isObject = require('lodash/isObject');
+const json2csv = require('json2csv');
+const crypto = require('crypto');
+const { createFile } = require('../clients/storage/BlobStorageClient');
 
 function withRunTime(promiseFunc) {
   function runTimer(...args) {
@@ -99,6 +102,33 @@ function parseLimit(limit) {
   return limit > 0 ? limit : DEFAULT_LIMIT;
 }
 
+function asCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes) {
+  container = container || 'csv-export';
+  expiryMinutes = expiryMinutes || 2 * 60;
+
+  function formatCsvFilename(provenance, content) {
+    const contentHash = content ? crypto.createHash('md5').update(content).digest('hex') : 'noresults';
+    const now = new Date();
+    const folder = `${now.getUTCFullYear()}/${now.getUTCMonth()+1}/${now.getUTCDate()}/${now.getUTCHours()}/${now.getUTCMinutes()}/${contentHash}`;
+    return `${folder}/${provenance}.csv`;
+  }
+
+  function csvExporter(...args) {
+    return new Promise((resolve, reject) => {
+      promiseFunc(...args)
+      .then(returnValue => {
+        const csvItems = returnValue && returnValue[exportPropertyName];
+        const csvText = csvItems && csvItems.length ? json2csv({ data: csvItems, withBOM: true }) : '';
+        return createFile(container, formatCsvFilename(promiseFunc.name, csvText), csvText, expiryMinutes);
+      })
+      .then(resolve)
+      .catch(reject);
+    });
+  }
+
+  return csvExporter;
+}
+
 module.exports = {
   parseLimit,
   parseFromToDate,
@@ -108,5 +138,6 @@ module.exports = {
   tilesForLocations,
   limitForInClause,
   fromTopicListToConjunctionTopics,
-  withRunTime: withRunTime
+  asCsvExporter,
+  withRunTime
 };

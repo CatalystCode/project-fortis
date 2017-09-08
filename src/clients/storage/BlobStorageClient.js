@@ -2,7 +2,13 @@
 
 const Promise = require('promise');
 const request = require('request');
-const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+const { trackDependency } = require('../appinsights/AppInsightsClient');
+const azure = require('azure-storage');
+const { minutesFromNow } = azure.date;
+const { READ } = azure.BlobUtilities.SharedAccessPermissions;
+
+const USER_FILES_BLOB_ACCOUNT_NAME = process.env.USER_FILES_BLOB_ACCOUNT_NAME;
+const USER_FILES_BLOB_ACCOUNT_KEY = process.env.USER_FILES_BLOB_ACCOUNT_KEY;
 
 /**
  * @param {string} uri
@@ -27,6 +33,37 @@ function fetchJson(uri) {
   });
 }
 
+/**
+ * @param {string} container
+ * @param {string} fileName
+ * @param {string} content
+ * @param {number} expiryMinutes
+ * @returns {Promise.<{url: string, expires: Date}>}
+ */
+function createFile(container, fileName, content, expiryMinutes) {
+  const client = azure.createBlobService(USER_FILES_BLOB_ACCOUNT_NAME, USER_FILES_BLOB_ACCOUNT_KEY);
+
+  return new Promise((resolve, reject) => {
+    client.createContainerIfNotExists(container, (error) => {
+      if (error) return reject(error);
+
+      client.createBlockBlobFromText(container, fileName, content, (error) => {
+        if (error) return reject(error);
+
+        const expires = minutesFromNow(expiryMinutes);
+        const accessSignature = client.generateSharedAccessSignature(container, fileName, { AccessPolicy: { Expiry: expires, Permissions: READ } });
+        const url = client.getUrl(container, fileName, accessSignature, true);
+
+        resolve({
+          url,
+          expires
+        });
+      });
+    });
+  });
+}
+
 module.exports = {
+  createFile: trackDependency(createFile, 'BlobStorage', 'createFile'),
   fetchJson: trackDependency(fetchJson, 'BlobStorage', 'fetchJson')
 };

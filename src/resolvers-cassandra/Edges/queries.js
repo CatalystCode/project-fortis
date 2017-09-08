@@ -5,7 +5,7 @@ const moment = require('moment');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, withRunTime, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { tilesForBbox, withRunTime, asCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
 const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
@@ -289,5 +289,12 @@ module.exports = {
   topTerms: trackEvent(topTerms, 'topTerms'),
   geofenceplaces: trackEvent(withRunTime(locations), 'locations'),
   conjunctiveTopics: trackEvent(conjunctiveTopics, 'conjunctiveTopics'),
-  topSources: trackEvent(topSources, 'topSources')
+  topSources: trackEvent(topSources, 'topSources'),
+
+  csv_popularLocations: trackEvent(asCsvExporter(popularLocations, 'edges'), 'csv_popularLocations'),
+  csv_timeSeries: trackEvent(asCsvExporter(timeSeries, 'graphData'), 'csv_timeSeries'),
+  csv_topTerms: trackEvent(asCsvExporter(topTerms, 'edges'), 'csv_topTerms'),
+  csv_geofenceplaces: trackEvent(asCsvExporter(locations, 'places'), 'csv_locations'),
+  csv_conjunctiveTopics: trackEvent(asCsvExporter(conjunctiveTopics, 'edges'), 'csv_conjunctiveTopics'),
+  csv_topSources: trackEvent(asCsvExporter(topSources, 'edges'), 'csv_topSources')
 };
