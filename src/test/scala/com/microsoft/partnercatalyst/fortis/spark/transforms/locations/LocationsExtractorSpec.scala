@@ -14,11 +14,11 @@ object LocationsExtractorSpec {
   val lngManhattan = 90
 
   val testLookup = Map(
-    "nyc" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc)),
-    "ny" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc)),
-    "new york" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc)),
-    "big apple" -> Set(Location(idManhattan, latitude = latManhattan, longitude = lngManhattan)),
-    "manhattan" -> Set(Location(idManhattan, latitude = latManhattan, longitude = lngManhattan))
+    "nyc" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc, layer = "city")),
+    "ny" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc, layer = "city")),
+    "new york" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc, layer = "city")),
+    "big apple" -> Set(Location(idManhattan, latitude = latManhattan, longitude = lngManhattan, layer = "city")),
+    "manhattan" -> Set(Location(idManhattan, latitude = latManhattan, longitude = lngManhattan, layer = "city"))
   )
 }
 
@@ -48,8 +48,8 @@ class LocationsExtractorSpec extends FlatSpec {
 
   it should "build the locations lookup" in {
     val client = new TestFeatureServiceClient(Seq(
-      FeatureServiceFeature(id = "id1", name = "New York", layer = "city"),
-      FeatureServiceFeature(id = "id2", name = "New York", layer = "state"),
+      FeatureServiceFeature(id = "id1", name = "New York", layer = "metro area"),
+      FeatureServiceFeature(id = "id2", name = "New York", layer = "macroregion"),
       FeatureServiceFeature(id = "id3", name = "Gowanus Heights", layer = "neighbourhood")
     ), null)
 
@@ -57,7 +57,7 @@ class LocationsExtractorSpec extends FlatSpec {
     val lookup = extractorFactory.getLookup
 
     assert(lookup.size == 2)
-    assert(lookup("new york").map(_.wofId) == Set("id1", "id2"))
+    assert(lookup("new york").map(_.wofId) == Set("id1"))
     assert(lookup("gowanus heights").map(_.wofId) == Set("id3"))
   }
 
