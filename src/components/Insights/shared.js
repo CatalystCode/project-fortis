@@ -23,8 +23,26 @@ function innerJoin(arr1, arr2) {
     return Array.from(out);
 }
 
+function hasChanged(prevProps, nextProps) {
+    if (prevProps && prevProps.bbox &&
+        nextProps.bbox === prevProps.bbox &&
+        nextProps.zoomLevel === Math.max(nextProps.defaultZoom, prevProps.zoomLevel) &&
+        nextProps.fromDate === prevProps.fromDate &&
+        nextProps.toDate === prevProps.toDate &&
+        nextProps.maintopic === prevProps.maintopic &&
+        nextProps.externalsourceid === prevProps.externalsourceid &&
+        nextProps.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
+        nextProps.dataSource === prevProps.dataSource) {
+        
+        return false;
+      }
+
+    return true;
+}
+
 module.exports = {
     fetchTermFromMap,
     fromMapToArray,
-    innerJoin
+    innerJoin,
+    hasChanged
 }

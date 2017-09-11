@@ -4,6 +4,7 @@ import async from 'async';
 import L from 'leaflet';
 import '../../styles/Insights/HeatMap.css';
 import numeralLibs from 'numeral';
+import { hasChanged } from './shared';
 import ClusterGroup from 'react-leaflet-markercluster';
 
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.0.2/dist/images/";
@@ -16,26 +17,17 @@ export default class MarkerClusterGroup extends React.Component {
     };
 
     this.clusterIconFunction = this.clusterIconFunction.bind(this);
+    this.asyncFetchHeatmapFromTileService = this.asyncFetchHeatmapFromTileService.bind(this);
   }
 
   componentDidMount() {
     this.rebuildHeatmap();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps && prevProps.bbox &&
-      this.props.bbox === prevProps.bbox &&
-      this.props.zoomLevel === prevProps.zoomLevel &&
-      this.props.fromDate === prevProps.fromDate &&
-      this.props.toDate === prevProps.toDate &&
-      this.props.maintopic === prevProps.maintopic &&
-      this.props.externalsourceid === prevProps.externalsourceid &&
-      this.props.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
-      this.props.dataSource === prevProps.dataSource) {
-      return console.log('no relevant change, not rebuilding heatmap');
-    }
-
-    this.rebuildHeatmap();
+  componentWillReceiveProps(nextProps) {
+    if (hasChanged(this.props, nextProps)) {
+      this.rebuildHeatmap();
+    }    
   }
 
   rebuildHeatmap() {
@@ -48,8 +40,8 @@ export default class MarkerClusterGroup extends React.Component {
     this.asyncFetchHeatmapFromTileService((err, heatmapClusters) => {
       if (err) return;
 
-      const markers = this.buildHeatmap(heatmapClusters);
-      this.clearClusters();
+      const markers = self.buildHeatmap(heatmapClusters);
+      self.clearClusters();
       self.setState({ markers });
     });
   }

@@ -3,6 +3,7 @@ import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
 import constants from '../../actions/constants';
 import Sentiment from '../Graphics/Sentiment';
+import { hasChanged } from './shared';
 
 export default class PopularLocationsChart extends React.Component {
     constructor(props) {
@@ -47,7 +48,9 @@ export default class PopularLocationsChart extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+      if(hasChanged(this.props, nextProps)) { 
         this.refreshChart(nextProps);
+      }
     }
 
     render() {

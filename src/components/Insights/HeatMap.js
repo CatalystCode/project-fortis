@@ -2,6 +2,7 @@ import MarkerClusterGroup from './MarkerClusterGroup';
 import { Map, TileLayer, ZoomControl } from 'react-leaflet';
 import constants from '../../actions/constants';
 import React from 'react';
+import { hasChanged } from './shared';
 import '../../styles/Insights/HeatMap.css';
 
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg';  // FIXME: should this really be checked in?
@@ -15,8 +16,8 @@ export default class HeatMap extends React.Component {
     this.updateBounds = this.updateBounds.bind(this);
   }
 
-  handleMoveEnd(viewport) {
-    this.updateBounds(viewport);
+  handleMoveEnd() {
+    this.updateBounds();
   }
 
   getLeafletBbox(){
@@ -29,7 +30,7 @@ export default class HeatMap extends React.Component {
     return [bounds.getNorth(), bounds.getWest(), bounds.getSouth(), bounds.getEast()];
   }
 
-  updateBounds(viewport) {
+  updateBounds() {
     if(this.refs.map){
       const { dataSource, timespanType, termFilters, datetimeSelection, maintopic, externalsourceid,
         fromDate, toDate } = this.props;
@@ -41,20 +42,7 @@ export default class HeatMap extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps && nextProps.bbox &&
-      this.props.bbox === nextProps.bbox &&
-      this.props.zoomLevel === nextProps.zoomLevel &&
-      this.props.fromDate === nextProps.fromDate &&
-      this.props.toDate === nextProps.toDate &&
-      this.props.maintopic === nextProps.maintopic &&
-      this.props.externalsourceid === nextProps.externalsourceid &&
-      this.props.conjunctiveTermsLength === nextProps.conjunctiveTermsLength &&
-      this.props.dataSource === nextProps.dataSource) {
-      
-      return false;
-    }
-
-    return true;
+    return hasChanged(this.props, nextProps);
   }
 
   render() {
@@ -68,7 +56,7 @@ export default class HeatMap extends React.Component {
     
     return (
       <Map
-        onViewportChanged={this.handleMoveEnd}
+        onMoveend={this.handleMoveEnd}
         bounds={bounds}
         ref="map"
         id="leafletMap"
@@ -78,7 +66,7 @@ export default class HeatMap extends React.Component {
 
         <TileLayer url={TILE_LAYER_URL}
           maxZoom={maxzoom}
-          //minZoom={minzoom}
+          minZoom={minzoom}
           attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
           accessToken={MAPBOX_ACCESS_TOKEN} />
 

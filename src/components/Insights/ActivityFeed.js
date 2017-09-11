@@ -8,7 +8,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FortisEvent from './FortisEvent';
 import constants from '../../actions/constants';
 import DialogBox from '../dialogs/DialogBox';
-import { fetchTermFromMap, innerJoin } from './shared';
+import { fetchTermFromMap, innerJoin, hasChanged } from './shared';
 
 const ActivityConsts = constants.ACTIVITY_FEED;
 
@@ -177,25 +177,8 @@ export default class ActivityFeed extends React.Component {
         setTimeout(() => this.processNewsFeed(), ActivityConsts.INFINITE_LOAD_DELAY_MS);
     }
 
-    hasChanged(prevProps, nextProps){
-        if (prevProps && prevProps.bbox &&
-            nextProps.bbox === prevProps.bbox &&
-            nextProps.zoomLevel === Math.max(nextProps.defaultZoom, prevProps.zoomLevel) &&
-            nextProps.fromDate === prevProps.fromDate &&
-            nextProps.toDate === prevProps.toDate &&
-            nextProps.maintopic === prevProps.maintopic &&
-            nextProps.externalsourceid === prevProps.externalsourceid &&
-            nextProps.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
-            nextProps.dataSource === prevProps.dataSource) {
-            
-            return false;
-          }
-
-        return true;
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if(this.hasChanged(prevProps, this.props)) {
+    componentWillReceiveProps(nextProps) {
+        if(hasChanged(this.props, nextProps)) {
           this.setState(Object.assign({}, this.resetNewsFeed(), {filteredSource: this.props.dataSource, isInfiniteLoading: true}));
           setTimeout(() => this.processNewsFeed(), ActivityConsts.INFINITE_LOAD_DELAY_MS);
         }

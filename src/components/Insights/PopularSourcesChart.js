@@ -3,6 +3,7 @@ import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
 import constants from '../../actions/constants';
 import Sentiment from '../Graphics/Sentiment';
+import { hasChanged } from './shared';
 
 export default class PopularSourcesChart extends React.Component {
     constructor(props) {
@@ -46,12 +47,14 @@ export default class PopularSourcesChart extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.refreshChart(nextProps);
+        if (hasChanged(this.props, nextProps)) {
+            this.refreshChart(nextProps);
+        }
     }
 
     render() {
         return (
-            <DoughnutChart handleClick={(data, activeIndex)=>this.handleClick(data, activeIndex)}
+            <DoughnutChart handleClick={(data, activeIndex) => this.handleClick(data, activeIndex)}
                 fill={constants.CHART_STYLE.BG_FILL}
                 data={this.state.dataProvider}
                 activeIndex={this.state.activeIndex}>
