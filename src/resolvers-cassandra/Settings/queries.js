@@ -3,28 +3,11 @@
 const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const withRunTime = require('../shared').withRunTime;
+const {withRunTime, getsiteDefintion} = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 const CONNECTOR_TWITTER = 'Twitter';
 const CONNECTOR_FACEBOOK = 'Facebook';
-
-function cassandraRowToSite(row) {
-  // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
-  // storageConnectionString, featuresConnectionString, mapzenApiKey, fbToken.
-  return {
-    name: row.sitename,
-    properties: {
-      targetBbox: row.geofence,
-      defaultZoomLevel: row.defaultzoom,
-      logo: row.logo,
-      title: row.title,
-      defaultLocation: row.geofence,
-      defaultLanguage: row.defaultlanguage,
-      supportedLanguages: row.languages
-    }
-  };
-}
 
 function transformWatchlist(item, translatedlanguage){
   return {
@@ -64,15 +47,9 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
  * @returns {Promise.<{runTime: string, sites: Array<{name: string, properties: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}>}
  */
 function sites(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {    
-    const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
-    cassandraConnector.executeQuery(siteByIdQuery, [])
-    .then(rows => {
-      if (rows.length < 1) return reject('Could not find site with sitename');
-      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
-
-      resolve({site: cassandraRowToSite(rows[0])});
-    })
+  return new Promise((resolve, reject) => {   
+    getsiteDefintion()
+    .then(resolve)
     .catch(reject);
   });
 }

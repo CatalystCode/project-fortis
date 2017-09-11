@@ -6,6 +6,40 @@ const isObject = require('lodash/isObject');
 const json2csv = require('json2csv');
 const uuidv4 = require('uuid/v4');
 const { createFile } = require('../clients/storage/BlobStorageClient');
+const cassandraConnector = require('../clients/cassandra/CassandraConnector');
+
+function cassandraRowToSite(row) {
+  // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
+  // storageConnectionString, featuresConnectionString, mapzenApiKey, fbToken.
+  return {
+    name: row.sitename,
+    properties: {
+      targetBbox: row.geofence,
+      defaultZoomLevel: row.defaultzoom,
+      logo: row.logo,
+      title: row.title,
+      translationsvctoken: row.translationsvctoken,
+      featureServiceNamespace: row.featureservicenamespace,
+      defaultLocation: row.geofence,
+      defaultLanguage: row.defaultlanguage,
+      supportedLanguages: row.languages
+    }
+  };
+}
+
+function getsiteDefintion(){
+  return new Promise((resolve, reject) => {    
+    const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
+    cassandraConnector.executeQuery(siteByIdQuery, [])
+    .then(rows => {
+      if (rows.length < 1) return reject('Could not find site with sitename');
+      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
+
+      resolve({site: cassandraRowToSite(rows[0])});
+    })
+    .catch(reject);
+  });
+}
 
 function withRunTime(promiseFunc) {
   function runTimer(...args) {
@@ -140,6 +174,7 @@ module.exports = {
   tilesForBbox,
   tilesForLocations,
   limitForInClause,
+  getsiteDefintion,
   fromTopicListToConjunctionTopics,
   asCsvExporter,
   withRunTime

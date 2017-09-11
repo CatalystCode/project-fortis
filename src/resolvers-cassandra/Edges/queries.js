@@ -11,6 +11,10 @@ const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 const MaxFetchedRows = 10000;
 
+/**
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, bbox: [Float]}} args
+ * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, placeid: string, avgsentiment: float}>}>}
+ */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -76,11 +80,14 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
         } else {
           resolve({ edges: [] });
         }
-      })
-      .catch(reject);
+      });
   });
 }
 
+/**
+ * @param {{fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, maintopics: [String]!, conjunctivetopics: [String], bbox: [Float], zoomLevel: Int, externalsourceid: String!}} args
+ * @returns {Promise.<{labels: Array<{name: string, mentions: number}>, graphData: Array<{date: string, edges: string[], mentions: number[]}>}>}
+ */
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const conjunctivetopics = args.maintopics.length > 1 ? [] : args.conjunctivetopics;
@@ -133,22 +140,26 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+/**
+ * @param {{bbox: string}} args
+ * @returns {Promise.<{runTime: string, edges: Array<{name: string, coordinates: number[]}>}>}
+ */
 function locations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { bbox } = args;
 
     featureServiceClient.fetchByBbox({ north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3] }, 'bbox')
-      .then(locations => {
-        const places = locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox }));
-
-        resolve({
-          places
-        });
-      })
+      .then(locations =>
+        resolve(locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox })))
+      )
       .catch(reject);
   });
 }
 
+/**
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, bbox: [Float], zoomLevel: Int}} args
+ * @returns {Promise.<{edges: Array<{name: string, mentions: number, avgsentiment: float}>}>}
+ */
 function topTerms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -178,21 +189,24 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
     ];
 
     return cassandraConnector.executeQuery(query, params, { fetchSize })
-      .then(rows => {
-        const edges = aggregateBy(rows, row => `${row.conjunctiontopic1}`, row => ({
-          name: row.conjunctiontopic1,
-          mentions: Long.ZERO,
-          avgsentimentnumerator: Long.ZERO
-        })).slice(0, responseSize);
-
+      .then(rows =>
         resolve({
-          edges
-        });
-      })
+          edges: aggregateBy(rows, row => `${row.conjunctiontopic1}`, row => ({
+            name: row.conjunctiontopic1,
+            mentions: Long.ZERO,
+            avgsentimentnumerator: Long.ZERO
+          }))
+            .slice(0, responseSize)
+        })
+      )
       .catch(reject);
   });
 }
 
+/**
+ * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int}} args
+ * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
+ */
 function topSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -230,7 +244,8 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
           name: row.externalsourceid,
           mentions: Long.ZERO,
           avgsentimentnumerator: Long.ZERO
-        })).slice(0, responseSize);
+        }))
+          .slice(0, responseSize);
 
         resolve({
           edges
@@ -240,6 +255,10 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+/**
+ * @param {{fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, maintopic: String!, bbox: [Float], zoomLevel: Int!}} args
+ * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
+ */
 function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -270,8 +289,9 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
 
     return cassandraConnector.executeQuery(query, params, { fetchSize })
       .then(rows => {
+        const filteredRows = rows.filter(topic=>topic.conjunctivetopic.toLowerCase() !== args.maintopic.toLowerCase());
         //todo: need to add sentiment field to the conjunctivetopics table
-        const edges = aggregateBy(rows, row => `${row.conjunctivetopic}`, row => ({
+        const edges = aggregateBy(filteredRows, row => `${row.conjunctivetopic}`, row => ({
           conjunctionterm: row.conjunctivetopic,
           name: row.topic,
           mentions: Long.ZERO

@@ -10,7 +10,7 @@ module.exports = graphql.buildSchema(`
             filteredEdges: [String]!, langCode: String!, 
             limit: Int, offset: Int, fromDate: String!, 
             toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
-    event(site: String!, messageId: String!): Feature
+    event(messageId: String!): Feature
     translate(sentence: String!, fromLanguage: String!, toLanguage: String!): TranslationResult
     translateWords(words: [String]!, fromLanguage: String!, toLanguage: String!): TranslatedWords
   }
@@ -89,6 +89,7 @@ module.exports = graphql.buildSchema(`
     language: String,
     pipelinekey: String,
     fullText: String,
-    link: String
+    link: String,
+    body: String
   }
 `);
