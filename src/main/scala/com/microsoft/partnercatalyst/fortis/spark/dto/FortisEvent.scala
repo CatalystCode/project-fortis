@@ -5,6 +5,8 @@ import java.util.Objects
 trait FortisEvent {
   val details: Details
   val analysis: Analysis
+
+  def copy(analysis: Analysis = null): FortisEvent
 }
 
 trait Details {

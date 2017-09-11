@@ -17,7 +17,13 @@ object CassandraTest {
   case class TestFortisEvent(
     details: Details,
     analysis: Analysis
-  ) extends FortisEvent
+  ) extends FortisEvent {
+    override def copy(analysis: Analysis = null): FortisEvent = {
+      TestFortisEvent(
+        details = details,
+        analysis = Option(analysis).getOrElse(this.analysis))
+    }
+  }
 
   case class TestFortisDetails(
     sourceeventid: String,

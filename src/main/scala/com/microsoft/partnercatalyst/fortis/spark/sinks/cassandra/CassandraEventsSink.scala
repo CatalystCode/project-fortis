@@ -27,7 +27,13 @@ object CassandraEventsSink extends Loggable {
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession, configurationManager: ConfigurationManager): Unit = {
     implicit lazy val connector: CassandraConnector = CassandraConnector(sparkSession.sparkContext)
 
-    dstream.foreachRDD { (eventsRDD, time: Time) => {
+    dstream
+    .map(event => event.copy(analysis = event.analysis.copy(
+      keywords = event.analysis.keywords.distinct,
+      locations = event.analysis.locations.distinct,
+      entities = event.analysis.entities.distinct
+    )))
+    .foreachRDD { (eventsRDD, _: Time) => {
       Timer.time(Telemetry.logSinkPhase("all", _, _, -1)) {
         Timer.time(Telemetry.logSinkPhase("eventsRDD.cache", _, _, -1)) {
           eventsRDD.cache()
@@ -62,13 +68,12 @@ object CassandraEventsSink extends Loggable {
 
           offlineAggregators.foreach(aggregator => {
             val aggregatorName = aggregator.getClass.getSimpleName
-            Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.${aggregatorName}", _, _, -1)) {
+            Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.$aggregatorName", _, _, -1)) {
               try {
                 aggregator.aggregateAndSave(fortisEventsRDD, KeyspaceName)
               } catch {
-                case e: Exception => {
-                  logError(s"Failed performing offline aggregation ${aggregatorName}", e)
-                }
+                case e: Exception =>
+                  logError(s"Failed performing offline aggregation $aggregatorName", e)
               }
             }
           })

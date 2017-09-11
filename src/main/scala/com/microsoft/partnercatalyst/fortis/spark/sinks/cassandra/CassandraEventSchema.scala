@@ -188,7 +188,7 @@ object Utils {
             Ordering.comparatorToOrdering(Collator.getInstance(new Locale(langcode.getOrElse(langcode.getOrElse(DefaultPrimaryLanguage))))).compare(a,b) < 0 && a != ""
           }
 
-          (sortedCombo(0), sortedCombo(1), sortedCombo(2))
+          (sortedCombo.head, sortedCombo(1), sortedCombo(2))
         })
       case None => Seq()
     }
