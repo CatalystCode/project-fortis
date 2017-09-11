@@ -5,7 +5,13 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Details, Fortis
 case class ExtendedFortisEvent[T](
   details: ExtendedDetails[T],
   analysis: Analysis
-) extends FortisEvent
+) extends FortisEvent {
+  override def copy(analysis: Analysis) = {
+    ExtendedFortisEvent[T](
+      details = details,
+      analysis = Option(analysis).getOrElse(this.analysis))
+  }
+}
 
 case class ExtendedDetails[T](
   eventid: String,

@@ -27,7 +27,13 @@ object CassandraEventsSink extends Loggable {
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession, configurationManager: ConfigurationManager): Unit = {
     implicit lazy val connector: CassandraConnector = CassandraConnector(sparkSession.sparkContext)
 
-    dstream.foreachRDD { (eventsRDD, _: Time) => {
+    dstream
+    .map(event => event.copy(analysis = event.analysis.copy(
+      keywords = event.analysis.keywords.distinct,
+      locations = event.analysis.locations.distinct,
+      entities = event.analysis.entities.distinct
+    )))
+    .foreachRDD { (eventsRDD, _: Time) => {
       Timer.time(Telemetry.logSinkPhase("all", _, _, -1)) {
         Timer.time(Telemetry.logSinkPhase("eventsRDD.cache", _, _, -1)) {
           eventsRDD.cache()
