@@ -27,7 +27,7 @@ class LocationsExtractorFactory(
         logDebug(s"Discarding location ${oldLocation.wofId} for name $locationName as we now have more granular location ${newLocation.wofId}")
         map(locationName) = newLocation
       } else {
-        logDebug(s"Discarding location ${newLocation.wofId} for name $locationName since we already have more granular location ${oldLocation.wofId}")
+        logDebug(s"Ignoring location ${newLocation.wofId} for name $locationName since we already have more granular location ${oldLocation.wofId}")
       }
     })
 
