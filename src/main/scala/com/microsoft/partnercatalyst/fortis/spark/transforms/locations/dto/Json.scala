@@ -12,6 +12,7 @@ object FeatureServiceFeature {
   def toLocation(feature: FeatureServiceFeature): Location = {
     Location(
       wofId = feature.id,
+      layer = feature.layer,
       longitude = feature.centroid.map(_.head).getOrElse(DefaultLongitude),
       latitude = feature.centroid.map(_.tail.head).getOrElse(DefaultLatitude))
   }
