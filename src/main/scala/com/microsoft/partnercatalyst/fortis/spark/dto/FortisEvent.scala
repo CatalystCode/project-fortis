@@ -34,6 +34,7 @@ case class Analysis(
 
 case class Location(
   wofId: String,
+  name: String,
   layer: String,
   latitude: Double,
   longitude: Double,

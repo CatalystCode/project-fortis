@@ -35,13 +35,13 @@ class FeatureServiceClientSpec extends FlatSpec {
 
   it should "convert features to locations" in {
     val feature = FeatureServiceFeature(id = "wof-102061079", name = "Gowanus Heights", layer = "neighbourhood", centroid = None)
-    val location = Location(wofId = "wof-102061079", layer = "country", confidence = None, longitude = DefaultLongitude, latitude = DefaultLatitude)
+    val location = Location(wofId = "wof-102061079", name = "Gowanus Heights", layer = "country", confidence = None, longitude = DefaultLongitude, latitude = DefaultLatitude)
     assert(location == toLocation(feature))
   }
 
   it should "convert features to locations with centroids" in {
     val feature = FeatureServiceFeature(id = "wof-102061079", name = "Gowanus Heights", layer = "neighbourhood", centroid = Some(List(-1.2, 3.4)))
-    val location = Location(wofId = "wof-102061079", layer = "country", confidence = None, longitude = -1.2, latitude = 3.4)
+    val location = Location(wofId = "wof-102061079", name = "Gowanus Heights", layer = "country", confidence = None, longitude = -1.2, latitude = 3.4)
     assert(location == toLocation(feature))
   }
 }
