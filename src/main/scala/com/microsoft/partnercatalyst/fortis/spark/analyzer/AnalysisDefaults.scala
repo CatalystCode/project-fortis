@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Location, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractor
 import com.microsoft.partnercatalyst.fortis.spark.transforms.people.PeopleRecognizer
@@ -21,6 +21,8 @@ private[analyzer] object AnalysisDefaults {
     with EnableEntity[T]
     with EnableLanguage[T]
     with EnableBlacklist[T]
+    with EnableLocationsBlacklist[T]
+    with EnableEntitiesBlacklist[T]
     with EnableSummary[T]
     with EnableSentiment[T] {
     this: Analyzer[T] =>
@@ -67,6 +69,23 @@ private[analyzer] object AnalysisDefaults {
     this: Analyzer[T] =>
     override def hasBlacklistedTerms(details: ExtendedDetails[T], blacklist: Blacklist): Boolean = {
       blacklist.matches(details.body) || blacklist.matches(details.title)
+    }
+  }
+
+  trait EnableLocationsBlacklist[T] {
+    this: Analyzer[T] =>
+    override def hasBlacklistedLocations(details: ExtendedDetails[T], analysis: Analysis, blacklist: Blacklist): Boolean = {
+      val sharedLocations = details.sharedLocations.map(_.name).toSet
+      val analyzedLocations = analysis.locations.map(_.name).toSet
+      blacklist.matches(sharedLocations) || blacklist.matches(analyzedLocations)
+    }
+  }
+
+  trait EnableEntitiesBlacklist[T] {
+    this: Analyzer[T] =>
+    override def hasBlacklistedEntities(analysis: Analysis, blacklist: Blacklist): Boolean = {
+      val entities = analysis.entities.map(_.name).toSet
+      blacklist.matches(entities)
     }
   }
 

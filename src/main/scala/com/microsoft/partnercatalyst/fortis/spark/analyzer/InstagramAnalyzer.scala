@@ -12,6 +12,8 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.summary.Summarizer
 @SerialVersionUID(100L)
 class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
   with AnalysisDefaults.EnableBlacklist[InstagramItem]
+  with AnalysisDefaults.EnableLocationsBlacklist[InstagramItem]
+  with AnalysisDefaults.EnableEntitiesBlacklist[InstagramItem]
   with AnalysisDefaults.EnableKeyword[InstagramItem] {
   override def toSchema(item: InstagramItem, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[InstagramItem] = {
     val imageAnalysis = imageAnalyzer.analyze(item.images.standard_resolution.url)

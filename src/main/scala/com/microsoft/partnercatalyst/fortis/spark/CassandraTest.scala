@@ -72,7 +72,7 @@ object CassandraTest {
         title = "twitter post" ),
       analysis = Analysis(
         sentiments = List(.5),
-        locations = List(Location(wofId = "wof-85670485", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1), Location(wofId = "wof-85680959", layer = "country", confidence = Option(1.0), latitude = 14.21, longitude = 43.1)),
+        locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1), Location(wofId = "wof-85680959", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 14.21, longitude = 43.1)),
         keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="car", confidence = Option(1.0))),
        //todo genders = List(Tag(name = "male", confidence = Option(1.0)), Tag(name ="female", confidence = Option(1.0))),
         entities = List(Tag(name = "putin", confidence = Option(1.0))),
@@ -91,7 +91,7 @@ object CassandraTest {
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
-          locations = List(Location(wofId = "wof-85670485", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
+          locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
           keywords = List(Tag(name = "isis", confidence = Option(1.0)),
             Tag(name ="car", confidence = Option(1.0)),
             Tag(name ="bomb", confidence = Option(1.0)),
@@ -113,7 +113,7 @@ object CassandraTest {
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
-          locations = List(Location(wofId = "wof-85670485", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
+          locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
           keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="fear", confidence = Option(1.0)), Tag(name ="bomb", confidence = Option(1.0)), Tag(name ="fatalities", confidence = Option(1.0))),
           //todo genders = List(Tag(name = "male", confidence = Option(1.0)), Tag(name ="female", confidence = Option(1.0))),
           entities = List(Tag(name = "putin", confidence = Option(1.0))),

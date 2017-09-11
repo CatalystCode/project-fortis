@@ -14,11 +14,11 @@ object LocationsExtractorSpec {
   val lngManhattan = 90
 
   val testLookup = Map(
-    "nyc" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc, layer = "city")),
-    "ny" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc, layer = "city")),
-    "new york" -> Set(Location(idNyc, latitude = latNyc, longitude = lngNyc, layer = "city")),
-    "big apple" -> Set(Location(idManhattan, latitude = latManhattan, longitude = lngManhattan, layer = "city")),
-    "manhattan" -> Set(Location(idManhattan, latitude = latManhattan, longitude = lngManhattan, layer = "city"))
+    "nyc" -> Set(Location(idNyc, name = "nyc", latitude = latNyc, longitude = lngNyc, layer = "city")),
+    "ny" -> Set(Location(idNyc, name = "ny", latitude = latNyc, longitude = lngNyc, layer = "city")),
+    "new york" -> Set(Location(idNyc, name = "new york", latitude = latNyc, longitude = lngNyc, layer = "city")),
+    "big apple" -> Set(Location(idManhattan, name = "big apple", latitude = latManhattan, longitude = lngManhattan, layer = "city")),
+    "manhattan" -> Set(Location(idManhattan, name = "manhattan", latitude = latManhattan, longitude = lngManhattan, layer = "city"))
   )
 }
 

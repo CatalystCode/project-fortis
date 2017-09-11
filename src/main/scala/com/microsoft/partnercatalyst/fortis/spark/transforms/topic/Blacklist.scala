@@ -13,4 +13,8 @@ class Blacklist(blacklist: Seq[BlacklistedTerm]) extends Serializable {
     val tokens = Tokenizer(text).toSet
     blacklist.exists(entry => entry.conjunctiveFilter.forall(tokens.contains))
   }
+
+  def matches(terms: Set[String]): Boolean = {
+    blacklist.exists(entry => entry.conjunctiveFilter.forall(terms.contains))
+  }
 }
