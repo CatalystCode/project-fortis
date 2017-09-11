@@ -43,6 +43,7 @@ retries=0
 
 while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    cassandra_host=$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{.spec.clusterIP}')
+   cassandra_extlb_host=$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
 
    DEIS_ROUTER_HOST_ROOT=$(kubectl --namespace=deis get svc deis-router -o jsonpath='{.status.loadBalancer.ingress[*].ip}')
    retries=$((retries+1))
@@ -52,20 +53,23 @@ while [[ -z ${cassandra_host} || -z ${DEIS_ROUTER_HOST_ROOT} ]]; do
    sleep 3
 done
 
-readonly graphql_service_host="fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
-readonly fortis_interface_host="fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+readonly graphql_service_host="http://fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
+readonly fortis_interface_host="http://fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly feature_service_db_conn_str="${FEATURE_SERVICE_DB_CONNECTION_STRING}"
-#readonly feature_service_host="http://feature-service.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
+
+#This needs to be exporting to the environment as the creat-react-app assett pipeline polyfills this into the build. 
+export REACT_APP_SERVICE_HOST="${fortis_interface_host}"
+
+echo "Finished. Installing cassandra cqlsh cli."
+./storage-ddls/install-cassandra-ddls.sh "${cassandra_extlb_host}"
 
 echo "Finished. Now setting up site entry"
 if ! (command -v python >/dev/null); then sudo apt-get install -y python; fi
 ./create_site.py "http://${graphql_service_host}" "${site_name}" "${site_type}"
 
-echo "Finished. Installing cassandra cqlsh cli."
-./storage-ddls/install-cassandra-ddls.sh "${cassandra_host}"
 kubectl create -f ./spark-namespace.yaml
 echo "Finished. Deploying environment settings to cluster."
 ./setup-environment.sh \
@@ -78,7 +82,6 @@ echo "Finished. Deploying environment settings to cluster."
     "${k8resource_group}" \
     "${fortis_interface_host}" \
     "${eh_conn_str}" \
-    "${feature_service_db_conn_str}" \
     "${fortis_central_directory}" \
     "${sb_conn_str}" \
     "${storage_account_name}"

@@ -20,9 +20,6 @@ helm install --set Worker.Replicas="${k8spark_worker_count}" \
              --set Worker.ConfigMapName="${ConfigMapName}" \
              --set Master.ConfigMapName="${ConfigMapName}" \
              --set Master.SparkSubmitCommand="${SparkCommand}" \
-             --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="3g"
-             --set Persistence.PvcAcctName="${storage_acct_name}" \
-             --set Persistence.PvcPwd="${storage_acct_key}" \
-             --set Persistence.CheckpointShare="${checkpointfileshare}" \
+             --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="3g" \
              --name spark-cluster ./stable/spark --namespace spark
 cd ..

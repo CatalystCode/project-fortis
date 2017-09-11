@@ -102,6 +102,7 @@ CREATE TABLE sitesettings(
     cogspeechsvctoken text,
     cogvisionsvctoken text,
     cogtextsvctoken text,
+    featureservicenamespace: text,
     insertiontime timestamp,
     PRIMARY KEY (sitename)
 );
@@ -295,7 +296,7 @@ AS SELECT eventid, pipelinekey, eventtime, centroidlat, centroidlon, placeid, co
      AND conjunctiontopic3 IS NOT NULL
      AND centroidlat IS NOT NULL
      AND centroidlon IS NOT NULL
-PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, externalsourceid), eventtime, tileid, placeid, eventid);
+PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, externalsourceid), tileid, eventtime, placeid, eventid);
 
 /**
  * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.

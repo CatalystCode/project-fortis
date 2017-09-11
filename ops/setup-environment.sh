@@ -12,10 +12,9 @@ readonly graphql_service_host="${6}"
 readonly k8resource_group="${7}"
 readonly fortis_interface_host="${8}"
 readonly eh_conn_str="${9}"
-readonly feature_service_db_conn_str="${10}"
-readonly fortis_central_directory="${11}"
-readonly sb_conn_str="${12}"
-readonly storage_account_name="${13}"
+readonly fortis_central_directory="${10}"
+readonly sb_conn_str="${11}"
+readonly storage_account_name="${12}"
 
 readonly fortis_admin_interface="http://${fortis_interface_host}/#/site/${site_name}/admin"
 readonly default_language="en"
@@ -41,10 +40,6 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
-
-#cd deis-apps/feature-service || exit 2
-#deis config:set APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
-#deis config:set FEATURES_CONNECTION_STRING="${feature_service_db_conn_str}"
 
 cd deis-apps/fortis-services || exit 2
 
