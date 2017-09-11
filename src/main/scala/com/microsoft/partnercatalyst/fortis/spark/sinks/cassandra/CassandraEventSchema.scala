@@ -59,12 +59,18 @@ object CassandraPopularPlaces {
 }
 
 object CassandraConjunctiveTopics {
-  def apply(item: Event, minZoom: Int): Seq[ConjunctiveTopic] = {
-    val keywords = item.computedfeatures.keywords
-    val keywordPairs = if (keywords.isEmpty) Seq() else keywords.map(k=>(k, "")) ++ keywords.combinations(2).flatMap(combination => Seq(
+
+  def flatMapKeywords(item: Event): Seq[(String, String)] = {
+    val keywords = item.computedfeatures.keywords.toSet.toSeq
+    if (keywords.isEmpty) Seq() else keywords.map(k=>(k, "")) ++ keywords.combinations(2).flatMap(combination => Seq(
       (combination.head, combination(1)),
       (combination(1), combination.head
-    )))
+      )))
+  }
+
+  def apply(item: Event, minZoom: Int): Seq[ConjunctiveTopic] = {
+    val keywords = item.computedfeatures.keywords
+    val keywordPairs = flatMapKeywords(item)
 
     val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
 
