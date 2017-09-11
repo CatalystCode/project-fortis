@@ -9,6 +9,40 @@ import org.scalatest.FlatSpec
 
 class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
 
+  it should "flat map keywords" in {
+    val period = Period("day-2017-08-11")
+    val keywords = CassandraConjunctiveTopics.flatMapKeywords(Event(
+      pipelinekey = "twitter",
+      computedfeatures = Features(
+        mentions = 1,
+        sentiment = Sentiment(1.0),
+        keywords = Seq("europe", "humanitarian"),
+        places = Seq(Place("abc123", 10.0, 20.0)),
+        entities = Seq()
+      ),
+      eventtime = period.startTime(),
+      eventlangcode = "en",
+      eventid = UUID.randomUUID().toString,
+      sourceeventid = UUID.randomUUID().toString,
+      insertiontime = new Date().getTime,
+      body = "",
+      summary = "",
+      fulltext = "",
+      batchid = UUID.randomUUID().toString,
+      externalsourceid = "HamillHimself",
+      topics = Seq(),
+      placeids = Seq(),
+      sourceurl = "",
+      title = ""
+    ))
+    assert(keywords == Seq(
+      ("europe", ""),
+      ("humanitarian", ""),
+      ("europe", "humanitarian"),
+      ("humanitarian", "europe")
+    ))
+  }
+
   it should "produce an non-empty sequence" in {
     val period = Period("day-2017-08-11")
     val topics = CassandraConjunctiveTopics(Event(

@@ -4,10 +4,7 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.Place
 
 import scala.collection.mutable
 
-class TileId(var tileId: String) {
-  var row: Int = -1
-  var zoom: Int = -1
-  var column: Int = -1
+case class TileId(var tileId: String) {
 
   private val parts = tileId.split('_')
 
@@ -17,9 +14,12 @@ class TileId(var tileId: String) {
 
   private val tile = (parts(0).toInt, parts(1).toInt, parts(2).toInt)
 
-  this.zoom = tile._1
-  this.row = tile._2
-  this.column = tile._3
+  val zoom = tile._1
+  val row = tile._2
+  val column = tile._3
+
+  override def toString: String = tileId
+
 }
 
 class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Double, var longitudeWest: Double,
@@ -30,6 +30,23 @@ class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Dou
   def midSouthLatitude(): Double = (centerLatitude() + latitudeSouth) / 2.0
   def midEastLongitude(): Double = (centerLongitude() + longitudeEast) / 2.0
   def midWestLongitude(): Double = (centerLongitude() + longitudeWest) / 2.0
+
+  override def toString = s"Tile($tileId, $latitudeNorth, $latitudeSouth, $longitudeWest, $longitudeEast)"
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[Tile]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: Tile =>
+      (that canEqual this) &&
+        tileId == that.tileId
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(tileId)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+
 }
 
 object TileUtils {
