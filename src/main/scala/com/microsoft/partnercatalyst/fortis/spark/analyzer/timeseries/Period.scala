@@ -46,7 +46,7 @@ object PeriodType {
 
   val Day = PeriodType("day", Days.days, "yyyy-MM-dd", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY))
 
-  val Week = PeriodType("week", Weeks.weeks, "yyyy-w", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.WEEK_OF_YEAR))
+  val Week = PeriodType("week", Weeks.weeks, "yyyy-w", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_WEEK))
 
   val Month = PeriodType("month", Months.months, "yyyy-MM", Set(Calendar.MINUTE, Calendar.HOUR_OF_DAY, Calendar.DAY_OF_MONTH))
 
@@ -84,6 +84,7 @@ case class PeriodType(periodTypeName: String, increment: Int=>ReadablePeriod, fo
     calendar.set(Calendar.SECOND, 0)
     this.truncateFields.foreach {
       case field@Calendar.DAY_OF_MONTH => calendar.set(field, 1)
+      case field@Calendar.DAY_OF_WEEK => calendar.set(Calendar.DAY_OF_WEEK, 1)
       case field => calendar.set(field, 0)
     }
     calendar.getTimeInMillis

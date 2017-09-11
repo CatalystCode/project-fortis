@@ -34,6 +34,18 @@ class PeriodSpec extends FlatSpec with BeforeAndAfter {
   it should "parse Week period strings" in {
     val period = Period("week-2016-32")
     assert(period.toString == "week-2016-32")
+    assert(format.format(new Date(period.startTime())) == "2016-07-31 00:00:00")
+    assert(format.format(new Date(period.endTime())) == "2016-08-07 00:00:00")
+  }
+
+  it should "extract same week period from another period's start date" in {
+    val referenceDate = format.parse("2017-09-11 15:34:56")
+    val period = new Period(referenceDate.getTime, PeriodType.Week)
+    assert(period.toString == "week-2017-37")
+
+    val periodStartTime = period.startTime()
+    val confirmation = new Period(periodStartTime, PeriodType.Week)
+    assert(confirmation.toString == period.toString)
   }
 
   it should "parse Month period strings" in {
@@ -92,6 +104,12 @@ class PeriodSpec extends FlatSpec with BeforeAndAfter {
     val date = format.parse("2016-07-04 08:15:32")
     val truncatedDate = PeriodType.Month.truncate(date.getTime)
     assert(format.format(truncatedDate) == "2016-07-01 00:00:00")
+  }
+
+  it should "truncate Week to first of week" in {
+    val date = format.parse("2016-07-05 08:15:32")
+    val truncatedDate = PeriodType.Week.truncate(date.getTime)
+    assert(format.format(truncatedDate) == "2016-07-03 00:00:00")
   }
 
   it should "format Year to contain a single element" in {
