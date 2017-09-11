@@ -48,7 +48,7 @@ export default class HeatMap extends React.Component {
       this.props.toDate === nextProps.toDate &&
       this.props.maintopic === nextProps.maintopic &&
       this.props.externalsourceid === nextProps.externalsourceid &&
-      Array.from(this.props.termFilters).join(',') === Array.from(nextProps.termFilters).join(',') &&
+      this.props.conjunctiveTermsLength === nextProps.conjunctiveTermsLength &&
       this.props.dataSource === nextProps.dataSource) {
       
       return false;
@@ -78,7 +78,7 @@ export default class HeatMap extends React.Component {
 
         <TileLayer url={TILE_LAYER_URL}
           maxZoom={maxzoom}
-          minZoom={minzoom}
+          //minZoom={minzoom}
           attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
           accessToken={MAPBOX_ACCESS_TOKEN} />
 

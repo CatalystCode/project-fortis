@@ -29,14 +29,13 @@ export default class PopularSourcesChart extends React.Component {
         topSources.forEach((source, index) => {
             const { name, mentions, avgsentiment } = source;
             const value = mentions;
-            const icon = <Sentiment showGraph={false} value={avgsentiment} />;
             if (name === externalsourceid) {
                 activeIndex = index;
             }
             let color = constants.CHART_STYLE.COLORS[index];
             colorCells.push(<Cell key={0} fill={color} />);
 
-            dataProvider.push(Object.assign({}, { value, name, icon }));
+            dataProvider.push(Object.assign({}, { value, name }));
         });
 
         this.setState({ colorCells, dataProvider, activeIndex });

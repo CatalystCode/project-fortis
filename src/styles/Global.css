@@ -51,11 +51,11 @@ html, body, #leafletMap {
 }
 
 .positiveSentiment{
-  background-color: rgb(47, 64, 141);
+  background-color: rgb(98, 227, 30);
 }
 
 .neutralPositiveSentiment{
-  background-color: rgb(47, 88, 120);
+  background-color: rgb(234, 224, 34);
 }
 
 .negativeSentiment{
@@ -71,11 +71,11 @@ html, body, #leafletMap {
 }
 
 .positiveSentimentIcon{
-  color: rgb(47, 64, 141);
+  color: rgb(98, 227, 30);
 }
 
 .neutralPositiveSentimentIcon{
-  color: rgb(47, 88, 120);
+  color: rgb(234, 224, 34);
 }
 
 .negativeSentimentIcon{

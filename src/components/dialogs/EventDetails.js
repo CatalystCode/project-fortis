@@ -1,11 +1,11 @@
 import React from 'react';
 import { getHumanDateFromNow } from '../../utils/Utils.js';
 import Sentiment from '../Graphics/Sentiment';
-import {SERVICES} from '../../services/Dashboard';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import MapViewPort from './MapViewPort';
 import Highlighter from 'react-highlight-words';
+import constants from '../../actions/constants';
 import Chip from 'material-ui/Chip';
 import {blue300, indigo900} from 'material-ui/styles/colors';
 
@@ -22,6 +22,9 @@ const styles = {
     chip: {
       margin: 4,
     },
+    sourceLogo: {
+        color: "#337ab7"
+    },
     title: {
         font: '.777777778em Arial,Helvetica,sans-serif',
         fontWeight: 700,
@@ -34,39 +37,13 @@ const styles = {
     }
 };
 
-export default class Facebook extends React.Component {
-    _loadDetail(id){
-        SERVICES.FetchMessageDetail(this.props.siteKey, id, ["facebook-messages", "facebook-comments"], [], (error, response, body) => {
-            if (error || response.statusCode !== 200 || !body.data || !body.data.event ) {
-                console.error("Failed to fetch details for id:", id, error);
-                return;
-            }
-            let payload = body.data.event;
-            this.setState({...payload});
-        });
-    }
-
-    componentDidMount() {
-        this._loadDetail(this.props.content.id);
-    }
-
+export default class EventDetails extends React.Component {
     render() {
-        // loading details
-        if (!this.state){
-            return (
-                <div className="facebook">
-                    <p>Loading details&hellip;</p>
-                </div>
-            );
-        }
         // show details
-        const text = this.state.properties.fullText || this.props.content.sentence;
-        const dateText = getHumanDateFromNow(this.state.properties.createdtime);
-        const sentiment = this.state.properties.sentiment;
-        const link = this.state.properties.properties.link;
-        const tags = this.props.content.featureEdges || [];
-        const originalSource = this.state.properties.properties.originalSources && this.state.properties.properties.originalSources.length > 0 ? this.state.properties.properties.originalSources[0] : "";
-        const title = this.state.properties.properties.title || "";
+        const { body, summary, edges, messageid, sourceeventid, eventtime, sentiment, title, externalsourceid, language, pipelinekey, link } = this.props.properties;
+        const dateText = getHumanDateFromNow(eventtime);
+        const dataSourceSchema = constants.DATA_SOURCES.get(pipelinekey);
+        const tags = edges || [];
 
         return (
             <div id="fact">
@@ -81,7 +58,7 @@ export default class Facebook extends React.Component {
                       </div>
                       <div className="col-md-3 viewport">
                         <p className="drop">
-                            <MapViewPort coordinates={this.state.coordinates} mapSize={[375, 400]}/>
+                            <MapViewPort coordinates={this.props.coordinates} mapSize={[375, 400]}/>
                         </p>
                       </div>
                       <div className="col-md-6">
@@ -89,7 +66,7 @@ export default class Facebook extends React.Component {
                             <p className="text">
                             <Highlighter searchWords={tags}
                                             highlightStyle={styles.highlight}
-                                            textToHighlight={text} />
+                                            textToHighlight={body} />
                             </p>
                         </div>
                       </div>
@@ -106,17 +83,17 @@ export default class Facebook extends React.Component {
                             
                             <p className="subheading">Sentiment</p>
                             <div className="drop">
-                                <Sentiment value={sentiment}></Sentiment>
+                                <Sentiment value={sentiment} showGraph={true}></Sentiment>
                             </div>
                             
                             <p className="subheading">Sources</p>
                             <div className="drop">
+                            <i style={styles.sourceLogo} className={`${dataSourceSchema.icon} fa-4x`}></i>
                             {
-                              originalSource && originalSource !== "" && !originalSource.startsWith("facebook-") ? 
-                                <Chip key={originalSource} style={styles.chip}>
+                              <Chip key={externalsourceid} style={styles.chip}>
                                                         <Avatar icon={<FontIcon className="material-icons">share</FontIcon>} />
-                                                        {originalSource}
-                                </Chip> : undefined
+                                                        {externalsourceid}
+                              </Chip>
                             }
                             </div>
                             <p className="subheading">Tags</p>
@@ -136,12 +113,4 @@ export default class Facebook extends React.Component {
         );
     }
 
-};
-
-Facebook.defaultProps = {
-    content: null,
-};
-
-Facebook.propTypes = {
-    content: React.PropTypes.object.isRequired,
 };

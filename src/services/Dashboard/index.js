@@ -75,46 +75,15 @@ export const SERVICES = {
         fetchGqlData(gqlEndpoint, { variables, query }, callback);
     },
 
-    FetchMessageDetail(site, messageId, dataSources, sourcePropeties, callback) {
-        const properties = sourcePropeties.join(' ');
-        const messageDetailsFragment = `fragment FortisDashboardView on Feature {
-                        coordinates
-                        properties {
-                            edges
-                            messageid
-                            createdtime
-                            sentiment
-                            sentence
-                            language
-                            source
-                            fullText
-                            properties {
-                                title
-                                link
-                                originalSources
-                                ${properties}
-                            }
-                        }
-                    }`;
+    FetchMessageDetail(messageId, callback) {
+        const query = ` ${DashboardFragments.eventDetailsFragment} 
+                        ${DashboardQueries.getEventDetailsQuery}`;
 
-        const query = `  ${messageDetailsFragment} 
-                        query FetchEvent($site: String!, $messageId: String!, $dataSources: [String]!, $langCode: String) { 
-                            event(site: $site, messageId: $messageId, dataSources: $dataSources, langCode: $langCode) {
-                                ...FortisDashboardView 
-                            }
-                        }`;
-
-        const variables = { site, messageId, dataSources };
-        const host = process.env.REACT_APP_SERVICE_HOST;
-        const POST = {
-            url: `${host}/api/Messages`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-        request(POST, callback);
+        const variables = { messageId };
+        const gqlEndpoint = 'Messages';
+        fetchGqlData(gqlEndpoint, { variables, query }, callback);
     },
+
     FetchMessages(site, originalSource, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm, sourceProperties, callback) {
         const properties = sourceProperties.length > 0 ? "properties {{0}}".format(sourceProperties.join(' ')) : "";
         const fragmentView = `fragment FortisMessagesView on FeatureCollection {
@@ -195,16 +164,8 @@ export const SERVICES = {
         request(POST, callback);
     },
     translateSentence(sentence, fromLanguage, toLanguage, callback) {
-        let query = `
-        fragment TranslationView on TranslationResult{
-            translatedSentence
-            } 
-
-            query FetchEvent($sentence: String!, $fromLanguage: String!, $toLanguage: String!) {
-
-            translate(sentence: $sentence, fromLanguage: $fromLanguage, toLanguage: $toLanguage){
-                ...TranslationView
-            }
+        let query = `${DashboardFragments.translationEventFragment}
+                     ${DashboardQueries.translateEvent}
         }`
         let variables = { sentence, fromLanguage, toLanguage };
         let host = process.env.REACT_APP_SERVICE_HOST;
@@ -216,13 +177,6 @@ export const SERVICES = {
             body: { query, variables }
         };
 
-        request(POST, (error, response, body) => {
-            if (!error && body && body.data && body.data.translate && body.data.translate.translatedSentence) {
-                callback(body.data.translate.translatedSentence);
-            }
-            else {
-                callback(undefined, error || 'Translate request failed: ' + JSON.stringify(response));
-            }
-        });
+        request(POST, callback);
     }
 }

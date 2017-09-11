@@ -28,6 +28,10 @@ export const topSourcesFragment = `fragment FortisTopSourcesView on TopSourcesCo
         }
     }`;
 
+export const translationEventFragment = `fragment TranslationView on TranslationResult{
+    translatedSentence
+}`;
+
 export const termsFragment = ` fragment FortisPopularTermsView on TopTermsCollection {
         edges {
             name
@@ -67,6 +71,25 @@ export const conjunctiveTermsFragment = `fragment FortisDashboardConjunctiveTerm
             conjunctionterm
         }
     }`;
+
+export const eventDetailsFragment = `fragment FortisDashboardView on Feature {
+    coordinates
+    properties {
+        messageid,
+        summary,
+        edges,
+        eventtime,
+        sourceeventid,
+        externalsourceid,
+        sentiment,
+        language,
+        pipelinekey,
+        link,
+        title,
+        body,
+        link
+    }
+}`;
 
 export const heatmapFragment = `fragment FortisHeatmapViewFeatures on FeatureCollection {
     features {

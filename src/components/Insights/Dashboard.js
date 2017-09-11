@@ -65,7 +65,9 @@ export default class Dashboard extends React.Component {
   filterLiterals() {
     const { dataSource, zoomLevel, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
     const defaultLanguage = this.props.settings.defaultLanguage;
-    return Object.assign({}, { zoomLevel, dataSource, flux, maintopic, defaultLanguage, termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
+    const conjunctiveTermsLength = termFilters.size;
+
+    return Object.assign({}, { zoomLevel, dataSource, conjunctiveTermsLength, flux, maintopic, defaultLanguage, termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
   }
 
   heatmapComponent() {
@@ -98,6 +100,7 @@ export default class Dashboard extends React.Component {
           {bbox.length ?
             <ActivityFeed
               allSiteTopics={this.props.fullTermList}
+              defaultZoom={parseInt(this.props.settings.defaultZoomLevel)}
               infiniteScrollHeight={HeatMapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
               {...this.filterLiterals() }
             />
@@ -197,7 +200,7 @@ export default class Dashboard extends React.Component {
 
   renderedGridCards(heatMapFullScreen) {
     return heatMapFullScreen ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()] :
-      [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent()];//;, this.newsfeedComponent()];
+      [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
   }
 
   render() {

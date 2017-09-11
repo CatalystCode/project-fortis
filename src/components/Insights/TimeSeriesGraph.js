@@ -19,7 +19,7 @@ export default class TimeSeriesGraph extends React.Component {
         };
     }
 
-    refreshChart(props) {
+    refreshChart(props, initialLoad) {
         const { timeSeriesGraphData, defaultLanguage, language, allSiteTopics } = props;
 
         const lines = timeSeriesGraphData.labels.map((label, index) => {
@@ -43,6 +43,28 @@ export default class TimeSeriesGraph extends React.Component {
         this.range = { startIndex, endIndex };
 
         this.setState({ lines });
+
+        if(initialLoad){
+            this.forceUpdate();
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps && nextProps.bbox &&
+          this.props.bbox === nextProps.bbox &&
+          this.props.zoomLevel === nextProps.zoomLevel &&
+          this.props.fromDate === nextProps.fromDate &&
+          this.props.toDate === nextProps.toDate &&
+          this.props.maintopic === nextProps.maintopic &&
+          this.props.externalsourceid === nextProps.externalsourceid &&
+          this.props.conjunctiveTermsLength === nextProps.conjunctiveTermsLength &&
+          this.props.dataSource === nextProps.dataSource) {
+          
+          return false;
+        }
+        
+        console.log(`Rendering time series for ${nextProps.fromDate} - ${nextProps.toDate} ${nextProps.maintopic} ${nextProps.bbox}`);
+        return true;
     }
 
     dateFormat(time) {
@@ -52,7 +74,8 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     componentDidMount() {
-        this.refreshChart(this.props);
+        const initialLoad = true;
+        this.refreshChart(this.props, initialLoad);
     }
 
     dateRangeChanged(range, obj) {

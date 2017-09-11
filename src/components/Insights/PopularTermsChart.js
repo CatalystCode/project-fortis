@@ -35,14 +35,13 @@ export default class PopularTermsChart extends React.Component {
             }
 
             const value = term.mentions;
-            const icon = <Sentiment showGraph={false} value={term.avgsentiment} />;
             const color = constants.CHART_STYLE.COLORS[index];
             const name = edge.translatedname;
             const defaultName = edge.name;
 
             colorCells.push(<Cell key={0} fill={color} />);
 
-            dataProvider.push(Object.assign({}, { value, name, icon, defaultName }));
+            dataProvider.push(Object.assign({}, { value, name, defaultName }));
         });
 
         this.setState({ colorCells, dataProvider, activeIndex });

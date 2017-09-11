@@ -30,7 +30,7 @@ export default class MarkerClusterGroup extends React.Component {
       this.props.toDate === prevProps.toDate &&
       this.props.maintopic === prevProps.maintopic &&
       this.props.externalsourceid === prevProps.externalsourceid &&
-      Array.from(this.props.termFilters).join(',') === Array.from(prevProps.termFilters).join(',') &&
+      this.props.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
       this.props.dataSource === prevProps.dataSource) {
       return console.log('no relevant change, not rebuilding heatmap');
     }
@@ -63,8 +63,6 @@ export default class MarkerClusterGroup extends React.Component {
       maintopic, externalsourceid, fromDate, toDate, heatmapTileIds } = this.props;
 
     async.concat(heatmapTileIds, (tileId, tileCallback) => {
-      const tiletest = tileId;
-      
       SERVICES.getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileId, timespanType,
         dataSource, externalsourceid, Array.from(termFilters), (error, response, heatmap) => {
           if (!error) {

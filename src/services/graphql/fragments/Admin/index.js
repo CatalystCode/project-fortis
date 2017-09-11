@@ -12,7 +12,6 @@ export const siteSettingsFragment = `fragment FortisSiteDefinitionView on SiteCo
                 defaultLanguage
                 storageConnectionString
                 featuresConnectionString
-                featureServiceNamespace
                 supportedLanguages
             }
         }

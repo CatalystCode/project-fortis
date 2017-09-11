@@ -11,7 +11,7 @@ export default class Sentiment extends React.Component {
 
     // sentiment_very_dissatisfied
     if (value < 0.3) {
-      return { icon: 'sentiment_very_dissatisfied', style: 'negativeSenitment' };
+      return { icon: 'sentiment_very_dissatisfied', style: 'negativeSentiment' };
     }
 
     // sentiment_dissatisfied
@@ -30,40 +30,31 @@ export default class Sentiment extends React.Component {
     }
 
     // sentiment_very_satisfied
-    return { icon: 'sentiment_very_satisfied', style: 'positiveSenitment' };
+    return { icon: 'sentiment_very_satisfied', style: 'positiveSentiment' };
   }
 
   render() {
     const sentiment = this.getSentimentProperties();
-    const sentimentIcon = <span className={`material-icons sentimentIcon ${sentiment.style}Icon`}>{sentiment.icon}</span>;
+    const className = `material-icons sentimentIcon ${sentiment.style}Icon`;
+    const sentimentIcon = <span className={className}>{sentiment.icon}</span>;
+    const displayValue = parseFloat(this.props.value * 10).toFixed(0);
+    const graphbarClassname = `sentimentGraphBar ${sentiment.style}`;
 
     return (
       <div>
         {
           this.props.showGraph ?
-          
-          <div className="sentimentGraph">
-            <div className={`sentimentGraphBar ${sentiment.style}`}>
-                {parseFloat(this.props.value * 10).toFixed(2)} / 10
+            <div className="sentimentGraph">
+              <div className={graphbarClassname}>
+                  { displayValue }
+              </div>
+              {sentimentIcon}
             </div>
-            {sentimentIcon}
-          </div>
-            : undefined
+            : {sentimentIcon}
         }
-        {sentimentIcon}
       </div>
 
     );
   }
 
-};
-
-Sentiment.defaultProps = {
-  value: 0.5,
-  showGraph: true
-};
-
-Sentiment.propTypes = {
-  value: React.PropTypes.number.isRequired,
-  showGraph: React.PropTypes.bool
 };

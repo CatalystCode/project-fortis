@@ -35,7 +35,9 @@ export default class FortisEvent extends React.Component {
         let self = this;
         event.stopPropagation();
 
-        SERVICES.translateSentence(sentence, sourcelanguage, targetLanguage, (translatedSentence, error) => {
+        SERVICES.translateSentence(sentence, sourcelanguage, targetLanguage, (error, response, body) => {
+            const { translatedSentence } = body.data.translate;
+
             if (translatedSentence && !error) {
                 self.props.updateFeedWithText(eventId, translatedSentence);
             } else {
@@ -45,13 +47,13 @@ export default class FortisEvent extends React.Component {
     }
 
     render() {
-        const{ content, source, originalSource, link, pageLanguage, featureEdges, 
+        const{ source, originalSource, link, pageLanguage, featureEdges, 
                edges, postedTime, language, sentence, id, sentiment } = this.props;
         const dataSourceSchema = constants.DATA_SOURCES.get(source);
         const newsItemTitle = originalSource.replace(/http:\/\/www./g, '').replace(/.com\//g, '').replace(/http:\/\//g, '');
 
         return <div className="infinite-list-item" onClick={() => {
-            this.props.handleOpenDialog(content)
+            this.props.handleOpenDialog(this.props.id)
         }
         }>
             <div className="row">

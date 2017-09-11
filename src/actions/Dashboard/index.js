@@ -104,12 +104,6 @@ const methods = {
     changeTermsFilter(newFilters) {
         this.dispatch(constants.DASHBOARD.CHANGE_TERM_FILTERS, newFilters);
     },
-    changeTermsFilterToOnly(newFilter) {
-        this.dispatch(constants.DASHBOARD.CHANGE_TERM_FILTERS_TO_ONLY, newFilter);
-    },
-    updateAssociatedTerms(associatedKeywords, bbox, zoomLevel) {
-        this.dispatch(constants.DASHBOARD.ASSOCIATED_TERMS, { associatedKeywords, bbox, zoomLevel });
-    },
     loadDetail(siteKey, messageId, dataSources, sourcePropeties) {
         let self = this;
         DashboardServices.FetchMessageDetail(siteKey, messageId, dataSources, sourcePropeties, (error, response, body) => {
