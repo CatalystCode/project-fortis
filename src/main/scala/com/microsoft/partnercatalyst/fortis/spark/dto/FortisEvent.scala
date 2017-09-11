@@ -5,6 +5,8 @@ import java.util.Objects
 trait FortisEvent {
   val details: Details
   val analysis: Analysis
+
+  def copy(analysis: Analysis = null): FortisEvent
 }
 
 trait Details {
@@ -32,10 +34,12 @@ case class Analysis(
 
 case class Location(
   wofId: String,
+  name: String,
+  layer: String,
   latitude: Double,
   longitude: Double,
   confidence: Option[Double] = None
-) {
+) extends Ordered[Location] {
 
   override def equals(obj: scala.Any): Boolean = {
     if (obj == null) return false
@@ -45,6 +49,42 @@ case class Location(
   }
 
   override def hashCode(): Int = wofId.hashCode
+
+  override def compare(that: Location): Int = {
+    Location.layerToInt(layer).compare(Location.layerToInt(that.layer))
+  }
+}
+
+object Location {
+  /**
+   * @see https://github.com/whosonfirst/whosonfirst-placetypes
+   */
+  def layerToInt(layer: String): Int = {
+    Option(layer).map(_.toLowerCase) match {
+      case Some("continent") =>     4000
+      case Some("empire") =>        3900
+      case Some("country") =>       3800
+      case Some("dependency") |
+           Some("disputed") =>      3700
+      case Some("macroregion") =>   3600
+      case Some("region") =>        3500
+      case Some("macrocounty") =>   3400
+      case Some("county") =>        3300
+      case Some("metro area") |
+           Some("localadmin") =>    3200
+      case Some("locality") =>      3100
+      case Some("borough") =>       3000
+      case Some("macrohood") =>     2900
+      case Some("neighbourhood") => 2800
+      case Some("microhood") =>     2700
+      case Some("campus") =>        2600
+      case Some("building") =>      2500
+      case Some("address") =>       2400
+      case Some("venue") =>         2300
+      case _ =>                     999999 // we usually care about the most granular location values
+                                           // so it's fine to treat unknown values as greater than all
+    }
+  }
 }
 
 case class Tag(

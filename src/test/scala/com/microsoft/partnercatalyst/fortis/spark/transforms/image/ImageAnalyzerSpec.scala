@@ -7,7 +7,7 @@ import org.scalatest.FlatSpec
 class TestImageAnalyzer(cognitiveServicesResponse: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
   override protected def callCognitiveServices(requestBody: String): String = cognitiveServicesResponse
   override def buildRequestBody(imageUrl: String): String = super.buildRequestBody(imageUrl)
-  override def landmarksToLocations(landmarks: Iterable[JsonImageLandmark]): Iterable[Location] = landmarks.map(x => Location(x.name, latitude = -1, longitude = -1, confidence = Some(x.confidence)))
+  override def landmarksToLocations(landmarks: Iterable[JsonImageLandmark]): Iterable[Location] = landmarks.map(x => Location(x.name, name = x.name, layer = "", latitude = -1, longitude = -1, confidence = Some(x.confidence)))
 }
 
 class ImageAnalyzerSpec extends FlatSpec {
@@ -123,7 +123,7 @@ class ImageAnalyzerSpec extends FlatSpec {
       keywords = List(Tag("person", Some(0.98979085683822632)), Tag("man", Some(0.94493889808654785)), Tag("outdoor", Some(0.938492476940155)), Tag("window", Some(0.89513939619064331))),
       summary = Some("Satya Nadella sitting on a bench"),
       entities = List(Tag("Satya Nadella", Some(0.999028444))),
-      locations = List(Location(wofId = "Forbidden City", latitude = -1, longitude = -1, confidence = Some(0.9978346)))
+      locations = List(Location(wofId = "Forbidden City", name = "Forbidden City", layer = "city", latitude = -1, longitude = -1, confidence = Some(0.9978346)))
     ))
   }
 

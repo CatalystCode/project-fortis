@@ -97,6 +97,14 @@ object Pipeline {
         analyzer.hasBlacklistedTerms(event.details, new Blacklist(blacklist.value))
       }
 
+      def hasBlacklistedLocations(event: ExtendedFortisEvent[T]): Boolean = {
+        analyzer.hasBlacklistedLocations(event.details, event.analysis, new Blacklist(blacklist.value))
+      }
+
+      def hasBlacklistedEntities(event: ExtendedFortisEvent[T]): Boolean = {
+        analyzer.hasBlacklistedEntities(event.analysis, new Blacklist(blacklist.value))
+      }
+
       def addEntities(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val entities = analyzer.extractEntities(event.details, new PeopleRecognizer(entityModelsProvider, event.analysis.language))
         event.copy(analysis = event.analysis.copy(entities = entities))
@@ -128,7 +136,11 @@ object Pipeline {
         .filter(item => isLanguageSupported(item.analysis))
         .map(addKeywords)
         .filter(item => hasKeywords(item.analysis))
-        .map(item => addLocations(addSentiments(addEntities(addSummary(item)))))
+        .map(item => addLocations(item))
+        .filter(item => !hasBlacklistedLocations(item))
+        .map(item => addEntities(item))
+        .filter(item => !hasBlacklistedEntities(item))
+        .map(item => addSentiments(addSummary(item)))
     }))
   }
 }

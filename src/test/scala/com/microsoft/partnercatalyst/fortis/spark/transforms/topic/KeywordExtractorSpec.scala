@@ -63,4 +63,16 @@ class KeywordExtractorSpec extends FlatSpec {
     val matches = extractor.extractKeywords("Testing{testing}123").map(_.name)
     assert(matches.head == keywords.head)
   }
+
+  it should "find keywords many times" in {
+    val keywords = List(
+      "{testing}"
+    )
+
+    val extractor = new KeywordExtractor(keywords)
+
+    val matches = extractor.extractKeywords("Testing{testing}12{testing}3").map(_.name)
+    assert(matches.length == 2)
+    assert(matches.forall(term => term == "{testing}"))
+  }
 }
