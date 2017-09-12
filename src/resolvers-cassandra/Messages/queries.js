@@ -3,7 +3,7 @@
 const Promise = require('promise');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { parseFromToDate, getsiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
+const { parseFromToDate, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
@@ -191,7 +191,7 @@ function event(args, res) { // eslint-disable-line no-unused-vars
  */
 function translate(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    getsiteDefintion()
+    getSiteDefintion()
       .then(sitesettings => {
         return translatorService.translate(sitesettings.site.properties.translationsvctoken,
           args.sentence,

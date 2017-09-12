@@ -3,7 +3,7 @@
 const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const {withRunTime, getsiteDefintion} = require('../shared');
+const {withRunTime, getSiteDefintion} = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 const CONNECTOR_TWITTER = 'Twitter';
@@ -48,7 +48,7 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
  */
 function sites(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {   
-    getsiteDefintion()
+    getSiteDefintion()
     .then(resolve)
     .catch(reject);
   });
