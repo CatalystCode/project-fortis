@@ -139,3 +139,7 @@ input.settings:out-of-range {
 	user-select: none;
 	white-space: nowrap;
 }
+
+.react-grid-Row--odd .react-grid-Cell {
+    background-color: #f9f9f9;
+}

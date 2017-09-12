@@ -62,15 +62,22 @@ export const SERVICES = {
 
         request(POST, callback);
     },
+
     fetchStreams(callback) {
         const query = `
         query Streams {
           streams {
             streams {
+              streamId
               pipelineKey
               pipelineLabel
               pipelineIcon
               streamFactory
+              params {
+                key
+                value
+              }
+              enabled
             }
           }
         }`;
@@ -87,35 +94,100 @@ export const SERVICES = {
         request(POST, callback);
       },
 
-      getSiteDefinition(callback) {
-        const query = `
-        query Sites {
-          sites {
-            site {
-              name
-              properties {
-                targetBbox
-                defaultZoomLevel
-                logo
-                title
-                defaultLocation
-                defaultLanguage
-                supportedLanguages
-              }
+      saveStreams(streams, callback) {
+      const query = `
+      mutation ModifyStreams($input: StreamListInput!) {
+        modifyStreams(input: $input) {
+          streams {
+            streamId
+            pipelineKey
+            pipelineLabel
+            pipelineIcon
+            streamFactory
+            params {
+              key
+              value
+            }
+            enabled
+          }
+        }
+      }
+      `;
+
+      const variables = { input: { streams: streams } };
+      const host = process.env.REACT_APP_SERVICE_HOST;
+      const POST = {
+        url: `${host}/api/settings`,
+        method: 'POST',
+        json: true,
+        withCredentials: false,
+        body: { query, variables }
+      };
+
+      request(POST, callback);      
+    },
+
+    removeStreams(streams, callback) {
+      const query = `
+      mutation RemoveStreams($input: StreamListInput!) {
+        removeStreams(input: $input) {
+          streams {
+            streamId
+            pipelineKey
+            pipelineLabel
+            pipelineIcon
+            streamFactory
+            params {
+              key
+              value
+            }
+            enabled
+          }
+        }
+      }`;
+
+      const variables = { input: { streams: streams } };
+      const host = process.env.REACT_APP_SERVICE_HOST;
+      const POST = {
+        url: `${host}/api/settings`,
+        method: 'POST',
+        json: true,
+        withCredentials: false,
+        body: { query, variables }
+      };
+
+      request(POST, callback);
+    },
+
+    getSiteDefinition(callback) {
+      const query = `
+      query Sites {
+        sites {
+          site {
+            name
+            properties {
+              targetBbox
+              defaultZoomLevel
+              logo
+              title
+              defaultLocation
+              defaultLanguage
+              supportedLanguages
             }
           }
-        }`;
+        }
+      }`;
 
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query }
-        };
+      const host = process.env.REACT_APP_SERVICE_HOST
+      const POST = {
+          url: `${host}/api/settings`,
+          method: "POST",
+          json: true,
+          withCredentials: false,
+          body: { query }
+      };
 
-        request(POST, callback);
+      request(POST, callback);
     },
     saveTwitterAccounts(site, accounts, mutation, callback) {
         const query = ` ${twitterFragment} 
