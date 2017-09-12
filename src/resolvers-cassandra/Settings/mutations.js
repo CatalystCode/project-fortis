@@ -67,23 +67,22 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
     })
     .then(() => {
       return cassandraConnector.executeBatchMutations([{
-        query: `INSERT INTO fortis.sitesettings (
-          geofence,
-          defaultzoom,
-          logo,
-          title,
-          sitename,
-          languages,
-          defaultLanguage
-        ) VALUES (?,?,?,?,?,?,?)`,
+        query: `UPDATE fortis.sitesettings 
+          SET geofence = ?,
+          defaultzoom = ?,
+          logo = ?,
+          title = ?,
+          languages = ?,
+          defaultLanguage = ?
+        WHERE sitename = ?`,
         params: [
           args.input.targetBbox,
           args.input.defaultZoomLevel,
           args.input.logo,
           args.input.title,
-          args.input.name,
           args.input.supportedLanguages,
-          args.input.defaultLanguage
+          args.input.defaultLanguage,
+          args.input.name
         ]
       }]);
     })
