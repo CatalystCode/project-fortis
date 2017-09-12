@@ -2,40 +2,41 @@ import {DataGrid} from './DataGrid';
 import React from 'react';
 import Fluxxor from 'fluxxor';
 
-const FluxMixin = Fluxxor.FluxMixin(React),
-    StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
+const FluxMixin = Fluxxor.FluxMixin(React);
+const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
 export const AdminWatchlist = React.createClass({
     mixins: [FluxMixin, StoreWatchMixin],
 
-    componentDidMount(){
-        this.getFlux().actions.ADMIN.load_keywords(this.props.siteKey);
+    getInitialState() {
+      return {};
     },
+
+    componentDidMount(){
+      const defaultLanguage = this.getDefaultLanguage();
+      this.getFlux().actions.ADMIN.load_topics(defaultLanguage);
+    },
+
+    getDefaultLanguage() {
+      return this.getFlux().store("AdminStore").getState().settings.properties.defaultLanguage;
+    },
+
     getStateFromFlux() {
         return this.getFlux().store("AdminStore").getState();
     },
-    handleSave(mutatedRows, columns){
-        this.getFlux().actions.ADMIN.save_keywords(this.props.siteKey, mutatedRows);
-    },
-    handleRemove(deletedRows){
-        this.getFlux().actions.ADMIN.remove_keywords(this.props.siteKey, deletedRows);
-    },
+
     render(){
         let state = this.getFlux().store("AdminStore").getState();
-        const alternateLanguage = state.settings.properties.supportedLanguages.find(lang=>lang!=="en");
-        const translatableFields = {sourceField: {language: "en", key: "name"}, targetField: {language: alternateLanguage, key: `name_${alternateLanguage}`}};
-        
         return (
-         this.state.termGridColumns.length > 0 ? 
+         this.state.topicGridColumns.length > 0 ? 
             <DataGrid rowHeight={40}
                       minHeight={500}
-                      rowKey="RowKey"
-                      guidAutofillColumn="RowKey"
-                      handleSave={this.handleSave}
-                      translatableFields={translatableFields}
-                      handleRemove={this.handleRemove}
-                      columns={this.state.termGridColumns}
-                      rows={state.watchlist} />
+                      rowKey="topicid"
+                      guidAutofillColumn="topicid"
+                      toolbar={null}
+                      rowSelection={null}
+                      columns={this.state.topicGridColumns}
+                      rows={this.state.watchlist} />
             : <div />
         );
     }

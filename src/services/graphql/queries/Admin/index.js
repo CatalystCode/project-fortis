@@ -22,10 +22,10 @@ export const getAdminSiteDefinition = `query sites {
 }`;
 
 export const getPipelineTerms = `siteTerms(translationLanguage:$translationLanguage){
-    edges {
-      name
-      translatedname
-    }
+  edges {
+    name
+    translatedname
+  }
 }`;
 
 export const getPipelineDenfintion = `query PipelineDefintion($translationLanguage: String) {
