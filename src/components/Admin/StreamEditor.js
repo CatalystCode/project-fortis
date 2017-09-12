@@ -8,7 +8,11 @@ const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 export const StreamEditor = React.createClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
-  componentDidMount(){
+  getInitialState() {
+    return {};
+  },
+
+  componentDidMount() {
     this.getFlux().actions.ADMIN.load_streams();
   },
 
@@ -16,28 +20,18 @@ export const StreamEditor = React.createClass({
     return this.getFlux().store("AdminStore").getState();
   },
 
-  handleSave(mutatedRows, columns){
-    
-  },
-  
-  handleRemove(deletedRows){
-    
-  },
-
   render(){
-    let state = this.getFlux().store("AdminStore").getState();
-    
     return (
       this.state.streamGridColumns.length > 0 ? 
         <DataGrid 
           rowHeight={40}
           minHeight={500}
-          rowKey="pipelineKey"
-          guidAutofillColumn="pipelineKey"
-          handleSave={this.handleSave}
-          handleRemove={this.handleRemove}
+          toolbar={null}
+          rowSelection={null}
+          rowKey="streamId"
+          guidAutofillColumn="streamId"
           columns={this.state.streamGridColumns}
-          rows={state.streams}
+          rows={this.state.streams}
         /> : <div />
     );
   }

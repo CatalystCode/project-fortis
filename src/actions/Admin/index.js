@@ -22,6 +22,38 @@ const methods = {
       }
     },
 
+    save_streams (streams) {
+      let self = this;
+      AdminServices.saveStreams(streams, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse) {
+          const response = graphqlResponse ? graphqlResponse : [];
+          const action = false;
+          self.dispatch(constants.ADMIN.MODIFY_STREAMS, {response, action});
+        } else {
+          const error = `[${error}]: Error, could not load streams for admin page.`;
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }));
+    },
+
+    remove_streams (streams) {
+      const self = this;
+      const dataStore = this.flux.stores.AdminStore.dataStore;
+
+      if (!dataStore.loading) {
+        AdminServices.removeStreams(streams, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+          if (graphqlResponse) {
+            const response = graphqlResponse ? graphqlResponse : [];
+            const action = false;
+            self.dispatch(constants.ADMIN.REMOVE_STREAMS, {response, action});
+          } else {
+            const error = 'Error, could not remove streams for admin page';
+            self.dispatch(constants.ADMIN.REMOVE_FAIL, { error });
+          }
+        }))
+      }
+    },
+
     load_settings () {
         let self = this;
         AdminServices.getSiteDefinition((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
