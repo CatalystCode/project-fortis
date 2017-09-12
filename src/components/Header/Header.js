@@ -6,7 +6,7 @@ import MenuItem from 'material-ui/MenuItem';
 
 import LanguagePicker from './LanguagePicker';
 
-export default class Header extends React.Component {
+class Header extends React.Component {
   render() {
     return (
       <nav className="navbar navbar-trans" role="navigation">
@@ -86,3 +86,5 @@ export default class Header extends React.Component {
     );
   }
 };
+
+export default Header;

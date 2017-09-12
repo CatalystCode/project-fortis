@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class LanguagePicker extends React.Component {
+class LanguagePicker extends React.Component {
   changeLanguage(event, index, value) {
     this.props.flux.actions.DASHBOARD.changeLanguage(value);
   }
@@ -23,3 +23,5 @@ export default class LanguagePicker extends React.Component {
     );
   }
 }
+
+export default LanguagePicker;
