@@ -5,7 +5,7 @@ const moment = require('moment');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, withRunTime, asCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { tilesForBbox, withRunTime, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
 const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
@@ -149,9 +149,12 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
     const { bbox } = args;
 
     featureServiceClient.fetchByBbox({ north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3] }, 'bbox')
-      .then(locations =>
-        resolve(locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox })))
-      )
+      .then(locations => {
+        const places = locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox }));
+        resolve({
+          places
+        });
+      })
       .catch(reject);
   });
 }
@@ -306,17 +309,10 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  popularLocations: trackEvent(withRunTime(popularLocations), 'popularLocations'),
-  timeSeries: trackEvent(timeSeries, 'timeSeries'),
-  topTerms: trackEvent(topTerms, 'topTerms'),
-  geofenceplaces: trackEvent(withRunTime(locations), 'locations'),
-  conjunctiveTopics: trackEvent(conjunctiveTopics, 'conjunctiveTopics'),
-  topSources: trackEvent(topSources, 'topSources'),
-
-  csv_popularLocations: trackEvent(asCsvExporter(popularLocations, 'edges'), 'csv_popularLocations'),
-  csv_timeSeries: trackEvent(asCsvExporter(timeSeries, 'graphData'), 'csv_timeSeries'),
-  csv_topTerms: trackEvent(asCsvExporter(topTerms, 'edges'), 'csv_topTerms'),
-  csv_geofenceplaces: trackEvent(asCsvExporter(locations, 'places'), 'csv_locations'),
-  csv_conjunctiveTopics: trackEvent(asCsvExporter(conjunctiveTopics, 'edges'), 'csv_conjunctiveTopics'),
-  csv_topSources: trackEvent(asCsvExporter(topSources, 'edges'), 'csv_topSources')
+  popularLocations: trackEvent(withRunTime(withCsvExporter(popularLocations, 'edges')), 'popularLocations'),
+  timeSeries: trackEvent(withCsvExporter(timeSeries, 'graphData'), 'timeSeries'),
+  topTerms: trackEvent(withCsvExporter(topTerms, 'edges'), 'topTerms'),
+  geofenceplaces: trackEvent(withRunTime(withCsvExporter(locations, 'places')), 'locations'),
+  conjunctiveTopics: trackEvent(withCsvExporter(conjunctiveTopics, 'edges'), 'conjunctiveTopics'),
+  topSources: trackEvent(withCsvExporter(topSources, 'edges'), 'topSources')
 };
