@@ -4,7 +4,7 @@ import moment from 'moment';
 import GraphCard from '../Graphics/GraphCard';
 import constants from '../../actions/constants';
 import { FromToDateFormat } from '../../utils/Utils';
-import { fetchTermFromMap } from './shared';
+import { fetchTermFromMap, hasChanged } from './shared';
 import Timeline from '../Graphics/Timeline';
 import FlatButton from 'material-ui/FlatButton';
 import ActionTimeline from 'material-ui/svg-icons/action/timeline';
@@ -28,10 +28,10 @@ export default class TimeSeriesGraph extends React.Component {
             const color = constants.CHART_STYLE.COLORS[index];
 
             return <Area key={index}
-                name={localTopicName}
+                name={localTopicName.toLowerCase()}
                 type="monotone"
                 connectNulls={true}
-                dataKey={topic.name}
+                dataKey={topic.name.toLowerCase()}
                 stroke={color}
                 fill={color}
                 strokeWidth={3}
@@ -44,27 +44,9 @@ export default class TimeSeriesGraph extends React.Component {
 
         this.setState({ lines });
 
-        if(initialLoad){
+        if (initialLoad) {
             this.forceUpdate();
         }
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps && nextProps.bbox &&
-          this.props.bbox === nextProps.bbox &&
-          this.props.zoomLevel === nextProps.zoomLevel &&
-          this.props.fromDate === nextProps.fromDate &&
-          this.props.toDate === nextProps.toDate &&
-          this.props.maintopic === nextProps.maintopic &&
-          this.props.externalsourceid === nextProps.externalsourceid &&
-          this.props.conjunctiveTermsLength === nextProps.conjunctiveTermsLength &&
-          this.props.dataSource === nextProps.dataSource) {
-          
-          return false;
-        }
-        
-        console.log(`Rendering time series for ${nextProps.fromDate} - ${nextProps.toDate} ${nextProps.maintopic} ${nextProps.bbox}`);
-        return true;
     }
 
     dateFormat(time) {
@@ -84,14 +66,16 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.refreshChart(nextProps);
+        if (hasChanged(this.props, nextProps)){
+            this.refreshChart(nextProps);
+        }
     }
 
-    momentFormat(dateString, format){
+    momentFormat(dateString, format) {
         return moment(dateString).format(format);
     }
 
-    resetTimeline(){
+    resetTimeline() {
         this.props.refreshDashboardFunction();
     }
 
@@ -101,10 +85,10 @@ export default class TimeSeriesGraph extends React.Component {
         const fromDateSlice = timeSeriesGraphData.graphData[startIndex];
         const toDateSlice = timeSeriesGraphData.graphData[endIndex];
 
-        if(fromDateSlice && toDateSlice){
+        if (fromDateSlice && toDateSlice) {
             const datetimeSelectionFormat = "YY-MM-DD HH:mm";
             const fromDate = this.momentFormat(fromDateSlice.date, FromToDateFormat);
-            const toDate =  this.momentFormat(toDateSlice.date, FromToDateFormat);
+            const toDate = this.momentFormat(toDateSlice.date, FromToDateFormat);
             const datetimeSelection = `${this.momentFormat(fromDateSlice.date, datetimeSelectionFormat)} - ${this.momentFormat(toDateSlice.date, datetimeSelectionFormat)}`
             const timeseriesType = constants.TIMESPAN_TYPES[timespanType].timeseriesType
             this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timeseriesType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
@@ -113,15 +97,15 @@ export default class TimeSeriesGraph extends React.Component {
 
     render() {
         const ActionButtons = [<FlatButton key="reload-button"
-                                           icon={<ActionTimeline color={fullWhite} />}
-                                           label="Reload with Range"
-                                           primary={true}
-                                           onClick={()=>this.handleDataFetch()} />,
-                               <FlatButton key="reset-button"
-                                           icon={<ActionTimeline color={fullWhite} />}
-                                           label="Reset Selection"
-                                           primary={true}
-                                           onClick={event => this.resetTimeline(event)} />
+            icon={<ActionTimeline color={fullWhite} />}
+            label="Reload with Range"
+            primary={true}
+            onClick={() => this.handleDataFetch()} />,
+        <FlatButton key="reset-button"
+            icon={<ActionTimeline color={fullWhite} />}
+            label="Reset Selection"
+            primary={true}
+            onClick={event => this.resetTimeline(event)} />
         ];
 
         return (

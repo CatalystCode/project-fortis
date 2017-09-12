@@ -119,7 +119,7 @@ export default class ActivityFeed extends React.Component {
                 const newsFeedPage = body.data.messages ? body.data.messages.features.filter(feature => feature.properties.summary && feature.properties.summary.length && !processedEventids.has(feature.properties.messageid)).map(this.parseEvent) : [];
                 
                 const elementsMutated = elements.concat(newsFeedPage);
-                const pageStateMutated = body.data.messages.pageState;
+                const pageStateMutated = body.data.messages ? body.data.messages.pageState || null : null;
                 const processedEventIdsMutated= new Set(Array.from(processedEventids).concat(newsFeedPage.map(msg=>msg.messageid)));
 
                 callback({ elements: elementsMutated, pageState: pageStateMutated, processedEventids: processedEventIdsMutated });
