@@ -43,6 +43,10 @@ export const DataStore = Fluxxor.createStore({
             targetBbox: [],
             popularTerms: [],
             topSources: [],
+            timeSeriesCsv: "",
+            popularLocationsCsv: "",
+            popularTermsCsv: "",
+            topSourcesCsv: "",
             trustedSources: [],
             supportedLanguages: [],
             termFilters: new Set(),
@@ -77,9 +81,12 @@ export const DataStore = Fluxxor.createStore({
     syncChartDataToStore(graphqlResponse){
         const { locations, topics, sources, timeSeries, conjunctiveterms } = graphqlResponse;
         this.dataStore.popularLocations = locations && locations.edges ? locations.edges : [];
+        this.dataStore.popularLocationsCsv = (locations && locations.csv && locations.csv.url) || "";
         this.dataStore.popularTerms = topics && topics.edges ? topics.edges : [];
+        this.dataStore.popularTermsCsv = (topics && topics.csv && topics.csv.url) || "";
         this.dataStore.conjunctivetopics = conjunctiveterms && conjunctiveterms.edges ? conjunctiveterms.edges : [];
         this.dataStore.topSources = sources && sources.edges ? sources.edges : [];
+        this.dataStore.topSourcesCsv = (sources && sources.csv && sources.csv.url) || "";
         this.syncTimeSeriesData(timeSeries || []);
     },
 
@@ -137,6 +144,7 @@ export const DataStore = Fluxxor.createStore({
         if (mutatedTimeSeries && mutatedTimeSeries.graphData && mutatedTimeSeries.labels && mutatedTimeSeries.graphData.length) {
             const { labels, graphData, tiles } = mutatedTimeSeries;
             this.dataStore.timeSeriesGraphData = Object.assign({}, { labels });
+            this.dataStore.timeSeriesCsv = (mutatedTimeSeries.csv && mutatedTimeSeries.csv.url) || "";
             
             const timeseriesMap = makeMap(graphData, item=>item.date, item=>{
                 let timeSeriesEntry = {date: item.date};

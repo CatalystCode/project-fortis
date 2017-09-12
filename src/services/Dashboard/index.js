@@ -21,7 +21,7 @@ function fetchGqlData(endpoint, gqlQueryBody, callback) {
 
 export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
-        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, callback) {
+        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, csv, callback) {
         const timePeriodType = constants.TIMESPAN_TYPES[periodType].timeseriesType;
         const topsourcespipelinekey = ActionMethods.DataSources(dataSource);
         const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
@@ -42,7 +42,7 @@ export const SERVICES = {
         const variables = {
             bbox, limit, fromDate, topsourcespipelinekey, pipelinekeys,
             toDate, zoomLevel, periodType, timePeriodType, externalsourceid, maintopic,
-            timeseriesmaintopics, conjunctivetopics
+            timeseriesmaintopics, conjunctivetopics, csv
         };
         fetchGqlData(gqlEndpoint, { variables, query }, callback);
     },
@@ -50,6 +50,7 @@ export const SERVICES = {
     getCommonTerms(periodType, fromDate, toDate, bbox, zoomLevel, callback) {
         const pipelinekeys = [constants.DEFAULT_DATA_SOURCE];
         const limit = 5;
+        const csv = false;
         const externalsourceid = constants.DEFAULT_EXTERNAL_SOURCE;
         const selectionFragments = `${DashboardFragments.termsFragment}`;
         const gqlEndpoint = 'edges';
@@ -58,7 +59,8 @@ export const SERVICES = {
 
         const variables = {
             bbox, limit, fromDate, pipelinekeys,
-            toDate, zoomLevel, periodType, externalsourceid
+            toDate, zoomLevel, periodType, externalsourceid,
+            csv
         };
         fetchGqlData(gqlEndpoint, { variables, query }, callback);
     },

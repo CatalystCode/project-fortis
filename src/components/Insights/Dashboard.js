@@ -4,6 +4,7 @@ import HeatMap from './Maps/HeatMap';
 import SentimentTreeview from './SentimentTreeview';
 import GraphCard from '../Graphics/GraphCard';
 import ActivityFeed from './ActivityFeed';
+import CsvExporter from './CsvExporter';
 import TimeSeriesGraph from './TimeSeriesGraph';
 import PopularTermsChart from './PopularTermsChart';
 import PopularLocationsChart from './PopularLocationsChart';
@@ -162,9 +163,9 @@ export default class Dashboard extends React.Component {
     );
   }
 
-  refreshDashboard(){
+  refreshDashboard(includeCsv) {
     const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, externalsourceid } = this.filterLiterals();
-    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, includeCsv);
   }
 
   timelineComponent() {
@@ -214,6 +215,15 @@ export default class Dashboard extends React.Component {
               heatmapToggleText={this.state.heatmapToggleText}
               toggleHeatmapSize={this.toggleHeatmapSize}
               {...this.filterLiterals() }
+            />
+            <CsvExporter
+              csvs={[
+                {name: 'Timeseries', url: this.props.timeSeriesCsv},
+                {name: 'Top locations', url: this.props.popularLocationsCsv},
+                {name: 'Top terms', url: this.props.popularTermsCsv},
+                {name: 'Top sources', url: this.props.topSourcesCsv},
+              ]}
+              fetchCsvs={() => this.refreshDashboard(true)}
             />
             <div className="row" id="contentArea">
               <div className="dashboard-grid">
