@@ -10,7 +10,7 @@ export const AdminTwitterAccounts = React.createClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   componentDidMount() {
-    this.getFlux().actions.ADMIN.load_twitter_accts();
+    this.getFlux().actions.ADMIN.load_twitter_accounts();
   },
 
   getStateFromFlux() {

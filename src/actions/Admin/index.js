@@ -89,7 +89,7 @@ const methods = {
             if(!error && response.statusCode === 200 && body.data && body.data.streams) {
                 const action = 'saved';
                 const streams = body.data.streams;
-                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {streams, action});
+                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {streams, action});
             }else{
                 console.error(`[${error}] occured while processing message request`);
             }
@@ -103,20 +103,20 @@ const methods = {
             if(!error && response.statusCode === 200 && body.data && body.data.streams) {
                 const action = 'saved';
                 const streams = body.data.streams;
-                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {streams, action});
+                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {streams, action});
             }else{
                 console.error(`[${error}] occured while processing message request`);
             }
        });
     },
 
-    load_twitter_accts () {
+    load_twitter_accounts () {
       let self = this;
       AdminServices.fetchTwitterAccounts((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse && !error) {
           const response = graphqlResponse ? graphqlResponse : [];
           const action = false;
-          self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {response, action});
+          self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {response, action});
         } else{
           const error = 'Error, could not load twitter accounts for admin page';
           self.dispatch(constants.ADMIN.LOAD_FAIL, { error });

@@ -45,7 +45,7 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
-            constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccounts,
+            constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
             constants.ADMIN.CREATE_SITE, this.handleCreateSite,
