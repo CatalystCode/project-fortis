@@ -66,7 +66,16 @@ object CassandraEventsSink extends Loggable {
             writeEventBatchToEventTagTables(eventBatchDF, sparkSession)
           }
 
-          val fortisEventsRDDRepartitioned = fortisEventsRDD.repartition(5)
+          val eventsExploded = fortisEventsRDD.flatMap(event=>{
+            Seq(
+              event,
+              event.copy(externalsourceid = "all"),
+              event.copy(pipelinekey = "all", externalsourceid = "all")
+            )
+          })
+
+          val fortisEventsRDDRepartitioned = eventsExploded.repartition(2 * sparkSession.sparkContext.defaultParallelism).cache()
+
           offlineAggregators.foreach(aggregator => {
             val aggregatorName = aggregator.getClass.getSimpleName
             Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.$aggregatorName", _, _, -1)) {

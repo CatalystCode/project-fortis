@@ -76,7 +76,15 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       title = ""
     )))
 
-    val topics = aggregator.aggregate(events).collect()
+    val eventsExploded = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    })
+
+    val topics = aggregator.aggregate(eventsExploded).collect()
     assert(topics.size == 165)
 
     val filteredTopics = topics.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
@@ -147,7 +155,15 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       )
     ))
 
-    val topics = aggregator.aggregate(events).collect()
+    val eventsExploded = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    })
+
+    val topics = aggregator.aggregate(eventsExploded).collect()
     assert(topics.size == 220)
 
     val allSourcesTopics = topics.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
@@ -232,7 +248,15 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       )
     ))
 
-    val topics = aggregator.aggregate(events).collect()
+    val eventsExploded = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    })
+
+    val topics = aggregator.aggregate(eventsExploded).collect()
     assert(topics.size == 275)
 
     val allSourcesTopics = topics.filter(topic=>topic.pipelinekey != "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
