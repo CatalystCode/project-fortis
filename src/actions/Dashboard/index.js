@@ -20,10 +20,10 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate) {
 }
 
 function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
-    bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, callback) {
+    bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, includeCsv, callback) {
 
     DashboardServices.getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, 
-        bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, 
+        bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, !!includeCsv,
         (err, response, body) => ResponseHandler(err, response, body, callback));
 }
 
@@ -31,10 +31,11 @@ function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, ca
     const { configuration, topics } = resultUnion;
 
     if (topics.edges.length) {
+        const includeCsv = false;
         const maintopic = topics.edges[0].name;//grab the most commonly mentioned term
         //we're defaulting the timeseriesmaintopics to the most popular on the initial load so we can show all in the timeseries
         fetchFullChartData(fromDate, toDate, timespanType, constants.DEFAULT_DATA_SOURCE, maintopic, configuration.targetBbox,
-            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name), 
+            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name), includeCsv,
             (err, chartData) => {
                 const response = Object.assign({}, chartData, resultUnion);
 
@@ -84,13 +85,13 @@ const methods = {
     reloadTopSources(topSources) {
         this.dispatch(constants.DASHBOARD.RELOAD_TOP_SOURCES, topSources);
     },
-    reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid) {
+    reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, includeCsv) {
         let self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;
 
         let timeserieslabels = isMostPopularTopicSelected(maintopic, dataStore.popularTerms) ? dataStore.popularTerms.map(topic=>topic.name) : [maintopic];
 
-        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, [], externalsourceid, timeserieslabels, (err, chartData) => {
+        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, [], externalsourceid, timeserieslabels, includeCsv, (err, chartData) => {
             if (!err) {
                 let mutatedFilters = { fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;

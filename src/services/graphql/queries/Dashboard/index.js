@@ -4,19 +4,19 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  }
  }`;
  
- export const getPopularTerms = `topTerms(bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid) {
+ export const getPopularTerms = `topTerms(bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid, csv: $csv) {
      ... FortisPopularTermsView
  }`;
  
- export const getTopSources = `topSources(maintopic:$maintopic, bbox: $bbox, conjunctivetopics: $conjunctivetopics, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $topsourcespipelinekey, zoomLevel:$zoomLevel, periodType: $periodType) {
+ export const getTopSources = `topSources(maintopic:$maintopic, bbox: $bbox, conjunctivetopics: $conjunctivetopics, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $topsourcespipelinekey, zoomLevel:$zoomLevel, periodType: $periodType, csv: $csv) {
      ... FortisTopSourcesView
  }`;
  
- export const getTimeSeries = `timeSeries(maintopics:$timeseriesmaintopics, pipelinekeys: $pipelinekeys, fromDate: $fromDate, toDate: $toDate, periodType: $timePeriodType, bbox: $bbox, zoomLevel: $zoomLevel, externalsourceid: $externalsourceid, conjunctivetopics: $conjunctivetopics){
+ export const getTimeSeries = `timeSeries(maintopics:$timeseriesmaintopics, pipelinekeys: $pipelinekeys, fromDate: $fromDate, toDate: $toDate, periodType: $timePeriodType, bbox: $bbox, zoomLevel: $zoomLevel, externalsourceid: $externalsourceid, conjunctivetopics: $conjunctivetopics, csv: $csv){
      ...FortisDashboardTimeSeriesView
  }`;
  
- export const getConjunctiveTerms = `conjunctiveTerms(maintopic:$maintopic, bbox: $bbox, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid) {
+ export const getConjunctiveTerms = `conjunctiveTerms(maintopic:$maintopic, bbox: $bbox, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid, csv: $csv) {
      ... FortisDashboardConjunctiveTermsView
  }`;
  
@@ -32,7 +32,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
      }
  }`;
  
- export const getPopularPlaces = `topLocations(zoomLevel:$zoomLevel, maintopic:$maintopic, bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, conjunctivetopics:$conjunctivetopics, periodType: $periodType, externalsourceid: $externalsourceid) {
+ export const getPopularPlaces = `topLocations(zoomLevel:$zoomLevel, maintopic:$maintopic, bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, conjunctivetopics:$conjunctivetopics, periodType: $periodType, externalsourceid: $externalsourceid, csv: $csv) {
      ... FortisPopularPlacesView
  }`;
  
@@ -47,7 +47,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  }`;
  
  
- export const getPopularTermsQuery = `query PopularTerms($bbox: [Float]!, $zoomLevel: Int!, $limit: Int!, $fromDate: String!, $toDate: String!, $pipelinekeys: [String]!, $periodType: String!, $externalsourceid: String!) {
+ export const getPopularTermsQuery = `query PopularTerms($bbox: [Float]!, $zoomLevel: Int!, $limit: Int!, $fromDate: String!, $toDate: String!, $pipelinekeys: [String]!, $periodType: String!, $externalsourceid: String!, $csv: Boolean) {
      topics: ${getPopularTerms}
  }`;
  
@@ -62,7 +62,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  }`;
  
  export const DashboardQuery = `query DashboardQuery($bbox: [Float]!, $zoomLevel: Int!, $limit: Int!, $fromDate: String!, $toDate: String!, 
-                         $pipelinekeys: [String]!, $timePeriodType: String!, $periodType: String!, $externalsourceid: String!, 
+                         $pipelinekeys: [String]!, $timePeriodType: String!, $periodType: String!, $externalsourceid: String!, $csv: Boolean,
                          $maintopic: String!, $timeseriesmaintopics: [String]!, $conjunctivetopics: [String]!, $topsourcespipelinekey: [String]!) {
                              topics: ${getPopularTerms} , 
                              sources: ${getTopSources},

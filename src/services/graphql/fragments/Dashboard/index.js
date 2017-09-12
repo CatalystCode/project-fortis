@@ -26,6 +26,9 @@ export const topSourcesFragment = `fragment FortisTopSourcesView on TopSourcesCo
             mentions,
             avgsentiment
         }
+        csv {
+            url
+        }
     }`;
 
 export const translationEventFragment = `fragment TranslationView on TranslationResult{
@@ -38,6 +41,9 @@ export const termsFragment = ` fragment FortisPopularTermsView on TopTermsCollec
             avgsentiment
             mentions
         }
+        csv {
+            url
+        }
     }`;
 
 export const popularPlacesFragment = ` fragment FortisPopularPlacesView on TopPlacesCollection {
@@ -48,6 +54,9 @@ export const popularPlacesFragment = ` fragment FortisPopularPlacesView on TopPl
             bbox
             mentions
             avgsentiment
+        }
+        csv {
+            url
         }
     }`;
 
@@ -62,6 +71,9 @@ export const visualizationChartFragment = `fragment FortisDashboardTimeSeriesVie
             date
         }
         tiles
+        csv {
+            url
+        }
     }`;
 
 export const conjunctiveTermsFragment = `fragment FortisDashboardConjunctiveTermsView on ConjunctionTermCollection {
@@ -69,6 +81,9 @@ export const conjunctiveTermsFragment = `fragment FortisDashboardConjunctiveTerm
             name
             mentions
             conjunctionterm
+        }
+        csv {
+            url
         }
     }`;
 
