@@ -11,13 +11,7 @@ class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManag
 
   override def aggregate(events: RDD[Event]): RDD[ConjunctiveTopic] = {
     val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
-    val conjunctiveTopics = events.flatMap(event=>{
-      Seq(
-        event,
-        event.copy(externalsourceid = "all"),
-        event.copy(pipelinekey = "all", externalsourceid = "all")
-      )
-    }).flatMap(CassandraConjunctiveTopics(_, siteSettings.defaultzoom))
+    val conjunctiveTopics = events.flatMap(CassandraConjunctiveTopics(_, siteSettings.defaultzoom))
 
     conjunctiveTopics.keyBy(r=>{(
       r.pipelinekey, r.externalsourceid,

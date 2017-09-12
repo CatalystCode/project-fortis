@@ -11,13 +11,7 @@ class PopularPlacesOfflineAggregator(configurationManager: ConfigurationManager)
 
   override def aggregate(events: RDD[Event]): RDD[PopularPlace] = {
     val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
-    val places = events.flatMap(event=>{
-      Seq(
-        event,
-        event.copy(externalsourceid = "all"),
-        event.copy(pipelinekey = "all", externalsourceid = "all")
-      )
-    }).flatMap(CassandraPopularPlaces(_, siteSettings.defaultzoom))
+    val places = events.flatMap(CassandraPopularPlaces(_, siteSettings.defaultzoom))
 
     places.keyBy(r=>{(
       r.placeid,
