@@ -79,9 +79,12 @@ CREATE TABLE watchlist(
     topic text,
     lang_code text,
     translations map<text, text>,
+    category text,
     insertiontime timestamp,
-    PRIMARY KEY (topic, lang_code)
+    PRIMARY KEY ((topic, lang_code), category)
 );
+
+CREATE INDEX ON fortis.watchlist (category);
 
 CREATE TABLE blacklist(
     id uuid,
