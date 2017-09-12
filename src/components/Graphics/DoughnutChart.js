@@ -23,34 +23,24 @@ class CustomTooltip extends Component {
 
 export default class DoughnutChart extends Component {
     renderActiveShape(props, activeIndex){
-
-        if(activeIndex < 0){
-            return;
-        }
-
-        const RADIAN = Math.PI / 180;
-        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle,
+      const RADIAN = Math.PI / 180;
+      const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
         fill, payload, value } = props;
-
-        let c = {};
-        c.midAngle = 54.11764705882353;
-        c.sin = Math.sin(-RADIAN * c.midAngle);
-        c.cos = Math.cos(-RADIAN * c.midAngle);
-        c.cx = cx;
-        c.cy = cy;
-        c.sx = cx + (outerRadius + 10) * c.cos; 
-        c.sy = cy + (outerRadius + 10) * c.sin; 
-        c.mx = cx + (outerRadius + 30) * c.cos; 
-        c.my = cy + (outerRadius + 30) * c.sin; 
-        c.ex = c.mx + (c.cos >= 0 ? 1 : -1) * 22; 
-        c.ey = c.my; 
-        c.textAnchor = 'start'
-        const valueText = numeralLibs(value).format(value > 1000 ? '+0.0a' : '0a')
-
-        return (
+      const sin = Math.sin(-RADIAN * midAngle);
+      const cos = Math.cos(-RADIAN * midAngle);
+      const sx = cx + (outerRadius + 10) * cos;
+      const sy = cy + (outerRadius + 10) * sin;
+      const mx = cx + (outerRadius + 30) * cos;
+      const my = cy + (outerRadius + 30) * sin;
+      const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+      const ey = my;
+      const textAnchor = cos >= 0 ? 'start' : 'end';
+      const valueText = numeralLibs(value).format(value > 1000 ? '+0.0a' : '0a')
+    
+      return (
         <g>
-            <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>{payload.name}</text>
-            <Sector
+          <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>{payload.name}</text>
+          <Sector
             cx={cx}
             cy={cy}
             innerRadius={innerRadius}
@@ -58,19 +48,19 @@ export default class DoughnutChart extends Component {
             startAngle={startAngle}
             endAngle={endAngle}
             fill={fill}
-            />
-            <Sector
-            cx={c.cx}
-            cy={c.cy}
-            startAngle={300}
-            endAngle={60}
+          />
+          <Sector
+            cx={cx}
+            cy={cy}
+            startAngle={startAngle}
+            endAngle={endAngle}
             innerRadius={outerRadius + 6}
             outerRadius={outerRadius + 10}
             fill={fill}
-            />
-            <path d={`M${c.sx},${c.sy}L${c.mx},${c.my}L${c.ex},${c.ey}`} stroke={fill} fill="none"/>
-            <circle cx={c.ex} cy={c.ey} r={2} fill={fill} stroke="none"/>
-            <text x={c.ex + (c.cos >= 0 ? 1 : -1) * 12} y={c.ey} textAnchor={c.textAnchor} fill="#fff">{`${valueText} mentions`}</text>
+          />
+          <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
+          <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
+          <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#fff">{`${valueText}`}</text>      
         </g>
         );
   }
@@ -102,7 +92,8 @@ export default class DoughnutChart extends Component {
                     activeIndex={this.props.activeIndex}
                     data={this.props.data}
                     activeShape={props=>this.renderActiveShape(props, this.props.activeIndex)} 
-                    paddingAngle={0}>
+                    paddingAngle={0}
+                    {...this.props}>
               {this.props.children}
             </Pie>
             <Tooltip content={<CustomTooltip/>}/>

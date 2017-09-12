@@ -1,11 +1,11 @@
 import React from 'react';
-import { SERVICES } from '../../services/Dashboard';
+import { SERVICES } from '../../../services/Dashboard';
 import async from 'async';
 import L from 'leaflet';
-import '../../styles/Insights/HeatMap.css';
+import '../../../styles/Insights/HeatMap.css';
 import numeralLibs from 'numeral';
-import { hasChanged } from './shared';
-import ClusterGroup from 'react-leaflet-markercluster';
+import { hasChanged } from '../shared';
+import ClusterGroup from './MarkerCluster';
 
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.0.2/dist/images/";
 
@@ -21,27 +21,26 @@ export default class MarkerClusterGroup extends React.Component {
   }
 
   componentDidMount() {
-    this.rebuildHeatmap();
+    this.rebuildHeatmap(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
     if (hasChanged(this.props, nextProps)) {
-      this.rebuildHeatmap();
+      this.rebuildHeatmap(nextProps);
     }    
   }
 
-  rebuildHeatmap() {
+  rebuildHeatmap(props) {
     let self = this;
 
-    if (!this.props.bbox) {
+    if (!props.bbox) {
       return;
     }
 
-    this.asyncFetchHeatmapFromTileService((err, heatmapClusters) => {
+    this.asyncFetchHeatmapFromTileService(props, (err, heatmapClusters) => {
       if (err) return;
 
       const markers = self.buildHeatmap(heatmapClusters);
-      self.clearClusters();
       self.setState({ markers });
     });
   }
@@ -50,9 +49,9 @@ export default class MarkerClusterGroup extends React.Component {
     this.refs.clusterGroup.leafletElement.clearLayers();
   }
 
-  asyncFetchHeatmapFromTileService(callback) {
+  asyncFetchHeatmapFromTileService(props, callback) {
     const { dataSource, timespanType, termFilters, zoomLevel,
-      maintopic, externalsourceid, fromDate, toDate, heatmapTileIds } = this.props;
+      maintopic, externalsourceid, fromDate, toDate, heatmapTileIds } = props;
 
     async.concat(heatmapTileIds, (tileId, tileCallback) => {
       SERVICES.getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileId, timespanType,
@@ -115,6 +114,9 @@ export default class MarkerClusterGroup extends React.Component {
       chunkedLoading: true,
       zoomToBoundsOnClick: true,
       showCoverageOnHover: true,
+      enableDefaultStyle: true,
+      removeDuplicates: true,
+      removeOutsideVisibleBounds: false,
       iconCreateFunction: this.clusterIconFunction,
       singleMarkerMode: true
     };
