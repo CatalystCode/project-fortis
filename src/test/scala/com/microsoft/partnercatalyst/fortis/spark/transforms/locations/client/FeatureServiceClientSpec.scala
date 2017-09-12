@@ -7,7 +7,7 @@ import org.scalatest.FlatSpec
 
 import scala.util.Try
 
-class TestFeatureServiceClient(bboxResponse: String) extends FeatureServiceClient(apiUrlBase = "unittest") {
+class TestFeatureServiceClient(bboxResponse: String) extends FeatureServiceClient(apiUrlBase = "unittest", None) {
   override def fetchBboxResponse(geofence: Geofence, layers: Seq[String]): Try[String] = Try(bboxResponse)
 }
 

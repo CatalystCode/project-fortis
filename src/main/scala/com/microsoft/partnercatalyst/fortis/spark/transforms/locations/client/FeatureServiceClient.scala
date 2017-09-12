@@ -9,7 +9,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
-class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggable {
+class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extends Serializable with Loggable {
   def bbox(geofence: Geofence, layers: Seq[String] = List()): Iterable[FeatureServiceFeature] = {
     unpack(fetchBboxResponse(geofence, layers), "bbox")
   }
@@ -61,6 +61,10 @@ class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggabl
 
     if (layers.nonEmpty) {
       url += s"&filter_layer=${layers.mkString(",")}"
+    }
+
+    if (namespace.nonEmpty) {
+      url += s"&filter_namespace=${namespace.get}"
     }
 
     url

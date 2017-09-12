@@ -6,7 +6,6 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.{AppInsights, Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraEventsSink}
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -74,8 +73,7 @@ object ProjectFortis extends App with Loggable {
   private def attachToContext(ssc:StreamingContext): Boolean = {
     val configManager = new CassandraConfigurationManager
     val streamProvider = StreamProviderFactory.create(configManager)
-    val featureServiceClient = new FeatureServiceClient(fortisSettings.featureServiceUrlBase)
-    val transformContextProvider = new TransformContextProvider(configManager, featureServiceClient)
+    val transformContextProvider = new TransformContextProvider(configManager, fortisSettings.featureServiceUrlBase)
 
     def pipeline[T: TypeTag](name: String, analyzer: Analyzer[T]) =
       Pipeline(name, analyzer, ssc, streamProvider, transformContextProvider, configManager)
