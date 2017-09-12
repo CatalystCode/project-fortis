@@ -26,7 +26,6 @@ export const AdminTwitterAccounts = React.createClass({
   },
 
   render() {
-    console.log(this.state.twitterAccountsGridColumns);
     return (
       this.state.twitterAccounts ? 
         <DataGrid 
