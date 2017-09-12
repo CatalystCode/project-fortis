@@ -5,7 +5,7 @@ module.exports = graphql.buildSchema(`
     sites: SiteCollection
     streams: StreamCollection
     siteTerms(translationLanguage: String): TermCollection
-    twitterAccounts(siteId: String!): TwitterAccountCollection
+    twitterAccounts: TwitterAccountCollection
     trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
     facebookPages(siteId: String!): FacebookPageCollection
     facebookAnalytics(siteId: String!, days: Int!): FacebookPageAnalyticsCollection
@@ -138,7 +138,7 @@ module.exports = graphql.buildSchema(`
   type TrustedTwitterAcct {
     RowKey: String
     acctUrl: String
-    }
+  }
 
   type FacebookPageAnalytics{
     Name: String,
@@ -147,12 +147,11 @@ module.exports = graphql.buildSchema(`
   }
 
   type TwitterAccount {
-    RowKey: String,
-    accountName: String,
-    consumerKey: String,
-    consumerSecret: String,
-    token: String,
-    tokenSecret: String
+    userIds: String!,
+    consumerKey: String!,
+    consumerSecret: String!,
+    accessToken: String!,
+    accessTokenSecret: String!
   }
 
   input SiteDefinition {
@@ -217,12 +216,11 @@ module.exports = graphql.buildSchema(`
   }
 
   input TwitterAccountInput {
-    RowKey: String,
-    accountName: String!,
+    userIds: String!,
     consumerKey: String!,
     consumerSecret: String!,
-    token: String!,
-    tokenSecret: String!
+    accessToken: String!,
+    accessTokenSecret: String!
   }
 
   input TrustedTwitterInput {
