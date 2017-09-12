@@ -124,24 +124,24 @@ const methods = {
                     }
         });
     },
-    load_keywords (siteId) {
-        let self = this;
-        const edgeType = "Term";
-        let dataStore = this.flux.stores.AdminStore.dataStore;
-        if (!dataStore.loading) {
-            AdminServices.fetchEdges(siteId, edgeType, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        let response = body.data.terms ? body.data.terms.edges : [];
 
-                        let action = false;
-                        self.dispatch(constants.ADMIN.LOAD_KEYWORDS, {response, action});
-                    }else{
-                        let error = 'Error, could not load keywords for admin page';
-                        self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-                    }
-            })
-        }
+    load_topics (translationLanguage) {
+      const self = this;
+      const dataStore = this.flux.stores.AdminStore.dataStore;
+      if (!dataStore.loading) {
+        AdminServices.fetchTopics(translationLanguage, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+          if (graphqlResponse && !error) {
+            const response = graphqlResponse.siteTerms.edges ? graphqlResponse.siteTerms.edges : [];
+            const action = false;
+            self.dispatch(constants.ADMIN.LOAD_TOPICS, {response, action});
+          } else {
+            let error = 'Error, could not load keywords for admin page';
+            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+          }
+        }))
+      }
     },
+
     remove_keywords (siteId, deletedRows) {
         let self = this;
 

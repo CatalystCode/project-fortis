@@ -19,7 +19,7 @@ export const AdminStore = Fluxxor.createStore({
             loading: false,
             twitterAccounts: [],
             trustedTwitterAccounts: [],
-            termGridColumns: [],
+            topicGridColumns: [],
             facebookPages: [],
             osmPlaceGroups: new Map(),
             blacklist: [],
@@ -35,7 +35,7 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
             constants.ADMIN.REMOVE_STREAMS, this.handleRemoveStreams,
-            constants.ADMIN.LOAD_KEYWORDS, this.handleLoadTerms,
+            constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
             constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccts,
@@ -129,10 +129,37 @@ export const AdminStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleLoadTerms(response){
-        this.dataStore.watchlist = response.response;
+    handleLoadTopics(response){
+        this.dataStore.watchlist = response.response || [];
         this.dataStore.action = response.action || false;
+        this.loadTopicGridColumns(this.dataStore.settings.properties.supportedLanguages);
         this.emit("change");
+    },
+
+    loadTopicGridColumns(languages) {
+      const defaultColDef = {
+        editable: false,
+        sortable: false,
+        filterable: false,
+        resizable: true
+      };
+      let columns = [];
+
+      const defaultLanguage = this.dataStore.settings.properties.defaultLanguage;
+      const supportedLanguages = this.dataStore.settings.properties.supportedLanguages;
+
+      columns.push(Object.assign({}, defaultColDef, {key: "topicid", name: "Topic Id"}));
+      columns.push(Object.assign({}, defaultColDef, {key: "name", name: defaultLanguage}));
+      languages.forEach(lang => {
+        if (lang !== defaultLanguage) {
+          columns.push(Object.assign({}, defaultColDef, {
+            key: "translatedname",
+            name: lang
+          }))
+        }
+      });
+            
+      this.dataStore.topicGridColumns = columns;
     },
 
     handleLoadLocalities(response){
@@ -177,29 +204,8 @@ export const AdminStore = Fluxxor.createStore({
             this.dataStore.siteList = siteList;
         }
         
-        this.loadTermColumns(settings.properties.supportedLanguages);
         this.loadLocalitiesColumns(settings.properties.supportedLanguages);
         this.emit("change");
-    },
-
-    loadTermColumns(languages){
-        const defaultColDef = {
-                    editable:true,
-                    sortable : true,
-                    filterable: true,
-                    resizable: true
-        };
-        let columns = [];
-        columns.push(Object.assign({}, defaultColDef, {editable: false, key: "RowKey", name: "Term ID"}));
-        languages.forEach(lang => {
-            columns.push(Object.assign({}, defaultColDef, {
-                                                           compositeKey: true, 
-                                                           key: lang !== "en" ? `name_${lang}` : 'name', 
-                                                           name: lang !== "en" ? `name_${lang}` : 'name'
-                                                          }))
-        });
-              
-        this.dataStore.termGridColumns = columns;
     },
 
     handleLoadPayloadFail(payload) {

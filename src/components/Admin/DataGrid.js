@@ -454,7 +454,7 @@ handleGridRowsUpdated(updatedRowData) {
                   rowRenderer={<RowRenderer rowKey={this.props.rowKey} 
                                             modifiedRows={this.state.modifiedRows}/>}
                   onGridRowsUpdated={this.handleGridRowsUpdated}
-                  ttoolbar={<Toolbar enableFilter={true} {...toolBarProps}/>}
+                  toolbar={<Toolbar enableFilter={true} {...toolBarProps}/>}
                   getValidFilterValues={this.getValidFilterValues}
                   rowsCount={this.getSize()}
                   onClearFilters={this.onClearFilters}
