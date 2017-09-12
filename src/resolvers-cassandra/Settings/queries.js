@@ -10,7 +10,12 @@ const CONNECTOR_TWITTER = 'Twitter';
 const CONNECTOR_FACEBOOK = 'Facebook';
 
 function transformWatchlist(item, translatedlanguage){
+  console.log('topicid:');
+  console.log(item.topicid);
+
+  console.log(translatedlanguage);
   return {
+    topicid: item.topicid,
     name: item.topic.toLowerCase(),
     translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ? 
     (item.translations || {})[translatedlanguage] : item.topic,
@@ -20,13 +25,15 @@ function transformWatchlist(item, translatedlanguage){
 }
 
 /**
-* @param {{input: {translationLanguage: string}}} args
+* @param {{translationLanguage: string}} args
 * @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
 */
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
+    const translationLanguage = args.translationLanguage || 'en';
+
     const query = `
-    SELECT topic, translations, lang_code
+    SELECT topicid, topic, translations, lang_code
     FROM fortis.watchlist
     `.trim();
 
@@ -35,8 +42,8 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     .then(rows => 
       resolve({
         edges: rows
-        .map(item=>transformWatchlist(item, args.translationLanguage))
-        .filter(term=>term.translatedname)
+        .map(item => transformWatchlist(item, translationLanguage))
+        .filter(term => term.translatedname)
       })
     ).catch(reject);
   });
