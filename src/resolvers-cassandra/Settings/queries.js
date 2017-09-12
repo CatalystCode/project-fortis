@@ -73,10 +73,12 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
 
 function cassandraRowToStream(row) {
   return {
+    streamId: row.streamid,
     pipelineKey: row.pipelinekey,
     pipelineLabel: row.pipelinelabel,
     pipelineIcon: row.pipelineicon,
-    streamFactory: row.streamfactory
+    streamFactory: row.streamfactory,
+    enabled: row.enabled
   };
 }
 
