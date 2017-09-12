@@ -37,7 +37,7 @@ export default class PopularTermsChart extends React.Component {
             const value = term.mentions;
             const color = constants.CHART_STYLE.COLORS[index];
             const name = edge.translatedname;
-            const defaultName = edge.name;
+            const defaultName = term.name;
 
             colorCells.push(<Cell key={0} fill={color} />);
 

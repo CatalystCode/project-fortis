@@ -129,11 +129,6 @@ export const DataStore = Fluxxor.createStore({
         this.dataStore.timeSeriesGraphData = { labels: [], graphData: [] };
         this.dataStore.heatmapTileIds = [];
 
-        let test = [{ "date": "2017-08-30 17:00", "isis": 1, "bomb": 23, "car": 2, "fatalities": 2, "fear": 1 },
-        { "date": "2017-09-01 17:00", "isis": 1, "bomb": 15, "car": 2, "fatalities": 2, "fear": 1 },
-        { "date": "2017-09-02 17:00", "isis": 1, "bomb": 23, "car": 2, "fatalities": 2, "fear": 1 }
-        ];
-
         if (mutatedTimeSeries && mutatedTimeSeries.graphData && mutatedTimeSeries.labels && mutatedTimeSeries.graphData.length) {
             const { labels, graphData, tiles } = mutatedTimeSeries;
             this.dataStore.timeSeriesGraphData = Object.assign({}, { labels });
@@ -145,7 +140,7 @@ export const DataStore = Fluxxor.createStore({
                 return timeSeriesEntry;
             });
 
-            let sorted = Array.from(timeseriesMap.values()).concat(test).sort((a, b)=>moment(a.date).unix() > moment(b.date).unix());
+            let sorted = Array.from(timeseriesMap.values()).sort((a, b)=>moment(a.date).unix() > moment(b.date).unix());
             this.dataStore.timeSeriesGraphData.graphData = sorted;
             this.dataStore.heatmapTileIds = tiles;
         }
