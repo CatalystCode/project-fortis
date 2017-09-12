@@ -27,6 +27,7 @@ export default class Dashboard extends React.Component {
 
     
     this.onResizeStop = this.onResizeStop.bind(this);
+    this.toggleHeatmapSize = this.toggleHeatmapSize.bind(this);
 
     this.state = {
       contentRowHeight: 0,
@@ -66,9 +67,11 @@ export default class Dashboard extends React.Component {
   filterLiterals() {
     const { dataSource, zoomLevel, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
     const defaultLanguage = this.props.settings.defaultLanguage;
+    const defaultZoom = parseInt(this.props.settings.defaultZoomLevel);
     const conjunctiveTermsLength = termFilters.size;
 
-    return Object.assign({}, { zoomLevel, dataSource, conjunctiveTermsLength, flux, maintopic, defaultLanguage, termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
+    return Object.assign({}, { zoomLevel, dataSource, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 
+       termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
   }
 
   isHeatmapFullScreen() {
@@ -85,7 +88,6 @@ export default class Dashboard extends React.Component {
           <HeatMap
             targetBbox={this.props.settings.targetBbox}
             heatmapTileIds={this.props.heatmapTileIds}
-            defaultZoom={parseInt(this.props.settings.defaultZoomLevel)}
             {...this.filterLiterals() }
           />
         </div>
@@ -103,7 +105,6 @@ export default class Dashboard extends React.Component {
           {bbox.length ?
             <ActivityFeed
               allSiteTopics={this.props.fullTermList}
-              defaultZoom={parseInt(this.props.settings.defaultZoomLevel)}
               infiniteScrollHeight={this.isHeatmapFullScreen() ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
               {...this.filterLiterals() }
             />

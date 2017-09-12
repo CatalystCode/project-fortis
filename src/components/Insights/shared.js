@@ -29,6 +29,7 @@ function hasChanged(prevProps, nextProps) {
         nextProps.zoomLevel === Math.max(nextProps.defaultZoom, prevProps.zoomLevel) &&
         nextProps.fromDate === prevProps.fromDate &&
         nextProps.toDate === prevProps.toDate &&
+        nextProps.language === prevProps.language &&
         nextProps.maintopic === prevProps.maintopic &&
         nextProps.externalsourceid === prevProps.externalsourceid &&
         nextProps.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&

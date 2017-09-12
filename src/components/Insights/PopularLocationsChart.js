@@ -9,7 +9,6 @@ export default class PopularLocationsChart extends React.Component {
     constructor(props) {
         super(props);
 
-        this.onPieEnter = this.onPieEnter.bind(this);
         this.state = {
             activeIndex: -1,
             dataProvider: [],
@@ -49,12 +48,6 @@ export default class PopularLocationsChart extends React.Component {
         this.refreshChart(this.props);
     }
 
-    onPieEnter(data, index) {
-        this.setState({
-          activeIndex: index,
-        });
-    }
-
     componentWillReceiveProps(nextProps) {
       if(hasChanged(this.props, nextProps)) { 
         this.refreshChart(nextProps);
@@ -67,7 +60,6 @@ export default class PopularLocationsChart extends React.Component {
                 fill={constants.CHART_STYLE.BG_FILL}
                 language={this.props.language}
                 data={this.state.dataProvider}
-                onMouseEnter={this.onPieEnter}
                 activeIndex={this.state.activeIndex}>
                 {this.state.colorCells}
             </DoughnutChart>

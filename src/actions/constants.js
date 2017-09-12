@@ -7,7 +7,7 @@ module.exports = {
     MAP: {
         MINZOOM: 8,
         MAXZOOM: 10,
-
+        DEBOUNCE: 5
     },
     TIMESPAN_TYPES : {
          'hour': {
