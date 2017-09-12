@@ -139,7 +139,7 @@ function parseLimit(limit) {
 const DEFAULT_CSV_CONTAINER = 'csv-export';
 const DEFAULT_CSV_EXPIRY_MINUTES = 2 * 60;
 
-function asCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes) {
+function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes) {
   container = container || DEFAULT_CSV_CONTAINER;
   expiryMinutes = expiryMinutes || DEFAULT_CSV_EXPIRY_MINUTES;
 
@@ -151,14 +151,26 @@ function asCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes
   }
 
   function csvExporter(...args) {
+    const reportName = promiseFunc.name;
+
+    if (!args || !args.length || !args[0] || !args[0].csv) {
+      console.log(`No CSV requested for ${reportName}, skipping creation of report`);
+      return promiseFunc(...args);
+    }
+
     return new Promise((resolve, reject) => {
+      console.log(`CSV requested, creating report for ${reportName} based on ${exportPropertyName}`);
       promiseFunc(...args)
       .then(returnValue => {
         const csvItems = returnValue && returnValue[exportPropertyName];
         const csvText = csvItems && csvItems.length ? json2csv({ data: csvItems, withBOM: true }) : '';
-        return createFile(container, formatCsvFilename(promiseFunc.name), csvText, expiryMinutes);
+        createFile(container, formatCsvFilename(reportName), csvText, expiryMinutes)
+        .then(csv => {
+          returnValue.csv = csv;
+          resolve(returnValue);
+        })
+        .catch(reject);
       })
-      .then(resolve)
       .catch(reject);
     });
   }
@@ -176,6 +188,6 @@ module.exports = {
   limitForInClause,
   getSiteDefintion,
   fromTopicListToConjunctionTopics,
-  asCsvExporter,
+  withCsvExporter,
   withRunTime
 };
