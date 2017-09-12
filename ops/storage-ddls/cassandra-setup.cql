@@ -114,6 +114,7 @@ CREATE TABLE streams (
     pipelineicon text,
     streamfactory text,
     params frozen<map<text, text>>,
+    enabled boolean,
     PRIMARY KEY (pipelinekey, streamid)
 );
 
