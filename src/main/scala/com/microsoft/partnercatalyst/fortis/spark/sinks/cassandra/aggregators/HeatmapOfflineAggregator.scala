@@ -13,13 +13,8 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
 
   override def aggregate(events: RDD[Event]): RDD[HeatmapTile] = {
     val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
-    val tiles = events.flatMap(event=>{
-      Seq(
-        event,
-        event.copy(externalsourceid = "all"),
-        event.copy(pipelinekey = "all", externalsourceid = "all")
-      )
-    }).flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
+    val tiles = events.flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
+
     tiles.keyBy(r=>{(
       r.heatmaptileid, r.period,
       r.periodtype, r.perioddate,
@@ -90,7 +85,7 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
         implicit val rowWriter = SqlRowWriter.Factory
         tiles.saveToCassandra(keyspace, "heatmap")
 
-        val tileBuckets = aggregateTileBuckets(tiles, keyspace).cache()
+        val tileBuckets = aggregateTileBuckets(tiles, keyspace)
         tileBuckets.write
           .format("org.apache.spark.sql.cassandra")
           .mode(SaveMode.Append)

@@ -76,7 +76,15 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       title = ""
     )))
 
-    val popularPlaces = aggregator.aggregate(events).collect()
+    val eventsExploded = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    })
+
+    val popularPlaces = aggregator.aggregate(eventsExploded).collect()
     assert(popularPlaces.size == 165)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
@@ -169,7 +177,15 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       )
     ))
 
-    val popularPlaces = aggregator.aggregate(events).collect()
+    val eventsExploded = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    })
+
+    val popularPlaces = aggregator.aggregate(eventsExploded).collect()
     assert(popularPlaces.size == 220)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
@@ -262,7 +278,15 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       )
     ))
 
-    val popularPlaces = aggregator.aggregate(events).collect()
+    val eventsExploded = events.flatMap(event=>{
+      Seq(
+        event,
+        event.copy(externalsourceid = "all"),
+        event.copy(pipelinekey = "all", externalsourceid = "all")
+      )
+    })
+
+    val popularPlaces = aggregator.aggregate(eventsExploded).collect()
     assert(popularPlaces.size == 275)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
