@@ -27,7 +27,7 @@ class TestLocationsExtractorFactory(client: FeatureServiceClient) extends Locati
 }
 
 class TestFeatureServiceClient(givenBbox: Seq[FeatureServiceFeature], givenPoint: Seq[FeatureServiceFeature]) extends FeatureServiceClient("http://some/test/url") {
-  override def bbox(geofence: Geofence): Iterable[FeatureServiceFeature] = givenBbox
+  override def bbox(geofence: Geofence, layers: Seq[String] = List()): Iterable[FeatureServiceFeature] = givenBbox
   override def point(latitude: Double, longitude: Double): Iterable[FeatureServiceFeature] = givenPoint
 }
 

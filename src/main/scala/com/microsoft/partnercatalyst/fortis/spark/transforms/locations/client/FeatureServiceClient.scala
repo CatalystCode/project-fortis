@@ -10,8 +10,8 @@ import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
 class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggable {
-  def bbox(geofence: Geofence): Iterable[FeatureServiceFeature] = {
-    unpack(fetchBboxResponse(geofence), "bbox")
+  def bbox(geofence: Geofence, layers: Seq[String] = List()): Iterable[FeatureServiceFeature] = {
+    unpack(fetchBboxResponse(geofence, layers), "bbox")
   }
 
   def point(latitude: Double, longitude: Double): Iterable[FeatureServiceFeature] = {
@@ -39,8 +39,11 @@ class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggabl
     Try(json.parse(response).extract[FeatureServiceResponse].features)
   }
 
-  protected def fetchBboxResponse(geofence: Geofence): Try[String] = {
-    val fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}?include=centroid"
+  protected def fetchBboxResponse(geofence: Geofence, layers: Seq[String]): Try[String] = {
+    var fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}?include=centroid"
+    if (layers.nonEmpty) {
+      fetch += s"&filter_layer=${layers.mkString(",")}"
+    }
     fetchResponse(fetch)
   }
 

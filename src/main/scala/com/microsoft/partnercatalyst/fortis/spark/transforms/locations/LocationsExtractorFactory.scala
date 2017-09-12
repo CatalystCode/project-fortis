@@ -10,13 +10,15 @@ import scala.collection.mutable
 @SerialVersionUID(100L)
 class LocationsExtractorFactory(
   featureServiceClient: FeatureServiceClient,
-  geofence: Geofence) extends Serializable with Loggable {
+  geofence: Geofence,
+  layersIncluded: Seq[String] = List("macroregion", "region", "macrocounty", "county", "metroarea", "localadmin", "locality", "borough", "macrohood", "neighbourhood")
+) extends Serializable with Loggable {
 
   protected var lookup: Map[String, Set[Location]] = _
 
   def buildLookup(): this.type = {
     val map = mutable.Map[String, Location]()
-    featureServiceClient.bbox(geofence).foreach(feature => {
+    featureServiceClient.bbox(geofence, layersIncluded).foreach(feature => {
       val locationName = feature.name.toLowerCase
       val newLocation = toLocation(feature)
       val oldLocation = map.get(locationName).orNull
