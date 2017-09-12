@@ -56,6 +56,7 @@
     "react-addons-create-fragment": "^15.4.1",
     "react-addons-transition-group": "^15.4.2",
     "react-autosuggest": "^7.0.1",
+    "react-bootstrap": "^0.31.3",
     "react-data-grid": "^2.0.37",
     "react-data-grid-addons": "^2.0.1",
     "react-dom": "^15.4.2",
