@@ -56,7 +56,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
 
 /**
  * @param {{siteId: string}} args
- * @returns {Promise.<{runTime: string, sites: Array<{pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string}>}>}
+ * @returns {Promise.<{runTime: string, sites: Array<{pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, enabled: boolean}>}>}
  */
 function streams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
@@ -72,14 +72,29 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function cassandraRowToStream(row) {
+  if (row.enabled == null) row.enabled = true;
   return {
     streamId: row.streamid,
     pipelineKey: row.pipelinekey,
     pipelineLabel: row.pipelinelabel,
     pipelineIcon: row.pipelineicon,
     streamFactory: row.streamfactory,
+    params: paramsToParamsEntries(row.params),
     enabled: row.enabled
   };
+}
+
+function paramsToParamsEntries(params) {
+  const paramsEntries = [];
+  for (const key of Object.keys(params)) {
+    let value = params[key];
+    let paramsEntry = {
+      key,
+      value
+    };
+    paramsEntries.push(paramsEntry);
+  }
+  return paramsEntries;
 }
 
 function cassandraRowToTwitterAccount(row) {
