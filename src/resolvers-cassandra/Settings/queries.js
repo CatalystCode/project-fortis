@@ -140,8 +140,8 @@ function cassandraRowToTrustedTwitterAccount(row) {
  */
 function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
+    const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE pipelinekey = ? ALLOW FILTERING';
+    cassandraConnector.executeQuery(sourcesByConnector, [PIPELINE_KEY_TWITTER])
     .then(rows => {
       const accounts = rows.map(cassandraRowToTrustedTwitterAccount);
       resolve({accounts: accounts});
