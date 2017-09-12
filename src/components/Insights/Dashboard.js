@@ -70,8 +70,11 @@ export default class Dashboard extends React.Component {
     return Object.assign({}, { zoomLevel, dataSource, conjunctiveTermsLength, flux, maintopic, defaultLanguage, termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
   }
 
+  isHeatmapFullScreen() {
+    return this.state.heatmapToggleText !== DefaultToggleText;
+  }
+
   heatmapComponent() {
-    const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
     const { contentAreaHeight, contentRowHeight } = this.state;
 
     return (
@@ -90,7 +93,6 @@ export default class Dashboard extends React.Component {
   }
 
   newsfeedComponent() {
-    const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
     const { bbox } = this.props;
     const { contentAreaHeight, contentRowHeight, newsfeedResizedHeight } = this.state;
 
@@ -101,7 +103,7 @@ export default class Dashboard extends React.Component {
             <ActivityFeed
               allSiteTopics={this.props.fullTermList}
               defaultZoom={parseInt(this.props.settings.defaultZoomLevel)}
-              infiniteScrollHeight={HeatMapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
+              infiniteScrollHeight={this.isHeatmapFullScreen() ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
               {...this.filterLiterals() }
             />
             : undefined}
@@ -181,7 +183,6 @@ export default class Dashboard extends React.Component {
   }
 
   watchlistComponent() {
-    const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
     const { contentAreaHeight, contentRowHeight, watchlistResizedHeight } = this.state;
 
     return (
@@ -190,7 +191,7 @@ export default class Dashboard extends React.Component {
           <SentimentTreeview
             conjunctivetopics={this.props.conjunctivetopics}
             allSiteTopics={this.props.fullTermList}
-            height={HeatMapFullScreen ? contentAreaHeight : (watchlistResizedHeight > 0) ? watchlistResizedHeight : contentRowHeight}
+            height={this.isHeatmapFullScreen() ? contentAreaHeight : (watchlistResizedHeight > 0) ? watchlistResizedHeight : contentRowHeight}
             {...this.filterLiterals() }
           />
         </GraphCard>
@@ -198,14 +199,13 @@ export default class Dashboard extends React.Component {
     );
   }
 
-  renderedGridCards(heatMapFullScreen) {
-    return heatMapFullScreen ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()] :
-      [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
+  renderGridCards() {
+    return this.isHeatmapFullScreen()
+      ? [this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()]
+      : [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
   }
 
   render() {
-    const HeatMapFullScreen = this.state.heatmapToggleText !== DefaultToggleText;
-
     return (
       <div>
         <div className="app-container">
@@ -222,13 +222,13 @@ export default class Dashboard extends React.Component {
                   className="layout"
                   isDraggable={false}
                   isDraggable={false}
-                  layouts={HeatMapFullScreen ? defaultLayout.layoutCollapsed : defaultLayout.layout}
+                  layouts={this.isHeatmapFullScreen() ? defaultLayout.layoutCollapsed : defaultLayout.layout}
                   cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
                   rowHeight={28}
                   onResizeStop={this.onResizeStop}
                   breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                   useCSSTransforms={this.state.mounted}>
-                  {this.renderedGridCards(HeatMapFullScreen)}
+                    {this.renderGridCards()}
                 </ResponsiveReactGridLayout>
               </div>
             </div>
