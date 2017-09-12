@@ -9,11 +9,10 @@ import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import org.apache.spark.SparkContext
 
 @SerialVersionUID(100L)
-class TransformContextProvider(configManager: ConfigurationManager, featureServiceClient: FeatureServiceClient)
+class TransformContextProvider(configManager: ConfigurationManager, featureServiceClientUrlBase: String)
   (implicit settings: FortisSettings) extends Serializable with Loggable
 {
   private val deltaChannel: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
@@ -57,7 +56,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
           val langToWatchlist = configManager.fetchWatchlist(sparkContext)
           val blacklist = configManager.fetchBlacklist(sparkContext)
 
-          val delta = Delta(TransformContext(), featureServiceClient, Some(siteSettings), Some(langToWatchlist), Some(blacklist))
+          val delta = Delta(TransformContext(), featureServiceClientUrlBase, Some(siteSettings), Some(langToWatchlist), Some(blacklist))
 
           updateTransformContextAndBroadcast(delta, sparkContext)
           startQueueClient(sparkContext)
@@ -133,13 +132,13 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
         case Some(value) => value match {
           case "settings" =>
             val siteSettings = configManager.fetchSiteSettings(sparkContext)
-            Delta(transformContext, featureServiceClient, siteSettings = Some(siteSettings))
+            Delta(transformContext, featureServiceClientUrlBase, siteSettings = Some(siteSettings))
           case "watchlist" =>
             val langToWatchlist = configManager.fetchWatchlist(sparkContext)
-            Delta(transformContext, featureServiceClient, langToWatchlist = Some(langToWatchlist))
+            Delta(transformContext, featureServiceClientUrlBase, langToWatchlist = Some(langToWatchlist))
           case "blacklist" =>
             val blacklist = configManager.fetchBlacklist(sparkContext)
-            Delta(transformContext, featureServiceClient, blacklist = Some(blacklist))
+            Delta(transformContext, featureServiceClientUrlBase, blacklist = Some(blacklist))
           case unknown =>
             logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
             Delta()

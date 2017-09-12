@@ -26,7 +26,7 @@ class TestLocationsExtractorFactory(client: FeatureServiceClient) extends Locati
   def getLookup: Map[String, Set[Location]] = lookup
 }
 
-class TestFeatureServiceClient(givenBbox: Seq[FeatureServiceFeature], givenPoint: Seq[FeatureServiceFeature]) extends FeatureServiceClient("http://some/test/url") {
+class TestFeatureServiceClient(givenBbox: Seq[FeatureServiceFeature], givenPoint: Seq[FeatureServiceFeature]) extends FeatureServiceClient("http://some/test/url", None) {
   override def bbox(geofence: Geofence, layers: Seq[String] = List()): Iterable[FeatureServiceFeature] = givenBbox
   override def point(latitude: Double, longitude: Double): Iterable[FeatureServiceFeature] = givenPoint
 }

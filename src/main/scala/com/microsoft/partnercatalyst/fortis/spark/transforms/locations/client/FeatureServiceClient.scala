@@ -9,7 +9,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
-class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggable {
+class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extends Serializable with Loggable {
   def bbox(geofence: Geofence, layers: Seq[String] = List()): Iterable[FeatureServiceFeature] = {
     unpack(fetchBboxResponse(geofence, layers), "bbox")
   }
@@ -40,21 +40,34 @@ class FeatureServiceClient(apiUrlBase: String) extends Serializable with Loggabl
   }
 
   protected def fetchBboxResponse(geofence: Geofence, layers: Seq[String]): Try[String] = {
-    var fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}?include=centroid"
-    if (layers.nonEmpty) {
-      fetch += s"&filter_layer=${layers.mkString(",")}"
-    }
-    fetchResponse(fetch)
+    val fetch = s"$apiUrlBase/features/bbox/${geofence.north}/${geofence.west}/${geofence.south}/${geofence.east}"
+    fetchResponse(addQueryParameters(fetch, layers))
   }
 
   protected def fetchPointResponse(latitude: Double, longitude: Double): Try[String] = {
-    val fetch = s"$apiUrlBase/features/point/$latitude/$longitude?include=centroid"
-    fetchResponse(fetch)
+    val fetch = s"$apiUrlBase/features/point/$latitude/$longitude"
+    fetchResponse(addQueryParameters(fetch))
   }
 
   protected def fetchNameResponse(names: Iterable[String]): Try[String] = {
-    val fetch = s"$apiUrlBase/features/name/${names.mkString(",")}?include=centroid"
-    fetchResponse(fetch)
+    val fetch = s"$apiUrlBase/features/name/${names.mkString(",")}"
+    fetchResponse(addQueryParameters(fetch))
+  }
+
+  private def addQueryParameters(baseUrl: String, layers: Seq[String] = List()): String = {
+    var url = baseUrl
+
+    url += "?include=centroid"
+
+    if (layers.nonEmpty) {
+      url += s"&filter_layer=${layers.mkString(",")}"
+    }
+
+    if (namespace.nonEmpty) {
+      url += s"&filter_namespace=${namespace.get}"
+    }
+
+    url
   }
 
   private def fetchResponse(url: String): Try[String] = {

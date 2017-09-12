@@ -28,7 +28,7 @@ private[transformcontext] object Delta {
     */
   def apply(
     transformContext: TransformContext,
-    featureServiceClient: FeatureServiceClient,
+    featureServiceClientUrlBase: String,
     siteSettings: Option[SiteSettings] = None,
     langToWatchlist: Option[Map[String, Seq[String]]] = None,
     blacklist: Option[Seq[BlacklistedTerm]] = None): Delta =
@@ -52,12 +52,18 @@ private[transformcontext] object Delta {
     new Delta(
       siteSettings = siteSettings,
       locationsExtractorFactory = updatedField(
-        siteSettings.get.getGeofence() != transformContext.siteSettings.geofence,
-        new LocationsExtractorFactory(featureServiceClient, siteSettings.get.getGeofence()).buildLookup()
+        siteSettings.get.getGeofence() != transformContext.siteSettings.geofence
+        || siteSettings.get.featureservicenamespace != transformContext.siteSettings.featureservicenamespace,
+        new LocationsExtractorFactory(
+          new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace),
+          siteSettings.get.getGeofence()).buildLookup()
       ),
       imageAnalyzer = updatedField(
-        siteSettings.get.cogvisionsvctoken != transformContext.siteSettings.cogvisionsvctoken,
-        new ImageAnalyzer(ImageAnalysisAuth(siteSettings.get.cogvisionsvctoken), featureServiceClient)
+        siteSettings.get.cogvisionsvctoken != transformContext.siteSettings.cogvisionsvctoken
+        || siteSettings.get.featureservicenamespace != transformContext.siteSettings.featureservicenamespace,
+        new ImageAnalyzer(
+          ImageAnalysisAuth(siteSettings.get.cogvisionsvctoken),
+          new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace))
       ),
       sentimentDetectorAuth = updatedField(
         siteSettings.get.translationsvctoken != transformContext.siteSettings.translationsvctoken,
