@@ -85,7 +85,7 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
         implicit val rowWriter = SqlRowWriter.Factory
         tiles.saveToCassandra(keyspace, "heatmap")
 
-        val tileBuckets = aggregateTileBuckets(tiles, keyspace)
+        val tileBuckets = aggregateTileBuckets(tiles, keyspace).cache()
         tileBuckets.write
           .format("org.apache.spark.sql.cassandra")
           .mode(SaveMode.Append)
