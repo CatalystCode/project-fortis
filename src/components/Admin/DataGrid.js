@@ -50,7 +50,8 @@ export const DataGrid = React.createClass({
             localAction: false,
             modifiedRows: new Set(),
             sortDirection: 1,
-            selectedRowKeys: []
+            selectedRowKeys: [],
+            coordinates: {}
         }
   },
   getStateFromFlux() {
@@ -148,7 +149,7 @@ export const DataGrid = React.createClass({
       return this.state.rows.length;
   },
   handleAddRow(e){
-      let newRow = {}, rows = this.state.rows;
+      let newRow = {}, rows = this.state.rows || [];
 
       this.props.columns.forEach(column=>{
           newRow[column.key] = "";
@@ -332,7 +333,7 @@ handleGridRowsUpdated(updatedRowData) {
             const mutatedRows = this.state.rows.filter(row=>modifiedRows.has(row[this.props.rowKey]));
             //only save the grid rows that were modified to minimize unneccesary service mutations.
             modifiedRows.clear();
-            this.setState({localAction: STATE_ACTIONS.SAVING, filters: {}, modifiedRows: modifiedRows}, () => this.setStateAsSaving());
+            this.setState({localAction: STATE_ACTIONS.SAVING, filters: {}, modifiedRows: modifiedRows});
             this.props.handleSave(mutatedRows, this.state.columns);
         }else{
             return false;
@@ -453,8 +454,7 @@ handleGridRowsUpdated(updatedRowData) {
                   rowRenderer={<RowRenderer rowKey={this.props.rowKey} 
                                             modifiedRows={this.state.modifiedRows}/>}
                   onGridRowsUpdated={this.handleGridRowsUpdated}
-                  toolbar={<Toolbar enableFilter={true} 
-                                    {...toolBarProps}/>}
+                  ttoolbar={<Toolbar enableFilter={true} {...toolBarProps}/>}
                   getValidFilterValues={this.getValidFilterValues}
                   rowsCount={this.getSize()}
                   onClearFilters={this.onClearFilters}

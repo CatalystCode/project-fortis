@@ -2,6 +2,8 @@ import Fluxxor from 'fluxxor';
 import constants from '../actions/constants';
 // eslint-disable-next-line
 import ReactDataGridPlugins from 'react-data-grid-addons';
+import { StreamParamsButtonFormatter } from '../components/Admin/StreamParamsButtonFormatter';
+import { StreamStatusButtonFormatter } from '../components/Admin/StreamStatusButtonFormatter';
 
 // eslint-disable-next-line
 const Filters = window.ReactDataGridPlugins.Filters;
@@ -11,6 +13,7 @@ export const AdminStore = Fluxxor.createStore({
         this.dataStore = {
             streams: [],
             streamGridColumns: [],
+            streamParamGridColumns: [],
             settings: {},
             siteList: [],
             loading: false,
@@ -28,11 +31,13 @@ export const AdminStore = Fluxxor.createStore({
         };
 
         this.bindActions(
+            constants.ADMIN.LOAD_SITE_SETTINGS, this.handleLoadSiteSettings,
             constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
+            constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
+            constants.ADMIN.REMOVE_STREAMS, this.handleRemoveStreams,
             constants.ADMIN.LOAD_KEYWORDS, this.handleLoadTerms,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
-            constants.ADMIN.LOAD_SETTINGS, this.handleLoadSettings,
             constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
@@ -46,6 +51,12 @@ export const AdminStore = Fluxxor.createStore({
         return this.dataStore;
     },
 
+    handleLoadSiteSettings(response) {
+      this.dataStore.settings = response || [];
+      this.dataStore.action = response.action || false;
+      this.emit("change");
+    },
+
     handleLoadStreams(response) {
       this.dataStore.streams = response.response.streams.streams || [];
       this.dataStore.action = response.action || false;
@@ -53,19 +64,38 @@ export const AdminStore = Fluxxor.createStore({
       this.emit("change");
     },
 
+    handleModifyStreams(response) {
+      this.loadStreamsColumns(this.dataStore.streams);
+      this.emit("change");
+    },
+
+    handleRemoveStreams(response) {
+      this.loadStreamsColumns(this.dataStore.streams);
+      this.emit("change");
+    },
+
     loadStreamsColumns() {
       const defaultColumn = {
-        editable: true,
-        filterable: true,
+        editable: false,
+        filterable: false,
         resizable: true
       };
 
       let columns = [];
-      columns.push(Object.assign({}, defaultColumn, {editable: false, key: "pipelineKey", name: "Pipeline Key"}));
-      columns.push(Object.assign({}, defaultColumn, {editable: false, key: "pipelineLabel", name: "Pipeline Label"}));
-      columns.push(Object.assign({}, defaultColumn, {editable: false, key: "streamFactory", name: "Stream Factory"}));
-            
+      columns.push(Object.assign({}, defaultColumn, {key: "status", name: "Status", formatter: StreamStatusButtonFormatter, getRowMetaData: (row) => row, width: 90}));
+      columns.push(Object.assign({}, defaultColumn, {key: "streamId", name: "Stream Id"}));
+      columns.push(Object.assign({}, defaultColumn, {key: "pipelineKey", name: "Pipeline Key"}));
+      columns.push(Object.assign({}, defaultColumn, {key: "pipelineLabel", name: "Pipeline Label"}));
+      columns.push(Object.assign({}, defaultColumn, {key: "pipelineIcon", name: "Pipeline Icon"}));
+      columns.push(Object.assign({}, defaultColumn, {key: "streamFactory", name: "Stream Factory"}));
+      columns.push(Object.assign({}, defaultColumn, {key: "params", name: "Params", formatter: StreamParamsButtonFormatter, getRowMetaData: (row) => row, width: 70}));
+
       this.dataStore.streamGridColumns = columns;
+
+      let paramColumns = [];
+      paramColumns.push(Object.assign({}, defaultColumn, {editable: false, key: "key", name: "key"}));
+      paramColumns.push(Object.assign({}, defaultColumn, {editable: true, key: "value", name: "value"}));
+      this.dataStore.streamParamGridColumns = paramColumns;
     },
 
     handleLoadPayload(payload) {
@@ -133,8 +163,8 @@ export const AdminStore = Fluxxor.createStore({
 
     handleLoadSettings(response){
         const {settings, action, siteList, originalSiteName} = response;
-        this.dataStore.settings = settings;
-        this.dataStore.action = action;
+        this.dataStore.settings = response;
+        this.dataStore.action = response.action || false;
         if(!siteList){
             this.dataStore.siteList = this.dataStore.siteList.map(site => {
                 if(site.name === originalSiteName){

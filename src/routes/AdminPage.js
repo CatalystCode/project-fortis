@@ -9,7 +9,7 @@ const FluxMixin = Fluxxor.FluxMixin(React),
 export const AdminPage = React.createClass({
   mixins: [FluxMixin, StoreWatchMixin],
   componentDidMount(){
-      this.getFlux().actions.ADMIN.load_settings(this.props.params.siteKey);
+      this.getFlux().actions.ADMIN.load_settings();
   },
 
   getStateFromFlux() {
@@ -17,9 +17,7 @@ export const AdminPage = React.createClass({
   },
 
   componentWillReceiveProps(){
-    if(this.state.settings.name && this.state.settings.name !== this.props.params.siteKey){
-      this.getFlux().actions.ADMIN.load_settings(this.props.params.siteKey);
-    }
+      this.getFlux().actions.ADMIN.load_settings();
   },
 
   render() {

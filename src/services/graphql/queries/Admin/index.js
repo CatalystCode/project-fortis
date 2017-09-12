@@ -2,8 +2,23 @@ export const getAdminSite = `sites {
         ...FortisSiteDefinitionView
 }`;
 
-export const getAdminSiteDefinition = `query SiteDefintion($siteId: String, $selectedLanguage: String) {
-    siteDefinition: ${getAdminSite}
+export const getAdminSiteDefinition = `query sites {
+  site {
+    name
+    properties {
+        targetBbox
+        defaultZoomLevel
+        logo
+        title
+        fbToken
+        mapzenApiKey
+        defaultLocation
+        defaultLanguage
+        storageConnectionString
+        featuresConnectionString
+        supportedLanguages
+    }
+  }
 }`;
 
 export const getPipelineTerms = `siteTerms(translationLanguage:$translationLanguage){

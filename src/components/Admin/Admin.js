@@ -82,7 +82,7 @@ export const Admin = React.createClass({
                     <Tab>Trusted Twitter Accounts</Tab>
                     <Tab>Twitter API Accounts</Tab>
                     <Tab>Blacklisted Term(s)</Tab>
-                    <Tab>Stream(s)</Tab>
+                    <Tab>Streams</Tab>
                   </TabList>
                   <TabPanel>
                     <h2>Settings</h2>
@@ -161,7 +161,7 @@ export const Admin = React.createClass({
                     </div>
                   </TabPanel>
                   <TabPanel> 
-                    <h2>Stream(s)</h2>
+                    <h2>Streams</h2>
                     <div className="adminTable">
                       {
                         this.state.settings && this.state.settings.properties && this.state.index === STREAM_TAB ? 
