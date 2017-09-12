@@ -122,11 +122,11 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 
     return cassandraConnector.executeQuery(query, params)
       .then(rows => {
-        const labels = Array.from(makeSet(rows, row => row.conjunctiontopic1)).map(row => ({ name: row }));
+        const labels = Array.from(makeSet(rows, row => row.conjunctiontopic1.toLowerCase())).map(row => ({ name: row.toLowerCase() }));
         const tiles = Array.from(makeSet(rows, row => row.tileid)).map(row => row);
-        const graphData = aggregateBy(rows, row => `${row.conjunctiontopic1}_${row.perioddate}`, row => ({
+        const graphData = aggregateBy(rows, row => `${row.conjunctiontopic1.toLowerCase()}_${row.perioddate}`, row => ({
           date: moment(row.perioddate).format(dateFormat),
-          name: row.conjunctiontopic1,
+          name: row.conjunctiontopic1.toLowerCase(),
           mentions: Long.ZERO,
           avgsentimentnumerator: Long.ZERO
         }));

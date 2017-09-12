@@ -53,15 +53,15 @@ function queryEventsTable(eventIdResponse, args) {
       eventsQuery += ' AND fulltext LIKE ?';
       eventsParams.push(`%${args.fulltextTerm}%`);
     }
-
+ 
     if (eventIdResponse.rows.length) {
       cassandraConnector.executeQuery(eventsQuery, eventsParams)
         .then(rows => {
           resolve({
             type: 'FeatureCollection',
             features: rows.map(eventToFeature),
-            pageState: eventIdResponse.pageState,
-            bbox: args.bbox
+            bbox: args.bbox,
+            pageState: eventIdResponse.pageState
           });
         })
         .catch(reject);
