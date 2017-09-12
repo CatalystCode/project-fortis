@@ -189,6 +189,34 @@ export const SERVICES = {
 
       request(POST, callback);
     },
+
+    fetchTopics(translationLanguage, callback) {
+      const query = `
+      query SiteTerms($translationLanguage: String) {
+        siteTerms(translationLanguage: $translationLanguage) {
+          edges {
+            topicid
+            name
+            translatedname
+            namelang
+            translatednamelang
+          }
+        }
+      }`;
+
+      const variables = { input: { translationLanguage } };
+      const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
+
+        request(POST, callback);
+    },
+
     saveTwitterAccounts(site, accounts, mutation, callback) {
         const query = ` ${twitterFragment} 
                       mutation ModifyTwitterAccounts($input: TwitterAccountDefintion!) {
