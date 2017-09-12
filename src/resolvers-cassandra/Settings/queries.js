@@ -10,10 +10,6 @@ const CONNECTOR_TWITTER = 'Twitter';
 const CONNECTOR_FACEBOOK = 'Facebook';
 
 function transformWatchlist(item, translatedlanguage){
-  console.log('topicid:');
-  console.log(item.topicid);
-
-  console.log(translatedlanguage);
   return {
     topicid: item.topicid,
     name: item.topic.toLowerCase(),
