@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/Header.css';
+import '../../styles/Header.css';
 import { Link } from 'react-router';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
