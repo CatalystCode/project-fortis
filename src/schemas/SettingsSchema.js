@@ -53,9 +53,10 @@ module.exports = graphql.buildSchema(`
   }
 
   type SiteTerm {
-    name: String!
-    translatedname: String
-    namelang: String
+    topicid: String,
+    name: String!,
+    translatedname: String,
+    namelang: String,
     translatednamelang: String
   }
 

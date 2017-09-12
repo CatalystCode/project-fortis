@@ -250,15 +250,14 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
         SET pipelinelabel = ?,
         pipelineicon = ?,
         streamfactory = ?,
-        params = ?,
-        enabled = ? 
+        params = ?
         WHERE streamid = ? AND pipelinekey = ?`,
         params: [
           stream.pipelineLabel,
           stream.pipelineIcon,
           stream.streamFactory,
           params,
-          stream.enabled,
+          //stream.enabled,
           stream.streamId,
           stream.pipelineKey
         ]
