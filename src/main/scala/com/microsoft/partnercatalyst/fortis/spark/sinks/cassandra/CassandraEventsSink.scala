@@ -66,11 +66,12 @@ object CassandraEventsSink extends Loggable {
             writeEventBatchToEventTagTables(eventBatchDF, sparkSession)
           }
 
+          val fortisEventsRDDRepartitioned = fortisEventsRDD.repartition(5)
           offlineAggregators.foreach(aggregator => {
             val aggregatorName = aggregator.getClass.getSimpleName
             Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.$aggregatorName", _, _, -1)) {
               try {
-                aggregator.aggregateAndSave(fortisEventsRDD, KeyspaceName)
+                aggregator.aggregateAndSave(fortisEventsRDDRepartitioned, KeyspaceName)
               } catch {
                 case e: Exception =>
                   logError(s"Failed performing offline aggregation $aggregatorName", e)
