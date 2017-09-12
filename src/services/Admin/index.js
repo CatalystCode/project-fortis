@@ -87,18 +87,32 @@ export const SERVICES = {
         request(POST, callback);
       },
 
-      getSiteDefintion(siteId, callback) {
-        const query = ` ${AdminFragments.siteSettingsFragment}
-                        ${AdminQueries.getAdminSiteDefinition} `;
+      getSiteDefinition(callback) {
+        const query = `
+        query Sites {
+          sites {
+            site {
+              name
+              properties {
+                targetBbox
+                defaultZoomLevel
+                logo
+                title
+                defaultLocation
+                defaultLanguage
+                supportedLanguages
+              }
+            }
+          }
+        }`;
 
-        const variables = { siteId };
         const host = process.env.REACT_APP_SERVICE_HOST
         const POST = {
             url: `${host}/api/settings`,
             method: "POST",
             json: true,
             withCredentials: false,
-            body: { query, variables }
+            body: { query }
         };
 
         request(POST, callback);
@@ -252,12 +266,17 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    editSite(siteName, siteDefinition, callback) {
-        let query = `${AdminMutations.editSite}`;
-        let variables = { input: siteDefinition };
+    editSite(site, callback) {
+        const query = `mutation EditSite($input: EditableSiteSettings!) {
+          editSite(input: $input) {
+            name
+          }
+        }`;
 
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
+        const variables = { input: site };
+
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
             url: `${host}/api/settings`,
             method: "POST",
             json: true,

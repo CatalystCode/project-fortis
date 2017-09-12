@@ -28,11 +28,11 @@ export const AdminStore = Fluxxor.createStore({
         };
 
         this.bindActions(
+            constants.ADMIN.LOAD_SITE_SETTINGS, this.handleLoadSiteSettings,
             constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
             constants.ADMIN.LOAD_KEYWORDS, this.handleLoadTerms,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
-            constants.ADMIN.LOAD_SETTINGS, this.handleLoadSettings,
             constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
@@ -44,6 +44,12 @@ export const AdminStore = Fluxxor.createStore({
 
     getState() {
         return this.dataStore;
+    },
+
+    handleLoadSiteSettings(response) {
+      this.dataStore.settings = response || [];
+      this.dataStore.action = response.action || false;
+      this.emit("change");
     },
 
     handleLoadStreams(response) {
@@ -133,8 +139,8 @@ export const AdminStore = Fluxxor.createStore({
 
     handleLoadSettings(response){
         const {settings, action, siteList, originalSiteName} = response;
-        this.dataStore.settings = settings;
-        this.dataStore.action = action;
+        this.dataStore.settings = response;
+        this.dataStore.action = response.action || false;
         if(!siteList){
             this.dataStore.siteList = this.dataStore.siteList.map(site => {
                 if(site.name === originalSiteName){

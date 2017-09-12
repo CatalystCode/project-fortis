@@ -22,11 +22,11 @@ const methods = {
       }
     },
 
-    loadSettings (dispatchProperty, siteName) {
+    load_settings () {
         let self = this;
-        AdminServices.getSiteDefintion(siteName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        AdminServices.getSiteDefinition((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             if (graphqlResponse && !error) {
-                self.dispatch(dispatchProperty, graphqlResponse.siteDefinition.site);
+                self.dispatch(constants.ADMIN.LOAD_SITE_SETTINGS, graphqlResponse.sites.site);
             } else {
                 console.error(`[${error}] occured while processing message request`);
             }
@@ -37,22 +37,17 @@ const methods = {
         this.dispatch(constants.APP.CHANGE_LANGUAGE, language);
     },
 
-    save_settings (siteName, modifiedSettings) {
-        let self = this;
+    save_settings (settings) {
+      let self = this;
 
-        AdminServices.editSite(siteName, modifiedSettings, (error, response, body) => {
-            if(!error && response.statusCode === 200 && body.data && body.data.editSite) {
-                const action = 'saved';
-                let mutatedSettings = Object.assign({}, {name: modifiedSettings.name}, {properties: modifiedSettings});
-                delete mutatedSettings.properties.name;
-
-                self.dispatch(constants.ADMIN.LOAD_SETTINGS, {settings: mutatedSettings,
-                                                              originalSiteName: siteName,
-                                                              action: action});
-            }else{
-                console.error(`[${error}] occured while processing message request`);
-            }
-        });
+      AdminServices.editSite(settings, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const action = 'saved';
+          self.dispatch(constants.ADMIN.SAVE_SITE_SETTINGS, {settings: settings, action: action});
+        } else {
+          console.error(`[${error}] occured while processing message request`);
+        }
+      }));
     },
 
     save_twitter_accts (siteName, twitterAccts) {
