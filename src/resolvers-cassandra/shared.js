@@ -27,7 +27,7 @@ function cassandraRowToSite(row) {
   };
 }
 
-function getsiteDefintion(){
+function getSiteDefintion(){
   return new Promise((resolve, reject) => {    
     const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
     cassandraConnector.executeQuery(siteByIdQuery, [])
@@ -174,7 +174,7 @@ module.exports = {
   tilesForBbox,
   tilesForLocations,
   limitForInClause,
-  getsiteDefintion,
+  getSiteDefintion,
   fromTopicListToConjunctionTopics,
   asCsvExporter,
   withRunTime

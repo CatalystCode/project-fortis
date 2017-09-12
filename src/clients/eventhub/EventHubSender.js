@@ -7,7 +7,6 @@ const trackDependency = require('../appinsights/AppInsightsClient').trackDepende
 const eventHubConnectionString = process.env.PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING;
 const eventHubPath = process.env.PUBLISH_EVENTS_EVENTHUB_PATH;
 const eventHubPartition = process.env.PUBLISH_EVENTS_EVENTHUB_PARTITION;
-const eventHubClient = EventHubClient.fromConnectionString(eventHubConnectionString, eventHubPath);
 
 function sendMessages(messages) {
   return new Promise((resolve, reject) => {
@@ -21,6 +20,10 @@ function sendMessages(messages) {
     } catch (err) {
       return reject(`Unable to create payloads for EventHub: ${err}`);
     }
+
+    const eventHubClient = EventHubClient.fromConnectionString(eventHubConnectionString, eventHubPath);
+
+    if (!eventHubClient) return reject('No event hub connection string provided.');
 
     eventHubClient.open()
     .then(() => eventHubClient.createSender())
