@@ -23,8 +23,10 @@ export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
         zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, callback) {
         const timePeriodType = constants.TIMESPAN_TYPES[periodType].timeseriesType;
-        const pipelinekeys = [dataSource];
         const topsourcespipelinekey = ActionMethods.DataSources(dataSource);
+        const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
+        ? [dataSource] : topsourcespipelinekey;
+
         const limit = 5;
         const gqlEndpoint = 'edges';
 

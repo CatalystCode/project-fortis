@@ -8,7 +8,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import FortisEvent from './FortisEvent';
 import constants from '../../actions/constants';
 import DialogBox from '../dialogs/DialogBox';
-import { fetchTermFromMap, innerJoin } from './shared';
+import { fetchTermFromMap, innerJoin, hasChanged } from './shared';
 
 const ActivityConsts = constants.ACTIVITY_FEED;
 
@@ -41,15 +41,15 @@ export default class ActivityFeed extends React.Component {
 
         this.setState({ isInfiniteLoading });
         setTimeout(() => {
-            self.processNewsFeed();
+            self.processNewsFeed(self.props);
         }, ActivityConsts.INFINITE_LOAD_DELAY_MS);
     }
 
-    fetchSentences(callback) {
-        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters } = this.props;
+    fetchSentences(props, callback) {
+        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters } = props;
         const { pageState, filteredSource } = this.state;
         const pipelinekeys = constants.DATA_SOURCES.get(filteredSource).sourceValues;
-        const externalsourceid = this.props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? this.props.externalsourceid : null;
+        const externalsourceid = props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? props.externalsourceid : null;
         const fulltextTerm = "";
 
         SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, callback);
@@ -110,13 +110,13 @@ export default class ActivityFeed extends React.Component {
         this.setState(Object.assign({}, state, { isInfiniteLoading: false }));
     }
 
-    buildElements(callback) {
+    buildElements(props, callback) {
         let self = this;
 
-        this.fetchSentences((error, response, body) => {
+        this.fetchSentences(props, (error, response, body) => {
             if (!error && response.statusCode === 200 && body.data) {
                 const { elements, processedEventids } = self.state;
-                const newsFeedPage = body.data.messages.features.filter(feature => feature.properties.summary && feature.properties.summary.length && !processedEventids.has(feature.properties.messageid)).map(this.parseEvent);
+                const newsFeedPage = body.data.messages ? body.data.messages.features.filter(feature => feature.properties.summary && feature.properties.summary.length && !processedEventids.has(feature.properties.messageid)).map(this.parseEvent) : [];
                 
                 const elementsMutated = elements.concat(newsFeedPage);
                 const pageStateMutated = body.data.messages.pageState;
@@ -129,12 +129,12 @@ export default class ActivityFeed extends React.Component {
         });
     }
 
-    processNewsFeed() {
+    processNewsFeed(props) {
         const { pageState, elements } = this.state;
 
         //If events have already been rendered and pageState is null, then there are no more events to show
         if (pageState || !elements.length) {
-            this.buildElements(this.setInfinitLoadAsComplete);
+            this.buildElements(props, this.setInfinitLoadAsComplete);
         } else {
             this.setInfinitLoadAsComplete(this.state);
         }
@@ -152,7 +152,7 @@ export default class ActivityFeed extends React.Component {
 
     sourceOnClickHandler(filteredSource) {
         this.setState(Object.assign({}, this.resetNewsFeed(), { filteredSource }));
-        setTimeout(() => this.processNewsFeed(), ActivityConsts.INFINITE_LOAD_DELAY_MS);
+        setTimeout(() => this.processNewsFeed(this.props), ActivityConsts.INFINITE_LOAD_DELAY_MS);
     }
 
     resetNewsFeed() {
@@ -174,30 +174,13 @@ export default class ActivityFeed extends React.Component {
     }
 
     componentDidMount() {
-        setTimeout(() => this.processNewsFeed(), ActivityConsts.INFINITE_LOAD_DELAY_MS);
+        setTimeout(() => this.processNewsFeed(this.props), ActivityConsts.INFINITE_LOAD_DELAY_MS);
     }
 
-    hasChanged(prevProps, nextProps){
-        if (prevProps && prevProps.bbox &&
-            nextProps.bbox === prevProps.bbox &&
-            nextProps.zoomLevel === Math.max(nextProps.defaultZoom, prevProps.zoomLevel) &&
-            nextProps.fromDate === prevProps.fromDate &&
-            nextProps.toDate === prevProps.toDate &&
-            nextProps.maintopic === prevProps.maintopic &&
-            nextProps.externalsourceid === prevProps.externalsourceid &&
-            nextProps.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
-            nextProps.dataSource === prevProps.dataSource) {
-            
-            return false;
-          }
-
-        return true;
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if(this.hasChanged(prevProps, this.props)) {
+    componentWillReceiveProps(nextProps) {
+        if(hasChanged(this.props, nextProps)) {
           this.setState(Object.assign({}, this.resetNewsFeed(), {filteredSource: this.props.dataSource, isInfiniteLoading: true}));
-          setTimeout(() => this.processNewsFeed(), ActivityConsts.INFINITE_LOAD_DELAY_MS);
+          setTimeout(() => this.processNewsFeed(nextProps), ActivityConsts.INFINITE_LOAD_DELAY_MS);
         }
     }
 

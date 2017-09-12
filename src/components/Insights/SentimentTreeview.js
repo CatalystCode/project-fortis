@@ -7,7 +7,7 @@ import '../../styles/Header.css';
 import '../../styles/Insights/SentimentTreeView.css';
 import { styles, treeDataStyle } from '../../styles/Insights/SentimentTreeview';
 import numeralLibs from 'numeral';
-import { fetchTermFromMap } from './shared';
+import { fetchTermFromMap, hasChanged } from './shared';
 
 const TopRowHeight = 130;
 const parentTermsName = "Term Filters";
@@ -45,8 +45,10 @@ export default class SentimentTreeview extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        let treeData = this.createRelevantTermsTree(nextProps);
-        this.setState({ treeData: treeData, originalTreeData: treeData })
+        if(hasChanged(this.props, nextProps)){
+            let treeData = this.createRelevantTermsTree(nextProps);
+            this.setState({ treeData: treeData, originalTreeData: treeData })
+        }
     }
 
     createRelevantTermsTree(props) {

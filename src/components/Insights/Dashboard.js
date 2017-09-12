@@ -1,6 +1,6 @@
 import React from 'react';
 import DataSelector from './DataSelector';
-import HeatMap from './HeatMap';
+import HeatMap from './Maps/HeatMap';
 import SentimentTreeview from './SentimentTreeview';
 import GraphCard from '../Graphics/GraphCard';
 import ActivityFeed from './ActivityFeed';

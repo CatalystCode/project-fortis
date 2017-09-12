@@ -90,7 +90,7 @@ const methods = {
 
         let timeserieslabels = isMostPopularTopicSelected(maintopic, dataStore.popularTerms) ? dataStore.popularTerms.map(topic=>topic.name) : [maintopic];
 
-        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, timeserieslabels, (err, chartData) => {
+        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, [], externalsourceid, timeserieslabels, (err, chartData) => {
             if (!err) {
                 let mutatedFilters = { fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;

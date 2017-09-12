@@ -1,8 +1,9 @@
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { Map, TileLayer, ZoomControl } from 'react-leaflet';
-import constants from '../../actions/constants';
+import constants from '../../../actions/constants';
 import React from 'react';
-import '../../styles/Insights/HeatMap.css';
+import { hasChanged } from '../shared';
+import '../../../styles/Insights/HeatMap.css';
 
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg';  // FIXME: should this really be checked in?
 const TILE_LAYER_URL = 'https://api.mapbox.com/styles/v1/erikschlegel/cizn74i7700252rqk9tn70wu2/tiles/256/{z}/{x}/{y}?access_token={accessToken}';  // FIXME: should this be configurable?
@@ -11,11 +12,11 @@ export default class HeatMap extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleMoveEnd = this.handleMoveEnd.bind(this);
+    this.onViewportChanged = this.onViewportChanged.bind(this);
     this.updateBounds = this.updateBounds.bind(this);
   }
 
-  handleMoveEnd(viewport) {
+  onViewportChanged(viewport) {
     this.updateBounds(viewport);
   }
 
@@ -35,26 +36,22 @@ export default class HeatMap extends React.Component {
         fromDate, toDate } = this.props;
       const zoom = this.refs.map.leafletElement.getZoom();
       const bbox = this.getLeafletBbox();
+      //this.refs.map.leafletElement.fitBounds(this.formatLeafletBounds(bbox));
 
       this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid);
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps && nextProps.bbox &&
-      this.props.bbox === nextProps.bbox &&
-      this.props.zoomLevel === nextProps.zoomLevel &&
-      this.props.fromDate === nextProps.fromDate &&
-      this.props.toDate === nextProps.toDate &&
-      this.props.maintopic === nextProps.maintopic &&
-      this.props.externalsourceid === nextProps.externalsourceid &&
-      this.props.conjunctiveTermsLength === nextProps.conjunctiveTermsLength &&
-      this.props.dataSource === nextProps.dataSource) {
-      
-      return false;
+    return hasChanged(this.props, nextProps);
+  }
+
+  formatLeafletBounds(bbox){
+    if(bbox.length === 4){
+      return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
     }
 
-    return true;
+    console.error('Bad bbox format');
   }
 
   render() {
@@ -68,7 +65,7 @@ export default class HeatMap extends React.Component {
     
     return (
       <Map
-        onViewportChanged={this.handleMoveEnd}
+        onMoveend={this.onViewportChanged}
         bounds={bounds}
         ref="map"
         id="leafletMap"
@@ -78,7 +75,7 @@ export default class HeatMap extends React.Component {
 
         <TileLayer url={TILE_LAYER_URL}
           maxZoom={maxzoom}
-          //minZoom={minzoom}
+         // minZoom={minzoom}
           attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
           accessToken={MAPBOX_ACCESS_TOKEN} />
 
