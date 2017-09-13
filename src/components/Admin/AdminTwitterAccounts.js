@@ -1,4 +1,4 @@
-import {DataGrid} from './DataGrid';
+import { DataGrid } from './DataGrid';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
