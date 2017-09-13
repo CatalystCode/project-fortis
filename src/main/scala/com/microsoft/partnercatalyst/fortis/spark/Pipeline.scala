@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
+import java.util.Locale
+
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
@@ -73,9 +75,12 @@ object Pipeline {
       def addKeywords(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         event.analysis.language match {
           case Some(lang) =>
+            val locale = new Locale(lang);
             langToKeywordExtractor.value.get(lang) match {
               case Some(extractor) => event.copy(
-                analysis = event.analysis.copy(keywords = analyzer.extractKeywords(event.details, extractor))
+                analysis = event.analysis.copy(keywords = analyzer.extractKeywords(event.details, extractor).map(tag=>{
+                  tag.copy(name = tag.name.toLowerCase(locale))
+                }))
               )
               case None => event
             }
