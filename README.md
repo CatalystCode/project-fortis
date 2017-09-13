@@ -22,6 +22,8 @@ npm install
 
 ### Run in Development mode 
 ```
+REACT_APP_SERVICE_HOST='...'
+
 npm start
 ```
 
