@@ -29,7 +29,7 @@ object CassandraEventsSink extends Loggable {
 
     dstream
     .map(event => event.copy(analysis = event.analysis.copy(
-      keywords = event.analysis.keywords.map(t=>t.copy(name = t.name.toLowerCase)).distinct,
+      keywords = event.analysis.keywords.distinct,
       locations = event.analysis.locations.distinct,
       entities = event.analysis.entities.distinct
     )))
