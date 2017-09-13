@@ -4,10 +4,12 @@ import { fromMapToArray } from './shared';
 import request from 'request';
 import '../../styles/Insights/TypeaheadSearch.css';
 
-const SUGGESTION_TO_ICON = {
-  'Location': 'fa fa-map-marker fa-2x',
-  'Term': 'fa fa-tag fa-2x',
-};
+const LOCATION_SUGGESTION = 'Location';
+const TERM_SUGGESTION = 'Term';
+
+const SUGGESTION_TO_ICON = {};
+SUGGESTION_TO_ICON[LOCATION_SUGGESTION] = 'fa fa-map-marker fa-2x';
+SUGGESTION_TO_ICON[TERM_SUGGESTION] = 'fa fa-tag fa-2x';
 
 function fetchLocationsFromFeatureService(bbox, matchName, callback) {
   if (!matchName || !bbox || bbox.length !== 4) return callback(null, []);
@@ -48,14 +50,14 @@ export default class TypeaheadSearch extends React.Component {
 
   onSuggestionsFetchRequested = ({ value }) => {
     const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
-    termSuggestions.forEach(suggestion => suggestion.type = 'Term');
+    termSuggestions.forEach(suggestion => suggestion.type = TERM_SUGGESTION);
 
     fetchLocationsFromFeatureService(this.props.bbox, value, (err, locationSuggestions) => {
       if (err) {
         console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
         this.setState({ termSuggestions });
       } else {
-        locationSuggestions.forEach(suggestion => suggestion.type = 'Location');
+        locationSuggestions.forEach(suggestion => suggestion.type = LOCATION_SUGGESTION);
         this.setState({ suggestions: termSuggestions.concat(locationSuggestions) });
       }
     });
