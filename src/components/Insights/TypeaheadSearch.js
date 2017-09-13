@@ -9,14 +9,14 @@ export default class TypeaheadSearch extends React.Component {
   constructor(props) {
     super(props);
 
-    this.DATASET = {
+    this.DATASETS = {
       LOCATION: {type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations'},
       TERM: {type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms'},
     };
 
     this.state = {
       suggestions: [],
-      activeDataset: this.DATASET.TERM,
+      activeDataset: this.DATASETS.TERM,
       value: ''
     };
   }
@@ -41,7 +41,7 @@ export default class TypeaheadSearch extends React.Component {
 
   fetchTermSuggestions = (value, callback) => {
     const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
-    termSuggestions.forEach(suggestion => suggestion.icon = this.DATASET.TERM.icon);
+    termSuggestions.forEach(suggestion => suggestion.icon = this.DATASETS.TERM.icon);
     return callback(termSuggestions);
   }
 
@@ -51,7 +51,7 @@ export default class TypeaheadSearch extends React.Component {
         console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
         callback([]);
       } else {
-        locationSuggestions.forEach(suggestion => suggestion.icon = this.DATASET.LOCATION.icon);
+        locationSuggestions.forEach(suggestion => suggestion.icon = this.DATASETS.LOCATION.icon);
         callback(locationSuggestions);
       }
     });
@@ -96,7 +96,7 @@ export default class TypeaheadSearch extends React.Component {
       <InputGroup>
         <InputGroup.Button>
           <DropdownButton id="dataset-switcher-button" componentClass={InputGroup.Button} title={<i className={activeDataset.icon} title={activeDataset.description}></i>}>
-            {Object.values(this.DATASET).map(dataset =>
+            {Object.values(this.DATASETS).map(dataset =>
               <MenuItem active={dataset === activeDataset} key={dataset.type} onClick={() => this.setState({ activeDataset: dataset })}>
                 <span><i className={dataset.icon} /> {dataset.description}</span>
               </MenuItem>
