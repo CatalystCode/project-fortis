@@ -20,11 +20,12 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.4.1",
-    "eslint-plugin-flowtype": "^2.35.0",
+    "eslint": "^4.6.1",
+    "eslint-config-react-app": "^2.0.0",
+    "eslint-plugin-flowtype": "^2.35.1",
     "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
-    "eslint-plugin-react": "^7.2.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
     "mocha": "^3.1.2",
     "react-scripts": "^0.8.4"
   },
@@ -85,6 +86,7 @@
     "build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
+    "lint": "eslint src",
     "test": "mocha"
   },
   "eslintConfig": {
