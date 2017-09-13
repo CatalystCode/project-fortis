@@ -1,3 +1,5 @@
+[![CI status](https://travis-ci.org/CatalystCode/project-fortis-interfaces.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis-interfaces)
+
 # Fortis Insight Dashboard
 An Early Warning Humanitarian Crisis Detection Platform
 # Preview
