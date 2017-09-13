@@ -24,7 +24,7 @@ export const AdminStore = Fluxxor.createStore({
             siteList: [],
             loading: false,
             twitterAccounts: [],
-            twitterAccountsGridColumns: [],
+            twitterAccountColumns: [],
             trustedTwitterAccounts: [],
             topicGridColumns: [],
             facebookPages: [],
@@ -129,22 +129,16 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     loadTwitterAccountsColumns() {
-      const defaultColumn = {
-        editable: false,
-        sortable: true,
-        required: true,
-        filterable: false,
-        resizable: true,
-      };
+      const columnValues = [
+        {key: "consumerKey", name: "Consumer Key"},
+        {key: "consumerSecret", name: "Consumer Secret"},
+        {key: "accessToken", name: "Access Token"},
+        {key: "accessTokenSecret", name: "Access Token Secret"},
+        {key: "userIds", name: "User Ids"}
+      ];
+      const saveAsColumnName = 'twitterAccountColumns';
 
-      let twitterAccountColumns = [];
-      twitterAccountColumns.push(Object.assign({}, defaultColumn, {key: "consumerKey", name: "Consumer Key"}));
-      twitterAccountColumns.push(Object.assign({}, defaultColumn, {key: "consumerSecret", name: "Consumer Secret"}));
-      twitterAccountColumns.push(Object.assign({}, defaultColumn, {key: "accessToken", name: "Access Token"}));
-      twitterAccountColumns.push(Object.assign({}, defaultColumn, {key: "accessTokenSecret", name: "Access Token Secret"}));
-      twitterAccountColumns.push(Object.assign({}, defaultColumn, {key: "userIds", name: "User Ids"}));
-
-      this.dataStore.twitterAccountsGridColumns = twitterAccountColumns;
+      this.loadColumns(columnValues, saveAsColumnName);
     },
 
     handleLoadTrustedTwitterAccts(response){

@@ -32,6 +32,26 @@ export const site = `fragment SiteView on SiteCollection {
   }
 }`;
 
+export const topics = `fragment TopicsView on TermCollection {
+  edges {
+      topicid
+      name
+      translatedname
+      namelang
+      translatednamelang
+  }
+}`;
+
+export const twitterAccounts = `fragment TwitterAccountsView on TwitterAccountCollection {
+  accounts {
+    userIds
+    consumerKey
+    consumerSecret
+    accessToken
+    accessTokenSecret
+  }
+}`;
+
 export const streams = `fragment StreamsView on StreamCollection {
   streams {
     streamId
@@ -44,15 +64,5 @@ export const streams = `fragment StreamsView on StreamCollection {
       value
     }
     enabled
-  }
-}`;
-
-export const topics = `fragment TopicsView on TermCollection {
-  edges {
-      topicid
-      name
-      translatedname
-      namelang
-      translatednamelang
   }
 }`;

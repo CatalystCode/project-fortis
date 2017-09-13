@@ -35,7 +35,7 @@ export const AdminTwitterAccounts = React.createClass({
           uniqueKey="consumerKey"
           handleSave={this.handleSave}
           handleRemove={this.handleRemove}
-          columns={this.state.twitterAccountsGridColumns}
+          columns={this.state.twitterAccountColumns}
           rows={this.state.twitterAccounts} />
         : <div />
     );

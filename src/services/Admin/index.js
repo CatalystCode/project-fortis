@@ -71,15 +71,21 @@ export const SERVICES = {
     fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
   },
 
-  fetchStreams(callback) {
-    const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
-    const variables = {};
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
-
   fetchTopics(translationLanguage, callback) {
     const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
     const variables = { translationLanguage };
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
+
+  fetchTwitterAccounts(callback) {
+    const query = `${AdminFragments.twitterAccounts}${AdminQueries.getTwitterAccounts}`;
+    const variables = {};
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
+  
+  fetchStreams(callback) {
+    const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
+    const variables = {};
     fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
   },
 
@@ -120,32 +126,6 @@ export const SERVICES = {
         };
 
         request(POST, callback);
-    },
-
-    fetchTwitterAccounts(callback) {
-      const query = `
-      query TwitterAccounts {
-        twitterAccounts {
-          accounts {
-            userIds
-            consumerKey
-            consumerSecret
-            accessToken
-            accessTokenSecret
-          }
-        }
-      }`;
-
-      const host = process.env.REACT_APP_SERVICE_HOST
-      const POST = {
-        url: `${host}/api/settings`,
-        method: "POST",
-        json: true,
-        withCredentials: false,
-        body: { query }
-      };
-
-      request(POST, callback);
     },
 
     getTrustedTwitterAccounts(siteId, callback) {
