@@ -21,7 +21,7 @@ const WATCHLIST_TAB = 1;
 const LOCATIONS_TAB = 2;
 const CUSTOM_EVENTS_TAB = 3;
 const FB_PAGES_TAB = 4;
-const TRUSTED_TWITTER_ACCTS = 5; 
+const TRUSTED_TWITTER_ACCTS = 5;
 const TWITTER_ACCOUNTS_TAB = 6;
 const BLACKLIST_TAB = 7;
 const STREAM_TAB = 8;
@@ -41,7 +41,7 @@ const styles = {
 export const Admin = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
   displayName: 'Admin',
-  
+
   getInitialState(){
     return{
       index: 0
@@ -88,7 +88,7 @@ export const Admin = createReactClass({
                   <TabPanel>
                     <h2>Settings</h2>
                     {
-                      this.state.settings && this.state.settings.properties && this.state.index === SETTINGS_TAB ? 
+                      this.state.settings && this.state.settings.properties && this.state.index === SETTINGS_TAB ?
                       <AdminSettings {...this.props}
                         index={this.state.index}
                         siteSettings={this.state.settings}
@@ -100,7 +100,7 @@ export const Admin = createReactClass({
                     <h2>Watchlist</h2>
                       <div className="adminTable">
                         {
-                          this.state.settings && this.state.settings.properties && this.state.watchlist && this.state.index === WATCHLIST_TAB ? 
+                          this.state.settings && this.state.settings.properties && this.state.watchlist && this.state.index === WATCHLIST_TAB ?
                           <AdminWatchlist {...this.props}/>
                           : undefined
                         }
@@ -120,7 +120,7 @@ export const Admin = createReactClass({
                     <h2>Event Import</h2>
                     <div className="adminTable">
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === CUSTOM_EVENTS_TAB ? 
+                        this.state.settings && this.state.settings.properties && this.state.index === CUSTOM_EVENTS_TAB ?
                         <CustomEventsEditor {...this.props}/> : undefined
                       }
                     </div>
@@ -129,7 +129,7 @@ export const Admin = createReactClass({
                     <h2>Facebook pages</h2>
                     <div className="adminTable">
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === FB_PAGES_TAB ? 
+                        this.state.settings && this.state.settings.properties && this.state.index === FB_PAGES_TAB ?
                         <FacebookPagesEditor {...this.props}/> : undefined
                       }
                     </div>
@@ -138,7 +138,7 @@ export const Admin = createReactClass({
                     <h2>Trusted Twitter Accounts</h2>
                     <div className="adminTable">
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === TRUSTED_TWITTER_ACCTS ? 
+                        this.state.settings && this.state.settings.properties && this.state.index === TRUSTED_TWITTER_ACCTS ?
                         <AdminTrustedTwitterAcc {...this.props}/> : undefined
                       }
                     </div>
@@ -147,25 +147,25 @@ export const Admin = createReactClass({
                     <h2>Twitter API Accounts</h2>
                     <div>
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === TWITTER_ACCOUNTS_TAB ? 
+                        this.state.settings && this.state.settings.properties && this.state.index === TWITTER_ACCOUNTS_TAB ?
                         <AdminTwitterAccounts {...this.props}/> : undefined
                       }
                     </div>
                   </TabPanel>
-                  <TabPanel> 
+                  <TabPanel>
                     <h2>Blacklisted Term(s)</h2>
                     <div className="adminTable">
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === BLACKLIST_TAB ? 
+                        this.state.settings && this.state.settings.properties && this.state.index === BLACKLIST_TAB ?
                         <BlacklistEditor {...this.props}/> : undefined
                       }
                     </div>
                   </TabPanel>
-                  <TabPanel> 
+                  <TabPanel>
                     <h2>Streams</h2>
                     <div className="adminTable">
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === STREAM_TAB ? 
+                        this.state.settings && this.state.settings.properties && this.state.index === STREAM_TAB ?
                         <StreamEditor {...this.props}/> : undefined
                       }
                     </div>

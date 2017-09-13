@@ -214,7 +214,7 @@ export const AdminStore = Fluxxor.createStore({
         }else{
             this.dataStore.siteList = siteList;
         }
-        
+
         this.loadLocalitiesColumns(settings.properties.supportedLanguages);
         this.emit("change");
     },
