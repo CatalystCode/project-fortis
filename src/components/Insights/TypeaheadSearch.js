@@ -36,7 +36,7 @@ export default class TypeaheadSearch extends React.Component {
     this.setTopicToState(nextProps.maintopic);
   }
 
-  onSuggestionSelected(event, { suggestion }) {
+  onSuggestionSelected = (event, { suggestion }) => {
     this.props.dashboardRefreshFunc(suggestion.name, [], suggestion.bbox);
   }
 
@@ -46,7 +46,7 @@ export default class TypeaheadSearch extends React.Component {
 
   getSuggestionValue = suggestion => suggestion[this.getTopicFieldName()];
 
-  onSuggestionsFetchRequested({ value }) {
+  onSuggestionsFetchRequested = ({ value }) => {
     const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
     termSuggestions.forEach(suggestion => suggestion.type = 'Term');
 
@@ -63,7 +63,7 @@ export default class TypeaheadSearch extends React.Component {
 
   getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'
 
-  renderSuggestion(element, { query }) {
+  renderSuggestion = (element, { query }) => {
     const suggestionText = element[this.getTopicFieldName()];
     const normalizedQuery = query.toLowerCase();
     const matcher = new RegExp(`(:?${normalizedQuery})`, 'i');
@@ -89,7 +89,7 @@ export default class TypeaheadSearch extends React.Component {
     );
   }
 
-  onSuggestionsClearRequested() {
+  onSuggestionsClearRequested = () => {
     this.setState({
       suggestions: []
     });
@@ -111,11 +111,11 @@ export default class TypeaheadSearch extends React.Component {
           <Autosuggest suggestions={suggestions}
               inputProps={inputProps}
               focusInputOnSuggestionClick={true}
-              onSuggestionSelected={(event, { suggestion })=>this.onSuggestionSelected(event, { suggestion })}
-              onSuggestionsFetchRequested={({value})=>this.onSuggestionsFetchRequested({value})}
-              onSuggestionsClearRequested={()=>this.onSuggestionsClearRequested()}
-              renderSuggestion={(element, query)=>this.renderSuggestion(element, query)}
-              getSuggestionValue={value => this.getSuggestionValue(value)} />
+              onSuggestionSelected={this.onSuggestionSelected}
+              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+              renderSuggestion={this.renderSuggestion}
+              getSuggestionValue={this.getSuggestionValue} />
       </div>
     );
   }
