@@ -111,7 +111,7 @@ export const Admin = createReactClass({
                     <div className="adminTable">
                       {
                         this.state.settings && this.state.settings.properties && this.state.locations && this.state.index === LOCATIONS_TAB ?
-                        <AdminLocations {...this.props} rows = { Array.from(this.state.locations.values())} /> 
+                        <AdminLocations {...this.props} rows={ Array.from(this.state.locations.values())} />
                         : undefined
                       }
                     </div>
