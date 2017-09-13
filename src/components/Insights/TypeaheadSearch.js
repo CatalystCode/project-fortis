@@ -1,8 +1,6 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { fromMapToArray } from './shared';
-import match from 'autosuggest-highlight/match';
-import parse from 'autosuggest-highlight/parse';
 import request from 'request';
 import '../../styles/Insights/TypeaheadSearch.css';
 
@@ -67,8 +65,9 @@ export default class TypeaheadSearch extends React.Component {
 
   renderSuggestion(element, { query }) {
     const suggestionText = element[this.getTopicFieldName()];
-    const matches = match(suggestionText, query);
-    const parts = parse(suggestionText, matches);
+    const normalizedQuery = query.toLowerCase();
+    const matcher = new RegExp(`(:?${normalizedQuery})`, 'i');
+    const parts = suggestionText.split(matcher).map(part => ({text: part, highlight: part.toLowerCase() === normalizedQuery}));
 
     return (
       <span className="suggestion-content">
