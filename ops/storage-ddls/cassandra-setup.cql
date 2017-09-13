@@ -105,7 +105,6 @@ CREATE TABLE sitesettings(
     cogspeechsvctoken text,
     cogvisionsvctoken text,
     cogtextsvctoken text,
-    featureservicenamespace: text,
     insertiontime timestamp,
     PRIMARY KEY (sitename)
 );
