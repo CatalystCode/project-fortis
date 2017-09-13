@@ -157,7 +157,6 @@ export const AdminStore = Fluxxor.createStore({
 
     loadTopicColumns(languages) {
       const defaultLanguage = this.dataStore.settings.properties.defaultLanguage;
-      const supportedLanguages = this.dataStore.settings.properties.supportedLanguages;
       const columnValues = [
         {key: "topicid", name: "Topic Id"},
         {key: "name", name: defaultLanguage}
@@ -203,7 +202,7 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleLoadSettings(response){
-        const {settings, action, siteList, originalSiteName} = response;
+        const {settings, siteList, originalSiteName} = response;
         this.dataStore.settings = response;
         this.dataStore.action = response.action || false;
         if(!siteList){

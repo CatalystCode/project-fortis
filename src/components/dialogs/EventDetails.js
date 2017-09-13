@@ -40,7 +40,7 @@ const styles = {
 export default class EventDetails extends React.Component {
     render() {
         // show details
-        const { body, summary, edges, messageid, sourceeventid, eventtime, sentiment, title, externalsourceid, language, pipelinekey, link } = this.props.properties;
+        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, link } = this.props.properties;
         const dateText = getHumanDateFromNow(eventtime);
         const dataSourceSchema = constants.DATA_SOURCES.get(pipelinekey);
         const tags = edges || [];

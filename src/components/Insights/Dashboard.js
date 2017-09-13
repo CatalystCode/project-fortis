@@ -79,8 +79,6 @@ export default class Dashboard extends React.Component {
   }
 
   heatmapComponent() {
-    const { contentAreaHeight, contentRowHeight } = this.state;
-
     return (
       <div key={'heatmap'} className="heatmapContainer">
         <div>

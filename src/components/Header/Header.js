@@ -20,7 +20,7 @@ class Header extends React.Component {
   }
 
   renderNavHeader() {
-    const { title, logo, language } = this.props;
+    const { title, logo } = this.props;
 
     return (
       <div className="navbar-header">

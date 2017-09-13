@@ -27,7 +27,6 @@ export const AdminWatchlist = createReactClass({
     },
 
     render(){
-        let state = this.getFlux().store("AdminStore").getState();
         return (
          this.state.topicGridColumns.length > 0 ? 
             <DataGrid rowHeight={40}

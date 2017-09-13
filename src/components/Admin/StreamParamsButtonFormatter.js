@@ -48,8 +48,6 @@ export const StreamParamsButtonFormatter = createReactClass({
   },
 
   render() {
-    let state = this.getFlux().store("AdminStore").getState();
-
     return (
       <div>
         <Button id={this.props.dependentValues.streamId} onClick={this.handleShowDetails} bsStyle="primary" bsSize="xsmall">

@@ -2,7 +2,6 @@ import React from 'react';
 import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
 import { fetchTermFromMap, hasChanged } from './shared';
-import Sentiment from '../Graphics/Sentiment';
 import constants from '../../actions/constants';
 
 export default class PopularTermsChart extends React.Component {

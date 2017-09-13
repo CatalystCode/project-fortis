@@ -91,7 +91,7 @@ export const DataStore = Fluxxor.createStore({
     },
 
     intializeSettings(graphqlResponse) {
-        const { terms, configuration, topics, timeSeries } = graphqlResponse;
+        const { terms, configuration, topics } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);

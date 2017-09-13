@@ -1,7 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
-import { DataGrid } from './DataGrid';
 import { Glyphicon, Button } from 'react-bootstrap'; 
 
 const FluxMixin = Fluxxor.FluxMixin(React);

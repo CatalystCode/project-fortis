@@ -1,6 +1,5 @@
 import * as AdminFragments from '../graphql/fragments/Admin';
 import * as AdminQueries from '../graphql/queries/Admin';
-import * as AdminMutations from '../graphql/mutations/Admin';
 import { fetchGqlData } from '../shared';
 import request from 'request';
 
