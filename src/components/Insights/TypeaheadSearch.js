@@ -1,19 +1,9 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { fromMapToArray } from './shared';
-import request from 'request';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
+import { fetchLocationsFromFeatureService } from '../../services/featureService';
 import '../../styles/Insights/TypeaheadSearch.css';
-
-function fetchLocationsFromFeatureService(bbox, matchName, callback) {
-  if (!matchName || !bbox || bbox.length !== 4) return callback(null, []);
-
-  const host = process.env.REACT_APP_FEATURE_SERVICE_HOST;
-  const url = `${host}/features/bbox/${bbox.join('/')}?include=bbox&filter_name=${matchName}`;
-
-  request({ url, json: true }, (err, response) =>
-    callback(err, (response && response.body && response.body.features) || []));
-}
 
 export default class TypeaheadSearch extends React.Component {
   constructor(props) {
