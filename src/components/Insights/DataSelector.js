@@ -133,7 +133,7 @@ export default class DataSelector extends React.Component {
                         }
                     </div>
                     <div>
-                        <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={this.props.toggleHeatmapSize}>
+                        <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={()=>this.props.toggleHeatmapSize()}>
                             <span className="fa fa-expand" aria-hidden="true">
                             </span>
                             <span>{this.props.heatmapToggleText}</span>

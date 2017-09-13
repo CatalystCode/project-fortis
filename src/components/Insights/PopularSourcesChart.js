@@ -9,7 +9,6 @@ export default class PopularSourcesChart extends React.Component {
     constructor(props) {
         super(props);
 
-        this.onPieEnter = this.onPieEnter.bind(this);
         this.state = {
             activeIndex: -1,
             dataProvider: [],
@@ -54,18 +53,11 @@ export default class PopularSourcesChart extends React.Component {
         }
     }
 
-    onPieEnter(data, index) {
-        this.setState({
-          activeIndex: index,
-        });
-    }
-
     render() {
         return (
             <DoughnutChart handleClick={(data, activeIndex) => this.handleClick(data, activeIndex)}
                 fill={constants.CHART_STYLE.BG_FILL}
                 data={this.state.dataProvider}
-                onMouseEnter={this.onPieEnter}
                 activeIndex={this.state.activeIndex}>
                 {this.state.colorCells}
             </DoughnutChart>

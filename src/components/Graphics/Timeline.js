@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+import numeralLibs from 'numeral';
 import { AreaChart, XAxis, CartesianGrid, Brush, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+const toNumericDisplay = (decimal, fixed = 0) => {
+    return numeralLibs(decimal).format(decimal > 1000 ? '+0.0a' : '0a');
+};
+
 class Timeline extends Component {
+    
     render() {
         return (
             <ResponsiveContainer>
@@ -9,9 +15,8 @@ class Timeline extends Component {
                     data={this.props.data}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <XAxis dataKey={this.props.dataKey}
-                        tickFormatter={this.props.tickFormatter}
-                        minTickGap={10} />
-                    <YAxis type="number" domain={[0, 'dataMax + 2']} />
+                        tickFormatter={this.props.tickFormatter}/>
+                    <YAxis type="number" tickFormatter={toNumericDisplay}/>
                     <Tooltip />
                     <Brush height={25}
                         onChange={range=>this.props.dateRangeChanged(range)}

@@ -44,11 +44,19 @@ export default class SentimentTreeview extends React.Component {
         }
     }
 
+    refreshComponent(props){
+        const treeData = this.createRelevantTermsTree(props);
+        this.setState({ treeData: treeData, originalTreeData: treeData })
+    }
+
     componentWillReceiveProps(nextProps) {
         if(hasChanged(this.props, nextProps)){
-            let treeData = this.createRelevantTermsTree(nextProps);
-            this.setState({ treeData: treeData, originalTreeData: treeData })
+            this.refreshComponent(nextProps);
         }
+    }
+
+    componentDidMount(){
+        this.refreshComponent(this.props);
     }
 
     createRelevantTermsTree(props) {
@@ -81,7 +89,7 @@ export default class SentimentTreeview extends React.Component {
         let popularTermsTotal = 0, otherTotal = 0;
 
         conjunctivetopics.forEach(topic => {
-            const { mentions, conjunctionterm } = topic;
+            const { mentions, conjunctionterm, name } = topic;
             const edge = fetchTermFromMap(allSiteTopics, conjunctionterm, language, defaultLanguage);
             const enabledConjunctiveTerm = termFilters.has(conjunctionterm);
 
@@ -119,14 +127,14 @@ export default class SentimentTreeview extends React.Component {
     }
 
     onToggle(node, toggled) {
-        const { name } = node;
+        const { folderKey } = node;
         let { termFilters, maintopic } = this.props;
 
         if(!node.checked && termFilters.size < 2){
-            termFilters.add(name);
+            termFilters.add(folderKey);
             this.handleDataFetch(maintopic, termFilters);
         }else if(node.checked){
-            termFilters.delete(name);
+            termFilters.delete(folderKey);
             this.handleDataFetch(maintopic, termFilters);
         }else{
             alert(`You're allowed to select up to 2 conjunctive terms. Please unselect one of the topics.`);
@@ -154,7 +162,7 @@ export default class SentimentTreeview extends React.Component {
     }
 
     termSelected(node) {
-        this.handleDataFetch(node.name, []);
+        this.handleDataFetch(node.folderKey, []);
     }
 
     render() {

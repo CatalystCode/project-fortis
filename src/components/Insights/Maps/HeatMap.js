@@ -65,7 +65,7 @@ export default class HeatMap extends React.Component {
     
     return (
       <Map
-        onMoveend={this.onViewportChanged}
+        onViewportChanged={this.onViewportChanged}
         bounds={bounds}
         ref="map"
         id="leafletMap"
@@ -75,7 +75,7 @@ export default class HeatMap extends React.Component {
 
         <TileLayer url={TILE_LAYER_URL}
           maxZoom={maxzoom}
-         // minZoom={minzoom}
+          minZoom={minzoom}
           attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
           accessToken={MAPBOX_ACCESS_TOKEN} />
 
