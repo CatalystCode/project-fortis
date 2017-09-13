@@ -5,6 +5,11 @@ import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import '../../styles/Insights/TypeaheadSearch.css';
 
+const SUGGESTION_TO_ICON = {
+  'Location': 'fa fa-map-marker fa-2x',
+  'Term': 'fa fa-tag fa-2x',
+};
+
 export default class TypeaheadSearch extends React.Component {
   constructor(props) {
     super(props);
@@ -45,12 +50,11 @@ export default class TypeaheadSearch extends React.Component {
     const suggestionText = element[this.getTopicFieldName()];
     const matches = match(suggestionText, query);
     const parts = parse(suggestionText, matches);
-    const iconMap = {'Location': 'fa fa-map-marker fa-2x', 'Term': 'fa fa-tag fa-2x'};
 
     return (
       <span className="suggestion-content">
         <span className="type">
-          {<i className={iconMap[element.type]} />}
+          {<i className={SUGGESTION_TO_ICON[element.type]} />}
         </span>
         <span className="name">
           {
