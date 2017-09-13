@@ -225,7 +225,7 @@ export default class SentimentTreeview extends React.Component {
                 <div style={styles.searchBox}>
                     <div className="input-group">
                         <span className="input-group-addon">
-                            <i className="fa fa-filter"></i>
+                            <i className="fa fa-filter" id="edge-filter-icon"></i>
                         </span>
                         <input type="text"
                             className="form-control edgeFilterInput"

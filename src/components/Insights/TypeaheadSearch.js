@@ -2,14 +2,8 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { fromMapToArray } from './shared';
 import request from 'request';
+import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
 import '../../styles/Insights/TypeaheadSearch.css';
-
-const LOCATION_SUGGESTION = 'Location';
-const TERM_SUGGESTION = 'Term';
-
-const SUGGESTION_TO_ICON = {};
-SUGGESTION_TO_ICON[LOCATION_SUGGESTION] = 'fa fa-map-marker fa-2x';
-SUGGESTION_TO_ICON[TERM_SUGGESTION] = 'fa fa-tag fa-2x';
 
 function fetchLocationsFromFeatureService(bbox, matchName, callback) {
   if (!matchName || !bbox || bbox.length !== 4) return callback(null, []);
@@ -24,8 +18,15 @@ function fetchLocationsFromFeatureService(bbox, matchName, callback) {
 export default class TypeaheadSearch extends React.Component {
   constructor(props) {
     super(props);
+
+    this.DATASET = {
+      LOCATION: {type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations'},
+      TERM: {type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms'},
+    };
+
     this.state = {
       suggestions: [],
+      activeDataset: this.DATASET.TERM,
       value: ''
     };
   }
@@ -42,25 +43,32 @@ export default class TypeaheadSearch extends React.Component {
     this.props.dashboardRefreshFunc(suggestion.name, [], suggestion.bbox);
   }
 
-  onChange(event, { newValue }) {
+  onChange = (event, { newValue }) => {
     this.setTopicToState(newValue);
   }
 
   getSuggestionValue = suggestion => suggestion[this.getTopicFieldName()];
 
-  onSuggestionsFetchRequested = ({ value }) => {
+  fetchTermSuggestions = (value, callback) => {
     const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
-    termSuggestions.forEach(suggestion => suggestion.type = TERM_SUGGESTION);
+    termSuggestions.forEach(suggestion => suggestion.icon = this.DATASET.TERM.icon);
+    return callback(termSuggestions);
+  }
 
+  fetchLocationSuggestions = (value, callback) => {
     fetchLocationsFromFeatureService(this.props.bbox, value, (err, locationSuggestions) => {
       if (err) {
         console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
-        this.setState({ termSuggestions });
+        callback([]);
       } else {
-        locationSuggestions.forEach(suggestion => suggestion.type = LOCATION_SUGGESTION);
-        this.setState({ suggestions: termSuggestions.concat(locationSuggestions) });
+        locationSuggestions.forEach(suggestion => suggestion.icon = this.DATASET.LOCATION.icon);
+        callback(locationSuggestions);
       }
     });
+  }
+
+  onSuggestionsFetchRequested = ({ value }) => {
+    this.state.activeDataset.fetcher(value, (suggestions) => this.setState({ suggestions }));
   }
 
   getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'
@@ -74,18 +82,12 @@ export default class TypeaheadSearch extends React.Component {
     return (
       <span className="suggestion-content">
         <span className="type">
-          {<i className={SUGGESTION_TO_ICON[element.type]} />}
+          <i className={`${element.icon} fa-2x`} />
         </span>
         <span className="name">
-          {
-            parts.map((part, index) => {
-              const className = part.highlight ? 'highlight' : null;
-
-              return (
-                <span className={className} key={index}>{part.text}</span>
-              );
-            })
-          }
+          {parts.map((part, index) =>
+            <span className={part.highlight ? 'highlight' : null} key={index}>{part.text}</span>
+          )}
         </span>
       </span>
     );
@@ -98,29 +100,30 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   render() {
-    const { suggestions, value } = this.state;
-    const inputProps = {
-      placeholder: "Type 'c'",
-      value,
-      onChange: (event, { newValue })=>this.onChange(event, { newValue })
-    };
+    const { suggestions, value, activeDataset } = this.state;
 
     return (
-      <div className="input-group">
-        <span className="input-group-addon">
-          <i className="fa fa-search"></i>
-        </span>
-          <Autosuggest
-            suggestions={suggestions}
-            inputProps={inputProps}
-            focusInputOnSuggestionClick={true}
-            onSuggestionSelected={this.onSuggestionSelected}
-            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-            renderSuggestion={this.renderSuggestion}
-            getSuggestionValue={this.getSuggestionValue}
-          />
-      </div>
+      <InputGroup>
+        <InputGroup.Button>
+          <DropdownButton id="dataset-switcher-button" componentClass={InputGroup.Button} title={<i className={activeDataset.icon} title={activeDataset.description}></i>}>
+            {Object.values(this.DATASET).map(dataset =>
+              <MenuItem active={dataset === activeDataset} key={dataset.type} onClick={() => this.setState({ activeDataset: dataset })}>
+                <span><i className={dataset.icon} /> {dataset.description}</span>
+              </MenuItem>
+            )}
+          </DropdownButton>
+        </InputGroup.Button>
+        <Autosuggest
+          suggestions={suggestions}
+          inputProps={{placeholder: "Type 'c'", value, onChange: this.onChange}}
+          focusInputOnSuggestionClick={true}
+          onSuggestionSelected={this.onSuggestionSelected}
+          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+          renderSuggestion={this.renderSuggestion}
+          getSuggestionValue={this.getSuggestionValue}
+        />
+      </InputGroup>
     );
   }
 }
