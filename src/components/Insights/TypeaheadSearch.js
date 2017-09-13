@@ -45,12 +45,12 @@ export default class TypeaheadSearch extends React.Component {
     const suggestionText = element[this.getTopicFieldName()];
     const matches = match(suggestionText, query);
     const parts = parse(suggestionText, matches);
-    const iconMap = new Map([["Location", "fa fa-map-marker fa-2x"], ["Term", "fa fa-tag fa-2x"]]);
+    const iconMap = {'Location': 'fa fa-map-marker fa-2x', 'Term': 'fa fa-tag fa-2x'};
 
     return (
       <span className="suggestion-content">
         <span className="type">
-          {<i className={iconMap.get(element.type)} />}
+          {<i className={iconMap[element.type]} />}
         </span>
         <span className="name">
           {
@@ -76,7 +76,7 @@ export default class TypeaheadSearch extends React.Component {
   render() {
     const { suggestions, value } = this.state;
     const inputProps = {
-      placeholder: 'Type \'c\'',
+      placeholder: "Type 'c'",
       value,
       onChange: (event, { newValue })=>this.onChange(event, { newValue })
     };
