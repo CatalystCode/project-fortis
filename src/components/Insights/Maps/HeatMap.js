@@ -74,6 +74,15 @@ export default class HeatMap extends React.Component {
     return hasChanged(this.props, nextProps);
   }
 
+  moveMapToNewLocation(location, zoom) {
+    const originalLocation = this.refs.map.coordinates;
+
+    if (location.length > 0 && location[0] !== originalLocation[0] && location[1] !== originalLocation[1]) {
+      this.map.setView([location[1], location[0]], zoom);
+      this.map.coordinates = [location[0], location[1]];
+    }
+  }
+
   formatLeafletBounds(bbox) {
     if (bbox.length === 4) {
       return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
@@ -84,9 +93,7 @@ export default class HeatMap extends React.Component {
 
   render() {
     const { maxbounds, defaultZoom } = this.state;
-
     const maxzoom = defaultZoom + constants.MAP.MAXZOOM;
-    const bboxRectangleColor = "#0ff";
 
     return (
       <Map
@@ -108,12 +115,6 @@ export default class HeatMap extends React.Component {
         <ZoomControl
           position={'topright'}
         />
-
-        {/*<Rectangle
-          bounds={bounds}
-          fill={false}
-          color={bboxRectangleColor}
-        />*/}
 
         <MarkerClusterGroup
           clusterColorField={"avgsentiment"}

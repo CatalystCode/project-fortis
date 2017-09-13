@@ -1,4 +1,5 @@
 import geoViewport from 'geo-viewport';
+import PropTypes from 'prop-types';
 import turfExtent from 'turf-extent';
 import React from 'react';
 
@@ -26,14 +27,14 @@ class MapViewPort extends React.Component {
         const mapImageSrc = `${tileServer}/${tileStyle}/${pins.join(',')}/${vp.center.join(',')},${pins.length > 1 ? vp.zoom : DEFAULT_ZOOM}/${this.props.mapSize.join('x')}.png?access_token=${accessToken}`;
 
         return (
-            <img src={mapImageSrc} role="presentation" width="100%"/>
+            <img src={mapImageSrc} alt="" width="100%"/>
         );
     }
 }
 
 MapViewPort.propTypes = {
-  	coordinates: React.PropTypes.array.isRequired,
-    mapSize: React.PropTypes.array.isRequired
+    coordinates: PropTypes.array.isRequired,
+    mapSize: PropTypes.array.isRequired
 }
 
 export default MapViewPort;

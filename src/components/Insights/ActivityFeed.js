@@ -166,7 +166,7 @@ export default class ActivityFeed extends React.Component {
         };
     }
 
-    searchSubmit() {
+    searchSubmit(event) {
         const searchValue = this.refs.filterTextInput.value;
 
         event.preventDefault();

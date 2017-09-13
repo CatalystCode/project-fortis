@@ -1,11 +1,12 @@
 import {DataGrid} from './DataGrid';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 
 const FluxMixin = Fluxxor.FluxMixin(React),
     StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
-export const AdminTrustedTwitterAcc = React.createClass({
+export const AdminTrustedTwitterAcc = createReactClass({
     mixins: [FluxMixin, StoreWatchMixin],
 
     componentDidMount(){

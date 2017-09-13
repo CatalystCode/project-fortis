@@ -8,6 +8,12 @@ import { StreamStatusButtonFormatter } from '../components/Admin/StreamStatusBut
 // eslint-disable-next-line
 const Filters = window.ReactDataGridPlugins.Filters;
 
+const DEFAULT_COLUMN = {
+  editable: false,
+  filterable: false,
+  resizable: true
+};
+
 export const AdminStore = Fluxxor.createStore({
     initialize() {
         this.dataStore = {
@@ -51,6 +57,13 @@ export const AdminStore = Fluxxor.createStore({
         return this.dataStore;
     },
 
+    loadColumns(columnValues, saveAsColumnName) {
+      const columns = columnValues.map(value =>
+        Object.assign({}, DEFAULT_COLUMN, value));
+
+      this.dataStore[saveAsColumnName] = columns;
+    },
+
     handleLoadSiteSettings(response) {
       this.dataStore.settings = response || [];
       this.dataStore.action = response.action || false;
@@ -60,8 +73,36 @@ export const AdminStore = Fluxxor.createStore({
     handleLoadStreams(response) {
       this.dataStore.streams = response.response.streams.streams || [];
       this.dataStore.action = response.action || false;
-      this.loadStreamsColumns(this.dataStore.streams);
+
+      this.loadStreamsColumns();
+      this.loadStreamParamsColumns();
+
       this.emit("change");
+    },
+
+    loadStreamsColumns() {
+      const columnValues = [
+        {key: "status", name: "Status", formatter: StreamStatusButtonFormatter, getRowMetaData: (row) => row, width: 90},
+        {key: "streamId", name: "Stream Id"},
+        {key: "pipelineKey", name: "Pipeline Key"},
+        {key: "pipelineLabel", name: "Pipeline Label"},
+        {key: "pipelineIcon", name: "Pipeline Icon"},
+        {key: "streamFactory", name: "Stream Factory"},
+        {key: "params", name: "Params", formatter: StreamParamsButtonFormatter, getRowMetaData: (row) => row, width: 70}
+      ];
+      const saveAsColumnName = 'streamGridColumns';
+
+      this.loadColumns(columnValues, saveAsColumnName);
+    },
+
+    loadStreamParamsColumns() {
+      const columnValues = [
+        {editable: false, key: "key", name: "key"},
+        {editable: true, key: "value", name: "value"}
+      ];
+      const saveAsColumnName = 'streamParamGridColumns';
+
+      this.loadColumns(columnValues, saveAsColumnName);
     },
 
     handleModifyStreams(response) {
@@ -72,30 +113,6 @@ export const AdminStore = Fluxxor.createStore({
     handleRemoveStreams(response) {
       this.loadStreamsColumns(this.dataStore.streams);
       this.emit("change");
-    },
-
-    loadStreamsColumns() {
-      const defaultColumn = {
-        editable: false,
-        filterable: false,
-        resizable: true
-      };
-
-      let columns = [];
-      columns.push(Object.assign({}, defaultColumn, {key: "status", name: "Status", formatter: StreamStatusButtonFormatter, getRowMetaData: (row) => row, width: 90}));
-      columns.push(Object.assign({}, defaultColumn, {key: "streamId", name: "Stream Id"}));
-      columns.push(Object.assign({}, defaultColumn, {key: "pipelineKey", name: "Pipeline Key"}));
-      columns.push(Object.assign({}, defaultColumn, {key: "pipelineLabel", name: "Pipeline Label"}));
-      columns.push(Object.assign({}, defaultColumn, {key: "pipelineIcon", name: "Pipeline Icon"}));
-      columns.push(Object.assign({}, defaultColumn, {key: "streamFactory", name: "Stream Factory"}));
-      columns.push(Object.assign({}, defaultColumn, {key: "params", name: "Params", formatter: StreamParamsButtonFormatter, getRowMetaData: (row) => row, width: 70}));
-
-      this.dataStore.streamGridColumns = columns;
-
-      let paramColumns = [];
-      paramColumns.push(Object.assign({}, defaultColumn, {editable: false, key: "key", name: "key"}));
-      paramColumns.push(Object.assign({}, defaultColumn, {editable: true, key: "value", name: "value"}));
-      this.dataStore.streamParamGridColumns = paramColumns;
     },
 
     handleLoadPayload(payload) {
@@ -132,34 +149,28 @@ export const AdminStore = Fluxxor.createStore({
     handleLoadTopics(response){
         this.dataStore.watchlist = response.response || [];
         this.dataStore.action = response.action || false;
-        this.loadTopicGridColumns(this.dataStore.settings.properties.supportedLanguages);
+        this.loadTopicColumns(this.dataStore.settings.properties.supportedLanguages);
         this.emit("change");
     },
 
-    loadTopicGridColumns(languages) {
-      const defaultColDef = {
-        editable: false,
-        sortable: false,
-        filterable: false,
-        resizable: true
-      };
-      let columns = [];
-
+    loadTopicColumns(languages) {
       const defaultLanguage = this.dataStore.settings.properties.defaultLanguage;
-      const supportedLanguages = this.dataStore.settings.properties.supportedLanguages;
+      const columnValues = [
+        {key: "topicid", name: "Topic Id"},
+        {key: "name", name: defaultLanguage}
+      ];
+      const saveAsColumnName = 'topicGridColumns';
 
-      columns.push(Object.assign({}, defaultColDef, {key: "topicid", name: "Topic Id"}));
-      columns.push(Object.assign({}, defaultColDef, {key: "name", name: defaultLanguage}));
       languages.forEach(lang => {
         if (lang !== defaultLanguage) {
-          columns.push(Object.assign({}, defaultColDef, {
+          columnValues.push({
             key: "translatedname",
             name: lang
-          }))
+          })
         }
       });
-            
-      this.dataStore.topicGridColumns = columns;
+
+      this.loadColumns(columnValues, saveAsColumnName);
     },
 
     handleLoadLocalities(response){
@@ -189,7 +200,7 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleLoadSettings(response){
-        const {settings, action, siteList, originalSiteName} = response;
+        const {settings, siteList, originalSiteName} = response;
         this.dataStore.settings = response;
         this.dataStore.action = response.action || false;
         if(!siteList){
@@ -203,7 +214,7 @@ export const AdminStore = Fluxxor.createStore({
         }else{
             this.dataStore.siteList = siteList;
         }
-        
+
         this.loadLocalitiesColumns(settings.properties.supportedLanguages);
         this.emit("change");
     },

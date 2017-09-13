@@ -1,8 +1,9 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Predictions } from '../components/Facts/Predictions';
 import '../styles/Facts/Predictions.css';
 
-export const PredictionsPage = React.createClass({
+export const PredictionsPage = createReactClass({
   render() {
     return (
       <div className="fullbleed">

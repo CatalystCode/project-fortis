@@ -1,5 +1,5 @@
 function weightedMean(weightedValues) {
-    
+
     let weight = 0;
 
     let totalWeight = weightedValues.reduce((sum, weightedValue) => {

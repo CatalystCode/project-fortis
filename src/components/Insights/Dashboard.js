@@ -79,8 +79,6 @@ export default class Dashboard extends React.Component {
   }
 
   heatmapComponent() {
-    const { contentAreaHeight, contentRowHeight } = this.state;
-
     return (
       <div key={'heatmap'} className="heatmapContainer">
         <div>
@@ -232,7 +230,6 @@ export default class Dashboard extends React.Component {
                 <ResponsiveReactGridLayout
                   measureBeforeMount={false}
                   className="layout"
-                  isDraggable={false}
                   isDraggable={false}
                   layouts={this.isHeatmapFullScreen() ? defaultLayout.layoutCollapsed : defaultLayout.layout}
                   cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}

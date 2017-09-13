@@ -9,20 +9,20 @@ export default class GraphCard extends Component {
     return (
       <Card className='dash-card'>
         {
-          this.props.cardHeader ? 
-            <CardHeader className='card-header' {...this.props.cardHeader}/> : undefined 
+          this.props.cardHeader ?
+            <CardHeader className='card-header' {...this.props.cardHeader}/> : undefined
         }
         <CardMedia style={styles.cardMediaStyle}>
             {this.props.children}
         </CardMedia>
         {
-          this.props.cardTitle ? <CardTitle {...this.props.cardTitle}/> : undefined 
+          this.props.cardTitle ? <CardTitle {...this.props.cardTitle}/> : undefined
         }
         {
-         this.props.cardActions ? 
+         this.props.cardActions ?
             <CardActions>
                 {this.props.cardActions}
-            </CardActions> : undefined 
+            </CardActions> : undefined
         }
       </Card>
     );

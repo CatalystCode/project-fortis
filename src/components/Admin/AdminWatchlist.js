@@ -1,11 +1,12 @@
 import {DataGrid} from './DataGrid';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
-export const AdminWatchlist = React.createClass({
+export const AdminWatchlist = createReactClass({
     mixins: [FluxMixin, StoreWatchMixin],
 
     getInitialState() {
@@ -26,7 +27,6 @@ export const AdminWatchlist = React.createClass({
     },
 
     render(){
-        let state = this.getFlux().store("AdminStore").getState();
         return (
          this.state.topicGridColumns.length > 0 ? 
             <DataGrid rowHeight={40}

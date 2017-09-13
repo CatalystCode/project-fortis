@@ -1,4 +1,4 @@
-export const getAdminSite = `sites {
+ export const getAdminSite = `sites {
         ...FortisSiteDefinitionView
 }`;
 

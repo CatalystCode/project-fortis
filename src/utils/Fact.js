@@ -26,7 +26,7 @@ export function getAdjacentArticles(id, facts) {
     return result;
 }
 
-// returns a copy of filtered facts 
+// returns a copy of filtered facts
 export function getFilteredResults(facts, tag) {
     if (tag.length === 0) {
         return facts;

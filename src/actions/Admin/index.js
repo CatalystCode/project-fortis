@@ -30,8 +30,7 @@ const methods = {
           const action = false;
           self.dispatch(constants.ADMIN.MODIFY_STREAMS, {response, action});
         } else {
-          const error = `[${error}]: Error, could not load streams for admin page.`;
-          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error: `[${error}]: Error, could not load streams for admin page.` });
         }
       }));
     },
@@ -56,7 +55,7 @@ const methods = {
 
     load_settings () {
         let self = this;
-        AdminServices.getSiteDefinition((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        AdminServices.fetchSite((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             if (graphqlResponse && !error) {
                 self.dispatch(constants.ADMIN.LOAD_SITE_SETTINGS, graphqlResponse.sites.site);
             } else {
