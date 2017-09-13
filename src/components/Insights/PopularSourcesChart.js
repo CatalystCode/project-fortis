@@ -2,7 +2,6 @@ import React from 'react';
 import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
 import constants from '../../actions/constants';
-import Sentiment from '../Graphics/Sentiment';
 import { hasChanged } from './shared';
 
 export default class PopularSourcesChart extends React.Component {
@@ -29,7 +28,7 @@ export default class PopularSourcesChart extends React.Component {
         let colorCells = [], dataProvider = [];
 
         topSources.forEach((source, index) => {
-            const { name, mentions, avgsentiment } = source;
+            const { name, mentions } = source;
             const value = mentions;
             if (name === externalsourceid) {
                 activeIndex = index;

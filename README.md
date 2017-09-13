@@ -1,3 +1,5 @@
+[![CI status](https://travis-ci.org/CatalystCode/project-fortis-interfaces.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis-interfaces)
+
 # Fortis Insight Dashboard
 An Early Warning Humanitarian Crisis Detection Platform
 # Preview
@@ -20,7 +22,7 @@ cd fortis-interface
 npm install
 ```
 
-### Run in Development mode 
+### Run in Development mode
 ```
 REACT_APP_SERVICE_HOST='...'
 REACT_APP_FEATURE_SERVICE_HOST='...'

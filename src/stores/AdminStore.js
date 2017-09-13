@@ -58,10 +58,8 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     loadColumns(columnValues, saveAsColumnName) {
-      let columns = [];
-      columnValues.map(value => {
-        columns.push(Object.assign({}, DEFAULT_COLUMN, value));
-      });
+      const columns = columnValues.map(value =>
+        Object.assign({}, DEFAULT_COLUMN, value));
 
       this.dataStore[saveAsColumnName] = columns;
     },
@@ -157,7 +155,6 @@ export const AdminStore = Fluxxor.createStore({
 
     loadTopicColumns(languages) {
       const defaultLanguage = this.dataStore.settings.properties.defaultLanguage;
-      const supportedLanguages = this.dataStore.settings.properties.supportedLanguages;
       const columnValues = [
         {key: "topicid", name: "Topic Id"},
         {key: "name", name: defaultLanguage}
@@ -203,7 +200,7 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleLoadSettings(response){
-        const {settings, action, siteList, originalSiteName} = response;
+        const {settings, siteList, originalSiteName} = response;
         this.dataStore.settings = response;
         this.dataStore.action = response.action || false;
         if(!siteList){
@@ -217,7 +214,7 @@ export const AdminStore = Fluxxor.createStore({
         }else{
             this.dataStore.siteList = siteList;
         }
-        
+
         this.loadLocalitiesColumns(settings.properties.supportedLanguages);
         this.emit("change");
     },

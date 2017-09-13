@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import '../styles/Global.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
@@ -7,7 +8,7 @@ import Header from '../components/Header';
 const FluxMixin = Fluxxor.FluxMixin(React),
       StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-export const AppPage = React.createClass({
+export const AppPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   componentDidMount() {

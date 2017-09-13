@@ -30,8 +30,7 @@ const methods = {
           const action = false;
           self.dispatch(constants.ADMIN.MODIFY_STREAMS, {response, action});
         } else {
-          const error = `[${error}]: Error, could not load streams for admin page.`;
-          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error: `[${error}]: Error, could not load streams for admin page.` });
         }
       }));
     },

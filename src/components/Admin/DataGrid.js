@@ -1,6 +1,7 @@
 import {SERVICES} from '../../services/Dashboard';
 import ReactDataGrid from 'react-data-grid';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import moment from 'moment';
 // eslint-disable-next-line
@@ -16,7 +17,7 @@ const STATE_ACTIONS = {
 };
 
 const FluxMixin = Fluxxor.FluxMixin(React), StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
-const RowRenderer = React.createClass({
+const RowRenderer = createReactClass({
     getRowStyle: function() {
         return {
             color: this.getRowBackground()
@@ -41,7 +42,7 @@ const styles = {
         marginLeft: '5px'
     }
 }
-export const DataGrid = React.createClass({
+export const DataGrid = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
   getInitialState(){
         return{

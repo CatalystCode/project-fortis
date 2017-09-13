@@ -7,7 +7,7 @@ import LanguagePicker from './LanguagePicker';
 class Header extends React.Component {
   render() {
     return (
-      <nav className="navbar navbar-trans" role="navigation">
+      <nav className="navbar navbar-trans">
         <div>
           { this.renderNavHeader() }
           <div className="navbar-collapse collapse" id="navbar-collapsible">
@@ -20,7 +20,7 @@ class Header extends React.Component {
   }
 
   renderNavHeader() {
-    const { title, logo, language } = this.props;
+    const { title, logo } = this.props;
 
     return (
       <div className="navbar-header">
@@ -30,8 +30,8 @@ class Header extends React.Component {
           <span className="icon-bar"></span>
           <span className="icon-bar"></span>
         </button>
-        <a className="navbar-brand text-danger" href="#">
-          { logo && <img role="presentation" src={logo.startsWith("http:") ? logo : `${process.env.PUBLIC_URL}/images/${logo}`} style={{display: 'inline'}} height="48" /> }
+        <a className="navbar-brand text-danger">
+          { logo && <img src={logo.startsWith("http:") ? logo : `${process.env.PUBLIC_URL}/images/${logo}`} style={{display: 'inline'}} height="48" alt="" /> }
           <span className="brandLabel">{title}</span>
         </a>
       </div>

@@ -1,6 +1,5 @@
 import * as AdminFragments from '../graphql/fragments/Admin';
 import * as AdminQueries from '../graphql/queries/Admin';
-import * as AdminMutations from '../graphql/mutations/Admin';
 import { fetchGqlData } from '../shared';
 import request from 'request';
 
@@ -85,7 +84,7 @@ export const SERVICES = {
   },
 
     saveTwitterAccounts(site, accounts, mutation, callback) {
-        const query = ` ${twitterFragment} 
+        const query = ` ${twitterFragment}
                       mutation ModifyTwitterAccounts($input: TwitterAccountDefintion!) {
                             streams: ${mutation}(input: $input) {
                                 ...FortisTwitterAcctView
@@ -107,7 +106,7 @@ export const SERVICES = {
 
     publishCustomEvents(messages, callback) {
         const query = ` mutation PublishEvents($input: NewMessages!) {
-                            events: publishEvents(input: $input) 
+                            events: publishEvents(input: $input)
                         }`;
 
         const variables = { input: { messages } };
@@ -168,7 +167,7 @@ export const SERVICES = {
     },
 
     saveKeywords(site, edges, callback) {
-        const query = `${""}//termsEdgeFragment} 
+        const query = `${""}//termsEdgeFragment}
                         mutation AddKeywords($input: EdgeTerms!) {
                             addKeywords(input: $input) {
                                 ...FortisDashboardTermEdges
@@ -190,7 +189,7 @@ export const SERVICES = {
     },
 
     saveLocations(site, edges, callback) {
-        const query = `${""}//locationEdgeFragment} 
+        const query = `${""}//locationEdgeFragment}
                         mutation SaveLocations($input: EdgeLocations!) {
                             saveLocations(input: $input) {
                                 ...FortisDashboardLocationEdges
@@ -212,7 +211,7 @@ export const SERVICES = {
     },
 
     removeLocations(site, edges, callback) {
-        const query = `${""}//locationEdgeFragment} 
+        const query = `${""}//locationEdgeFragment}
                         mutation removeLocations($input: EdgeLocations!) {
                             removeLocations(input: $input) {
                                 ...FortisDashboardLocationEdges
@@ -255,7 +254,7 @@ export const SERVICES = {
     },
 
     removeKeywords(site, edges, callback) {
-        const query = `${""}//termsEdgeFragment} 
+        const query = `${""}//termsEdgeFragment}
                         mutation RemoveKeywords($input: EdgeTerms!) {
                             removeKeywords(input: $input) {
                                 ...FortisDashboardTermEdges
@@ -287,9 +286,9 @@ export const SERVICES = {
                                   ...FortisAdminSettingsView
                               }
                           }`;
-  
+
           let variables = { siteId, days };
-  
+
           let host = process.env.REACT_APP_SERVICE_HOST
           var POST = {
               url: `${host}/api/settings`,
@@ -298,19 +297,19 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
     saveFbPages(site, pages, callback) {
-          const query = `${fbPageFragment} 
+          const query = `${fbPageFragment}
                           mutation ModifyFacebookPages($input: FacebookPageListInput!) {
                               pages: modifyFacebookPages(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
-  
+
           const variables = { input: { pages, site } };
-  
+
           const host = process.env.REACT_APP_SERVICE_HOST
           const POST = {
               url: `${host}/api/settings`,
@@ -319,19 +318,19 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
     saveTrustedTwitterAccts(site, accounts, callback) {
-          const query = `${trustedTwitterFragment} 
+          const query = `${trustedTwitterFragment}
                           mutation ModifyTrustedTwitterAccounts($input: TrustedTwitterAccountDefintion!) {
                               accounts: modifyTrustedTwitterAccounts(input: $input) {
                                   ...FortisTrustedTwitterAcctView
                               }
                           }`;
-  
+
           const variables = { input: { accounts, site } };
-  
+
           const host = process.env.REACT_APP_SERVICE_HOST
           const POST = {
               url: `${host}/api/settings`,
@@ -340,19 +339,19 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
     removeFbPages(site, pages, callback) {
-          const query = `${fbPageFragment} 
+          const query = `${fbPageFragment}
                           mutation RemoveFacebookPages($input: FacebookPageListInput!) {
                               pages: removeFacebookPages(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
-  
+
           const variables = { input: { pages, site } };
-  
+
           const host = process.env.REACT_APP_SERVICE_HOST
           const POST = {
               url: `${host}/api/settings`,
@@ -361,19 +360,19 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
     removeTrustedTwitterAccts(site, accounts, callback) {
-        const query = `${trustedTwitterFragment} 
+        const query = `${trustedTwitterFragment}
                           mutation RemoveTrustedTwitterAccounts($input: TrustedTwitterAccountDefintion!) {
                               accounts: removeTrustedTwitterAccounts(input: $input) {
                                   ...FortisTrustedTwitterAcctView
                               }
                           }`;
-  
+
         const variables = { input: { accounts, site } };
-  
+
         const host = process.env.REACT_APP_SERVICE_HOST
         const POST = {
             url: `${host}/api/settings`,
@@ -382,7 +381,7 @@ export const SERVICES = {
             withCredentials: false,
             body: { query, variables }
         };
-  
+
         request(POST, callback);
     },
     getBlacklistTerms(siteId, callback){
@@ -392,9 +391,9 @@ export const SERVICES = {
                                   ...FortisDashboardView
                               }
                           }`;
-  
+
           let variables = { siteId };
-  
+
           let host = process.env.REACT_APP_SERVICE_HOST
           var POST = {
               url: `${host}/api/settings`,
@@ -403,17 +402,17 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
     saveBlacklistTerms(site, terms, callback) {
-          const query = `${blacklistFragment} 
+          const query = `${blacklistFragment}
                           mutation ModifyBlacklist($input: BlacklistTermDefintion!) {
                               terms: modifyBlacklist(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
-  
+
           const variables = { input: { terms, site } };
           const host = process.env.REACT_APP_SERVICE_HOST
           const POST = {
@@ -423,17 +422,17 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
     removeBlacklistTerms(site, terms, callback) {
-          const query = `${blacklistFragment} 
+          const query = `${blacklistFragment}
                           mutation RemoveBlacklist($input: BlacklistTermDefintion!) {
                               terms: removeBlacklist(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
-  
+
           const variables = { input: { terms, site } };
           const host = process.env.REACT_APP_SERVICE_HOST
           const POST = {
@@ -443,7 +442,7 @@ export const SERVICES = {
               withCredentials: false,
               body: { query, variables }
           };
-  
+
           request(POST, callback);
     },
 };

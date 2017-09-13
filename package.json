@@ -20,11 +20,12 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.4.1",
-    "eslint-plugin-flowtype": "^2.35.0",
+    "eslint": "^4.6.1",
+    "eslint-config-react-app": "^2.0.0",
+    "eslint-plugin-flowtype": "^2.35.1",
     "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
-    "eslint-plugin-react": "^7.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^7.3.0",
     "mocha": "^3.1.2",
     "react-scripts": "^0.8.4"
   },
@@ -37,6 +38,7 @@
     "async-seq": "^0.2.9",
     "autosuggest-highlight": "^3.1.0",
     "bootstrap": "^3.3.7",
+    "create-react-class": "^15.6.0",
     "fbgraph": "^1.4.1",
     "fetch": "^1.1.0",
     "flux": "^3.1.0",
@@ -52,6 +54,7 @@
     "material-ui-superselectfield": "^0.1.4",
     "moment": "^2.11.2",
     "numeral": "^1.5.3",
+    "prop-types": "^15.5.10",
     "react": "^15.4.2",
     "react-addons-create-fragment": "^15.4.1",
     "react-addons-transition-group": "^15.4.2",
@@ -85,6 +88,7 @@
     "build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
+    "lint": "eslint src",
     "test": "mocha"
   },
   "eslintConfig": {

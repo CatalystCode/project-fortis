@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import ListView from './ListView';
 import { Link } from 'react-router';
@@ -37,7 +38,7 @@ const styles = {
 const FluxMixin = Fluxxor.FluxMixin(React),
   StoreWatchMixin = Fluxxor.StoreWatchMixin("FactsStore");
 
-export const FactsList = React.createClass({
+export const FactsList = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   displayName: 'FactsList',
