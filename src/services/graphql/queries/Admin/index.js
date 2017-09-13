@@ -1,4 +1,4 @@
-export const getAdminSite = `sites {
+ export const getAdminSite = `sites {
         ...FortisSiteDefinitionView
 }`;
 
@@ -31,4 +31,22 @@ export const getPipelineTerms = `siteTerms(translationLanguage:$translationLangu
 export const getPipelineDenfintion = `query PipelineDefintion($translationLanguage: String) {
     terms: ${getPipelineTerms}
     configuration: ${getAdminSite}
+}`;
+
+export const getSite = `query Sites {
+  sites {
+		...SiteView
+  }
+}`;
+
+export const getStreams = `query Streams {
+  streams {
+    ...StreamsView
+  }
+}`;
+
+export const getTopics = `query SiteTerms($translationLanguage: String) {
+  siteTerms(translationLanguage: $translationLanguage) {
+    ...TopicsView
+  }
 }`;
