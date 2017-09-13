@@ -1,5 +1,6 @@
 import {DataGrid} from './DataGrid';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 
 const FluxMixin = Fluxxor.FluxMixin(React),
@@ -43,7 +44,7 @@ const columns = [
             }
 ];
 
-export const BlacklistEditor = React.createClass({
+export const BlacklistEditor = createReactClass({
     mixins: [FluxMixin, StoreWatchMixin],
 
     getInitialState(){

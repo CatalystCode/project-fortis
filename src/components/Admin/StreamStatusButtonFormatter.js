@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import { DataGrid } from './DataGrid';
 import { Glyphicon, Button } from 'react-bootstrap'; 
@@ -18,7 +19,7 @@ const disableButtonStyle = {
   buttonColor: "danger"
 };
 
-export const StreamStatusButtonFormatter = React.createClass({
+export const StreamStatusButtonFormatter = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   getInitialState() {

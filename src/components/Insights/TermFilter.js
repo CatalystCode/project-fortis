@@ -1,11 +1,12 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import Multiselect from 'react-widgets/lib/Multiselect';
 
 const FluxMixin = Fluxxor.FluxMixin(React),
       StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-export const TermFilter = React.createClass({
+export const TermFilter = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
   
   getInitialState(){

@@ -1,12 +1,13 @@
 import {DataGrid} from './DataGrid';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 let graph = require('fbgraph');
 
 const FluxMixin = Fluxxor.FluxMixin(React),
     StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
-export const FacebookPagesEditor = React.createClass({
+export const FacebookPagesEditor = createReactClass({
     mixins: [FluxMixin, StoreWatchMixin],
 
     getInitialState(){

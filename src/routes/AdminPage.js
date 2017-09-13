@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Admin } from '../components/Admin/Admin';
 import '../styles/Admin/Admin.css';
 import Fluxxor from 'fluxxor';
@@ -6,7 +7,7 @@ import Fluxxor from 'fluxxor';
 const FluxMixin = Fluxxor.FluxMixin(React),
       StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
-export const AdminPage = React.createClass({
+export const AdminPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
   componentDidMount(){
       this.getFlux().actions.ADMIN.load_settings();

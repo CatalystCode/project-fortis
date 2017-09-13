@@ -1,5 +1,6 @@
 import Fluxxor from 'fluxxor';
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Actions } from '../../actions/Dashboard';
 import { SERVICES } from '../../services/Dashboard';
 import weightedMean from '../../utils/WeightedMean';
@@ -29,7 +30,7 @@ const DEFAULT_LANGUAGE = 'en';
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg';  // FIXME: should this really be checked in?
 const TILE_LAYER_URL = 'https://api.mapbox.com/styles/v1/erikschlegel/cizn74i7700252rqk9tn70wu2/tiles/256/{z}/{x}/{y}?access_token={accessToken}';  // FIXME: should this be configurable?
 
-export const HeatMap = React.createClass({
+export const HeatMap = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   getInitialState() {

@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { AdminSettings } from './AdminSettings';
@@ -37,7 +38,7 @@ const styles = {
   }
 };
 
-export const Admin = React.createClass({
+export const Admin = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
   displayName: 'Admin',
   

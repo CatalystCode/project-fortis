@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import '../../styles/Admin/Admin.css'
 
@@ -29,7 +30,7 @@ const styles = {
   }
 };
 
-export const AdminSettings = React.createClass({
+export const AdminSettings = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   contextTypes: {

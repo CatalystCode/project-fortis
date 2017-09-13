@@ -1,4 +1,5 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 import { Link } from 'react-router';
 import { getHumanDateFromNow, UCWords, open } from '../../utils/Utils.js';
 import { arrayToFragment, changeFactsUrl } from '../../utils/Fact.js';
@@ -23,7 +24,7 @@ const styles = {
 const FluxMixin = Fluxxor.FluxMixin(React),
   StoreWatchMixin = Fluxxor.StoreWatchMixin("FactsStore");
 
-export const FactDetail = React.createClass({
+export const FactDetail = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   _loadDetail: function (id) {

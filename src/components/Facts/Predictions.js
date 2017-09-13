@@ -1,6 +1,7 @@
 import React from 'react';
+import createReactClass from 'create-react-class';
 
-export const Predictions = React.createClass({
+export const Predictions = createReactClass({
 
     render() {
         return (
