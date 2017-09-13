@@ -3,12 +3,23 @@ import Autosuggest from 'react-autosuggest';
 import { fromMapToArray } from './shared';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import request from 'request';
 import '../../styles/Insights/TypeaheadSearch.css';
 
 const SUGGESTION_TO_ICON = {
   'Location': 'fa fa-map-marker fa-2x',
   'Term': 'fa fa-tag fa-2x',
 };
+
+function fetchLocationsFromFeatureService(bbox, matchName, callback) {
+  if (!matchName || !bbox || bbox.length !== 4) return callback(null, []);
+
+  const host = process.env.REACT_APP_FEATURE_SERVICE_HOST;
+  const url = `${host}/features/bbox/${bbox.join('/')}?include=bbox&filter_name=${matchName}`;
+
+  request({ url, json: true }, (err, response) =>
+    callback(err, (response && response.body && response.body.features) || []));
+}
 
 export default class TypeaheadSearch extends React.Component {
   constructor(props) {
@@ -38,10 +49,18 @@ export default class TypeaheadSearch extends React.Component {
   getSuggestionValue = suggestion => suggestion[this.getTopicFieldName()];
 
   onSuggestionsFetchRequested({ value }) {
-    const { allSiteTopics } = this.props;
-    const suggestions = fromMapToArray(allSiteTopics, value);
+    const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
+    termSuggestions.forEach(suggestion => suggestion.type = 'Term');
 
-    this.setState({ suggestions });
+    fetchLocationsFromFeatureService(this.props.bbox, value, (err, locationSuggestions) => {
+      if (err) {
+        console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
+        this.setState({ termSuggestions });
+      } else {
+        locationSuggestions.forEach(suggestion => suggestion.type = 'Location');
+        this.setState({ suggestions: termSuggestions.concat(locationSuggestions) });
+      }
+    });
   }
 
   getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'

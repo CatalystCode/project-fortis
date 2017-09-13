@@ -213,6 +213,7 @@ export default class SentimentTreeview extends React.Component {
                 <div style={styles.searchBox}>
                    { <TypeaheadSearch 
                         dashboardRefreshFunc={(maintopic, conjunctivetopics)=>this.handleDataFetch(maintopic, conjunctivetopics)}
+                        bbox={this.props.bbox}
                         language={this.props.language}
                         allSiteTopics={this.props.allSiteTopics}
                         maintopic={this.props.maintopic}
