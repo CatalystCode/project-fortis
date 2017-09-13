@@ -108,14 +108,16 @@ export default class TypeaheadSearch extends React.Component {
         <span className="input-group-addon">
           <i className="fa fa-search"></i>
         </span>
-          <Autosuggest suggestions={suggestions}
-              inputProps={inputProps}
-              focusInputOnSuggestionClick={true}
-              onSuggestionSelected={this.onSuggestionSelected}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-              renderSuggestion={this.renderSuggestion}
-              getSuggestionValue={this.getSuggestionValue} />
+          <Autosuggest
+            suggestions={suggestions}
+            inputProps={inputProps}
+            focusInputOnSuggestionClick={true}
+            onSuggestionSelected={this.onSuggestionSelected}
+            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+            renderSuggestion={this.renderSuggestion}
+            getSuggestionValue={this.getSuggestionValue}
+          />
       </div>
     );
   }
