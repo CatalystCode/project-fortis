@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import '../../styles/Admin/Admin.css'
@@ -34,7 +35,7 @@ export const AdminSettings = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   contextTypes: {
-      router: React.PropTypes.object
+      router: PropTypes.object
   },
 
   getInitialState() {

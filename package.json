@@ -54,6 +54,7 @@
     "material-ui-superselectfield": "^0.1.4",
     "moment": "^2.11.2",
     "numeral": "^1.5.3",
+    "prop-types": "^15.5.10",
     "react": "^15.4.2",
     "react-addons-create-fragment": "^15.4.1",
     "react-addons-transition-group": "^15.4.2",

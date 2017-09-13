@@ -1,4 +1,5 @@
 import geoViewport from 'geo-viewport';
+import PropTypes from 'prop-types';
 import turfExtent from 'turf-extent';
 import React from 'react';
 
@@ -32,8 +33,8 @@ class MapViewPort extends React.Component {
 }
 
 MapViewPort.propTypes = {
-  	coordinates: React.PropTypes.array.isRequired,
-    mapSize: React.PropTypes.array.isRequired
+    coordinates: PropTypes.array.isRequired,
+    mapSize: PropTypes.array.isRequired
 }
 
 export default MapViewPort;

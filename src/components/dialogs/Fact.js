@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { getHumanDateFromNow, open } from '../../utils/Utils.js';
 import {SERVICES} from '../../services/Dashboard';
 import MapViewPort from './MapViewPort';
@@ -157,5 +158,5 @@ Fact.defaultProps = {
 };
 
 Fact.propTypes = {
-    content: React.PropTypes.object.isRequired,
+    content: PropTypes.object.isRequired,
 };

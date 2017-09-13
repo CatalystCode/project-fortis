@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactListView from 'react-list-view';
 
 // ListView is a wrapper component for ReactListView with adaptive design and infinite scrolling support
@@ -192,14 +193,14 @@ ListView.defaultProps = {
 };
 
 ListView.propTypes = {
-    items: React.PropTypes.array.isRequired,
-    renderCardItem: React.PropTypes.func.isRequired,
+    items: PropTypes.array.isRequired,
+    renderCardItem: PropTypes.func.isRequired,
 
-    minCardWidth: React.PropTypes.number,
-    maxCardHeight: React.PropTypes.number,
-    gutter: React.PropTypes.number,
+    minCardWidth: PropTypes.number,
+    maxCardHeight: PropTypes.number,
+    gutter: PropTypes.number,
 
-    loadItems: React.PropTypes.func,
-    scrollThreshold: React.PropTypes.number,
-    subtractedElements: React.PropTypes.array
+    loadItems: PropTypes.func,
+    scrollThreshold: PropTypes.number,
+    subtractedElements: PropTypes.array
 };
