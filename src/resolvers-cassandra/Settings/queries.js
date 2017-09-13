@@ -12,7 +12,7 @@ const CONNECTOR_FACEBOOK = 'Facebook';
 function transformWatchlist(item, translatedlanguage){
   return {
     topicid: item.topicid,
-    name: item.topic.toLowerCase(),
+    name: item.topic,
     translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ? 
     (item.translations || {})[translatedlanguage] : item.topic,
     translatednamelang: translatedlanguage,
@@ -26,7 +26,7 @@ function transformWatchlist(item, translatedlanguage){
 */
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const translationLanguage = args.translationLanguage || 'en';
+    const translationLanguage = args.translationLanguage;
 
     const query = `
     SELECT topicid, topic, translations, lang_code

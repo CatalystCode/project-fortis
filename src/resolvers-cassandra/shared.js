@@ -120,16 +120,6 @@ function tilesForLocations(locations, zoomLevel) {
   return locations.map(([lat, lon]) => geotile.tileIdFromLatLong(lat, lon, zoomLevel)).map(geotile.decodeTileId);
 }
 
-function parseFromToDate(fromDate, toDate) { // eslint-disable-line no-unused-vars
-  // TODO: implement
-  return {
-    fromDate: '2017-08-11 15:00:00.000000+0000',
-    toDate: '2017-08-11 16:00:00.000000+0000',
-    period: 'hour-2017-08-11 15',
-    periodType: 'hour'
-  };
-}
-
 function parseLimit(limit) {
   const DEFAULT_LIMIT = 15;
 
@@ -180,7 +170,6 @@ function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinut
 
 module.exports = {
   parseLimit,
-  parseFromToDate,
   toPipelineKey,
   toConjunctionTopics,
   tilesForBbox,
