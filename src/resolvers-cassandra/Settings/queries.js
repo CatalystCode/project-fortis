@@ -6,7 +6,7 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const {withRunTime, getSiteDefintion} = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
-const CONNECTOR_TWITTER = 'Twitter';
+const PIPELINE_KEY_TWITTER = 'twitter';
 const CONNECTOR_FACEBOOK = 'Facebook';
 
 function transformWatchlist(item, translatedlanguage){
@@ -102,22 +102,22 @@ function paramsToParamsEntries(params) {
 
 function cassandraRowToTwitterAccount(row) {
   return {
-    accountName: row.params.accountName,
+    userIds: row.params.userIds,
     consumerKey: row.params.consumerKey,
     consumerSecret: row.params.consumerSecret,
-    token: row.params.token,
-    tokenSecret: row.params.tokenSecret
+    accessToken: row.params.accessToken,
+    accessTokenSecret: row.params.accessTokenSecret
   };
 }
 
 /**
- * @param {{siteId: string}} args
+ * @param {{}} args
  * @returns {Promise.<{runTime: string, accounts: Array<{accountName: string, consumerKey: string, consumerSecret: string, token: string, tokenSecret: string}>}>}
  */
 function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const sourcesByConnector = 'SELECT params FROM fortis.streams WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
+    const sourcesByPipelineKey = 'SELECT params FROM fortis.streams WHERE pipelinekey = ?';
+    cassandraConnector.executeQuery(sourcesByPipelineKey, [PIPELINE_KEY_TWITTER])
     .then(result => {
       const accounts = result.map(cassandraRowToTwitterAccount);
       resolve({accounts: accounts});
@@ -140,8 +140,8 @@ function cassandraRowToTrustedTwitterAccount(row) {
  */
 function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_TWITTER])
+    const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE pipelinekey = ? ALLOW FILTERING';
+    cassandraConnector.executeQuery(sourcesByConnector, [PIPELINE_KEY_TWITTER])
     .then(rows => {
       const accounts = rows.map(cassandraRowToTrustedTwitterAccount);
       resolve({accounts: accounts});
