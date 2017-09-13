@@ -88,6 +88,7 @@ export default class Dashboard extends React.Component {
           <HeatMap
             targetBbox={this.props.settings.targetBbox}
             heatmapTileIds={this.props.heatmapTileIds}
+            placeId={this.props.placeId}
             {...this.filterLiterals() }
           />
         </div>

@@ -3,8 +3,6 @@ import constants from '../actions/constants';
 import { momentGetFromToRange } from '../utils/Utils.js';
 import moment from 'moment';
 
-const LANGUAGE_CODE_ENG = 'en';
-
 function makeMap(items, keyFunc, valueFunc) {
     let map = new Map();
 
@@ -37,7 +35,7 @@ export const DataStore = Fluxxor.createStore({
             logo: "",
             conjunctivetopics: [],
             externalsourceid: constants.DEFAULT_EXTERNAL_SOURCE,
-            placeid: "",
+            placeId: "",
             timeSeriesGraphData: {},
             popularLocations: [],
             targetBbox: [],
@@ -55,17 +53,13 @@ export const DataStore = Fluxxor.createStore({
             bbox: [],
             zoomLevel: constants.HEATMAP_DEFAULT_ZOOM,
             maintopic: false,
-            language: LANGUAGE_CODE_ENG
+            language: constants.LANGUAGE_CODE_ENG
         }
 
         this.bindActions(
             constants.DASHBOARD.INITIALIZE, this.intializeSettings,
             constants.DASHBOARD.RELOAD_CHARTS, this.handleReloadChartData,
-            constants.DASHBOARD.ASSOCIATED_TERMS, this.mapDataUpdate,
-            constants.DASHBOARD.CHANGE_TERM_FILTERS, this.handleChangeTermFilters,
-            constants.DASHBOARD.CHANGE_TERM_FILTERS_TO_ONLY, this.handleChangeTermFiltersToOnly,
-            constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange,
-            constants.DASHBOARD.CLEAR_FILTERS, this.handleClearFilters
+            constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange
         );
     },
 
@@ -73,8 +67,11 @@ export const DataStore = Fluxxor.createStore({
         return this.dataStore;
     },
 
-    handleLanguageChange(language) {
+    handleLanguageChange(gqlRespomse) {
+        const { terms, language } = gqlRespomse;
+        
         this.dataStore.language = language;
+        this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
         this.emit("change");
     },
 
@@ -114,24 +111,6 @@ export const DataStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleChangeTermFilters(newFilters) {
-        const filtersToRemove = newFilters.filter(filter => filter.action === 'remove').map(filter => filter.term);
-        const newFilterSet = new Set(newFilters.map(filter => filter.term));
-        //merge the earlier filters with the newly added selections
-        this.dataStore.termFilters = new Set([...this.dataStore.termFilters, ...newFilterSet].filter(filter => filtersToRemove.indexOf(filter) === -1));
-        this.emit("change");
-    },
-
-    handleChangeTermFiltersToOnly(newFilter) {
-        this.dataStore.termFilters = new Set(newFilter);
-        this.emit("change");
-    },
-
-    syncDatetimeState(datetimeSelection, timespanType) {
-        this.dataStore.datetimeSelection = datetimeSelection;
-        this.dataStore.timespanType = timespanType;
-    },
-
     syncTimeSeriesData(mutatedTimeSeries) {
         this.dataStore.timeSeriesGraphData = { labels: [], graphData: [] };
         this.dataStore.heatmapTileIds = [];
@@ -155,35 +134,25 @@ export const DataStore = Fluxxor.createStore({
     },
 
     syncFilterSelections(mutatedFilters){
-        const { fromDate, toDate, periodType, zoomLevel, dataSource, datetimeSelection, maintopic, externalsourceid, selectedconjunctiveterms } = mutatedFilters;
+        const { fromDate, toDate, periodType, zoomLevel, dataSource, placeId, datetimeSelection, maintopic, 
+            externalsourceid, selectedconjunctiveterms, bbox } = mutatedFilters;
 
         this.dataStore.fromDate = fromDate;
         this.dataStore.toDate = toDate;
         this.dataStore.timespanType = periodType;
         this.dataStore.dataSource = dataSource;
         this.dataStore.maintopic = maintopic;
+        this.dataStore.placeId = placeId;
+        this.dataStore.bbox = bbox;
         this.dataStore.datetimeSelection = datetimeSelection;
         this.dataStore.zoomLevel = zoomLevel;
         this.dataStore.externalsourceid = externalsourceid;
         this.dataStore.termFilters = new Set(selectedconjunctiveterms);
     },
 
-    handleClearFilters() {
-        this.dataStore.termFilters.clear();
-        this.emit("change");
-    },
-
     handleReloadChartData(changedData) {
         this.syncChartDataToStore(changedData);
         this.syncFilterSelections(changedData);
-        this.emit("change");
-    },
-
-    mapDataUpdate(heatmapData) {
-        this.dataStore.associatedKeywords = new Map();
-        this.dataStore.associatedKeywords = heatmapData.associatedKeywords;
-        this.dataStore.bbox = heatmapData.bbox;
-        this.dataStore.zoomLevel = heatmapData.zoomLevel;
         this.emit("change");
     }
 });

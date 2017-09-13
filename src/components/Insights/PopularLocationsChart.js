@@ -2,7 +2,6 @@ import React from 'react';
 import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
 import constants from '../../actions/constants';
-import Sentiment from '../Graphics/Sentiment';
 import { hasChanged } from './shared';
 
 export default class PopularLocationsChart extends React.Component {
@@ -18,9 +17,12 @@ export default class PopularLocationsChart extends React.Component {
     }
 
     handleClick(data, activeIndex) {
-        const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, externalsourceid, fromDate, toDate } = this.props;
         const { placeid, bbox } = data;
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        const { dataSource, timespanType, termFilters, datetimeSelection, defaultZoom, maintopic, externalsourceid, fromDate, toDate } = this.props;
+
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, 
+            bbox, defaultZoom, Array.from(termFilters), externalsourceid, null, placeid);
+
         this.setState({ activeIndex: activeIndex, selectedWofId: placeid });
     }
 

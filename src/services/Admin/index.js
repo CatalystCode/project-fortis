@@ -63,6 +63,22 @@ export const SERVICES = {
         request(POST, callback);
     },
 
+    getWatchlist(translationLanguage, callback){
+        const query = ` ${AdminQueries.getPipelineWatchlist}`;
+
+        const variables = { translationLanguage };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
+
+        request(POST, callback);
+    },
+
     fetchStreams(callback) {
         const query = `
         query Streams {

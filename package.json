@@ -34,11 +34,9 @@
   },
   "dependencies": {
     "async": "^2.0.1",
-    "async-seq": "^0.2.9",
     "autosuggest-highlight": "^3.1.0",
     "bootstrap": "^3.3.7",
     "fbgraph": "^1.4.1",
-    "fetch": "^1.1.0",
     "flux": "^3.1.0",
     "fluxxor": "^1.7.3",
     "geo-viewport": "^0.2.1",
