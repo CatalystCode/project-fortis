@@ -58,10 +58,8 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     loadColumns(columnValues, saveAsColumnName) {
-      let columns = [];
-      columnValues.map(value => {
-        columns.push(Object.assign({}, DEFAULT_COLUMN, value));
-      });
+      const columns = columnValues.map(value =>
+        Object.assign({}, DEFAULT_COLUMN, value));
 
       this.dataStore[saveAsColumnName] = columns;
     },
