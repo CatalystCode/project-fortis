@@ -1,6 +1,7 @@
 import * as AdminFragments from '../graphql/fragments/Admin';
 import * as AdminQueries from '../graphql/queries/Admin';
 import * as AdminMutations from '../graphql/mutations/Admin';
+import { fetchGqlData } from '../shared';
 import request from 'request';
 
 const SETTINGS_ENDPOINT = 'settings';
@@ -46,21 +47,6 @@ const blacklistFragment = `fragment FortisDashboardView on BlacklistCollection {
                             RowKey
                         }
                       }`;
-
-function fetchGqlData(endpoint, gqlQueryBody, callback) {
-    const host = process.env.REACT_APP_SERVICE_HOST;
-    const { query, variables } = gqlQueryBody;
-
-    const POST = {
-        url: `${host}/api/${endpoint}`,
-        method: "POST",
-        json: true,
-        withCredentials: false,
-        body: { query, variables }
-    };
-
-    request(POST, callback);
-}
 
 export const SERVICES = {
   getDashboardSiteDefinition(translationLanguage, callback){

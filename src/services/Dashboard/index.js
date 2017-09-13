@@ -2,22 +2,8 @@ import constants from '../../actions/constants';
 import * as ActionMethods from '../../actions/shared';
 import * as DashboardFragments from '../graphql/fragments/Dashboard';
 import * as DashboardQueries from '../graphql/queries/Dashboard';
+import { fetchGqlData } from '../shared';
 import request from 'request';
-
-function fetchGqlData(endpoint, gqlQueryBody, callback) {
-    const host = process.env.REACT_APP_SERVICE_HOST;
-    const { query, variables } = gqlQueryBody;
-
-    const POST = {
-        url: `${host}/api/${endpoint}`,
-        method: "POST",
-        json: true,
-        withCredentials: false,
-        body: { query, variables }
-    };
-
-    request(POST, callback);
-}
 
 export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
