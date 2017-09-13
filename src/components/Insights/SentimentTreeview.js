@@ -141,8 +141,11 @@ export default class SentimentTreeview extends React.Component {
         }
     }
 
-    handleDataFetch(maintopic, termFilters) {
-        const { dataSource, bbox, timespanType, datetimeSelection, zoomLevel, externalsourceid, fromDate, toDate } = this.props;
+    handleDataFetch = (maintopic, termFilters, bbox) => {
+        const { dataSource, timespanType, datetimeSelection, zoomLevel, externalsourceid, fromDate, toDate } = this.props;
+        maintopic = maintopic != null ? maintopic : this.props.maintopic;
+        termFilters = termFilters != null ? termFilters : this.props.termFilters;
+        bbox = bbox != null ? bbox : this.props.bbox;
 
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
     }
@@ -212,7 +215,7 @@ export default class SentimentTreeview extends React.Component {
                 </Subheader>
                 <div style={styles.searchBox}>
                    { <TypeaheadSearch 
-                        dashboardRefreshFunc={(maintopic, conjunctivetopics)=>this.handleDataFetch(maintopic, conjunctivetopics)}
+                        dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
                         language={this.props.language}
                         allSiteTopics={this.props.allSiteTopics}

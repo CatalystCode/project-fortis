@@ -39,7 +39,7 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   onSuggestionSelected(event, { suggestion }) {
-    this.props.dashboardRefreshFunc(suggestion.name, []);
+    this.props.dashboardRefreshFunc(suggestion.name, [], suggestion.bbox);
   }
 
   onChange(event, { newValue }) {
