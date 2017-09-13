@@ -3,6 +3,8 @@ import * as AdminQueries from '../graphql/queries/Admin';
 import * as AdminMutations from '../graphql/mutations/Admin';
 import request from 'request';
 
+const SETTINGS_ENDPOINT = 'settings';
+
 const twitterFragment = `fragment FortisTwitterAcctView on TwitterAccountCollection {
                             accounts {
                                     accountName
@@ -45,177 +47,56 @@ const blacklistFragment = `fragment FortisDashboardView on BlacklistCollection {
                         }
                       }`;
 
+function fetchGqlData(endpoint, gqlQueryBody, callback) {
+    const host = process.env.REACT_APP_SERVICE_HOST;
+    const { query, variables } = gqlQueryBody;
+
+    const POST = {
+        url: `${host}/api/${endpoint}`,
+        method: "POST",
+        json: true,
+        withCredentials: false,
+        body: { query, variables }
+    };
+
+    request(POST, callback);
+}
+
 export const SERVICES = {
-    getDashboardSiteDefinition(translationLanguage, callback){
-        const query = ` ${AdminFragments.siteSettingsFragment}
-                        ${AdminQueries.getPipelineDenfintion}`;
+  getDashboardSiteDefinition(translationLanguage, callback){
+      const query = ` ${AdminFragments.siteSettingsFragment}
+                      ${AdminQueries.getPipelineDenfintion}`;
 
-        const variables = { translationLanguage };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-
-    fetchStreams(callback) {
-        const query = `
-        query Streams {
-          streams {
-            streams {
-              streamId
-              pipelineKey
-              pipelineLabel
-              pipelineIcon
-              streamFactory
-              params {
-                key
-                value
-              }
-              enabled
-            }
-          }
-        }`;
-  
-        const host = process.env.REACT_APP_SERVICE_HOST;
-        const POST = {
-          url: `${host}/api/settings`,
-          method: 'POST',
-          json: true,
-          withCredentials: false,
-          body: { query }
-        };
-  
-        request(POST, callback);
-      },
-
-      saveStreams(streams, callback) {
-      const query = `
-      mutation ModifyStreams($input: StreamListInput!) {
-        modifyStreams(input: $input) {
-          streams {
-            streamId
-            pipelineKey
-            pipelineLabel
-            pipelineIcon
-            streamFactory
-            params {
-              key
-              value
-            }
-            enabled
-          }
-        }
-      }
-      `;
-
-      const variables = { input: { streams: streams } };
-      const host = process.env.REACT_APP_SERVICE_HOST;
-      const POST = {
-        url: `${host}/api/settings`,
-        method: 'POST',
-        json: true,
-        withCredentials: false,
-        body: { query, variables }
-      };
-
-      request(POST, callback);      
-    },
-
-    removeStreams(streams, callback) {
-      const query = `
-      mutation RemoveStreams($input: StreamListInput!) {
-        removeStreams(input: $input) {
-          streams {
-            streamId
-            pipelineKey
-            pipelineLabel
-            pipelineIcon
-            streamFactory
-            params {
-              key
-              value
-            }
-            enabled
-          }
-        }
-      }`;
-
-      const variables = { input: { streams: streams } };
-      const host = process.env.REACT_APP_SERVICE_HOST;
-      const POST = {
-        url: `${host}/api/settings`,
-        method: 'POST',
-        json: true,
-        withCredentials: false,
-        body: { query, variables }
-      };
-
-      request(POST, callback);
-    },
-
-    getSiteDefinition(callback) {
-      const query = `
-      query Sites {
-        sites {
-          site {
-            name
-            properties {
-              targetBbox
-              defaultZoomLevel
-              logo
-              title
-              defaultLocation
-              defaultLanguage
-              supportedLanguages
-            }
-          }
-        }
-      }`;
-
+      const variables = { translationLanguage };
       const host = process.env.REACT_APP_SERVICE_HOST
       const POST = {
           url: `${host}/api/settings`,
           method: "POST",
           json: true,
           withCredentials: false,
-          body: { query }
+          body: { query, variables }
       };
 
       request(POST, callback);
-    },
+  },
 
-    fetchTopics(translationLanguage, callback) {
-      const query = `
-      query SiteTerms($translationLanguage: String) {
-        siteTerms(translationLanguage: $translationLanguage) {
-          edges {
-            topicid
-            name
-            translatedname
-            namelang
-            translatednamelang
-          }
-        }
-      }`;
+  fetchSite(callback) {
+    const query = `${AdminFragments.site}${AdminQueries.getSite}`;
+    const variables = {};
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
 
-      const variables = { input: { translationLanguage } };
-      const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
+  fetchStreams(callback) {
+    const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
+    const variables = {};
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
 
-        request(POST, callback);
-    },
+  fetchTopics(translationLanguage, callback) {
+    const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
+    const variables = { translationLanguage };
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
 
     saveTwitterAccounts(site, accounts, mutation, callback) {
         const query = ` ${twitterFragment} 
