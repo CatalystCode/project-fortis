@@ -52,6 +52,7 @@ export const popularPlacesFragment = ` fragment FortisPopularPlacesView on TopPl
             placeid
             layer
             bbox
+            centroid
             mentions
             avgsentiment
         }

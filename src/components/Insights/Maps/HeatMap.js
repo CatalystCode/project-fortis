@@ -20,6 +20,7 @@ export default class HeatMap extends React.Component {
 
     this.state = {
       bounds: bounds, 
+      placeid: "",
       defaultZoom: parseFloat(defaultZoom || 6),
       maxbounds: maxbounds
     };
@@ -44,10 +45,6 @@ export default class HeatMap extends React.Component {
     return [bounds.getNorth(), bounds.getWest(), bounds.getSouth(), bounds.getEast()];
   }
 
-  targetPlaceSelected(prevProps, nextProps){
-    return (nextProps.placeId && nextProps.bbox && nextProps.placeId !== this.props.placeId) ? true : false;
-  }
-
   asyncInvokeDashboardRefresh(viewport) {
     if (this.refs.map) {
       const { dataSource, timespanType, termFilters, datetimeSelection, maintopic, externalsourceid,
@@ -58,8 +55,6 @@ export default class HeatMap extends React.Component {
 
       this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, 
         timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid);
-
-      //this.setState({ bounds });
     }
   }
 
@@ -74,13 +69,17 @@ export default class HeatMap extends React.Component {
     return hasChanged(this.props, nextProps);
   }
 
-  moveMapToNewLocation(location, zoom) {
-    const originalLocation = this.refs.map.coordinates;
+  componentWillReceiveProps(nextProps){
+    const { placeid } = this.state;
 
-    if (location.length > 0 && location[0] !== originalLocation[0] && location[1] !== originalLocation[1]) {
-      this.map.setView([location[1], location[0]], zoom);
-      this.map.coordinates = [location[0], location[1]];
+    if(hasChanged(this.props, nextProps) && nextProps.placeid && placeid !== nextProps.placeid && nextProps.placeCentroid.length === 2){
+      this.moveMapToNewLocation(nextProps);
     }
+  }
+
+  moveMapToNewLocation(props) {
+      this.refs.map.leafletElement.setView(props.placeCentroid, props.zoomLevel);
+      this.setState({ placeid: props.placeid});
   }
 
   formatLeafletBounds(bbox) {

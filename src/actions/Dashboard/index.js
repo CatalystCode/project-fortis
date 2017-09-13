@@ -80,7 +80,7 @@ const methods = {
         });
     },
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, 
-        zoomLevel, conjunctivetopics, externalsourceid, includeCsv, placeId) {
+        zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
         let self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;
 
@@ -88,7 +88,10 @@ const methods = {
 
         fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeserieslabels, includeCsv, (err, chartData) => {
             if (!err) {
-                let mutatedFilters = { fromDate, toDate, placeId, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
+                const placeid = place && place.placeid ? place.placeid : "";
+                const placeCentroid = place && place.centroid ? place.centroid : [];
+
+                let mutatedFilters = { fromDate, toDate, placeid, placeCentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));

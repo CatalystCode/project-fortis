@@ -35,7 +35,8 @@ export const DataStore = Fluxxor.createStore({
             logo: "",
             conjunctivetopics: [],
             externalsourceid: constants.DEFAULT_EXTERNAL_SOURCE,
-            placeId: "",
+            placeid: "",
+            placeCentroid: [],
             timeSeriesGraphData: {},
             popularLocations: [],
             targetBbox: [],
@@ -134,7 +135,7 @@ export const DataStore = Fluxxor.createStore({
     },
 
     syncFilterSelections(mutatedFilters){
-        const { fromDate, toDate, periodType, zoomLevel, dataSource, placeId, datetimeSelection, maintopic, 
+        const { fromDate, toDate, periodType, placeCentroid, zoomLevel, dataSource, placeid, datetimeSelection, maintopic, 
             externalsourceid, selectedconjunctiveterms, bbox } = mutatedFilters;
 
         this.dataStore.fromDate = fromDate;
@@ -142,7 +143,8 @@ export const DataStore = Fluxxor.createStore({
         this.dataStore.timespanType = periodType;
         this.dataStore.dataSource = dataSource;
         this.dataStore.maintopic = maintopic;
-        this.dataStore.placeId = placeId;
+        this.dataStore.placeid = placeid;
+        this.dataStore.placeCentroid = placeCentroid;
         this.dataStore.bbox = bbox;
         this.dataStore.datetimeSelection = datetimeSelection;
         this.dataStore.zoomLevel = zoomLevel;
