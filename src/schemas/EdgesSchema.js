@@ -28,6 +28,7 @@ module.exports = graphql.buildSchema(`
     mentions: Int
     avgsentiment: Float
     bbox: [Float]
+    centroid: [Float]
   }
 
   type OsmPlace{
@@ -35,6 +36,7 @@ module.exports = graphql.buildSchema(`
     name: String
     placeid: String
     bbox: [Float]
+    centroid: [Float]
   }
 
   type ExternalSource {
