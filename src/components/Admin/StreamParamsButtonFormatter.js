@@ -64,7 +64,7 @@ export const StreamParamsButtonFormatter = createReactClass({
               toolbar={null}
               rowKey="key"
               handleSave={this.handleSave}
-              columns={this.state.streamParamGridColumns}
+              columns={this.state.streamParamColumns}
               rows={this.state.params}
             />
           </Modal.Body>

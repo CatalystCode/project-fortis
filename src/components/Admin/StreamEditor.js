@@ -23,7 +23,7 @@ export const StreamEditor = createReactClass({
 
   render(){
     return (
-      this.state.streamGridColumns.length > 0 ? 
+      this.state.streamColumns.length > 0 ? 
         <DataGrid 
           rowHeight={40}
           minHeight={500}
@@ -31,7 +31,7 @@ export const StreamEditor = createReactClass({
           rowSelection={null}
           rowKey="streamId"
           guidAutofillColumn="streamId"
-          columns={this.state.streamGridColumns}
+          columns={this.state.streamColumns}
           rows={this.state.streams}
         /> : <div />
     );
