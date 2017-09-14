@@ -14,7 +14,7 @@ class ActiveFiltersView extends React.Component {
       chips.push({
         type: 'dataSource',
         label: `Publisher: ${dataSource}`,
-        icon: 'find_in_page',
+        icon: <FontIcon className="material-icons">find_in_page</FontIcon>,
         onDelete: this.props.deleteDataSource,
       });
     }
@@ -24,7 +24,7 @@ class ActiveFiltersView extends React.Component {
       chips.push({
         type: 'externalsourceid',
         label: `Source: ${externalsourceid}`,
-        icon: 'share',
+        icon: <FontIcon className="material-icons">share</FontIcon>,
         onDelete: this.props.deleteExternalSourceId,
       });
     }
@@ -35,7 +35,7 @@ class ActiveFiltersView extends React.Component {
   renderChip = (chip) => {
     return (
       <Chip key={chip.type} onRequestDelete={chip.onDelete} className="active-filters-view--chip">
-        <Avatar icon={<FontIcon className="material-icons">{chip.icon}</FontIcon>} />
+        <Avatar icon={chip.icon} />
         <div className="active-filters-view--chip--label-container" title={chip.label}>
           {chip.label}
         </div>
