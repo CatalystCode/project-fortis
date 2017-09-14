@@ -67,7 +67,7 @@ export default class Dashboard extends React.Component {
   filterLiterals() {
     const { dataSource, zoomLevel, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
     const defaultLanguage = this.props.settings.defaultLanguage;
-    const defaultZoom = parseInt(this.props.settings.defaultZoomLevel);
+    const defaultZoom = parseInt(this.props.settings.defaultZoomLevel, 10);
     const conjunctiveTermsLength = termFilters.size;
 
     return Object.assign({}, { zoomLevel, dataSource, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 

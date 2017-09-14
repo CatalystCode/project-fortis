@@ -1,5 +1,5 @@
 import MarkerClusterGroup from './MarkerClusterGroup';
-import { Map, TileLayer, ZoomControl, Rectangle  } from 'react-leaflet';
+import { Map, TileLayer, ZoomControl } from 'react-leaflet';
 import constants from '../../../actions/constants';
 import React from 'react';
 import { hasChanged } from '../shared';
@@ -51,7 +51,6 @@ export default class HeatMap extends React.Component {
         fromDate, toDate } = this.props;
       const zoom = this.refs.map.leafletElement.getZoom();
       const bbox = this.getLeafletBbox();
-      const bounds = this.refs.map.leafletElement.getBounds();
 
       this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, 
         timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid);

@@ -89,7 +89,7 @@ export default class SentimentTreeview extends React.Component {
         let popularTermsTotal = 0, otherTotal = 0;
 
         conjunctivetopics.forEach(topic => {
-            const { mentions, conjunctionterm, name } = topic;
+            const { mentions, conjunctionterm } = topic;
             const edge = fetchTermFromMap(allSiteTopics, conjunctionterm, language, defaultLanguage);
             const enabledConjunctiveTerm = termFilters.has(conjunctionterm);
 
