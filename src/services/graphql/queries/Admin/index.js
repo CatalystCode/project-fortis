@@ -39,14 +39,20 @@ export const getSite = `query Sites {
   }
 }`;
 
-export const getStreams = `query Streams {
-  streams {
-    ...StreamsView
-  }
-}`;
-
 export const getTopics = `query SiteTerms($translationLanguage: String) {
   siteTerms(translationLanguage: $translationLanguage) {
     ...TopicsView
+  }
+}`;
+
+export const getTwitterAccounts = `query TwitterAccounts {
+  twitterAccounts {
+    ...TwitterAccountsView
+  }
+}`;
+
+export const getStreams = `query Streams {
+  streams {
+    ...StreamsView
   }
 }`;

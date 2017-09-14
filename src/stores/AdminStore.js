@@ -24,6 +24,7 @@ export const AdminStore = Fluxxor.createStore({
             siteList: [],
             loading: false,
             twitterAccounts: [],
+            twitterAccountColumns: [],
             trustedTwitterAccounts: [],
             topicGridColumns: [],
             facebookPages: [],
@@ -44,7 +45,7 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
-            constants.ADMIN.LOAD_TWITTER_ACCTS, this.handleLoadTwitterAccts,
+            constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
             constants.ADMIN.CREATE_SITE, this.handleCreateSite,
@@ -120,10 +121,24 @@ export const AdminStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleLoadTwitterAccts(response){
-        this.dataStore.twitterAccounts = response.streams.accounts;
-        this.dataStore.action = response.action || false;
-        this.emit("change");
+    handleLoadTwitterAccounts(response) {
+      this.loadTwitterAccountsColumns();
+      this.dataStore.twitterAccounts = response.response.twitterAccounts.accounts;
+      this.dataStore.action = response.action || false;
+      this.emit("change");
+    },
+
+    loadTwitterAccountsColumns() {
+      const columnValues = [
+        {key: "consumerKey", name: "Consumer Key"},
+        {key: "consumerSecret", name: "Consumer Secret"},
+        {key: "accessToken", name: "Access Token"},
+        {key: "accessTokenSecret", name: "Access Token Secret"},
+        {key: "userIds", name: "User Ids"}
+      ];
+      const saveAsColumnName = 'twitterAccountColumns';
+
+      this.loadColumns(columnValues, saveAsColumnName);
     },
 
     handleLoadTrustedTwitterAccts(response){

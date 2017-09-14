@@ -4,7 +4,7 @@ import parallelAsync from 'async/parallel';
 import constants from '../constants';
 
 const methods = {
-    load_streams () {
+    load_streams() {
       const self = this;
       const dataStore = this.flux.stores.AdminStore.dataStore;
 
@@ -22,8 +22,8 @@ const methods = {
       }
     },
 
-    save_streams (streams) {
-      let self = this;
+    save_streams(streams) {
+      const self = this;
       AdminServices.saveStreams(streams, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse) {
           const response = graphqlResponse ? graphqlResponse : [];
@@ -35,7 +35,7 @@ const methods = {
       }));
     },
 
-    remove_streams (streams) {
+    remove_streams(streams) {
       const self = this;
       const dataStore = this.flux.stores.AdminStore.dataStore;
 
@@ -53,8 +53,8 @@ const methods = {
       }
     },
 
-    load_settings () {
-        let self = this;
+    load_settings() {
+        const self = this;
         AdminServices.fetchSite((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             if (graphqlResponse && !error) {
                 self.dispatch(constants.ADMIN.LOAD_SITE_SETTINGS, graphqlResponse.sites.site);
@@ -64,12 +64,12 @@ const methods = {
         }));
     },
 
-    changeLanguage (language) {
+    changeLanguage(language) {
         this.dispatch(constants.APP.CHANGE_LANGUAGE, language);
     },
 
-    save_settings (settings) {
-      let self = this;
+    save_settings(settings) {
+      const self = this;
 
       AdminServices.editSite(settings, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse && !error) {
@@ -81,50 +81,51 @@ const methods = {
       }));
     },
 
-    save_twitter_accts (siteName, twitterAccts) {
-        let self = this;
+    save_twitter_accounts(siteName, twitterAccts) {
+        const self = this;
         const mutationNameTwitterAcctModify = "modifyTwitterAccounts";
 
         AdminServices.saveTwitterAccounts(siteName, twitterAccts, mutationNameTwitterAcctModify, (error, response, body) => {
             if(!error && response.statusCode === 200 && body.data && body.data.streams) {
                 const action = 'saved';
                 const streams = body.data.streams;
-                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {streams, action});
+                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {streams, action});
             }else{
                 console.error(`[${error}] occured while processing message request`);
             }
        });
     },
 
-    remove_twitter_accts (siteName, twitterAccts) {
-        let self = this;
+    remove_twitter_accounts(siteName, twitterAccts) {
+        const self = this;
         const mutationNameTwitterAcctModifyRemove = "removeTwitterAccounts";
         AdminServices.saveTwitterAccounts(siteName, twitterAccts, mutationNameTwitterAcctModifyRemove, (error, response, body) => {
             if(!error && response.statusCode === 200 && body.data && body.data.streams) {
                 const action = 'saved';
                 const streams = body.data.streams;
-                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {streams, action});
+                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {streams, action});
             }else{
                 console.error(`[${error}] occured while processing message request`);
             }
        });
     },
 
-    load_twitter_accts (siteId) {
-        let self = this;
-        AdminServices.getTwitterAccounts(siteId, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        const streams = body.data.streams;
-                        let action = false;
-                        self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {streams, action});
-                    }else{
-                        let error = 'Error, could not load twitter accts for admin page';
-                        self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-                    }
-        });
+    load_twitter_accounts() {
+      const self = this;
+      AdminServices.fetchTwitterAccounts((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const response = graphqlResponse ? graphqlResponse : [];
+          const action = false;
+          self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {response, action});
+        } else{
+          const error = 'Error, could not load twitter accounts for admin page';
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }));
     },
 
-    load_topics (translationLanguage) {
+
+    load_topics(translationLanguage) {
       const self = this;
       const dataStore = this.flux.stores.AdminStore.dataStore;
       if (!dataStore.loading) {
@@ -141,8 +142,8 @@ const methods = {
       }
     },
 
-    remove_keywords (siteId, deletedRows) {
-        let self = this;
+    remove_keywords(siteId, deletedRows) {
+        const self = this;
 
         AdminServices.removeKeywords(siteId, deletedRows, (error, response, body) => {
             if(!error && response.statusCode === 200 && body.data.removeKeywords) {
@@ -155,7 +156,7 @@ const methods = {
         });
     },
     save_keywords: function(siteId, modifiedKeywords){
-        let self = this;
+        const self = this;
         AdminServices.saveKeywords(siteId, modifiedKeywords, (error, response, body) => {
             if(!error && response.statusCode === 200) {
                 const action = 'saved';
@@ -188,7 +189,7 @@ const methods = {
     publish_events: function(events){
         AdminServices.publishCustomEvents(events, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             let action = 'saved';
-            let self = this;
+            const self = this;
 
             if (graphqlResponse && !error) {
                 self.dispatch(constants.ADMIN.PUBLISHED_EVENTS, {action});
@@ -200,7 +201,7 @@ const methods = {
         }));
     },
     remove_locations: function(siteId, modifiedLocations){
-        let self = this;
+        const self = this;
         AdminServices.removeLocations(siteId, modifiedLocations, (error, response, body) => {
             if(!error && response.statusCode === 200) {
                 const action = 'saved';
@@ -212,7 +213,7 @@ const methods = {
         });
     },
    load_localities: function (siteId) {
-        let self = this;
+        const self = this;
         const edgeType = "Location";
         AdminServices.fetchEdges(siteId, edgeType, (error, response, body) => {
                     if (!error && response.statusCode === 200) {
@@ -227,7 +228,7 @@ const methods = {
     },
 
     load_fb_pages: function(siteId) {
-        let self = this;
+        const self = this;
         const days = 30;
 
         AdminServices.getAdminFbPages(siteId, days, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
@@ -255,7 +256,7 @@ const methods = {
         }));
     },
     load_trusted_twitter_accts: function(siteId) {
-        let self = this;
+        const self = this;
 
         AdminServices.getTrustedTwitterAccounts(siteId, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             let action = false;
@@ -270,7 +271,7 @@ const methods = {
         }));
     },
     load_places_inside_bbox: function(siteId, bbox) {
-        let self = this;
+        const self = this;
 
         AdminServices.getPlacesByBBox(siteId, bbox, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             let action = false;
@@ -285,7 +286,7 @@ const methods = {
         }));
     },
     load_blacklist: function(siteId) {
-        let self = this;
+        const self = this;
 
         AdminServices.getBlacklistTerms(siteId, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             let action = false;
@@ -300,7 +301,7 @@ const methods = {
         }));
     },
     remove_blacklist: function(siteId, terms){
-        let self = this;
+        const self = this;
         AdminServices.removeBlacklistTerms(siteId, terms, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
             let action = false;
 
@@ -316,7 +317,7 @@ const methods = {
         }));
     },
     save_blacklist: function(siteId, terms){
-        let self = this;
+        const self = this;
         AdminServices.saveBlacklistTerms(siteId, terms, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
             let action = false;
 
@@ -332,7 +333,7 @@ const methods = {
         }));
     },
     remove_fb_pages: function(siteId, pages){
-        let self = this;
+        const self = this;
         AdminServices.removeFbPages(siteId, pages, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
             let action = false;
 
@@ -349,7 +350,7 @@ const methods = {
     },
 
     remove_trusted_twitter_accts: function(siteId, accounts){
-        let self = this;
+        const self = this;
         AdminServices.removeTrustedTwitterAccts(siteId, accounts, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
             let action = false;
 
@@ -366,7 +367,7 @@ const methods = {
     },
 
     save_fb_pages: function(siteId, pages){
-        let self = this;
+        const self = this;
 
         // Only add the RowKey and pageUrl in the Azure Table Storage
         let filteredInput = [];
@@ -393,7 +394,7 @@ const methods = {
     },
 
     save_trusted_twitter_accts: function(siteId, accounts){
-        let self = this;
+        const self = this;
         AdminServices.saveTrustedTwitterAccts(siteId, accounts, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
             let action = false;
 
