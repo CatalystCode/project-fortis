@@ -9,11 +9,26 @@
     "url": "https://github.com/CatalystCode/project-fortis-interfaces.git"
   },
   "maintainers": [
-    {"name": "Erik Schlegel", "email": "erisch@microsoft.com"},
-    {"name": "Stephanie Marker", "email": "stmarker@microsoft.com"},
-    {"name": "JC Jimenez", "email": "jcjimene@microsoft.com"},
-    {"name": "Kevin Hartman", "email": "keha@microsoft.com"},
-    {"name": "Clemens Wolff", "email": "clewolff@microsoft.com"}
+    {
+      "name": "Erik Schlegel",
+      "email": "erisch@microsoft.com"
+    },
+    {
+      "name": "Stephanie Marker",
+      "email": "stmarker@microsoft.com"
+    },
+    {
+      "name": "JC Jimenez",
+      "email": "jcjimene@microsoft.com"
+    },
+    {
+      "name": "Kevin Hartman",
+      "email": "keha@microsoft.com"
+    },
+    {
+      "name": "Clemens Wolff",
+      "email": "clewolff@microsoft.com"
+    }
   ],
   "engines": {
     "node": "6.9.1"
@@ -34,7 +49,6 @@
     "react-dom": "^15.4.2"
   },
   "dependencies": {
-    "ajv": "^5.2.2",
     "async": "^2.0.1",
     "autosuggest-highlight": "^3.1.0",
     "bootstrap": "^3.3.7",

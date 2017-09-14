@@ -106,39 +106,6 @@ export const SERVICES = {
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
-    saveStreams(streams, callback) {
-        const query = `		
-              mutation ModifyStreams($input: StreamListInput!) {		
-                modifyStreams(input: $input) {		
-                  streams {		
-                    streamId		
-                    pipelineKey		
-                    pipelineLabel		
-                    pipelineIcon		
-                    streamFactory		
-                    params {		
-                      key		
-                      value		
-                }		
-               enabled		
-                  }		
-                }		
-              }		
-        `;
-
-        const variables = { input: { streams: streams } };
-        const host = process.env.REACT_APP_SERVICE_HOST;
-        const POST = {
-            url: `${host}/api/settings`,
-            method: 'POST',
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-
     removeStreams(streams, callback) {
         const query = `		
               mutation RemoveStreams($input: StreamListInput!) {		
