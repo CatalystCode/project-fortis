@@ -18,8 +18,8 @@ export const AdminStore = Fluxxor.createStore({
     initialize() {
         this.dataStore = {
             streams: [],
-            streamGridColumns: [],
-            streamParamGridColumns: [],
+            streamColumns: [],
+            streamParamColumns: [],
             settings: {},
             siteList: [],
             loading: false,
@@ -91,7 +91,7 @@ export const AdminStore = Fluxxor.createStore({
         {key: "streamFactory", name: "Stream Factory"},
         {key: "params", name: "Params", formatter: StreamParamsButtonFormatter, getRowMetaData: (row) => row, width: 70}
       ];
-      const saveAsColumnName = 'streamGridColumns';
+      const saveAsColumnName = 'streamColumns';
 
       this.loadColumns(columnValues, saveAsColumnName);
     },
@@ -101,7 +101,7 @@ export const AdminStore = Fluxxor.createStore({
         {editable: false, key: "key", name: "key"},
         {editable: true, key: "value", name: "value"}
       ];
-      const saveAsColumnName = 'streamParamGridColumns';
+      const saveAsColumnName = 'streamParamColumns';
 
       this.loadColumns(columnValues, saveAsColumnName);
     },
