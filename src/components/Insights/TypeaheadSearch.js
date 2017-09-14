@@ -69,6 +69,10 @@ export default class TypeaheadSearch extends React.Component {
     const matcher = new RegExp(`(:?${normalizedQuery})`, 'i');
     const parts = suggestionText.split(matcher).map(part => ({text: part, highlight: part.toLowerCase() === normalizedQuery}));
 
+    if (element.layer) {
+      parts.push({text: ` (${element.layer})`});
+    }
+
     return (
       <span className="suggestion-content">
         <span className="type">
