@@ -113,6 +113,8 @@ const methods = {
         });
     },
     changeLanguage(language) {
+        const self = this;
+
         AdminServices.getWatchlist(language, (error, response, body) => {
             if(!error && response.statusCode === 200 && body.data && !body.errors) {
                 const { terms } = body.data;
