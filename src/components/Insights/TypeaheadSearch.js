@@ -10,8 +10,8 @@ export default class TypeaheadSearch extends React.Component {
     super(props);
 
     this.DATASETS = {
-      LOCATION: {type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations'},
-      TERM: {type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms'},
+      LOCATION: { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' },
+      TERM: { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' },
     };
 
     this.state = {
@@ -21,7 +21,7 @@ export default class TypeaheadSearch extends React.Component {
     };
   }
 
-  setTopicToState(value){
+  setTopicToState(value) {
     this.setState({ value });
   }
 
@@ -29,8 +29,22 @@ export default class TypeaheadSearch extends React.Component {
     this.setTopicToState(nextProps.maintopic);
   }
 
+  parsePlace(suggestion) {
+    if (suggestion.layer) {
+      const { id, centroid, bbox } = suggestion;
+
+      return {
+        placeid: id,
+        centroid: centroid,
+        bbox: bbox
+      };
+    }
+
+    return undefined;
+  }
+
   onSuggestionSelected = (event, { suggestion }) => {
-    this.props.dashboardRefreshFunc(suggestion.name, [], suggestion.bbox);
+    this.props.dashboardRefreshFunc(suggestion.name, [], this.parsePlace(suggestion));
   }
 
   onChange = (event, { newValue }) => {
@@ -39,14 +53,14 @@ export default class TypeaheadSearch extends React.Component {
 
   getSuggestionValue = suggestion => suggestion[this.getTopicFieldName()];
 
-  fetchTermSuggestions = (value, callback) => {
+  fetchTermSuggestions = (value, featureservicenamespace, callback) => {
     const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
     termSuggestions.forEach(suggestion => suggestion.icon = this.DATASETS.TERM.icon);
     return callback(termSuggestions);
   }
 
-  fetchLocationSuggestions = (value, callback) => {
-    fetchLocationsFromFeatureService(this.props.bbox, value, (err, locationSuggestions) => {
+  fetchLocationSuggestions = (value, fetchLocationSuggestions, callback) => {
+    fetchLocationsFromFeatureService(this.props.bbox, value, fetchLocationSuggestions, (err, locationSuggestions) => {
       if (err) {
         console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
         callback([]);
@@ -58,7 +72,9 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   onSuggestionsFetchRequested = ({ value }) => {
-    this.state.activeDataset.fetcher(value, (suggestions) => this.setState({ suggestions }));
+    const { featureservicenamespace } = this.props;
+
+    this.state.activeDataset.fetcher(value, featureservicenamespace, (suggestions) => this.setState({ suggestions }));
   }
 
   getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'
@@ -67,10 +83,10 @@ export default class TypeaheadSearch extends React.Component {
     const suggestionText = element[this.getTopicFieldName()];
     const normalizedQuery = query.toLowerCase();
     const matcher = new RegExp(`(:?${normalizedQuery})`, 'i');
-    const parts = suggestionText.split(matcher).map(part => ({text: part, highlight: part.toLowerCase() === normalizedQuery}));
+    const parts = suggestionText.split(matcher).map(part => ({ text: part, highlight: part.toLowerCase() === normalizedQuery }));
 
     if (element.layer) {
-      parts.push({text: ` (${element.layer})`});
+      parts.push({ text: ` (${element.layer})` });
     }
 
     return (
@@ -109,7 +125,7 @@ export default class TypeaheadSearch extends React.Component {
         </InputGroup.Button>
         <Autosuggest
           suggestions={suggestions}
-          inputProps={{placeholder: "Type 'c'", value, onChange: this.onChange}}
+          inputProps={{ placeholder: "Type 'c'", value, onChange: this.onChange }}
           focusInputOnSuggestionClick={true}
           onSuggestionSelected={this.onSuggestionSelected}
           onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}

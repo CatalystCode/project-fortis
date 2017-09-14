@@ -143,13 +143,15 @@ export default class SentimentTreeview extends React.Component {
         }
     }
 
-    handleDataFetch = (maintopic, termFilters, bbox) => {
-        const { dataSource, timespanType, datetimeSelection, zoomLevel, externalsourceid, fromDate, toDate } = this.props;
-        maintopic = maintopic != null ? maintopic : this.props.maintopic;
-        termFilters = termFilters != null ? termFilters : this.props.termFilters;
-        bbox = bbox != null ? bbox : this.props.bbox;
+    handleDataFetch = (maintopic, termFilters, place) => {
+        const { dataSource, timespanType, datetimeSelection, defaultZoom, externalsourceid, fromDate, toDate } = this.props;
+        const bbox = place && place.bbox ? place.bbox : this.props.bbox;
+        const zoomLevel = place ? defaultZoom : this.props.zoomLevel;
 
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        maintopic = maintopic && !place ? maintopic : this.props.maintopic;
+        termFilters = termFilters != null ? termFilters : this.props.termFilters;
+        
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, place);
     }
 
     deleteExternalSourceId = () => {
@@ -242,6 +244,7 @@ export default class SentimentTreeview extends React.Component {
                         dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
                         language={this.props.language}
+                        featureservicenamespace={this.props.featureservicenamespace}
                         allSiteTopics={this.props.allSiteTopics}
                         maintopic={this.props.maintopic}
                         defaultLanguage={this.props.defaultLanguage} />

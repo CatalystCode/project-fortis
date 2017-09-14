@@ -10,6 +10,7 @@ export const siteSettingsFragment = `fragment FortisSiteDefinitionView on SiteCo
         mapzenApiKey
         defaultLocation
         defaultLanguage
+        featureservicenamespace
         storageConnectionString
         featuresConnectionString
         supportedLanguages

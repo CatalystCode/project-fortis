@@ -193,6 +193,7 @@ export default class Dashboard extends React.Component {
           <SentimentTreeview
             conjunctivetopics={this.props.conjunctivetopics}
             allSiteTopics={this.props.fullTermList}
+            featureservicenamespace={this.props.settings.featureservicenamespace}
             height={this.isHeatmapFullScreen() ? contentAreaHeight : (watchlistResizedHeight > 0) ? watchlistResizedHeight : contentRowHeight}
             {...this.filterLiterals() }
           />
