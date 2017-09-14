@@ -36,8 +36,7 @@ object CassandraTest {
     pipelinekey: String,
     sourceurl: String,
     sharedLocations: List[Location] = List()
-  ) extends Details {
-  }
+  ) extends Details
   def envOrFail(name: String): String = {
     envOrNone(name) match {
       case Some(v) => v
