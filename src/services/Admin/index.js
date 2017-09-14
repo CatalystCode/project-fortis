@@ -122,26 +122,30 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    getTwitterAccounts(siteId, callback) {
-        let query = `  ${twitterFragment}
-                        query TwitterAccounts($siteId: String!) {
-                            streams: twitterAccounts(siteId: $siteId) {
-                                ...FortisTwitterAcctView
-                            }
-                        }`;
+    fetchTwitterAccounts(callback) {
+      const query = `
+      query TwitterAccounts {
+        twitterAccounts {
+          accounts {
+            userIds
+            consumerKey
+            consumerSecret
+            accessToken
+            accessTokenSecret
+          }
+        }
+      }`;
 
-        let variables = { siteId };
+      const host = process.env.REACT_APP_SERVICE_HOST
+      const POST = {
+        url: `${host}/api/settings`,
+        method: "POST",
+        json: true,
+        withCredentials: false,
+        body: { query }
+      };
 
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+      request(POST, callback);
     },
 
     getTrustedTwitterAccounts(siteId, callback) {

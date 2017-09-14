@@ -110,19 +110,20 @@ const methods = {
        });
     },
 
-    load_twitter_accts (siteId) {
-        let self = this;
-        AdminServices.getTwitterAccounts(siteId, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        const streams = body.data.streams;
-                        let action = false;
-                        self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {streams, action});
-                    }else{
-                        let error = 'Error, could not load twitter accts for admin page';
-                        self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-                    }
-        });
+    load_twitter_accts () {
+      let self = this;
+      AdminServices.fetchTwitterAccounts((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const response = graphqlResponse ? graphqlResponse : [];
+          const action = false;
+          self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCTS, {response, action});
+        } else{
+          const error = 'Error, could not load twitter accounts for admin page';
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }));
     },
+
 
     load_topics (translationLanguage) {
       const self = this;
