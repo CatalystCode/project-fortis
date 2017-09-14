@@ -90,7 +90,7 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
       }]);
     })
     .then(() => {
-      serviceBusClient.sendMessages(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
+      serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
     })
     .then(() => { 
       resolve({
@@ -146,7 +146,7 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
       }]);
     })
     .then(() => {
-      serviceBusClient.sendMessages(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
+      serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
     })
     .then(() => { 
       resolve({
