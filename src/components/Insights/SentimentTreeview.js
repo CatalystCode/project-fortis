@@ -214,13 +214,13 @@ export default class SentimentTreeview extends React.Component {
                     }
                 </Subheader>
                 <div style={styles.searchBox}>
-                   { <TypeaheadSearch 
+                    <TypeaheadSearch
                         dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
                         language={this.props.language}
                         allSiteTopics={this.props.allSiteTopics}
                         maintopic={this.props.maintopic}
-                        defaultLanguage={this.props.defaultLanguage} /> }
+                        defaultLanguage={this.props.defaultLanguage} />
                 </div>
                 <div style={styles.searchBox}>
                     <div className="input-group">
