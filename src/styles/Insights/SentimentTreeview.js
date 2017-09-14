@@ -10,6 +10,9 @@ export const styles = {
         verticalAlign: 'top',
         width: '100%'
     },
+    activeFiltersView: {
+        padding: '0px 20px 10px 20px'
+    },
     searchBox: {
         padding: '0px 20px 10px 20px'
     },
