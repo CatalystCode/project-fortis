@@ -84,8 +84,6 @@ CREATE TABLE watchlist(
     PRIMARY KEY ((topic, lang_code), category)
 );
 
-CREATE INDEX ON fortis.watchlist (category);
-
 CREATE TABLE blacklist(
     id uuid,
     conjunctivefilter frozen<list<text>>,
