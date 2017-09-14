@@ -4,6 +4,7 @@ const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const blobStorageClient = require('../../clients/storage/BlobStorageClient');
+const serviceBusClient = require('../../clients/servicebus/ServiceBusClient');
 const { withRunTime, limitForInClause } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
@@ -13,6 +14,8 @@ const STREAM_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
+
+const SERVICE_BUS_CONFIG_QUEUE = process.env.FORTIS_SB_CONFIG_QUEUE || 'configuration';
 
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
@@ -86,6 +89,9 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
         ]
       }]);
     })
+    .then(() => {
+      serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
+    })
     .then(() => { 
       resolve({
         name: args.input.name,
@@ -138,6 +144,9 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
           args.input.supportedLanguages
         ]
       }]);
+    })
+    .then(() => {
+      serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
     })
     .then(() => { 
       resolve({
