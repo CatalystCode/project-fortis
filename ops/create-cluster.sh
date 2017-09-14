@@ -15,7 +15,7 @@ readonly site_type="${12}"
 
 chmod -R 752 .
 
-git clone https://github.com/CatalystCode/charts.git
+git clone https://github.com/erikschlegel/charts.git -b spark-localssd
 
 echo "Installing Cassandra chart"
 ./install-cassandra.sh "${k8cassandra_node_count}"
@@ -62,6 +62,7 @@ readonly spark_config_map_name="spark-master-conf"
 
 #This needs to be exporting to the environment as the creat-react-app assett pipeline polyfills this into the build. 
 export REACT_APP_SERVICE_HOST="${fortis_interface_host}"
+export REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}"
 
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_extlb_host}"
