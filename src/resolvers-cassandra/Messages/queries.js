@@ -7,10 +7,6 @@ const { parseFromToDate, getSiteDefintion, parseLimit, withRunTime, tilesForBbox
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
-/**
- * @typedef {type: string, coordinates: number[][], properties: {edges: string[], messageid: string, createdtime: string, sentiment: number, title: string, originalSources: string[], sentence: string, language: string, source: string, properties: {retweetCount: number, fatalaties: number, userConnecionCount: number, actor1: string, actor2: string, actor1Type: string, actor2Type: string, incidentType: string, allyActor1: string, allyActor2: string, title: string, link: string, originalSources: string[]}, fullText: string}} Feature
- */
-
 function eventToFeature(row) {
   const FeatureType = 'MultiPoint';
 
@@ -71,10 +67,6 @@ function queryEventsTable(eventIdResponse, args) {
   });
 }
 
-/**
- * @param {externalsourceid: string, bbox: number[], conjunctivetopics: string[], limit: number, pageState: number, fromDate: string, toDate: string, pipelinekeys: string[], fulltextTerm: string} args
- * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
- **/
 function byBbox(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
@@ -114,10 +106,6 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {site: string, mainTerm: string, filteredEdges: string[], langCode: string, limit: number, offset: number, fromDate: string, toDate: string, sourceFilter: string[], fulltextTerm: string} args
- * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Feature[]}>}
- */
 function byEdges(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
@@ -153,10 +141,6 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{site: string, messageId: string}} args
- * @returns {Promise.<Feature>}
- */
 function event(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.messageId) return reject('No event id to fetch specified');
@@ -185,10 +169,6 @@ function event(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{sentence: string, fromLanguage: string, toLanguage: string}} args
- * @returns {Promise.<{originalSentence: string, translatedSentence: string}>}
- */
 function translate(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     getSiteDefintion()
@@ -211,10 +191,6 @@ function translate(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{words: string[], fromLanguage: string, toLanguage: string}} args
- * @returns {Promise.<{words: Array<{originalSentence: string, translatedSentence: string}>}>}
- */
 function translateWords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)

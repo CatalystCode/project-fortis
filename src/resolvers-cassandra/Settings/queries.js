@@ -20,10 +20,6 @@ function transformWatchlist(item, translatedlanguage){
   };
 }
 
-/**
-* @param {{translationLanguage: string}} args
-* @returns {Promise.<{runTime: string, edges: Array<{name: string}>}>}
-*/
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const translationLanguage = args.translationLanguage || 'en';
@@ -45,10 +41,6 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{}} args
- * @returns {Promise.<{runTime: string, sites: Array<{name: string, properties: {targetBbox: number[], defaultZoomLevel: number, logo: string, title: string, defaultLocation: number[], storageConnectionString: string, featuresConnectionString: string, mapzenApiKey: string, fbToken: string, supportedLanguages: string[]}}>}>}
- */
 function sites(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {   
     getSiteDefintion()
@@ -57,10 +49,6 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{siteId: string}} args
- * @returns {Promise.<{runTime: string, sites: Array<{pipelineKey: string, pipelineLabel: string, pipelineIcon: string, streamFactory: string, enabled: boolean}>}>}
- */
 function streams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     cassandraConnector.executeQuery('SELECT * FROM fortis.streams', [])
@@ -110,10 +98,6 @@ function cassandraRowToTwitterAccount(row) {
   };
 }
 
-/**
- * @param {{}} args
- * @returns {Promise.<{runTime: string, accounts: Array<{accountName: string, consumerKey: string, consumerSecret: string, token: string, tokenSecret: string}>}>}
- */
 function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByPipelineKey = 'SELECT params FROM fortis.streams WHERE pipelinekey = ?';
@@ -134,10 +118,6 @@ function cassandraRowToTrustedTwitterAccount(row) {
   };
 }
 
-/**
- * @param {{siteId: string}} args
- * @returns {Promise.<{runTime: string, accounts: Array<{RowKey: string, acctUrl: string}>}>}
- */
 function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE pipelinekey = ? ALLOW FILTERING';
@@ -158,10 +138,6 @@ function cassandraRowToFacebookPage(row) {
   };
 }
 
-/**
- * @param {{siteId: string}} args
- * @returns {Promise.<{runTime: string, pages: Array<{RowKey: string, pageUrl: string}>}>}
- */
 function facebookPages(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const sourcesByConnector = 'SELECT connector, sourceid, sourcetype FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
@@ -180,10 +156,6 @@ function facebookPageToId(page) {
   return match && match.length >= 1 && match[1];
 }
 
-/**
- * @param {{siteId: string, days: number}} args
- * @returns {Promise.<{analytics: Array<{Name: string, Count: number, LastUpdated: string}>}>}
- */
 function facebookAnalytics(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     facebookPages({siteId: args.siteId})
@@ -204,10 +176,6 @@ function cassandraRowToTermFilter(row) {
   };
 }
 
-/**
- * @param {{siteId: string}} args
- * @returns {Promise.<{runTime: string, filters: Array<{filteredTerms: string[], lang: string, RowKey: string}>}>}
- */
 function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const blacklistQuery = 'SELECT id, conjunctivefilter FROM fortis.blacklist';
