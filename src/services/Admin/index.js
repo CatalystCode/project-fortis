@@ -71,15 +71,21 @@ export const SERVICES = {
     fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
   },
 
-  fetchStreams(callback) {
-    const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
-    const variables = {};
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
-
   fetchTopics(translationLanguage, callback) {
     const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
     const variables = { translationLanguage };
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
+
+  fetchTwitterAccounts(callback) {
+    const query = `${AdminFragments.twitterAccounts}${AdminQueries.getTwitterAccounts}`;
+    const variables = {};
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
+  
+  fetchStreams(callback) {
+    const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
+    const variables = {};
     fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
   },
 
@@ -113,28 +119,6 @@ export const SERVICES = {
         const host = process.env.REACT_APP_SERVICE_HOST
         const POST = {
             url: `${host}/api/messages`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-
-    getTwitterAccounts(siteId, callback) {
-        let query = `  ${twitterFragment}
-                        query TwitterAccounts($siteId: String!) {
-                            streams: twitterAccounts(siteId: $siteId) {
-                                ...FortisTwitterAcctView
-                            }
-                        }`;
-
-        let variables = { siteId };
-
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/settings`,
             method: "POST",
             json: true,
             withCredentials: false,

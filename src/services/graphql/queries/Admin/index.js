@@ -33,6 +33,26 @@ export const getPipelineDenfintion = `query PipelineDefintion($translationLangua
     configuration: ${getAdminSite}
 }`;
 
-export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!) {
-  terms: ${getPipelineTerms}
+export const getSite = `query Sites {
+  sites {
+		...SiteView
+  }
+}`;
+
+export const getTopics = `query SiteTerms($translationLanguage: String) {
+  siteTerms(translationLanguage: $translationLanguage) {
+    ...TopicsView
+  }
+}`;
+
+export const getTwitterAccounts = `query TwitterAccounts {
+  twitterAccounts {
+    ...TwitterAccountsView
+  }
+}`;
+
+export const getStreams = `query Streams {
+  streams {
+    ...StreamsView
+  }
 }`;
