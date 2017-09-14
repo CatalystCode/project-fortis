@@ -1,19 +1,19 @@
 {
-  "name": "Fortis-Client",
-  "description": "This repository holds all client / front-end related code for the Microsoft/OCHA Hackfest. .",
+  "name": "fortisclient",
+  "description": "This repository holds all client / front-end related code for the Fortis Project: https://aka.ms/fortis-story",
   "version": "0.0.1",
   "license": "MIT",
   "main": "./dist/js/index.min.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OICT-innovation/Project-Minerva-Client.git"
+    "url": "https://github.com/CatalystCode/project-fortis-interfaces.git"
   },
   "maintainers": [
-    {
-      "name": "Erik Schlegel",
-      "email": "erik.schlegel@gmail.com",
-      "web": "erikschlegel.com"
-    }
+    {"name": "Erik Schlegel", "email": "erisch@microsoft.com"},
+    {"name": "Stephanie Marker", "email": "stmarker@microsoft.com"},
+    {"name": "JC Jimenez", "email": "jcjimene@microsoft.com"},
+    {"name": "Kevin Hartman", "email": "keha@microsoft.com"},
+    {"name": "Clemens Wolff", "email": "clewolff@microsoft.com"}
   ],
   "engines": {
     "node": "6.9.1"
