@@ -17,10 +17,10 @@ export default class PopularLocationsChart extends React.Component {
     }
 
     handleClick(data, activeIndex) {
-        const { placeid, centroid, bbox } = data;
+        const { placeid, centroid, bbox, name } = data;
 
         const { dataSource, timespanType, termFilters, defaultZoom, datetimeSelection, maintopic, externalsourceid, fromDate, toDate } = this.props;
-        const place = { placeid, centroid, bbox }
+        const place = { placeid: placeid, placecentroid: centroid, name: name };
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, 
             bbox, defaultZoom, Array.from(termFilters), externalsourceid, null, place);
 

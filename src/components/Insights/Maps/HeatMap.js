@@ -1,5 +1,5 @@
 import MarkerClusterGroup from './MarkerClusterGroup';
-import { Map, TileLayer, ZoomControl } from 'react-leaflet';
+import { Map, TileLayer, ZoomControl, Rectangle } from 'react-leaflet';
 import constants from '../../../actions/constants';
 import React from 'react';
 import { hasChanged } from '../shared';
@@ -19,7 +19,7 @@ export default class HeatMap extends React.Component {
     const maxbounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
 
     this.state = {
-      bounds: bounds, 
+      bounds: bounds,
       placeid: "",
       defaultZoom: parseFloat(defaultZoom || 6),
       maxbounds: maxbounds
@@ -27,9 +27,9 @@ export default class HeatMap extends React.Component {
   }
 
   onViewportChanged(viewport) {
-    if(this.ready){
+    if (this.ready) {
       this.cancelQueuedProcess();
-      this.refreshTimerId = setTimeout(this.asyncInvokeDashboardRefresh(viewport), constants.MAP.DEBOUNCE);  
+      this.refreshTimerId = setTimeout(this.asyncInvokeDashboardRefresh(viewport), constants.MAP.DEBOUNCE);
     }
 
     this.ready = true;
@@ -38,6 +38,8 @@ export default class HeatMap extends React.Component {
   getLeafletBbox() {
     if (!this.refs.map) {
       return undefined;
+    } else if (this.props.selectedplace.placeid) {
+      return this.props.bbox;
     }
 
     const bounds = this.refs.map.leafletElement.getBounds();
@@ -48,17 +50,17 @@ export default class HeatMap extends React.Component {
   asyncInvokeDashboardRefresh(viewport) {
     if (this.refs.map) {
       const { dataSource, timespanType, termFilters, datetimeSelection, maintopic, externalsourceid,
-        fromDate, toDate } = this.props;
+        fromDate, toDate, selectedplace } = this.props;
       const zoom = this.refs.map.leafletElement.getZoom();
       const bbox = this.getLeafletBbox();
 
-      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, 
-        timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid);
+      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection,
+        timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid, null, selectedplace);
     }
   }
 
-  cancelQueuedProcess(){
-    if(this.refreshTimerId) {
+  cancelQueuedProcess() {
+    if (this.refreshTimerId) {
       clearTimeout(this.refreshTimerId);
       this.refreshTimerId = null;
     }
@@ -68,17 +70,17 @@ export default class HeatMap extends React.Component {
     return hasChanged(this.props, nextProps);
   }
 
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     const { placeid } = this.state;
 
-    if(hasChanged(this.props, nextProps) && nextProps.placeid && placeid !== nextProps.placeid && nextProps.placeCentroid.length === 2){
+    if (hasChanged(this.props, nextProps) && nextProps.placeid && placeid !== nextProps.placeid && nextProps.placeCentroid.length === 2) {
       this.moveMapToNewLocation(nextProps);
     }
   }
 
   moveMapToNewLocation(props) {
-      this.refs.map.leafletElement.setView(props.placeCentroid, props.zoomLevel);
-      this.setState({ placeid: props.placeid});
+    this.refs.map.leafletElement.setView(props.placeCentroid, props.zoomLevel);
+    this.setState({ placeid: props.placeid });
   }
 
   formatLeafletBounds(bbox) {
@@ -89,8 +91,20 @@ export default class HeatMap extends React.Component {
     console.error('Bad bbox format');
   }
 
+  renderRectangle(bbox) {
+    const bboxRectangleColor = "#0ff";
+    const bounds = [[bbox[0], bbox[1]], [bbox[2], bbox[3]]];
+
+    return <Rectangle
+      bounds={bounds}
+      fill={false}
+      color={bboxRectangleColor}
+    />;
+  }
+
   render() {
     const { maxbounds, defaultZoom } = this.state;
+    const { selectedplace, bbox } = this.props;
     const maxzoom = defaultZoom + constants.MAP.MAXZOOM;
 
     return (
@@ -113,6 +127,8 @@ export default class HeatMap extends React.Component {
         <ZoomControl
           position={'topright'}
         />
+
+        {selectedplace.placeid ? this.renderRectangle(bbox) : undefined}
 
         <MarkerClusterGroup
           clusterColorField={"avgsentiment"}

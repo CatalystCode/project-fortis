@@ -22,6 +22,9 @@ function innerJoin(arr1, arr2) {
 }
 
 function hasChanged(prevProps, nextProps) {
+    const nextplaceid = nextProps.selectedplace.placeid || "";
+    const prevplaceid = prevProps.selectedplace.placeid || "";
+
     if (prevProps && prevProps.bbox &&
         nextProps.bbox === prevProps.bbox &&
         nextProps.zoomLevel === Math.max(nextProps.defaultZoom, prevProps.zoomLevel) &&
@@ -29,6 +32,7 @@ function hasChanged(prevProps, nextProps) {
         nextProps.toDate === prevProps.toDate &&
         nextProps.language === prevProps.language &&
         nextProps.maintopic === prevProps.maintopic &&
+        prevplaceid === nextplaceid &&
         nextProps.externalsourceid === prevProps.externalsourceid &&
         nextProps.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
         nextProps.dataSource === prevProps.dataSource) {

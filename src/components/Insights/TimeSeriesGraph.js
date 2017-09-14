@@ -84,7 +84,7 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     handleDataFetch() {
-        const { dataSource, timespanType, bbox, termFilters, timeSeriesGraphData, zoomLevel, externalsourceid, maintopic } = this.props;
+        const { dataSource, timespanType, bbox, selectedplace, termFilters, timeSeriesGraphData, zoomLevel, externalsourceid, maintopic } = this.props;
         const { startIndex, endIndex } = this.range;
         const fromDateSlice = timeSeriesGraphData.graphData[startIndex];
         const toDateSlice = timeSeriesGraphData.graphData[endIndex];
@@ -95,7 +95,7 @@ export default class TimeSeriesGraph extends React.Component {
             const toDate = this.momentFormat(toDateSlice.date, FromToDateFormat);
             const datetimeSelection = `${this.momentFormat(fromDateSlice.date, datetimeSelectionFormat)} - ${this.momentFormat(toDateSlice.date, datetimeSelectionFormat)}`
             const timeseriesType = constants.TIMESPAN_TYPES[timespanType].timeseriesType
-            this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timeseriesType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+            this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timeseriesType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
         }
     }
 

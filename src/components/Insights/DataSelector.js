@@ -50,10 +50,10 @@ export default class DataSelector extends React.Component {
         const formatter = constants.TIMESPAN_TYPES[timeType];
         const dates = momentGetFromToRange(timeSelection, formatter.format, formatter.rangeFormat);
         const { fromDate, toDate } = dates;
-        const { dataSource, maintopic, bbox, zoomLevel, termFilters, externalsourceid } = this.props;
+        const { dataSource, maintopic, bbox, zoomLevel, termFilters, externalsourceid, selectedplace } = this.props;
         const dateType = this.customDateEntered(timeType) ? formatter.rangeFormat : timeType;
 
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, timeSelection, dateType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, timeSelection, dateType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
     }
 
     handleChange(event, index, value) {
