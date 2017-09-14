@@ -133,9 +133,9 @@ case class Stream(
 )
 
 case class TrustedSource(
-  sourceid: String,
+  externalsourceid: String,
   sourcetype: String,
-  connector: String,
+  pipelinekey: String,
   rank: Int,
-  insertion_time: Long
+  insertiontime: Long
 )

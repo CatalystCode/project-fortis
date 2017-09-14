@@ -73,5 +73,14 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.reddit.dto.RedditObjectData])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.summary.Summarizer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.summary.KeywordSummarizer])
+
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSCategory])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSContent])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSEnclosure])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSEntry])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSFeed])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSLink])
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSPerson])
+
   }
 }

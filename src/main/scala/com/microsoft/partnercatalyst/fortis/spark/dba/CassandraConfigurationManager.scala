@@ -6,6 +6,8 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.Connect
 import org.apache.spark.SparkContext
 import com.datastax.spark.connector._
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.TrustedSource
+
 import scala.compat.java8.FunctionConverters._
 
 @SerialVersionUID(100L)
@@ -71,4 +73,10 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
 
     blacklistRdd.collect()
   }
+
+  override def fetchTrustedSources(sparkContext: SparkContext): Seq[TrustedSource] = {
+    sparkContext.cassandraTable[TrustedSource](CassandraSchema.KeyspaceName, CassandraSchema.Table.TrustedSourcesName)
+      .collect()
+  }
+
 }
