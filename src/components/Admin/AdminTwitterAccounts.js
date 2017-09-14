@@ -6,7 +6,7 @@ import Fluxxor from 'fluxxor';
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
-export const AdminTwitterAccounts = React.createClass({
+export const AdminTwitterAccounts = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   componentDidMount() {
@@ -18,11 +18,11 @@ export const AdminTwitterAccounts = React.createClass({
   },
 
   handleSave(mutatedRows, columns) {
-    this.getFlux().actions.ADMIN.save_twitter_accts(this.props.siteKey, mutatedRows);
+    this.getFlux().actions.ADMIN.save_twitter_accounts(this.props.siteKey, mutatedRows);
   },
 
   handleRemove(deletedRows) {
-    this.getFlux().actions.ADMIN.remove_twitter_accts(this.props.siteKey, deletedRows);
+    this.getFlux().actions.ADMIN.remove_twitter_accounts(this.props.siteKey, deletedRows);
   },
 
   render() {
