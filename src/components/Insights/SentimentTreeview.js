@@ -3,11 +3,13 @@ import React from 'react';
 import { Treebeard, decorators } from 'react-treebeard';
 import * as filters from './TreeFilter';
 import TypeaheadSearch from './TypeaheadSearch';
+import ActiveFiltersView from './ActiveFiltersView';
 import '../../styles/Header.css';
 import '../../styles/Insights/SentimentTreeView.css';
 import { styles, treeDataStyle } from '../../styles/Insights/SentimentTreeview';
 import numeralLibs from 'numeral';
 import { fetchTermFromMap, hasChanged } from './shared';
+import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
 
 const TopRowHeight = 130;
 const parentTermsName = "Term Filters";
@@ -150,6 +152,20 @@ export default class SentimentTreeview extends React.Component {
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
     }
 
+    deleteExternalSourceId = () => {
+        const { dataSource, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, bbox } = this.props;
+        const externalsourceid = DEFAULT_EXTERNAL_SOURCE;
+
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+    }
+
+    deleteDataSource = () => {
+        const { externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, bbox } = this.props;
+        const dataSource = DEFAULT_DATA_SOURCE;
+
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+    }
+
     clearTerms(){
         const { maintopic } = this.props;
         this.handleDataFetch(maintopic, []);
@@ -213,6 +229,14 @@ export default class SentimentTreeview extends React.Component {
                             : undefined
                     }
                 </Subheader>
+                <div style={styles.activeFiltersView}>
+                    <ActiveFiltersView
+                        deleteExternalSourceId={this.deleteExternalSourceId}
+                        externalsourceid={this.props.externalsourceid}
+                        deleteDataSource={this.deleteDataSource}
+                        dataSource={this.props.dataSource}
+                    />
+                </div>
                 <div style={styles.searchBox}>
                     <TypeaheadSearch
                         dashboardRefreshFunc={this.handleDataFetch}

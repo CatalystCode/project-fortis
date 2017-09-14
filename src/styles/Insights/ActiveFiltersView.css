@@ -1,0 +1,18 @@
+.active-filters-view > div {
+    position: relative;
+}
+.active-filters-view > div > svg {
+    position: absolute;
+    right: 0;
+}
+
+.active-filters-view--chip {
+    margin-bottom: 0.5em !important;
+}
+
+.active-filters-view--chip--label-container {
+    width: 140px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
