@@ -251,6 +251,7 @@ CREATE TABLE events(
     externalsourceid text,
     eventlangcode text,
     body text,
+    imageurl text,
     summary text,
     computedfeatures frozen<features>,
     insertiontime timestamp,
