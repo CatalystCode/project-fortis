@@ -12,7 +12,7 @@ const CONNECTOR_FACEBOOK = 'Facebook';
 function transformWatchlist(item, translatedlanguage){
   return {
     topicid: item.topicid,
-    name: item.topic,
+    name: item.topic.toLowerCase(),
     translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ? 
     (item.translations || {})[translatedlanguage] : item.topic,
     translatednamelang: translatedlanguage,
@@ -26,7 +26,7 @@ function transformWatchlist(item, translatedlanguage){
 */
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const translationLanguage = args.translationLanguage;
+    const translationLanguage = args.translationLanguage || 'en';
 
     const query = `
     SELECT topicid, topic, translations, lang_code
@@ -75,7 +75,7 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
 }
 
 function cassandraRowToStream(row) {
-  if (row.enabled == null) row.enabled = true;
+  if (row.enabled == null) row.enabled = false;
   return {
     streamId: row.streamid,
     pipelineKey: row.pipelinekey,
