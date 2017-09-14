@@ -22,6 +22,7 @@ class BingAnalyzer extends Analyzer[BingPost] with Serializable
       externalsourceid = new URL(item.url).getHost,
       body = item.snippet,
       title = item.name,
+      imageurl = None,
       pipelinekey = "Bing",
       sourceurl = item.url,
       original = item

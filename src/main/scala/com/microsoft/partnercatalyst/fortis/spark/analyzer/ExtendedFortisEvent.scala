@@ -19,6 +19,7 @@ case class ExtendedDetails[T](
   eventtime: Long,
   body: String,
   title: String,
+  imageurl: Option[String],
   pipelinekey: String,
   externalsourceid: String,
   sourceurl: String,

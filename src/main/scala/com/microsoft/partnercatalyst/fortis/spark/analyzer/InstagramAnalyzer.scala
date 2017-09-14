@@ -25,6 +25,7 @@ class InstagramAnalyzer extends Analyzer[InstagramItem] with Serializable
       eventtime = item.created_time.toLong,
       body = imageAnalysis.summary.getOrElse(""),
       title = item.caption.text,
+      imageurl = Some(item.images.standard_resolution.url),
       sharedLocations = item.location match {
         case Some(location) => locationFetcher(location.latitude, location.longitude).toList
         case None => List()

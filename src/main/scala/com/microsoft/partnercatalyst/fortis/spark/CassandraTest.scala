@@ -30,12 +30,14 @@ object CassandraTest {
     eventid: String,
     eventtime: Long,
     body: String,
+    imageurl: Option[String],
     externalsourceid: String,
     title: String,
     pipelinekey: String,
     sourceurl: String,
     sharedLocations: List[Location] = List()
-  ) extends Details
+  ) extends Details {
+  }
   def envOrFail(name: String): String = {
     envOrNone(name) match {
       case Some(v) => v
@@ -69,6 +71,7 @@ object CassandraTest {
         sharedLocations = List(),
         externalsourceid = "cnn",
         body = "test message a new change",
+        imageurl = None,
         title = "twitter post" ),
       analysis = Analysis(
         sentiments = List(.5),
@@ -88,6 +91,7 @@ object CassandraTest {
           sharedLocations = List(),
           externalsourceid = "bbc",
           body = "This is a another test message",
+          imageurl = None,
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
@@ -110,6 +114,7 @@ object CassandraTest {
           sharedLocations = List(),
           externalsourceid = "bloomberg",
           body = "This is a another test message from bloomberg",
+          imageurl = None,
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),

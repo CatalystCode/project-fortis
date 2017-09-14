@@ -16,6 +16,7 @@ class FacebookCommentAnalyzer extends Analyzer[FacebookComment] with Serializabl
       title = s"Post ${item.postId}: Comment",
       externalsourceid = item.pageId,
       pipelinekey = "Facebook",
+      imageurl = None,
       sourceurl = s"https://www.facebook.com/${item.pageId}/posts/${item.postId}",
       original = item
     )
