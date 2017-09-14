@@ -10,26 +10,22 @@ class ActiveFiltersView extends React.Component {
     const chips = [];
 
     const dataSource = this.props.dataSource;
-    if (dataSource) {
+    if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
       chips.push({
         type: 'dataSource',
         label: `Publisher: ${dataSource}`,
         icon: 'find_in_page',
-        onDelete: dataSource === DEFAULT_DATA_SOURCE
-          ? undefined
-          : this.props.deleteDataSource,
+        onDelete: this.props.deleteDataSource,
       });
     }
 
     const externalsourceid = this.props.externalsourceid;
-    if (externalsourceid) {
+    if (externalsourceid && externalsourceid !== DEFAULT_EXTERNAL_SOURCE) {
       chips.push({
         type: 'externalsourceid',
         label: `Source: ${externalsourceid}`,
         icon: 'share',
-        onDelete: externalsourceid === DEFAULT_EXTERNAL_SOURCE
-          ? undefined
-          : this.props.deleteExternalSourceId,
+        onDelete: this.props.deleteExternalSourceId,
       });
     }
 
