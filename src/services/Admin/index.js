@@ -1,5 +1,6 @@
 import * as AdminFragments from '../graphql/fragments/Admin';
 import * as AdminQueries from '../graphql/queries/Admin';
+import * as AdminMutations from '../graphql/mutations/Admin';
 import { fetchGqlData } from '../shared';
 import request from 'request';
 
@@ -169,6 +170,12 @@ export const SERVICES = {
 
         request(POST, callback);
     },
+
+  saveStreams(streams, callback) {
+    const query = `${AdminFragments.streams}${AdminMutations.saveStreams}`;
+    const variables = { input: { streams } };
+    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+  },
 
     saveTwitterAccounts(site, accounts, mutation, callback) {
         const query = ` ${twitterFragment}

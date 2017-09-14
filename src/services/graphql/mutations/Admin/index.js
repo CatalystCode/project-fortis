@@ -3,3 +3,9 @@ export const editSite = `mutation EditSite($input: EditableSiteSettings!) {
     name
   }
 }`;
+
+export const saveStreams = `mutation SaveStreams($input: StreamListInput!) {
+  modifyStreams(input: $input) {
+    ...StreamsView
+  }
+}`;

@@ -74,7 +74,7 @@ export const StreamStatusButtonFormatter = createReactClass({
     const oldState = this.getStreamState();
     const newState = this.getNewState(oldState);
     const streamWithNewState = this.getStreamWithNewState(newState)
-    this.saveStream(streamWithNewState);
+    this.saveStreams(streamWithNewState);
   },
 
   getNewState(oldState) {
@@ -91,8 +91,9 @@ export const StreamStatusButtonFormatter = createReactClass({
     return this.props.dependentValues;
   },
 
-  saveStream(stream) {
-    this.getFlux().actions.ADMIN.save_streams([stream]);
+  saveStreams(streams) {
+    if (streams.constructor !== Array) streams = [streams];
+    this.getFlux().actions.ADMIN.save_streams(streams);
   },
 
   render() {
