@@ -11,10 +11,6 @@ const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
 const MaxFetchedRows = 1000;
 
-/**
- * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, bbox: [Float]}} args
- * @returns {Promise.<{runTime: string, edges: Array<{name: string, mentions: number, placeid: string, avgsentiment: float}>}>}
- */
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -86,10 +82,6 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, maintopics: [String]!, conjunctivetopics: [String], bbox: [Float], zoomLevel: Int, externalsourceid: String!}} args
- * @returns {Promise.<{labels: Array<{name: string, mentions: number}>, graphData: Array<{date: string, edges: string[], mentions: number[]}>}>}
- */
 function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const conjunctivetopics = args.maintopics.length > 1 ? [] : args.conjunctivetopics;
@@ -142,10 +134,6 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{bbox: string}} args
- * @returns {Promise.<{runTime: string, edges: Array<{name: string, coordinates: number[]}>}>}
- */
 function locations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { bbox } = args;
@@ -161,10 +149,6 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, bbox: [Float], zoomLevel: Int}} args
- * @returns {Promise.<{edges: Array<{name: string, mentions: number, avgsentiment: float}>}>}
- */
 function topTerms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -208,10 +192,6 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{limit: Int!, fromDate: String!, periodType: String!, toDate: String!, pipelinekeys: [String]!, conjunctivetopics: [String]!, bbox: [Float], zoomLevel: Int}} args
- * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
- */
 function topSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
@@ -260,10 +240,6 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-/**
- * @param {{fromDate: String!, periodType: String!, toDate: String!, externalsourceid: String!, pipelinekeys: [String]!, maintopic: String!, bbox: [Float], zoomLevel: Int!}} args
- * @returns {Promise.<{sources: Array<{Name: string, Count: number, Source: string}>}>}
- */
 function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const fetchSize = 400;
