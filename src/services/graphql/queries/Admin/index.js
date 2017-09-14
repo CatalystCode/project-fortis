@@ -28,6 +28,10 @@ export const getPipelineTerms = `siteTerms(translationLanguage:$translationLangu
   }
 }`;
 
+export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!) {
+   terms: ${getPipelineTerms}
+}`;
+
 export const getPipelineDenfintion = `query PipelineDefintion($translationLanguage: String) {
     terms: ${getPipelineTerms}
     configuration: ${getAdminSite}
