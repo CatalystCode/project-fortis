@@ -21,6 +21,7 @@ function cassandraRowToSite(row) {
       translationsvctoken: row.translationsvctoken,
       featureServiceNamespace: row.featureservicenamespace,
       defaultLocation: row.geofence,
+      featureservicenamespace: row.featureservicenamespace,
       defaultLanguage: row.defaultlanguage,
       supportedLanguages: row.languages
     }
