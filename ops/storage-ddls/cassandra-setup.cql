@@ -299,7 +299,7 @@ AS SELECT eventid, pipelinekey, eventtime, centroidlat, centroidlon, placeid, co
      AND conjunctiontopic3 IS NOT NULL
      AND centroidlat IS NOT NULL
      AND centroidlon IS NOT NULL
-PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, externalsourceid), tileid, eventtime, placeid, eventid);
+PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, externalsourceid, tileid), eventtime, placeid, eventid);
 
 /**
  * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
