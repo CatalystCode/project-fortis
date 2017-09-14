@@ -48,7 +48,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
         const placeIds = Array.from(makeSet(rows, row => row.placeid));
 
         if (placeIds.length) {
-          featureServiceClient.fetchById(placeIds, 'bbox')
+          featureServiceClient.fetchById(placeIds, 'bbox,centroid')
             .then(features => {
               const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);
               const edges = rows.map(row => ({
@@ -57,6 +57,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
                 layer: placeIdToFeature[row.placeid].layer,
                 placeid: row.placeid,
                 avgsentimentnumerator: row.avgsentimentnumerator,
+                centroid: placeIdToFeature[row.placeid].centroid,
                 bbox: placeIdToFeature[row.placeid].bbox
               }))
               .filter(row=>row.layer && layerfilters.indexOf(row.layer) === -1);
@@ -65,6 +66,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
                 edges: aggregateBy(edges, row => `${row.name.toLowerCase()}`, row => ({
                   name: row.name,
                   coordinates: row.coordinates,
+                  centroid: row.centroid,
                   bbox: row.bbox,
                   placeid: row.placeid,
                   mentions: Long.ZERO,
@@ -138,9 +140,15 @@ function locations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { bbox } = args;
 
-    featureServiceClient.fetchByBbox({ north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3] }, 'bbox')
+    featureServiceClient.fetchByBbox({ north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3] }, 'bbox,centroid')
       .then(locations => {
-        const places = locations.map(location => ({ name: location.name, placeid: location.id, layer: location.layer, bbox: location.bbox }));
+        const places = locations.map(location => ({
+          name: location.name,
+          placeid: location.id,
+          layer: location.layer,
+          bbox: location.bbox,
+          centroid: location.centroid
+        }));
         resolve({
           places
         });
