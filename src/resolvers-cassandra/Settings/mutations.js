@@ -16,6 +16,7 @@ const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
 const SERVICE_BUS_CONFIG_QUEUE = process.env.FORTIS_SB_CONFIG_QUEUE || 'configuration';
+const SERVICE_BUS_COMMAND_QUEUE = process.env.FORTIS_SB_COMMAND_QUEUE || 'command';
 
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
@@ -252,6 +253,9 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeBatchMutations(mutations)
     .then(() => {
+      serviceBusClient.sendStringMessage(SERVICE_BUS_COMMAND_QUEUE, JSON.stringify({'dirty': 'streams'}));
+    })
+    .then(() => {
       resolve({
         streams
       });
@@ -274,6 +278,9 @@ function removeStreams(args, res) { // eslint-disable-line no-unused-vars
     });
 
     cassandraConnector.executeBatchMutations(deletions)
+    .then(() => {
+      serviceBusClient.sendStringMessage(SERVICE_BUS_COMMAND_QUEUE, JSON.stringify({'dirty': 'streams'}));
+    })
     .then(() => {
       resolve({
         streams
