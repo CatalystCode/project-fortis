@@ -21,6 +21,11 @@ export const StreamEditor = createReactClass({
     return this.getFlux().store("AdminStore").getState();
   },
 
+  handleSave(streams) {
+    if (streams.constructor !== Array) streams = [streams];
+    this.getFlux().actions.ADMIN.save_streams(streams);
+  },
+
   render(){
     return (
       this.state.streamColumns.length > 0 ? 
@@ -33,6 +38,7 @@ export const StreamEditor = createReactClass({
           guidAutofillColumn="streamId"
           columns={this.state.streamColumns}
           rows={this.state.streams}
+          handleSave={this.handleSave}
         /> : <div />
     );
   }
