@@ -79,21 +79,19 @@ const methods = {
             }
         });
     },
-    clearWatchlistFilters() {
-        this.dispatch(constants.DASHBOARD.CLEAR_FILTERS, {});
-    },
-    reloadTopSources(topSources) {
-        this.dispatch(constants.DASHBOARD.RELOAD_TOP_SOURCES, topSources);
-    },
-    reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, includeCsv) {
+    reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, 
+        zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
         let self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;
 
         let timeserieslabels = isMostPopularTopicSelected(maintopic, dataStore.popularTerms) ? dataStore.popularTerms.map(topic=>topic.name) : [maintopic];
 
-        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, [], externalsourceid, timeserieslabels, includeCsv, (err, chartData) => {
+        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeserieslabels, includeCsv, (err, chartData) => {
             if (!err) {
-                let mutatedFilters = { fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
+                const placeid = place && place.placeid ? place.placeid : "";
+                const placeCentroid = place && place.centroid ? place.centroid : [];
+
+                let mutatedFilters = { fromDate, toDate, placeid, placeCentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
@@ -101,9 +99,6 @@ const methods = {
                 console.error(`[${err}] occured while processing tile visualization re-sync request`);
             }
         })
-    },
-    changeTermsFilter(newFilters) {
-        this.dispatch(constants.DASHBOARD.CHANGE_TERM_FILTERS, newFilters);
     },
     loadDetail(siteKey, messageId, dataSources, sourcePropeties) {
         let self = this;
@@ -118,7 +113,18 @@ const methods = {
         });
     },
     changeLanguage(language) {
-        this.dispatch(constants.DASHBOARD.CHANGE_LANGUAGE, language);
+        const self = this;
+
+        AdminServices.getWatchlist(language, (error, response, body) => {
+            if(!error && response.statusCode === 200 && body.data && !body.errors) {
+                const { terms } = body.data;
+
+                this.dispatch(constants.DASHBOARD.CHANGE_LANGUAGE, { language, terms });
+            } else {
+                console.error(error, null);
+                self.dispatch(constants.DASHBOARD.LOAD_DETAIL_ERROR, error);
+            }
+        })
     }
 };
 

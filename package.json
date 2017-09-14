@@ -9,11 +9,26 @@
     "url": "https://github.com/CatalystCode/project-fortis-interfaces.git"
   },
   "maintainers": [
-    {"name": "Erik Schlegel", "email": "erisch@microsoft.com"},
-    {"name": "Stephanie Marker", "email": "stmarker@microsoft.com"},
-    {"name": "JC Jimenez", "email": "jcjimene@microsoft.com"},
-    {"name": "Kevin Hartman", "email": "keha@microsoft.com"},
-    {"name": "Clemens Wolff", "email": "clewolff@microsoft.com"}
+    {
+      "name": "Erik Schlegel",
+      "email": "erisch@microsoft.com"
+    },
+    {
+      "name": "Stephanie Marker",
+      "email": "stmarker@microsoft.com"
+    },
+    {
+      "name": "JC Jimenez",
+      "email": "jcjimene@microsoft.com"
+    },
+    {
+      "name": "Kevin Hartman",
+      "email": "keha@microsoft.com"
+    },
+    {
+      "name": "Clemens Wolff",
+      "email": "clewolff@microsoft.com"
+    }
   ],
   "engines": {
     "node": "6.9.1"
@@ -35,12 +50,10 @@
   },
   "dependencies": {
     "async": "^2.0.1",
-    "async-seq": "^0.2.9",
     "autosuggest-highlight": "^3.1.0",
     "bootstrap": "^3.3.7",
     "create-react-class": "^15.6.0",
     "fbgraph": "^1.4.1",
-    "fetch": "^1.1.0",
     "flux": "^3.1.0",
     "fluxxor": "^1.7.3",
     "geo-viewport": "^0.2.1",
@@ -77,7 +90,7 @@
     "react-treebeard": "^1.1.4",
     "react-widgets": "^3.4.5",
     "recharts": "^0.22.4",
-    "request": "^2.78.0",
+    "request": "^2.81.0",
     "turf-bbox-polygon": "^3.0.12",
     "turf-extent": "^1.0.4",
     "turf-inside": "^3.0.12",

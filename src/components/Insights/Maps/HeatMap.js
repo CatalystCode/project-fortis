@@ -11,16 +11,31 @@ const TILE_LAYER_URL = 'https://api.mapbox.com/styles/v1/erikschlegel/cizn74i770
 export default class HeatMap extends React.Component {
   constructor(props) {
     super(props);
+    const { defaultZoom, targetBbox } = props;
 
+    const bounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[1], targetBbox[0]], [targetBbox[3], targetBbox[2]]] : [];
     this.onViewportChanged = this.onViewportChanged.bind(this);
-    this.updateBounds = this.updateBounds.bind(this);
+    this.updateBounds = this.asyncInvokeDashboardRefresh.bind(this);
+    const maxbounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
+
+    this.state = {
+      bounds: bounds, 
+      placeid: "",
+      defaultZoom: parseFloat(defaultZoom || 6),
+      maxbounds: maxbounds
+    };
   }
 
   onViewportChanged(viewport) {
-    this.updateBounds(viewport);
+    if(this.ready){
+      this.cancelQueuedProcess();
+      this.refreshTimerId = setTimeout(this.asyncInvokeDashboardRefresh(viewport), constants.MAP.DEBOUNCE);  
+    }
+
+    this.ready = true;
   }
 
-  getLeafletBbox(){
+  getLeafletBbox() {
     if (!this.refs.map) {
       return undefined;
     }
@@ -30,15 +45,22 @@ export default class HeatMap extends React.Component {
     return [bounds.getNorth(), bounds.getWest(), bounds.getSouth(), bounds.getEast()];
   }
 
-  updateBounds(viewport) {
-    if(this.refs.map){
+  asyncInvokeDashboardRefresh(viewport) {
+    if (this.refs.map) {
       const { dataSource, timespanType, termFilters, datetimeSelection, maintopic, externalsourceid,
         fromDate, toDate } = this.props;
       const zoom = this.refs.map.leafletElement.getZoom();
       const bbox = this.getLeafletBbox();
-      //this.refs.map.leafletElement.fitBounds(this.formatLeafletBounds(bbox));
 
-      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid);
+      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, 
+        timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid);
+    }
+  }
+
+  cancelQueuedProcess(){
+    if(this.refreshTimerId) {
+      clearTimeout(this.refreshTimerId);
+      this.refreshTimerId = null;
     }
   }
 
@@ -46,8 +68,21 @@ export default class HeatMap extends React.Component {
     return hasChanged(this.props, nextProps);
   }
 
-  formatLeafletBounds(bbox){
-    if(bbox.length === 4){
+  componentWillReceiveProps(nextProps){
+    const { placeid } = this.state;
+
+    if(hasChanged(this.props, nextProps) && nextProps.placeid && placeid !== nextProps.placeid && nextProps.placeCentroid.length === 2){
+      this.moveMapToNewLocation(nextProps);
+    }
+  }
+
+  moveMapToNewLocation(props) {
+      this.refs.map.leafletElement.setView(props.placeCentroid, props.zoomLevel);
+      this.setState({ placeid: props.placeid});
+  }
+
+  formatLeafletBounds(bbox) {
+    if (bbox.length === 4) {
       return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
     }
 
@@ -55,27 +90,23 @@ export default class HeatMap extends React.Component {
   }
 
   render() {
-    const { zoomLevel, targetBbox, bbox, defaultZoom } = this.props;
+    const { maxbounds, defaultZoom } = this.state;
+    const maxzoom = defaultZoom + constants.MAP.MAXZOOM;
 
-    if (!this.props.bbox.length) return null;
-    const minzoom = parseFloat(defaultZoom);
-    const maxzoom = minzoom + constants.MAP.MAXZOOM;
-    const bounds = [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
-    const maxbounds = [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]];
-    
     return (
       <Map
-        onViewportChanged={this.onViewportChanged}
-        bounds={bounds}
+        onzoomend={this.onViewportChanged}
+        ondragend={this.onViewportChanged}
+        bounds={this.state.bounds}
         ref="map"
         id="leafletMap"
         maxBounds={maxbounds}
-        zoom={zoomLevel}
+        useFlyTo={true}
         zoomControl={false} >
 
         <TileLayer url={TILE_LAYER_URL}
           maxZoom={maxzoom}
-          minZoom={minzoom}
+          minZoom={defaultZoom}
           attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
           accessToken={MAPBOX_ACCESS_TOKEN} />
 

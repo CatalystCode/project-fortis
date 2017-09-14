@@ -24,7 +24,7 @@ export default class PopularSourcesChart extends React.Component {
 
     refreshChart(props) {
         const { topSources, externalsourceid } = props;
-        let { activeIndex } = this.state;
+        let activeIndex = -1;
         let colorCells = [], dataProvider = [];
 
         topSources.forEach((source, index) => {

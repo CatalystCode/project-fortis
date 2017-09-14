@@ -17,19 +17,24 @@ export default class PopularLocationsChart extends React.Component {
     }
 
     handleClick(data, activeIndex) {
-        const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, externalsourceid, fromDate, toDate } = this.props;
-        const { placeid, bbox } = data;
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        const { placeid, centroid, bbox } = data;
+
+        const { dataSource, timespanType, termFilters, defaultZoom, datetimeSelection, maintopic, externalsourceid, fromDate, toDate } = this.props;
+        const place = { placeid, centroid, bbox }
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, 
+            bbox, defaultZoom, Array.from(termFilters), externalsourceid, null, place);
+
         this.setState({ activeIndex: activeIndex, selectedWofId: placeid });
     }
 
     refreshChart(props) {
         const { popularLocations } = props;
-        let { activeIndex,selectedWofId } = this.state;
+        let activeIndex = -1;
+        let { selectedWofId } = this.state;
         let colorCells = [], dataProvider = [];
 
         popularLocations.forEach((location, index) => {
-            const { name, mentions, bbox, placeid } = location;
+            const { name, mentions, bbox, placeid, centroid } = location;
             const value = mentions;
             if (placeid === selectedWofId) {
                 activeIndex = index;
@@ -37,7 +42,7 @@ export default class PopularLocationsChart extends React.Component {
             let color = constants.CHART_STYLE.COLORS[index];
             colorCells.push(<Cell key={0} fill={color} />);
 
-            dataProvider.push(Object.assign({}, { value, name, bbox, placeid }));
+            dataProvider.push(Object.assign({}, { value, name, bbox, placeid, centroid }));
         });
 
         this.setState({ colorCells, dataProvider, activeIndex });

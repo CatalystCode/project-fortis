@@ -49,46 +49,94 @@ const blacklistFragment = `fragment FortisDashboardView on BlacklistCollection {
                       }`;
 
 export const SERVICES = {
-  getDashboardSiteDefinition(translationLanguage, callback){
-      const query = ` ${AdminFragments.siteSettingsFragment}
+    getDashboardSiteDefinition(translationLanguage, callback) {
+        const query = ` ${AdminFragments.siteSettingsFragment}
                       ${AdminQueries.getPipelineDenfintion}`;
 
-      const variables = { translationLanguage };
-      const host = process.env.REACT_APP_SERVICE_HOST
-      const POST = {
-          url: `${host}/api/settings`,
-          method: "POST",
-          json: true,
-          withCredentials: false,
-          body: { query, variables }
-      };
+        const variables = { translationLanguage };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-      request(POST, callback);
-  },
+        request(POST, callback);
+    },
 
-  fetchSite(callback) {
-    const query = `${AdminFragments.site}${AdminQueries.getSite}`;
-    const variables = {};
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
+    fetchSite(callback) {
+        const query = `${AdminFragments.site}${AdminQueries.getSite}`;
+        const variables = {};
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
 
-  fetchTopics(translationLanguage, callback) {
-    const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
-    const variables = { translationLanguage };
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
+    getWatchlist(translationLanguage, callback) {
+        const query = ` ${AdminQueries.getPipelineWatchlist}`;
 
-  fetchTwitterAccounts(callback) {
-    const query = `${AdminFragments.twitterAccounts}${AdminQueries.getTwitterAccounts}`;
-    const variables = {};
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
-  
-  fetchStreams(callback) {
-    const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
-    const variables = {};
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
+        const variables = { translationLanguage };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
+
+        request(POST, callback);
+    },
+
+    fetchTopics(translationLanguage, callback) {
+        const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
+        const variables = { translationLanguage };
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    fetchTwitterAccounts(callback) {
+        const query = `${AdminFragments.twitterAccounts}${AdminQueries.getTwitterAccounts}`;
+        const variables = {};
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    fetchStreams(callback) {
+        const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
+        const variables = {};
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    removeStreams(streams, callback) {
+        const query = `		
+              mutation RemoveStreams($input: StreamListInput!) {		
+                removeStreams(input: $input) {		
+                  streams {		
+                    streamId		
+                    pipelineKey		
+                    pipelineLabel		
+                    pipelineIcon		
+                    streamFactory		
+                    params {		
+                      key		
+                      value		
+                }		
+                   enabled		
+                  }		
+                }		
+              }`;
+
+        const variables = { input: { streams: streams } };
+        const host = process.env.REACT_APP_SERVICE_HOST;
+        const POST = {
+            url: `${host}/api/settings`,
+            method: 'POST',
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
+
+        request(POST, callback);
+    },
 
   saveStreams(streams, callback) {
     const query = `${AdminFragments.streams}${AdminMutations.saveStreams}`;
@@ -265,7 +313,7 @@ export const SERVICES = {
 
         request(POST, callback);
     },
-    getAdminFbPages(siteId, days, callback){
+    getAdminFbPages(siteId, days, callback) {
         let query = ` ${fbPageFragment},
                       ${fbPageAnalyticsFragment}
                            query FacebookPages($siteId: String!, $days: Int!) {
@@ -278,81 +326,81 @@ export const SERVICES = {
                               }
                           }`;
 
-          let variables = { siteId, days };
+        let variables = { siteId, days };
 
-          let host = process.env.REACT_APP_SERVICE_HOST
-          var POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        let host = process.env.REACT_APP_SERVICE_HOST
+        var POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
     saveFbPages(site, pages, callback) {
-          const query = `${fbPageFragment}
+        const query = `${fbPageFragment}
                           mutation ModifyFacebookPages($input: FacebookPageListInput!) {
                               pages: modifyFacebookPages(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
 
-          const variables = { input: { pages, site } };
+        const variables = { input: { pages, site } };
 
-          const host = process.env.REACT_APP_SERVICE_HOST
-          const POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
     saveTrustedTwitterAccts(site, accounts, callback) {
-          const query = `${trustedTwitterFragment}
+        const query = `${trustedTwitterFragment}
                           mutation ModifyTrustedTwitterAccounts($input: TrustedTwitterAccountDefintion!) {
                               accounts: modifyTrustedTwitterAccounts(input: $input) {
                                   ...FortisTrustedTwitterAcctView
                               }
                           }`;
 
-          const variables = { input: { accounts, site } };
+        const variables = { input: { accounts, site } };
 
-          const host = process.env.REACT_APP_SERVICE_HOST
-          const POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
     removeFbPages(site, pages, callback) {
-          const query = `${fbPageFragment}
+        const query = `${fbPageFragment}
                           mutation RemoveFacebookPages($input: FacebookPageListInput!) {
                               pages: removeFacebookPages(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
 
-          const variables = { input: { pages, site } };
+        const variables = { input: { pages, site } };
 
-          const host = process.env.REACT_APP_SERVICE_HOST
-          const POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
     removeTrustedTwitterAccts(site, accounts, callback) {
         const query = `${trustedTwitterFragment}
@@ -375,7 +423,7 @@ export const SERVICES = {
 
         request(POST, callback);
     },
-    getBlacklistTerms(siteId, callback){
+    getBlacklistTerms(siteId, callback) {
         let query = `  ${blacklistFragment}
                           query TermBlacklist($siteId: String!) {
                               filters: termBlacklist(siteId: $siteId) {
@@ -383,57 +431,57 @@ export const SERVICES = {
                               }
                           }`;
 
-          let variables = { siteId };
+        let variables = { siteId };
 
-          let host = process.env.REACT_APP_SERVICE_HOST
-          var POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        let host = process.env.REACT_APP_SERVICE_HOST
+        var POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
     saveBlacklistTerms(site, terms, callback) {
-          const query = `${blacklistFragment}
+        const query = `${blacklistFragment}
                           mutation ModifyBlacklist($input: BlacklistTermDefintion!) {
                               terms: modifyBlacklist(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
 
-          const variables = { input: { terms, site } };
-          const host = process.env.REACT_APP_SERVICE_HOST
-          const POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        const variables = { input: { terms, site } };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
     removeBlacklistTerms(site, terms, callback) {
-          const query = `${blacklistFragment}
+        const query = `${blacklistFragment}
                           mutation RemoveBlacklist($input: BlacklistTermDefintion!) {
                               terms: removeBlacklist(input: $input) {
                                   ...FortisDashboardView
                               }
                           }`;
 
-          const variables = { input: { terms, site } };
-          const host = process.env.REACT_APP_SERVICE_HOST
-          const POST = {
-              url: `${host}/api/settings`,
-              method: "POST",
-              json: true,
-              withCredentials: false,
-              body: { query, variables }
-          };
+        const variables = { input: { terms, site } };
+        const host = process.env.REACT_APP_SERVICE_HOST
+        const POST = {
+            url: `${host}/api/settings`,
+            method: "POST",
+            json: true,
+            withCredentials: false,
+            body: { query, variables }
+        };
 
-          request(POST, callback);
+        request(POST, callback);
     },
 };

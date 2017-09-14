@@ -1,7 +1,5 @@
 function fetchTermFromMap(termMap, termLookup, selectedLanguage, defaultLanguage) {
-    const name = termLookup.toLowerCase();
-
-    return termMap.get(name) || { name: name, translatedname: name };
+    return termMap.get(termLookup) || { name: termLookup, translatedname: termLookup };
 }
 
 function fromMapToArray(termMap, termLookup) {
