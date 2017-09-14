@@ -8,9 +8,6 @@ const { tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { computeWeightedAvg } = require('../../utils/collections');
 
-/**
- * @param {{tilex: number, tiley: number, tilez: number, avgsentimentnumerator: number, mentioncount: number}} rows
- */
 function heatmapToFeatures(tiles) {
   const type = 'Point';
   
@@ -64,10 +61,6 @@ function queryHeatmapTilesByParentTile(args) {
   });
 }
 
-/**
- * @param {{site: string, bbox: number[], mainEdge: string, filteredEdges: string[], zoomLevel: number, sourceFilter: string[], fromDate: string, toDate: string, originalSource: string}} args
- * @returns {Promise.<{runTime: string, type: string, bbox: number[], features: Array<{type: string, coordinates: number[], properties: {mentionCount: number, location: string, population: number, neg_sentiment: number, pos_sentiment: number, tileId: string}}>}>}
- */
 function heatmapFeaturesByTile(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {    
     queryHeatmapTilesByParentTile(args)
@@ -76,10 +69,6 @@ function heatmapFeaturesByTile(args, res) { // eslint-disable-line no-unused-var
   });
 }
 
-/**
- * @param {{placeid: String, zoomLevel: int}} args
- * @returns {Promise.<{[tile]>}>}
- */
 function fetchTileIdsByPlaceId(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     featureServiceClient.fetchById(args.placeid, 'bbox')
