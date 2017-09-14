@@ -99,9 +99,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "react-test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "eslint src --max-warnings=0",
-    "test": "mocha"
+    "lint": "eslint src --max-warnings=0"
   }
 }
