@@ -21,8 +21,8 @@ REACT_APP_FEATURE_SERVICE_HOST="http://localhost:3035"  # https://github.com/Cat
 Now set up and run the fortis-interfaces project in development mode:
 
 ```sh
-git clone https://github.com/CatalystCode/fortis-interface.git
-cd fortis-interface
+git clone https://github.com/CatalystCode/project-fortis-interfaces.git
+cd project-fortis-interfaces
 npm install
 npm start
 ```
