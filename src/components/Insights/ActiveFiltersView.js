@@ -5,6 +5,20 @@ import FontIcon from 'material-ui/FontIcon';
 import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
 
+function areSetsEqual(s1, s2) {
+  if (s1 == null && s2 == null) return true;
+  if (s1 == null || s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+
+  let allEqual = true;
+  s1.forEach(item => {
+    if (!s2.has(s1)) {
+      allEqual = false;
+    }
+  });
+  return allEqual;
+}
+
 class ActiveFiltersView extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -13,6 +27,8 @@ class ActiveFiltersView extends React.Component {
 
     if (nextProps && nextplaceid === prevplaceid &&
         nextProps.externalsourceid === this.props.externalsourceid &&
+        nextProps.maintopic === this.props.maintopic &&
+        areSetsEqual(nextProps.termFilters, this.props.termFilters) &&
         nextProps.dataSource === this.props.dataSource) {
       return false;
     }
