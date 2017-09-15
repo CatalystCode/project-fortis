@@ -15,6 +15,7 @@ trait Details {
   val eventtime: Long
   val body: String
   val title: String
+  val imageurl: Option[String]
   val externalsourceid: String
   val pipelinekey: String
   val sourceurl: String

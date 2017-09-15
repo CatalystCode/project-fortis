@@ -17,6 +17,7 @@ class TadawebAnalyzer extends Analyzer[TadawebEvent] with Serializable
       eventtime = now.getEpochSecond,
       body = item.text,
       title = item.title,
+      imageurl = None,
       pipelinekey = "TadaWeb",
       sourceurl = item.link,
       sharedLocations = item.cities.flatMap(city => city.coordinates match {

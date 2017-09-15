@@ -17,6 +17,7 @@ class RadioAnalyzer extends Analyzer[RadioTranscription] with Serializable
       externalsourceid = item.radioUrl,
       body = item.text,
       title = "",
+      imageurl = None,
       pipelinekey = "Radio",
       sourceurl = item.radioUrl,
       original = item
