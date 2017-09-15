@@ -21,8 +21,8 @@ class ActiveFiltersView extends React.Component {
   }
 
   getChips = () => {
-    let chips = [];
-    const { dataSource, externalsourceid, selectedplace } = this.props;
+    const { dataSource, externalsourceid, selectedplace, maintopic, termFilters } = this.props;
+    const chips = [];
 
     if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
       chips.push({
@@ -48,6 +48,24 @@ class ActiveFiltersView extends React.Component {
         label: `Place: ${selectedplace.name}`,
         icon: <FontIcon className="material-icons">place</FontIcon>,
         onDelete: this.props.deleteSelectedPlace,
+      });
+    }
+
+    if (maintopic) {
+      chips.push({
+        type: 'maintopic',
+        label: `Topic: ${maintopic}`,
+        icon: <FontIcon className="fa fa-tag" />,
+        onDelete: this.props.deleteMainTopic,
+      });
+    }
+
+    if (termFilters && termFilters.size) {
+      chips.push({
+        type: 'termFilters',
+        label: `Filter${termFilters.size > 1 ? 's' : ''}: ${Array.from(termFilters).join(', ')}`,
+        icon: <FontIcon className="fa fa-tags" />,
+        onDelete: this.props.deleteTermFilters,
       });
     }
 

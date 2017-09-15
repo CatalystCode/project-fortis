@@ -174,6 +174,13 @@ export default class SentimentTreeview extends React.Component {
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, defaultBbox, zoomLevel, Array.from(termFilters), externalsourceid);
     }
 
+    deleteTermFilters = () => {
+        const { dataSource, externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, maintopic, bbox } = this.props;
+        const termFilters = new Set();
+
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+    }
+
     clearTerms(){
         const { maintopic } = this.props;
         this.handleDataFetch(maintopic, []);
@@ -256,6 +263,10 @@ export default class SentimentTreeview extends React.Component {
                         deleteSelectedPlace={this.deleteSelectedPlace}
                         deleteDataSource={this.deleteDataSource}
                         dataSource={this.props.dataSource}
+                        maintopic={this.props.maintopic}
+                        deleteMainTopic={undefined /* we always require a topic to be defined */}
+                        termFilters={this.props.termFilters}
+                        deleteTermFilters={this.deleteTermFilters}
                     />
                 </div>
                 <div style={styles.searchBox}>
