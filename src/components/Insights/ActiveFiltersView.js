@@ -11,9 +11,9 @@ class ActiveFiltersView extends React.Component {
     const nextplaceid = (nextProps.selectedplace && nextProps.selectedplace.placeid) || "";
     const prevplaceid = (this.props.selectedplace && this.props.selectedplace.placeid) || "";
 
-    if(nextProps && nextplaceid === prevplaceid &&
-       nextProps.externalsourceid === this.props.externalsourceid &&
-       nextProps.dataSource === this.props.dataSource) {
+    if (nextProps && nextplaceid === prevplaceid &&
+        nextProps.externalsourceid === this.props.externalsourceid &&
+        nextProps.dataSource === this.props.dataSource) {
       return false;
     }
 
