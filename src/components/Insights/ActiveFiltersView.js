@@ -5,15 +5,31 @@ import FontIcon from 'material-ui/FontIcon';
 import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
 
+function areSetsEqual(s1, s2) {
+  if (s1 == null && s2 == null) return true;
+  if (s1 == null || s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+
+  let allEqual = true;
+  s1.forEach(item => {
+    if (!s2.has(s1)) {
+      allEqual = false;
+    }
+  });
+  return allEqual;
+}
+
 class ActiveFiltersView extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
-    const nextplaceid = nextProps.selectedplace.placeid || "";
-    const prevplaceid = this.props.selectedplace.placeid || "";
+    const nextplaceid = (nextProps.selectedplace && nextProps.selectedplace.placeid) || "";
+    const prevplaceid = (this.props.selectedplace && this.props.selectedplace.placeid) || "";
 
-    if(nextProps && nextplaceid === prevplaceid && 
-       nextProps.externalsourceid === this.props.externalsourceid && 
-       nextProps.dataSource === this.props.dataSource) {
+    if (nextProps && nextplaceid === prevplaceid &&
+        nextProps.externalsourceid === this.props.externalsourceid &&
+        nextProps.maintopic === this.props.maintopic &&
+        areSetsEqual(nextProps.termFilters, this.props.termFilters) &&
+        nextProps.dataSource === this.props.dataSource) {
       return false;
     }
 
@@ -21,8 +37,8 @@ class ActiveFiltersView extends React.Component {
   }
 
   getChips = () => {
-    let chips = [];
-    const { dataSource, externalsourceid, selectedplace } = this.props;
+    const { dataSource, externalsourceid, selectedplace, maintopic, termFilters } = this.props;
+    const chips = [];
 
     if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
       chips.push({
@@ -48,6 +64,24 @@ class ActiveFiltersView extends React.Component {
         label: `Place: ${selectedplace.name}`,
         icon: <FontIcon className="material-icons">place</FontIcon>,
         onDelete: this.props.deleteSelectedPlace,
+      });
+    }
+
+    if (maintopic) {
+      chips.push({
+        type: 'maintopic',
+        label: `Topic: ${maintopic}`,
+        icon: <FontIcon className="fa fa-tag" />,
+        onDelete: this.props.deleteMainTopic,
+      });
+    }
+
+    if (termFilters && termFilters.size) {
+      chips.push({
+        type: 'termFilters',
+        label: `Filter${termFilters.size > 1 ? 's' : ''}: ${Array.from(termFilters).join(', ')}`,
+        icon: <FontIcon className="fa fa-tags" />,
+        onDelete: this.props.deleteTermFilters,
       });
     }
 
