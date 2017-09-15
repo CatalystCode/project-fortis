@@ -36,7 +36,11 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
-          new HTMLStreamFactory,
+          new HTMLStreamFactory
+        )
+      )
+      .withFactories(
+        List(
           new RSSStreamFactory
         )
       )
