@@ -43,7 +43,11 @@ module.exports = graphql.buildSchema(`
     featureservicenamespace: String,
     mapzenApiKey: String,
     fbToken: String,
-    supportedLanguages: [String]
+    supportedLanguages: [String],
+    translationSvcToken: String,
+    cogSpeechSvcToken: String,
+    cogVisionSvcToken: String,
+    cogTextSvcToken: String  
   }
 
   input Term {
@@ -179,7 +183,12 @@ module.exports = graphql.buildSchema(`
     title: String,
     name: String,
     defaultLocation: [Float],
-    supportedLanguages: [String]
+    supportedLanguages: [String],
+    translationSvcToken: String,
+    cogSpeechSvcToken: String,
+    cogVisionSvcToken: String,
+    cogTextSvcToken: String,
+    featureservicenamespace: String
   }
 
   input ParamsEntryInput {   
