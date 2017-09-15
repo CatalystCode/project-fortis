@@ -36,10 +36,12 @@ export default class HeatMap extends React.Component {
   }
 
   getLeafletBbox() {
+    const { bbox, selectedplace } = this.props;
+
     if (!this.refs.map) {
       return undefined;
-    } else if (this.props.selectedplace.placeid) {
-      return this.props.bbox;
+    } else if (selectedplace.placeid) {
+      return bbox;
     }
 
     const bounds = this.refs.map.leafletElement.getBounds();
@@ -51,8 +53,8 @@ export default class HeatMap extends React.Component {
     if (this.refs.map) {
       const { dataSource, timespanType, termFilters, datetimeSelection, maintopic, externalsourceid,
         fromDate, toDate, selectedplace } = this.props;
-      const zoom = this.refs.map.leafletElement.getZoom();
       const bbox = this.getLeafletBbox();
+      const zoom = this.refs.map.leafletElement.getZoom();
 
       this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection,
         timespanType, dataSource, maintopic, bbox, zoom, Array.from(termFilters), externalsourceid, null, selectedplace);
@@ -73,14 +75,16 @@ export default class HeatMap extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { placeid } = this.state;
 
-    if (hasChanged(this.props, nextProps) && nextProps.placeid && placeid !== nextProps.placeid && nextProps.placeCentroid.length === 2) {
+    if (hasChanged(this.props, nextProps) && nextProps.selectedplace.placeid && placeid !== nextProps.selectedplace.placeid) {
       this.moveMapToNewLocation(nextProps);
     }
   }
 
   moveMapToNewLocation(props) {
-    this.refs.map.leafletElement.setView(props.placeCentroid, props.zoomLevel);
-    this.setState({ placeid: props.placeid });
+    const { selectedplace } = props;
+    const { defaultZoom } = this.state;
+    this.refs.map.leafletElement.setView(selectedplace.placecentroid, defaultZoom);
+    this.setState({ placeid: selectedplace.placeid });
   }
 
   formatLeafletBounds(bbox) {
@@ -104,7 +108,7 @@ export default class HeatMap extends React.Component {
 
   render() {
     const { maxbounds, defaultZoom } = this.state;
-    const { selectedplace, bbox } = this.props;
+    const { selectedplace } = this.props;
     const maxzoom = defaultZoom + constants.MAP.MAXZOOM;
 
     return (
@@ -128,7 +132,7 @@ export default class HeatMap extends React.Component {
           position={'topright'}
         />
 
-        {selectedplace.placeid ? this.renderRectangle(bbox) : undefined}
+        {selectedplace.placeid ? this.renderRectangle(selectedplace.placebbox) : undefined}
 
         <MarkerClusterGroup
           clusterColorField={"avgsentiment"}

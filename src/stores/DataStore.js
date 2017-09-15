@@ -138,7 +138,7 @@ export const DataStore = Fluxxor.createStore({
     },
 
     syncFilterSelections(mutatedFilters){
-        const { fromDate, toDate, periodType, name, placecentroid, zoomLevel, dataSource, placeid, datetimeSelection, maintopic, 
+        const { fromDate, toDate, periodType, name, placebbox, placecentroid, zoomLevel, dataSource, placeid, datetimeSelection, maintopic, 
             externalsourceid, selectedconjunctiveterms, bbox } = mutatedFilters;
 
         this.dataStore.fromDate = fromDate;
@@ -146,7 +146,7 @@ export const DataStore = Fluxxor.createStore({
         this.dataStore.timespanType = periodType;
         this.dataStore.dataSource = dataSource;
         this.dataStore.maintopic = maintopic;
-        this.dataStore.selectedplace = { placeid, name, placecentroid };
+        this.dataStore.selectedplace = { placeid, name, placecentroid, placebbox };
         this.dataStore.bbox = bbox;
         this.dataStore.datetimeSelection = datetimeSelection;
         this.dataStore.zoomLevel = zoomLevel;

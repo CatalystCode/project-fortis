@@ -8,7 +8,7 @@ import { momentGetFromToRange } from '../../utils/Utils';
 function toDataSources(streams) {
     const dataSources = new Map();
 
-    const allDataSource = {display: 'All', sourceValues: streams.map(stream => stream.pipelineKey), icon: 'fa fa-share-alt', label: 'all'};
+    const allDataSource = {display: 'All', sourceValues: Array.from(new Set(streams.map(stream => stream.pipelineKey))), icon: 'fa fa-share-alt', label: 'all'};
     dataSources.set('all', allDataSource);
 
     streams.forEach(stream => {
@@ -109,8 +109,9 @@ const methods = {
                 const placeid = place && place.placeid ? place.placeid : "";
                 const name = place && place.name ? place.name : "";
                 const placecentroid = place && place.placecentroid ? place.placecentroid : [];
+                const placebbox = place && place.placebbox ? place.placebbox : [];
 
-                let mutatedFilters = { fromDate, toDate, name, placeid, placecentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
+                let mutatedFilters = { fromDate, toDate, name, placeid, placebbox, placecentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
