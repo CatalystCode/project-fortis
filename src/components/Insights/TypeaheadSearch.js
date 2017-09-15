@@ -62,8 +62,8 @@ export default class TypeaheadSearch extends React.Component {
     return callback(termSuggestions);
   }
 
-  fetchLocationSuggestions = (value, fetchLocationSuggestions, callback) => {
-    fetchLocationsFromFeatureService(this.props.bbox, value, fetchLocationSuggestions, (err, locationSuggestions) => {
+  fetchLocationSuggestions = (value, featureservicenamespace, callback) => {
+    fetchLocationsFromFeatureService(this.props.bbox, value, featureservicenamespace, (err, locationSuggestions) => {
       if (err) {
         console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
         callback([]);
