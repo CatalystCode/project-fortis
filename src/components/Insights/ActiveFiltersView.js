@@ -8,8 +8,8 @@ import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/cons
 class ActiveFiltersView extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {
-    const nextplaceid = nextProps.selectedplace.placeid || "";
-    const prevplaceid = this.props.selectedplace.placeid || "";
+    const nextplaceid = (nextProps.selectedplace && nextProps.selectedplace.placeid) || "";
+    const prevplaceid = (this.props.selectedplace && this.props.selectedplace.placeid) || "";
 
     if(nextProps && nextplaceid === prevplaceid && 
        nextProps.externalsourceid === this.props.externalsourceid && 
