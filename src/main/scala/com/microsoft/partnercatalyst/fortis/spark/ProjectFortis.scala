@@ -81,15 +81,15 @@ object ProjectFortis extends App with Loggable {
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
-      pipeline("twitter", new TwitterAnalyzer),
-      pipeline("facebookpost", new FacebookPostAnalyzer),
-      pipeline("facebookcomment", new FacebookCommentAnalyzer),
-      pipeline("instagram", new InstagramAnalyzer),
-      pipeline("tadaweb", new TadawebAnalyzer),
-      pipeline("customevents", new CustomEventAnalyzer),
-      pipeline("bing", new BingAnalyzer),
-      pipeline("radio", new RadioAnalyzer),
-      pipeline("reddit", new RedditAnalyzer)
+      pipeline("Twitter", new TwitterAnalyzer),
+      pipeline("Facebookpost", new FacebookPostAnalyzer),
+      pipeline("Facebookcomment", new FacebookCommentAnalyzer),
+      pipeline("Instagram", new InstagramAnalyzer),
+      pipeline("Tadaweb", new TadawebAnalyzer),
+      pipeline("Customevents", new CustomEventAnalyzer),
+      pipeline("Bing", new BingAnalyzer),
+      pipeline("Radio", new RadioAnalyzer),
+      pipeline("Reddit", new RedditAnalyzer)
     ).flatten.reduceOption(_.union(_))
 
     if (fortisEvents.isEmpty) return false
