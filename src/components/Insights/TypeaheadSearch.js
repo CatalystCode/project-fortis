@@ -56,16 +56,20 @@ export default class TypeaheadSearch extends React.Component {
 
   getSuggestionValue = suggestion => suggestion[this.getTopicFieldName()];
 
-  fetchTermSuggestions = (value, featureservicenamespace, callback) => {
-    const termSuggestions = fromMapToArray(this.props.allSiteTopics, value);
+  fetchTermSuggestions = (value, callback) => {
+    const { allSiteTopics } = this.props;
+
+    const termSuggestions = fromMapToArray(allSiteTopics, value);
     termSuggestions.forEach(suggestion => suggestion.icon = this.DATASETS.TERM.icon);
     return callback(termSuggestions);
   }
 
-  fetchLocationSuggestions = (value, featureservicenamespace, callback) => {
-    fetchLocationsFromFeatureService(this.props.bbox, value, featureservicenamespace, (err, locationSuggestions) => {
+  fetchLocationSuggestions = (value, callback) => {
+    const { bbox, featureservicenamespace } = this.props;
+
+    fetchLocationsFromFeatureService(bbox, value, featureservicenamespace, (err, locationSuggestions) => {
       if (err) {
-        console.error(`Error while fetching locations matching '${value}' in bbox [${this.props.bbox}] from feature service: ${err}`);
+        console.error(`Error while fetching locations matching '${value}' in bbox [${bbox}] from feature service: ${err}`);
         callback([]);
       } else {
         locationSuggestions.forEach(suggestion => suggestion.icon = this.DATASETS.LOCATION.icon);
@@ -75,9 +79,7 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   onSuggestionsFetchRequested = ({ value }) => {
-    const { featureservicenamespace } = this.props;
-
-    this.state.activeDataset.fetcher(value, featureservicenamespace, (suggestions) => this.setState({ suggestions }));
+    this.state.activeDataset.fetcher(value, (suggestions) => this.setState({ suggestions }));
   }
 
   getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'
