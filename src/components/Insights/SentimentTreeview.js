@@ -146,7 +146,7 @@ export default class SentimentTreeview extends React.Component {
     handleDataFetch = (maintopic, termFilters, place) => {
         const { dataSource, timespanType, datetimeSelection, externalsourceid, fromDate, toDate } = this.props;
         const bbox = place && place.bbox ? place.bbox : this.props.bbox;
-        const zoomLevel = place.zoom ? place.zoom : this.props.zoomLevel;
+        const zoomLevel = place && place.zoom ? place.zoom : this.props.zoomLevel;
 
         maintopic = maintopic && !place ? maintopic : this.props.maintopic;
         termFilters = termFilters != null ? termFilters : this.props.termFilters;
@@ -172,6 +172,13 @@ export default class SentimentTreeview extends React.Component {
         const { externalsourceid, dataSource, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, defaultBbox } = this.props;
 
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, defaultBbox, zoomLevel, Array.from(termFilters), externalsourceid);
+    }
+
+    deleteTermFilters = () => {
+        const { dataSource, externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, maintopic, bbox } = this.props;
+        const termFilters = new Set();
+
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
     }
 
     clearTerms(){
@@ -256,6 +263,10 @@ export default class SentimentTreeview extends React.Component {
                         deleteSelectedPlace={this.deleteSelectedPlace}
                         deleteDataSource={this.deleteDataSource}
                         dataSource={this.props.dataSource}
+                        maintopic={this.props.maintopic}
+                        deleteMainTopic={undefined /* we always require a topic to be defined */}
+                        termFilters={this.props.termFilters}
+                        deleteTermFilters={this.deleteTermFilters}
                     />
                 </div>
                 <div style={styles.searchBox}>

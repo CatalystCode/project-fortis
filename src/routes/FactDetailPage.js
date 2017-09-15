@@ -1,14 +1,13 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { FactDetail } from '../components/Facts/FactDetail';
 import '../styles/Facts/Facts.css';
 
-export const FactDetailPage = createReactClass({
+export class FactDetailPage extends React.Component {
   render() {
     return (
-        <div className="report">
-          <FactDetail {...this.props.params} />
-        </div>
-    )
+      <div className="report">
+        <FactDetail {...this.props.params} />
+      </div>
+    );
   }
-});
+}

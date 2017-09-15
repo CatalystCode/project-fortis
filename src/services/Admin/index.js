@@ -51,7 +51,7 @@ const blacklistFragment = `fragment FortisDashboardView on BlacklistCollection {
 export const SERVICES = {
     getDashboardSiteDefinition(translationLanguage, callback) {
         const query = ` ${AdminFragments.siteSettingsFragment}
-                      ${AdminQueries.getPipelineDenfintion}`;
+                      ${AdminQueries.getPipelineDefinition}`;
 
         const variables = { translationLanguage };
         const host = process.env.REACT_APP_SERVICE_HOST

@@ -88,11 +88,15 @@ export const DataStore = Fluxxor.createStore({
     },
 
     intializeSettings(graphqlResponse) {
-        const { terms, configuration, topics } = graphqlResponse;
+        const { terms, configuration, topics, dataSources } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
 
+        // pretty bad hack... do this properly at some point by pulling the DATA_SOURCES into the store
+        constants.DATA_SOURCES = dataSources;
+
+        this.dataStore.dataSource = constants.DEFAULT_DATA_SOURCE;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
         this.dataStore.title = title;
         this.dataStore.fromDate = fromDate;
