@@ -13,7 +13,7 @@ export default class MarkerClusterGroup extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      markers: []
+      markers: null
     };
 
     this.clusterIconFunction = this.clusterIconFunction.bind(this);
@@ -27,7 +27,7 @@ export default class MarkerClusterGroup extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (hasChanged(this.props, nextProps)) {
       this.rebuildHeatmap(nextProps);
-    }    
+    }
   }
 
   rebuildHeatmap(props) {
@@ -45,7 +45,7 @@ export default class MarkerClusterGroup extends React.Component {
     });
   }
 
-  clearClusters(){
+  clearClusters() {
     this.refs.clusterGroup.leafletElement.clearLayers();
   }
 
@@ -78,7 +78,7 @@ export default class MarkerClusterGroup extends React.Component {
       return "positive";
     } else if (level >= 30 && level < 60) {
       return "neutral";
-    } else{
+    } else {
       return "negative";
     }
   }
@@ -122,12 +122,13 @@ export default class MarkerClusterGroup extends React.Component {
     };
 
     return (
-      <ClusterGroup
-        wrapperOptions={{enableDefaultStyle: true}}
-        ref="clusterGroup"
-        markers={markers}
-        options={config}
-      />
+      markers ?
+        <ClusterGroup
+          wrapperOptions={{ enableDefaultStyle: true }}
+          ref="clusterGroup"
+          markers={markers}
+          options={config}
+        /> : null
     );
   }
 }

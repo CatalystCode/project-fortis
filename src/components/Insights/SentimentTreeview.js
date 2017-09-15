@@ -264,6 +264,7 @@ export default class SentimentTreeview extends React.Component {
                         deleteDataSource={this.deleteDataSource}
                         dataSource={this.props.dataSource}
                         maintopic={this.props.maintopic}
+                        conjunctiveTermsLength={this.props.conjunctiveTermsLength}
                         deleteMainTopic={undefined /* we always require a topic to be defined */}
                         termFilters={this.props.termFilters}
                         deleteTermFilters={this.deleteTermFilters}
