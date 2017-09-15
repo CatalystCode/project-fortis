@@ -50,7 +50,7 @@ class Tile(var tileId: TileId, var latitudeNorth: Double, var latitudeSouth: Dou
 }
 
 object TileUtils {
-  final val ZOOM_LENGTH = sys.env.getOrElse("FORTIS_ZOOM_LENGTH", "10").toInt
+  final val ZOOM_LENGTH = sys.env.getOrElse("FORTIS_ZOOM_LENGTH", "8").toInt
   final val MIN_ZOOM = 8
   final val DETAIL_ZOOM_DELTA = 5
 

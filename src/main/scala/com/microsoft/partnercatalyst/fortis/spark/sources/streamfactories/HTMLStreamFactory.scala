@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import java.net.URL
 
-import com.github.catalystcode.fortis.spark.streaming.html.{HTMLOnDemandInputDStream, HTMLPage}
+import com.github.catalystcode.fortis.spark.streaming.html.{HTMLInputDStream, HTMLOnDemandInputDStream, HTMLPage}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.streaming.StreamingContext
@@ -19,7 +19,7 @@ class HTMLStreamFactory extends StreamFactoryBase[HTMLPage] with Loggable {
     connectorConfig.parameters.get("feedUrls") match {
       case Some(feedUrls:String) => {
         val urls = feedUrls.split("[|]").map(u=>new URL(u))
-        new HTMLOnDemandInputDStream(
+        new HTMLInputDStream(
           urls,
           ssc,
           requestHeaders = Map(
