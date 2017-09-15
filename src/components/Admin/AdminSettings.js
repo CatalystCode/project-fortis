@@ -81,10 +81,8 @@ export const AdminSettings = createReactClass({
 
   isFormValid() {
     const siteSettings = this.getSiteSettings();
-    const siteName = siteSettings.name;
     const sitePropertyValues = Object.keys(siteSettings.properties);
 
-    if (!siteName) return false;
     sitePropertyValues.forEach(key => {
       if (!sitePropertyValues[key]) return false;
     });
