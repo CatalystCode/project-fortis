@@ -82,11 +82,6 @@ assemblyShadeRules in assembly := Seq(
   ShadeRule.rename("scalaj.http.**" -> "eventhub.scalaj.http.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.1.2")
 )
 
-//assemblyExcludedJars in assembly := {
-//  val cp = (fullClasspath in assembly).value
-//  cp filter {_.data.getName == "com.google.guava-guava-14.0.1.jar"}
-//}
-
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "inject", xs @ _*) => MergeStrategy.last
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
