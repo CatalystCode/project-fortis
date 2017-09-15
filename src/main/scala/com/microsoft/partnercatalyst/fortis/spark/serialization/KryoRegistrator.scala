@@ -74,6 +74,7 @@ class KryoRegistrator extends BaseKryoRegistrator {
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.summary.Summarizer])
     kryo.register(classOf[com.microsoft.partnercatalyst.fortis.spark.transforms.summary.KeywordSummarizer])
 
+    kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.html.HTMLPage])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSCategory])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSContent])
     kryo.register(classOf[com.github.catalystcode.fortis.spark.streaming.rss.RSSEnclosure])

@@ -90,7 +90,8 @@ object ProjectFortis extends App with Loggable {
       pipeline("bing", new BingAnalyzer),
       pipeline("radio", new RadioAnalyzer),
       pipeline("reddit", new RedditAnalyzer),
-      pipeline("rss", new RSSAnalyzer)
+      pipeline("HTML", new HTMLAnalyzer),
+      pipeline("RSS", new RSSAnalyzer)
     ).flatten.reduceOption(_.union(_))
 
     if (fortisEvents.isEmpty) return false

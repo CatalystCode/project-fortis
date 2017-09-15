@@ -36,6 +36,7 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
+          new HTMLStreamFactory,
           new RSSStreamFactory
         )
       )
