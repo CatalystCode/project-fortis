@@ -18,7 +18,7 @@ export const EntryPage = createReactClass({
             fromDate, toDate, language, zoomLevel, settings, timespanType, 
             conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
             timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
-            topSources, trustedSources, fullTermList, selectedplace } = this.state;
+            topSources, trustedSources, fullTermList, selectedplace } = this.getStateFromFlux();
 
     return Object.assign({}, { dataSource, maintopic, termFilters, bbox, 
                                externalsourceid, datetimeSelection, fromDate, toDate, language,

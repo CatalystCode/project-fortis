@@ -11,6 +11,7 @@ import PopularLocationsChart from './PopularLocationsChart';
 import PopularSourcesChart from './PopularSourcesChart';
 import ReactGridLayout from 'react-grid-layout';
 import { defaultLayout } from './Layouts';
+import { hasChanged } from './shared';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
@@ -93,6 +94,10 @@ export default class Dashboard extends React.Component {
         </div>
       </div>
     );
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return hasChanged(this.props, nextProps);
   }
 
   newsfeedComponent() {

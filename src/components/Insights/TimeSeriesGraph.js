@@ -65,10 +65,6 @@ export default class TimeSeriesGraph extends React.Component {
         this.range = { startIndex, endIndex };
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        return hasChanged(this.props, nextProps);
-    }    
-
     componentWillReceiveProps(nextProps) {
         if (hasChanged(this.props, nextProps)){
             this.refreshChart(nextProps);
