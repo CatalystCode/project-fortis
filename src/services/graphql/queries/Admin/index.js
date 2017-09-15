@@ -28,12 +28,21 @@ export const getPipelineTerms = `siteTerms(translationLanguage:$translationLangu
   }
 }`;
 
+export const getPipelineStreams = `streams {
+  streams {
+    pipelineKey
+    pipelineIcon
+    pipelineLabel
+  }
+}`;
+
 export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!) {
    terms: ${getPipelineTerms}
 }`;
 
-export const getPipelineDenfintion = `query PipelineDefintion($translationLanguage: String) {
+export const getPipelineDefinition = `query PipelineDefintion($translationLanguage: String) {
     terms: ${getPipelineTerms}
+    streams: ${getPipelineStreams}
     configuration: ${getAdminSite}
 }`;
 

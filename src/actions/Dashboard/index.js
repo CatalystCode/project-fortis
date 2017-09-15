@@ -5,14 +5,32 @@ import constants from '../constants';
 import { ResponseHandler } from '../shared';
 import { momentGetFromToRange } from '../../utils/Utils';
 
+function toDataSources(streams) {
+    const dataSources = new Map();
+
+    const allDataSource = {display: 'All', sourceValues: streams.map(stream => stream.pipelineKey), icon: 'fa fa-share-alt', label: 'all'};
+    dataSources.set('all', allDataSource);
+
+    streams.forEach(stream => {
+        const streamDataSource = {display: stream.pipelineLabel, sourceValues: [stream.pipelineKey], label: stream.pipelineKey, icon: stream.pipelineIcon};
+        dataSources.set(stream.pipelineKey, streamDataSource);
+    });
+
+    const importDataSource = {display: 'Imported Events', sourceValues: ['custom'], label: 'custom', icon: 'fa fa-upload'};
+    dataSources.set('custom', importDataSource);
+
+    return dataSources;
+}
+
 function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate) {
-    let { configuration, terms } = settings;
-    configuration = configuration.site.properties;
+    let { configuration, terms, streams } = settings;
+    configuration = configuration && configuration.site && configuration.site.properties;
+    const dataSources = toDataSources((streams && streams.streams) || []);
 
     DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel,
         (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
             if (!err) {
-                callback(null, Object.assign({}, { terms }, { configuration }, topics ));
+                callback(null, Object.assign({}, { terms, dataSources }, { configuration }, topics ));
             } else {
                 callback(err, null);
             }
