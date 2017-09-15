@@ -86,7 +86,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     })
 
     val popularPlaces = aggregator.aggregate(eventsExploded).collect()
-    assert(popularPlaces.size == 165)
+    assert(popularPlaces.size == 135)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
@@ -189,7 +189,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     })
 
     val popularPlaces = aggregator.aggregate(eventsExploded).collect()
-    assert(popularPlaces.size == 220)
+    assert(popularPlaces.size == 180)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
@@ -292,7 +292,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     })
 
     val popularPlaces = aggregator.aggregate(eventsExploded).collect()
-    assert(popularPlaces.size == 275)
+    assert(popularPlaces.size == 225)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(

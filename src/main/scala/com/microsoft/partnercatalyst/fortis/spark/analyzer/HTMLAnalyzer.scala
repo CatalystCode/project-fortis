@@ -39,10 +39,8 @@ class HTMLAnalyzer extends Analyzer[HTMLPage] with Serializable with AnalysisDef
     try {
       val metaElements = document.select("meta[itemprop=datePublished]")
       if (metaElements != null) {
-        println("Found metaElements: $metaElements")
         val dateString = metaElements.first().attr("content")
         if (dateString != null) {
-          println("Found dateString: $dateString")
           return new SimpleDateFormat("YYYY-MM-dd").parse(dateString.trim).getTime
         }
       }
