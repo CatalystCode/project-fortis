@@ -84,6 +84,7 @@ export const AdminSettings = createReactClass({
     const siteName = siteSettings.name;
     const sitePropertyValues = Object.keys(siteSettings.properties);
 
+    if (!siteName) return false;
     sitePropertyValues.forEach(key => {
       if (!sitePropertyValues[key]) return false;
     });
