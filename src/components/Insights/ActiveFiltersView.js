@@ -6,10 +6,24 @@ import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
 
 class ActiveFiltersView extends React.Component {
-  getChips = () => {
-    const chips = [];
 
-    const dataSource = this.props.dataSource;
+  shouldComponentUpdate(nextProps, nextState) {
+    const nextplaceid = nextProps.selectedplace.placeid || "";
+    const prevplaceid = this.props.selectedplace.placeid || "";
+
+    if(nextProps && nextplaceid === prevplaceid && 
+       nextProps.externalsourceid === this.props.externalsourceid && 
+       nextProps.dataSource === this.props.dataSource) {
+      return false;
+    }
+
+    return true;
+  }
+
+  getChips = () => {
+    let chips = [];
+    const { dataSource, externalsourceid, selectedplace } = this.props;
+
     if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
       chips.push({
         type: 'dataSource',
@@ -19,13 +33,21 @@ class ActiveFiltersView extends React.Component {
       });
     }
 
-    const externalsourceid = this.props.externalsourceid;
     if (externalsourceid && externalsourceid !== DEFAULT_EXTERNAL_SOURCE) {
       chips.push({
         type: 'externalsourceid',
         label: `Source: ${externalsourceid}`,
         icon: <FontIcon className="material-icons">share</FontIcon>,
         onDelete: this.props.deleteExternalSourceId,
+      });
+    }
+
+    if (selectedplace.placeid) {
+      chips.push({
+        type: 'placeid',
+        label: `Place: ${selectedplace.name}`,
+        icon: <FontIcon className="material-icons">place</FontIcon>,
+        onDelete: this.props.deleteSelectedPlace,
       });
     }
 

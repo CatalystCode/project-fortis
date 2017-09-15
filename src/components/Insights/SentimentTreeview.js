@@ -11,7 +11,7 @@ import numeralLibs from 'numeral';
 import { fetchTermFromMap, hasChanged } from './shared';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
 
-const TopRowHeight = 130;
+const TopRowHeight = 120;
 const parentTermsName = "Term Filters";
 
 decorators.Toggle = (props) => {
@@ -130,23 +130,23 @@ export default class SentimentTreeview extends React.Component {
 
     onToggle(node, toggled) {
         const { folderKey } = node;
-        let { termFilters, maintopic } = this.props;
+        let { termFilters, maintopic, selectedplace } = this.props;
 
         if(!node.checked && termFilters.size < 2){
             termFilters.add(folderKey);
-            this.handleDataFetch(maintopic, termFilters);
+            this.handleDataFetch(maintopic, termFilters, selectedplace);
         }else if(node.checked){
             termFilters.delete(folderKey);
-            this.handleDataFetch(maintopic, termFilters);
+            this.handleDataFetch(maintopic, termFilters, selectedplace);
         }else{
             alert(`You're allowed to select up to 2 conjunctive terms. Please unselect one of the topics.`);
         }
     }
 
     handleDataFetch = (maintopic, termFilters, place) => {
-        const { dataSource, timespanType, datetimeSelection, defaultZoom, externalsourceid, fromDate, toDate } = this.props;
+        const { dataSource, timespanType, datetimeSelection, externalsourceid, fromDate, toDate } = this.props;
         const bbox = place && place.bbox ? place.bbox : this.props.bbox;
-        const zoomLevel = place ? defaultZoom : this.props.zoomLevel;
+        const zoomLevel = place.zoom ? place.zoom : this.props.zoomLevel;
 
         maintopic = maintopic && !place ? maintopic : this.props.maintopic;
         termFilters = termFilters != null ? termFilters : this.props.termFilters;
@@ -155,17 +155,23 @@ export default class SentimentTreeview extends React.Component {
     }
 
     deleteExternalSourceId = () => {
-        const { dataSource, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, bbox } = this.props;
+        const { dataSource, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, bbox, selectedplace } = this.props;
         const externalsourceid = DEFAULT_EXTERNAL_SOURCE;
 
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
     }
 
     deleteDataSource = () => {
-        const { externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, bbox } = this.props;
+        const { externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, bbox, selectedplace } = this.props;
         const dataSource = DEFAULT_DATA_SOURCE;
 
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
+    }
+
+    deleteSelectedPlace = () => {
+        const { externalsourceid, dataSource, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, defaultBbox } = this.props;
+
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, defaultBbox, zoomLevel, Array.from(termFilters), externalsourceid);
     }
 
     clearTerms(){
@@ -231,23 +237,26 @@ export default class SentimentTreeview extends React.Component {
                             : undefined
                     }
                 </Subheader>
-                <div style={styles.activeFiltersView}>
-                    <ActiveFiltersView
-                        deleteExternalSourceId={this.deleteExternalSourceId}
-                        externalsourceid={this.props.externalsourceid}
-                        deleteDataSource={this.deleteDataSource}
-                        dataSource={this.props.dataSource}
-                    />
-                </div>
                 <div style={styles.searchBox}>
                     <TypeaheadSearch
                         dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
                         language={this.props.language}
+                        defaultZoom={this.props.defaultZoom}
                         featureservicenamespace={this.props.featureservicenamespace}
                         allSiteTopics={this.props.allSiteTopics}
                         maintopic={this.props.maintopic}
                         defaultLanguage={this.props.defaultLanguage} />
+                </div>
+                <div style={styles.activeFiltersView}>
+                    <ActiveFiltersView
+                        deleteExternalSourceId={this.deleteExternalSourceId}
+                        externalsourceid={this.props.externalsourceid}
+                        selectedplace={this.props.selectedplace}
+                        deleteSelectedPlace={this.deleteSelectedPlace}
+                        deleteDataSource={this.deleteDataSource}
+                        dataSource={this.props.dataSource}
+                    />
                 </div>
                 <div style={styles.searchBox}>
                     <div className="input-group">

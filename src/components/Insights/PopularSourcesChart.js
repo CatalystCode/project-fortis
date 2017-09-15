@@ -16,9 +16,9 @@ export default class PopularSourcesChart extends React.Component {
     }
 
     handleClick(data, activeIndex) {
-        const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate } = this.props;
+        const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, selectedplace  } = this.props;
         const { name } = data;
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), name);
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), name, null, selectedplace);
         this.setState({ activeIndex });
     }
 

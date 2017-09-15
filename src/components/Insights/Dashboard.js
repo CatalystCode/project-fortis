@@ -65,12 +65,12 @@ export default class Dashboard extends React.Component {
   }
 
   filterLiterals() {
-    const { dataSource, zoomLevel, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
+    const { dataSource, zoomLevel, selectedplace, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
     const defaultLanguage = this.props.settings.defaultLanguage;
     const defaultZoom = parseInt(this.props.settings.defaultZoomLevel, 10);
     const conjunctiveTermsLength = termFilters.size;
 
-    return Object.assign({}, { zoomLevel, dataSource, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 
+    return Object.assign({}, { zoomLevel, dataSource, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 
        termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
   }
 
@@ -167,8 +167,8 @@ export default class Dashboard extends React.Component {
   }
 
   refreshDashboard(includeCsv) {
-    const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, externalsourceid } = this.filterLiterals();
-    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, includeCsv);
+    const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, externalsourceid, selectedplace } = this.filterLiterals();
+    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, includeCsv, selectedplace);
   }
 
   timelineComponent() {
@@ -192,6 +192,7 @@ export default class Dashboard extends React.Component {
         <GraphCard>
           <SentimentTreeview
             conjunctivetopics={this.props.conjunctivetopics}
+            defaultBbox={this.props.settings.targetBbox}
             allSiteTopics={this.props.fullTermList}
             featureservicenamespace={this.props.settings.featureservicenamespace}
             height={this.isHeatmapFullScreen() ? contentAreaHeight : (watchlistResizedHeight > 0) ? watchlistResizedHeight : contentRowHeight}

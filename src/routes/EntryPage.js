@@ -18,14 +18,14 @@ export const EntryPage = createReactClass({
             fromDate, toDate, language, zoomLevel, settings, timespanType, 
             conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
             timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
-            topSources, trustedSources, fullTermList, placeid, placeCentroid } = this.state;
+            topSources, trustedSources, fullTermList, selectedplace } = this.state;
 
     return Object.assign({}, { dataSource, maintopic, termFilters, bbox, 
                                externalsourceid, datetimeSelection, fromDate, toDate, language,
                                zoomLevel, settings, timespanType, heatmapTileIds, 
-                               conjunctivetopics, timeSeriesGraphData, placeCentroid, popularLocations, popularTerms,
+                               conjunctivetopics, timeSeriesGraphData, popularLocations, popularTerms,
                                timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
-                               topSources, trustedSources, fullTermList, placeid });
+                               topSources, trustedSources, fullTermList, selectedplace });
   },
 
   render() {

@@ -31,12 +31,15 @@ export default class TypeaheadSearch extends React.Component {
 
   parsePlace(suggestion) {
     if (suggestion.layer) {
-      const { id, centroid, bbox } = suggestion;
+      const { id, centroid, bbox, name } = suggestion;
+      const { defaultZoom } = this.props;
 
       return {
         placeid: id,
-        centroid: centroid,
-        bbox: bbox
+        placecentroid: centroid,
+        bbox: bbox,
+        name: name,
+        zoom: defaultZoom
       };
     }
 

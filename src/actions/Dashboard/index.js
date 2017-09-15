@@ -89,9 +89,10 @@ const methods = {
         fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeserieslabels, includeCsv, (err, chartData) => {
             if (!err) {
                 const placeid = place && place.placeid ? place.placeid : "";
-                const placeCentroid = place && place.centroid ? place.centroid : [];
+                const name = place && place.name ? place.name : "";
+                const placecentroid = place && place.placecentroid ? place.placecentroid : [];
 
-                let mutatedFilters = { fromDate, toDate, placeid, placeCentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
+                let mutatedFilters = { fromDate, toDate, name, placeid, placecentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
