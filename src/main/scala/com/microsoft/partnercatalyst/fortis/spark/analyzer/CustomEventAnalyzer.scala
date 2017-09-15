@@ -16,6 +16,7 @@ class CustomEventAnalyzer extends Analyzer[CustomEvent] with Serializable
       eventtime = item.created_at.toLong,
       body = item.message,
       title = item.title.getOrElse(""),
+      imageurl = None,
       pipelinekey = item.source.getOrElse("CustomEvent"),
       sourceurl = item.link.getOrElse(""),
       original = item

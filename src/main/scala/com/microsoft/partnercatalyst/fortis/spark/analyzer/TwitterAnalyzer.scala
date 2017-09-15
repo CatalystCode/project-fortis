@@ -20,6 +20,7 @@ class TwitterAnalyzer extends Analyzer[TwitterStatus] with Serializable
       eventtime = item.getCreatedAt.getTime,
       body = item.getText,
       title = "",
+      imageurl = None,
       externalsourceid = item.getUser.getScreenName,
       pipelinekey = "Twitter",
       sourceurl = s"https://twitter.com/statuses/${item.getId}",

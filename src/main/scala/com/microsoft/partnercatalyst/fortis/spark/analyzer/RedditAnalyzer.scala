@@ -15,6 +15,7 @@ class RedditAnalyzer extends Analyzer[RedditObject] with Serializable
       eventtime = item.data.created_utc.get.toLong,
       body = item.data.description.getOrElse(""),
       title = item.data.title.getOrElse(""),
+      imageurl = None,
       externalsourceid = item.data.author.getOrElse(""),
       pipelinekey = "Reddit",
       sourceurl = item.data.url.getOrElse(""),

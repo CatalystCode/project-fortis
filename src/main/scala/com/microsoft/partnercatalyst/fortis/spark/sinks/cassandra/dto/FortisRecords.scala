@@ -11,6 +11,7 @@ case class Event(
   body: String,
   summary: String,
   fulltext: String,
+  imageurl: Option[String],
   batchid: String,
   externalsourceid: String,
   topics: Seq[String],
