@@ -40,33 +40,6 @@ class ActiveFiltersView extends React.Component {
     const { dataSource, externalsourceid, selectedplace, maintopic, termFilters } = this.props;
     const chips = [];
 
-    if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
-      chips.push({
-        type: 'dataSource',
-        label: `Publisher: ${dataSource}`,
-        icon: <FontIcon className="material-icons">find_in_page</FontIcon>,
-        onDelete: this.props.deleteDataSource,
-      });
-    }
-
-    if (externalsourceid && externalsourceid !== DEFAULT_EXTERNAL_SOURCE) {
-      chips.push({
-        type: 'externalsourceid',
-        label: `Source: ${externalsourceid}`,
-        icon: <FontIcon className="material-icons">share</FontIcon>,
-        onDelete: this.props.deleteExternalSourceId,
-      });
-    }
-
-    if (selectedplace.placeid) {
-      chips.push({
-        type: 'placeid',
-        label: `Place: ${selectedplace.name}`,
-        icon: <FontIcon className="material-icons">place</FontIcon>,
-        onDelete: this.props.deleteSelectedPlace,
-      });
-    }
-
     if (maintopic) {
       chips.push({
         type: 'maintopic',
@@ -82,6 +55,33 @@ class ActiveFiltersView extends React.Component {
         label: `Filter${termFilters.size > 1 ? 's' : ''}: ${Array.from(termFilters).join(', ')}`,
         icon: <FontIcon className="fa fa-tags" />,
         onDelete: this.props.deleteTermFilters,
+      });
+    }
+
+    if (selectedplace.placeid) {
+      chips.push({
+        type: 'placeid',
+        label: `Place: ${selectedplace.name}`,
+        icon: <FontIcon className="material-icons">place</FontIcon>,
+        onDelete: this.props.deleteSelectedPlace,
+      });
+    }
+
+    if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
+      chips.push({
+        type: 'dataSource',
+        label: `Publisher: ${dataSource}`,
+        icon: <FontIcon className="material-icons">find_in_page</FontIcon>,
+        onDelete: this.props.deleteDataSource,
+      });
+    }
+
+    if (externalsourceid && externalsourceid !== DEFAULT_EXTERNAL_SOURCE) {
+      chips.push({
+        type: 'externalsourceid',
+        label: `Source: ${externalsourceid}`,
+        icon: <FontIcon className="material-icons">share</FontIcon>,
+        onDelete: this.props.deleteExternalSourceId,
       });
     }
 
