@@ -28,17 +28,17 @@ function cassandraRowToSite(row) {
   };
 }
 
-function getSiteDefintion(){
-  return new Promise((resolve, reject) => {    
+function getSiteDefintion() {
+  return new Promise((resolve, reject) => {
     const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
     cassandraConnector.executeQuery(siteByIdQuery, [])
-    .then(rows => {
-      if (rows.length < 1) return reject('Could not find site with sitename');
-      if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
+      .then(rows => {
+        if (rows.length < 1) return reject('Could not find site with sitename');
+        if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
 
-      resolve({site: cassandraRowToSite(rows[0])});
-    })
-    .catch(reject);
+        resolve({ site: cassandraRowToSite(rows[0]) });
+      })
+      .catch(reject);
   });
 }
 
@@ -47,14 +47,14 @@ function withRunTime(promiseFunc) {
     return new Promise((resolve, reject) => {
       const startTime = Date.now();
       promiseFunc(...args)
-      .then(returnValue => {
-        const endTime = Date.now();
-        if (isObject(returnValue)) {
-          returnValue.runTime = endTime - startTime;
-        }
-        resolve(returnValue);
-      })
-      .catch(reject);
+        .then(returnValue => {
+          const endTime = Date.now();
+          if (isObject(returnValue)) {
+            returnValue.runTime = endTime - startTime;
+          }
+          resolve(returnValue);
+        })
+        .catch(reject);
     });
   }
 
@@ -86,7 +86,10 @@ function toPipelineKey(sourceFilter) {
 }
 
 function fromTopicListToConjunctionTopics(topicTerms, conjunctiveTopicLimit = 3) {
-  let selectedFilters = topicTerms.filter(edge => !!edge).slice(0, conjunctiveTopicLimit).sort();
+  let selectedFilters = topicTerms
+    .filter(edge => !!edge)
+    .slice(0, conjunctiveTopicLimit)
+    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
   if (topicTerms.length > conjunctiveTopicLimit) {
     console.warn(`Only ${conjunctiveTopicLimit} terms supported, ignoring: ${topicTerms.slice(conjunctiveTopicLimit).join(', ')}`);
@@ -108,12 +111,12 @@ function toConjunctionTopics(mainEdge, filteredEdges) {
   if (!filteredEdges || !filteredEdges.length) {
     return [mainEdge, '', ''];
   }
-  
+
   return fromTopicListToConjunctionTopics([mainEdge].concat(filteredEdges));
 }
 
 function tilesForBbox(bbox, zoomLevel) {
-  const fence = {north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3]};
+  const fence = { north: bbox[0], west: bbox[1], south: bbox[2], east: bbox[3] };
   return geotile.tileIdsForBoundingBox(fence, zoomLevel).map(geotile.decodeTileId);
 }
 
@@ -137,7 +140,7 @@ function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinut
   function formatCsvFilename(provenance) {
     const uniqueIdentifier = uuidv4();
     const now = new Date();
-    const folder = `${now.getUTCFullYear()}/${now.getUTCMonth()+1}/${now.getUTCDate()}/${now.getUTCHours()}/${now.getUTCMinutes()}/${uniqueIdentifier}`;
+    const folder = `${now.getUTCFullYear()}/${now.getUTCMonth() + 1}/${now.getUTCDate()}/${now.getUTCHours()}/${now.getUTCMinutes()}/${uniqueIdentifier}`;
     return `${folder}/${provenance}.csv`;
   }
 
@@ -152,17 +155,17 @@ function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinut
     return new Promise((resolve, reject) => {
       console.log(`CSV requested, creating report for ${reportName} based on ${exportPropertyName}`);
       promiseFunc(...args)
-      .then(returnValue => {
-        const csvItems = returnValue && returnValue[exportPropertyName];
-        const csvText = csvItems && csvItems.length ? json2csv({ data: csvItems, withBOM: true }) : '';
-        createFile(container, formatCsvFilename(reportName), csvText, expiryMinutes)
-        .then(csv => {
-          returnValue.csv = csv;
-          resolve(returnValue);
+        .then(returnValue => {
+          const csvItems = returnValue && returnValue[exportPropertyName];
+          const csvText = csvItems && csvItems.length ? json2csv({ data: csvItems, withBOM: true }) : '';
+          createFile(container, formatCsvFilename(reportName), csvText, expiryMinutes)
+            .then(csv => {
+              returnValue.csv = csv;
+              resolve(returnValue);
+            })
+            .catch(reject);
         })
         .catch(reject);
-      })
-      .catch(reject);
     });
   }
 
