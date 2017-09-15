@@ -35,8 +35,8 @@ const styles = {
   }
 };
 
-const FluxMixin = Fluxxor.FluxMixin(React),
-  StoreWatchMixin = Fluxxor.StoreWatchMixin("FactsStore");
+const FluxMixin = Fluxxor.FluxMixin(React);
+const StoreWatchMixin = Fluxxor.StoreWatchMixin("FactsStore");
 
 export const FactsList = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
@@ -53,7 +53,7 @@ export const FactsList = createReactClass({
   _select: "selectFilter",
   _isSelectOpen: false,
 
-  resetState: function (state, selectedTags = []) {
+  resetState(state, selectedTags = []) {
     state.loaded = false;
     state.facts = [];
     state.skip = 0;
@@ -61,8 +61,8 @@ export const FactsList = createReactClass({
     return state;
   },
 
-  getStateFromFlux: function () {
-    let state = this.getFlux().store("FactsStore").getState();
+  getStateFromFlux() {
+    const state = this.getFlux().store("FactsStore").getState();
     const tags = fragmentToArray(this.props.tags);
     if (!containsEqualValues(state.selectedTags, tags)) {
       return this.resetState(state, tags);
@@ -70,7 +70,7 @@ export const FactsList = createReactClass({
     return state;
   },
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     let state = this.getStateFromFlux();
     const curr = fragmentToArray(this.props.tags);
     const next = fragmentToArray(nextProps.tags);
@@ -80,12 +80,12 @@ export const FactsList = createReactClass({
     this.setState(state);
   },
 
-  componentDidMount: function () {
+  componentDidMount() {
     // get list of unique tags
     if (this.state.tags.length === 0) {
       this.loadTags();
     }
-    // get first page of all facts 
+    // get first page of all facts
     if (this.state.facts.length === 0) {
       this.loadFacts();
     }
@@ -107,7 +107,6 @@ export const FactsList = createReactClass({
     if (this.state.facts.length === 0) {
       return (
         <div id="facts" >
-
           <div className="noResults">
             <h3>No facts found.</h3>
             <Link to={`/site/${this.props.siteKey}/facts/`}>Reset filters</Link>
@@ -119,7 +118,7 @@ export const FactsList = createReactClass({
     const select = this.renderSelect();
     const chips = this.renderChips();
 
-    // List view 
+    // List view
     return (
       <div id="facts">
         <div id="filters">
@@ -148,7 +147,7 @@ export const FactsList = createReactClass({
   },
 
   translate(sentence, fromLanguage, toLanguage, factId) {
-    let self = this;
+    const self = this;
     DashboardServices.translateSentence(sentence, fromLanguage, toLanguage, (translatedSentence, error) => {
       if (translatedSentence) {
         self.state.facts.forEach(fact => {
@@ -181,7 +180,7 @@ export const FactsList = createReactClass({
           </p>
           <h3 className="title truncate-2"><Link to={`/site/${this.props.siteKey}/facts/detail/${item.messageid}`}>{title}</Link></h3>
           <div className="tags">
-            {item.edges.sort().map(function (tag) {
+            {item.edges.sort().map((tag) => {
               const name = UCWords(tag);
               return <Chip key={tag} style={styles.chip} onTouchTap={(event) => this.handleSelectTag(tag)}>{name}</Chip>;
             }, this)}
@@ -200,9 +199,9 @@ export const FactsList = createReactClass({
       return;
     }
 
-    let dataSource = this.state.tags.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) || (a.name.toLowerCase() === b.name.toLowerCase()) - 1);
-
-    dataSource = dataSource.map((x, index) => {
+    const dataSource = this.state.tags
+    .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) || (a.name.toLowerCase() === b.name.toLowerCase()) - 1)
+    .map((x, index) => {
       const tag = x.name.toLowerCase();
       return (
         <div key={tag} value={tag} label={tag}>{UCWords(x.name)}</div>
@@ -238,7 +237,7 @@ export const FactsList = createReactClass({
     const selectedTags = this.getSelectedTagNames();
     return (
       <div className="chips">
-        {selectedTags.map(function (name) {
+        {selectedTags.map((name) => {
           const tag = name.toLowerCase();
           return (
             <Chip key={tag} style={{ margin: 2 }} onRequestDelete={(event) => this.handleRequestDelete(tag)}>{UCWords(name)}</Chip>
@@ -250,17 +249,17 @@ export const FactsList = createReactClass({
 
   handleRequestDelete(name) {
     // create mutable clone of selected tags for splicing the deleted tag
-    let selectedTags = this.state.selectedTags.slice(); 
+    const selectedTags = this.state.selectedTags.slice();
     const index = selectedTags.indexOf(name);
     if (index > -1) {
       selectedTags.splice(index, 1);
       changeFactsUrl(this.props.siteKey, selectedTags);
     } else {
-      console.error("Unable to delete tag:", name);
+      console.error(`Unable to delete tag: ${name}`);
     }
   },
 
-  loadTags: function () {
+  loadTags() {
     const range = momentLastMonths(3);
     const fromDate = range.fromDate;
     const toDate = range.toDate;
@@ -269,7 +268,7 @@ export const FactsList = createReactClass({
 
   loadFacts() {
     // NB: filter edges param uses lowercase names
-    const selectedTags = this.state.selectedTags.slice().map(s => s.toLowerCase()); 
+    const selectedTags = this.state.selectedTags.slice().map(s => s.toLowerCase());
     this.getFlux().actions.FACTS.load_facts(this.props.siteKey, this.state.pageSize, this.state.skip, selectedTags, this.sources);
   },
 
@@ -282,5 +281,4 @@ export const FactsList = createReactClass({
       return prev;
     }, []);
   },
-
 });
