@@ -73,7 +73,12 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           logo = ?,
           title = ?,
           languages = ?,
-          defaultLanguage = ?
+          defaultlanguage = ?,
+          cogspeechsvctoken = ?,
+          cogtextsvctoken = ?,
+          cogvisionsvctoken = ?,
+          featureservicenamespace = ?,
+          translationsvctoken = ?
         WHERE sitename = ?`,
         params: [
           args.input.targetBbox,
@@ -82,6 +87,11 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           args.input.title,
           args.input.supportedLanguages,
           args.input.defaultLanguage,
+          args.input.cogSpeechSvcToken,
+          args.input.cogTextSvcToken,
+          args.input.cogVisionSvcToken,
+          args.input.featureservicenamespace,
+          args.input.translationSvcToken,
           args.input.name
         ]
       }]);
@@ -98,7 +108,13 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           logo: args.input.logo,
           title: args.input.title,
           defaultLocation: args.input.defaultLocation,
-          supportedLanguages:args.input.supportedLanguages
+          supportedLanguages:args.input.supportedLanguages,
+          defaultLanguage: args.input.defaultLanguage,
+          cogSpeechSvcToken: args.input.cogSpeechSvcToken,
+          cogTextSvcToken: args.input.cogTextSvcToken,
+          cogVisionSvcToken: args.input.cogVisionSvcToken,
+          featureservicenamespace: args.input.featureservicenamespace,
+          translationSvcToken: args.input.translationSvcToken
         }
       });
     })
