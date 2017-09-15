@@ -29,6 +29,11 @@ export const site = `fragment SiteView on SiteCollection {
       defaultLocation
       defaultLanguage
       supportedLanguages
+      featureservicenamespace
+      translationSvcToken
+      cogSpeechSvcToken
+      cogVisionSvcToken
+      cogTextSvcToken
     }
   }
 }`;

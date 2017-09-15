@@ -81,11 +81,11 @@ export const AdminSettings = createReactClass({
 
   isFormValid() {
     const siteSettings = this.getSiteSettings();
+    const sitePropertyValues = Object.keys(siteSettings.properties);
 
-    if (!siteSettings.name || !siteSettings.properties.title || !siteSettings.properties.logo || 
-    !siteSettings.properties.supportedLanguages || !siteSettings.properties.defaultLanguage) {
-      return false;
-    }
+    sitePropertyValues.forEach(key => {
+      if (!sitePropertyValues[key]) return false;
+    });
     return true;
   },
 
@@ -105,7 +105,12 @@ export const AdminSettings = createReactClass({
       title, 
       logo, 
       defaultLanguage,
-      supportedLanguages
+      supportedLanguages,
+      featureservicenamespace,
+      translationSvcToken,
+      cogSpeechSvcToken,
+      cogVisionSvcToken,
+      cogTextSvcToken
     } = this.refs;
 
     const languageArray = supportedLanguages.value.split(",");
@@ -118,7 +123,12 @@ export const AdminSettings = createReactClass({
       defaultLanguage: defaultLanguage.value,
       defaultZoomLevel: defaultZoomLevel, 
       supportedLanguages: JSON.parse(languageJSON), 
-      title: title.value
+      title: title.value,
+      featureservicenamespace: featureservicenamespace.value,
+      translationSvcToken: translationSvcToken.value,
+      cogSpeechSvcToken: cogSpeechSvcToken.value,
+      cogVisionSvcToken: cogVisionSvcToken.value,
+      cogTextSvcToken: cogTextSvcToken.value
     };
 
     this.setState({
@@ -133,7 +143,7 @@ export const AdminSettings = createReactClass({
         this.state.siteSettings.properties ? 
           <div className="row">
               <form ref="settingsForm">
-                  <div className="col-lg-10">
+                  <div className="col-lg-6">
                       <div className="form-group">
                           <label htmlFor="siteName">Site Name<span>*</span></label>
                           <input readOnly onChange={this.handleInputChange} required aria-required="true" data-rule="required" name="name" data-msg="Please enter a site name" ref="name" value={this.state.siteSettings.name} type="text" style={styles.settings.input} className="form-control settings" aria-label="siteName" />
@@ -141,12 +151,12 @@ export const AdminSettings = createReactClass({
                       </div>
                       <div className="form-group">
                           <label>Site Title<span>*</span></label>
-                          <input onChange={this.handleInputChange} required data-rule="required" data-msg="Please enter a site title" name="title" ref="title" value={this.state.siteSettings.properties.title} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <input onChange={this.handleInputChange} required data-rule="required" data-msg="Please enter a site title" name="title" ref="title" value={this.state.siteSettings.properties.title} type="text" style={styles.settings.input} className="form-control settings" aria-label="siteTitle" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
                           <label>Header Logo Banner<span>*</span></label>
-                          <input onChange={this.handleInputChange} required data-rule="required" data-msg="Please enter a header image for your site" name="logo" ref="logo" value={this.state.siteSettings.properties.logo} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <input onChange={this.handleInputChange} required data-rule="required" data-msg="Please enter a header image for your site" name="logo" ref="logo" value={this.state.siteSettings.properties.logo} type="text" style={styles.settings.input} className="form-control settings" aria-label="logo" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
@@ -157,6 +167,33 @@ export const AdminSettings = createReactClass({
                       <div className="form-group">
                           <label>Default Languages(<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="defaultLanguage" ref="defaultLanguage" value={this.state.siteSettings.properties.defaultLanguage} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <div className="validation"></div>
+                      </div>
+                    </div>
+                    <div className="col-lg-6">
+                      <div className="form-group">
+                          <label>Feature Service</label>
+                          <input onChange={this.handleInputChange} required name="featureservicenamespace" ref="featureservicenamespace" value={this.state.siteSettings.properties.featureservicenamespace} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
+                          <label>Translation Services Token</label>
+                          <input onChange={this.handleInputChange} required name="translationSvcToken" ref="translationSvcToken" value={this.state.siteSettings.properties.translationSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
+                          <label>Cognitive Speech Services Token</label>
+                          <input onChange={this.handleInputChange} required name="cogSpeechSvcToken" ref="cogSpeechSvcToken" value={this.state.siteSettings.properties.cogSpeechSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
+                          <label>Cognitive Vision Services Token</label>
+                          <input onChange={this.handleInputChange} required name="cogVisionSvcToken" ref="cogVisionSvcToken" value={this.state.siteSettings.properties.cogVisionSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
+                          <label>Cognitive Text Services Token</label>
+                          <input onChange={this.handleInputChange} required name="cogTextSvcToken" ref="cogTextSvcToken" value={this.state.siteSettings.properties.cogTextSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
