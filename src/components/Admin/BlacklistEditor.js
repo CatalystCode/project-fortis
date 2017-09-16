@@ -9,9 +9,9 @@ const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 function getValidatedTermFilters(termFilters) {
   termFilters.map(termFilter => {
     try {
-      termFilter.filteredTerms = JSON.parse(termFilter.filteredTerms);
+      return termFilter.filteredTerms = JSON.parse(termFilter.filteredTerms);
     } catch (error) {
-      termFilter.filteredTerms = [];
+      return termFilter.filteredTerms = [];
     }
   });
 

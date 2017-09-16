@@ -1,19 +1,11 @@
 import { SERVICES as AdminServices } from '../../services/Admin';
 import { ResponseHandler } from '../shared';
 import constants from '../constants';
-import unionBy from 'lodash/unionBy';
 import differenceBy from 'lodash/differenceBy';
 
 function getBlacklistAfterRemove(blacklistBeforeRemove, blacklistRemoved) {
   return differenceBy(blacklistBeforeRemove, blacklistRemoved, 'id');
 }
-
-/*
-function getBlacklistAfterSave(blacklistBeforeSave, blacklistSaved) {
-  const difference = differenceBy(blacklistBeforeSave, blacklistSaved, 'id');
-  return unionBy(difference, blacklistSaved, 'id');
-}
-*/
 
 const methods = {
   load_blacklist() {
