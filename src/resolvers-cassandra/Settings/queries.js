@@ -53,7 +53,7 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     cassandraConnector.executeQuery('SELECT * FROM fortis.streams', [])
     .then(rows => {
-      const streams = rows.map(cassandraRowToStream);
+      const streams = rows.map(cassandraRowToStream).filter(stream=>stream.enabled);
       resolve({
         streams
       });

@@ -8,9 +8,11 @@ const { tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { computeWeightedAvg } = require('../../utils/collections');
 
+const DETAIL_ZOOM_LEVEL = 5;
+
 function heatmapToFeatures(tiles) {
   const type = 'Point';
-  
+
   return tiles.map(tile => {
     const { row, column, zoom, id } = geotile.tileFromTileId(tile.heatmaptileid);
     const coordinates = [geotile.longitudeFromColumn(column, zoom), geotile.latitudeFromRow(row, zoom)];
@@ -23,6 +25,22 @@ function heatmapToFeatures(tiles) {
 
     return { properties, coordinates, type };
   });
+}
+
+function filterFeaturesByPlaceBbox(bbox, zoomLevel, features) {
+  let filteredfeatures = features;
+
+  if (bbox) {
+    const placetiles = tilesForBbox(bbox, zoomLevel).map(tile => tile.id);
+
+    filteredfeatures = features.filter(feature => {
+      const tileid = feature.properties && feature.properties.tile && feature.properties.tile.id ? feature.properties.tile.id : '';
+
+      return tileid && placetiles.indexOf(tileid) > -1;
+    });
+  }
+
+  return filteredfeatures;
 }
 
 function queryHeatmapTilesByParentTile(args) {
@@ -53,30 +71,34 @@ function queryHeatmapTilesByParentTile(args) {
     ];
 
     cassandraConnector.executeQuery(query, params)
-    .then(rows => resolve({
-      type: type,
-      features: [].concat.apply([], heatmapToFeatures(rows))
-    }))
-    .catch(reject);
+      .then(rows => {
+        const heatmapfeatures = heatmapToFeatures(rows);
+
+        resolve({
+          type: type,
+          features: [].concat.apply([], filterFeaturesByPlaceBbox(args.bbox, args.zoomLevel + DETAIL_ZOOM_LEVEL, heatmapfeatures))
+        });
+      })
+      .catch(reject);
   });
 }
 
 function heatmapFeaturesByTile(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {    
+  return new Promise((resolve, reject) => {
     queryHeatmapTilesByParentTile(args)
-    .then(features => resolve(features) )
-    .catch(reject);
+      .then(features => resolve(features))
+      .catch(reject);
   });
 }
 
 function fetchTileIdsByPlaceId(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     featureServiceClient.fetchById(args.placeid, 'bbox')
-    .then(places => {
-      const tileIds = places.length ? tilesForBbox(places[0].bbox, args.zoomLevel) : [];
-      resolve(tileIds);
-    })
-    .catch(reject);
+      .then(places => {
+        const tileIds = places.length ? tilesForBbox(places[0].bbox, args.zoomLevel) : [];
+        resolve(tileIds);
+      })
+      .catch(reject);
   });
 }
 
