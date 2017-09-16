@@ -63,6 +63,7 @@
     "leaflet-geocoder-mapzen": "^1.7.1",
     "leaflet.markercluster": "^1.0.0",
     "leaflet.markercluster.layersupport": "^1.0.3",
+    "lodash": "^4.17.4",
     "material-ui": "^0.16.6",
     "material-ui-superselectfield": "^0.1.4",
     "moment": "^2.11.2",
