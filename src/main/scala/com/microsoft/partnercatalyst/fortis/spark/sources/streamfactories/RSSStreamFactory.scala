@@ -26,7 +26,7 @@ class RSSStreamFactory extends StreamFactoryBase[RSSEntry] with Loggable {
           ),
           connectTimeout = params.getOrElse("connectTimeout", "1000").toString.toInt,
           readTimeout = params.getOrElse("readTimeout", "3000").toString.toInt,
-          pollingPeriodInSeconds = params.getOrElse("pollingPeriodInSeconds", "10").toString.toInt,
+          pollingPeriodInSeconds = params.getOrElse("pollingPeriodInSeconds", "3600").toString.toInt,
           ssc = ssc
         )
       }

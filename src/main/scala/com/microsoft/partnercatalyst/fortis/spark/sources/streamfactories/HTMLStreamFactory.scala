@@ -26,7 +26,7 @@ class HTMLStreamFactory extends StreamFactoryBase[HTMLPage] with Loggable {
             "User-Agent" -> params.getOrElse("userAgent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").toString
           ),
           maxDepth = params.getOrElse("maxDepth", "1").toString.toInt,
-          pollingPeriodInSeconds = params.getOrElse("pollingPeriodInSeconds", "60").toString.toInt,
+          pollingPeriodInSeconds = params.getOrElse("pollingPeriodInSeconds", "3600").toString.toInt,
           cacheEditDistanceThreshold = params.getOrElse("cacheEditDistanceThreshold", "0.0001").toString.toDouble
         )
       }
