@@ -473,28 +473,31 @@ function removeTwitterAccounts(args, res) { // eslint-disable-line no-unused-var
 
 function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const terms = args && args.input && args.input.terms;
-    if (!terms || !terms.length) return reject('No terms specified');
+    const termFilters = args && args.input && args.input.filters;
+    if (!termFilters || !termFilters.length) return reject('No blacklists to modify specified.');
 
     const mutations = [];
     const filterRecords = [];
-    terms.forEach(term => {
-      if (term.RowKey) {
+    termFilters.forEach(termFilter => {
+      if (termFilter.id) {
         mutations.push({
-          query:'UPDATE blacklist SET conjunctivefilter = ? WHERE id = ?',
-          params:[term.filteredTerms, term.RowKey]
+          query: 'UPDATE blacklist SET conjunctivefilter = ? WHERE id = ?',
+          params: [termFilter.filteredTerms, termFilter.id]
         });
       } else {
-        term.RowKey = uuid();
+        termFilter.id = uuid();
         mutations.push({
-          query:'INSERT INTO blacklist (id, conjunctivefilter) VALUES(?, ?)',
-          params:[term.RowKey, term.filteredTerms]
+          query:'INSERT INTO blacklist (id, conjunctivefilter) VALUES (?, ?)',
+          params:[termFilter.id, termFilter.filteredTerms]
         });
       }
-      filterRecords.push(term);
+      filterRecords.push(termFilter);
     });
 
     cassandraConnector.executeBatchMutations(mutations)
+    .then(() => {
+      return serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'blacklist'}));
+    })
     .then(() => resolve({ filters: filterRecords }))
     .catch(reject);
   });
@@ -502,13 +505,10 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const terms = args && args.input && args.input.terms;
-    if (!terms || !terms.length) return reject('No terms specified');
-    
-    const invalidTerms = terms.some(terms => !terms.RowKey);
-    if (invalidTerms.length > 0) return reject(`RowKey required for ${JSON.stringify(invalidTerms)}`);
+    const termFilters = args && args.input && args.input.filters;
+    if (!termFilters || !termFilters.length) return reject('No blacklists to remove specified.');
 
-    const termIds = terms.map(term => term.RowKey);
+    const termIds = termFilters.map(termFilter => termFilter.id);
     
     const query = `
     DELETE
@@ -522,8 +522,11 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeQuery(query, params)
     .then(() => {
+      return serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'blacklist'}));
+    })
+    .then(() => {
       resolve({
-        filters: terms
+        filters: termFilters
       });
     })
     .catch(reject);
