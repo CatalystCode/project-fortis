@@ -56,10 +56,22 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
       logInfo(s"No users set for Twitter consumerKey $consumerKey")
     }
 
-    TwitterUtils.createFilteredStream(
+    val stream = TwitterUtils.createFilteredStream(
       ssc,
       twitterAuth = Some(auth),
-      query = Some(query))
+      query = Some(query)
+    )
+
+    params.getOrElse("trustedSourceFilterEnabled", "true").toString.toBoolean match {
+      case false => stream
+      case true => {
+        val trustedSourceScreenNames = configurationManager.fetchTrustedSources(sparkContext = ssc.sparkContext)
+          .filter(source=>source.pipelinekey.equalsIgnoreCase("twitter"))
+          .map(source=>source.externalsourceid).toSet
+
+        stream.filter(status=>{ trustedSourceScreenNames.contains(status.getUser.getScreenName) })
+      }
+    }
   }
 
   private[streamfactories] def appendWatchlist(query: FilterQuery, sparkContext: SparkContext, configurationManager: ConfigurationManager): Boolean = {

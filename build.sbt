@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
 // Bundled dependencies
 libraryDependencies ++= Seq(
   "log4j" % "log4j" % "1.2.17",
-  "com.github.catalystcode" %% "streaming-rss-html" % "0.0.5" excludeAll(),
+  "com.github.catalystcode" %% "streaming-rss-html" % "0.0.6" excludeAll(),
   "org.jsoup" % "jsoup" % "1.10.3" excludeAll(),
   "com.rometools" % "rome" % "1.8.0" excludeAll(),
   "com.microsoft.azure" % "applicationinsights-core" % "1.0.6",
@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "com.github.catalystcode" %% "streaming-instagram" % "0.0.5",
   "com.github.catalystcode" %% "streaming-facebook" % "0.0.3",
   "com.github.catalystcode" %% "streaming-bing" % "0.0.1",
-  "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2" exclude("com.google.guava", "guava"),
+  "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2",
   "com.github.catalystcode" %% "streaming-reddit" % "0.0.2",
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.twitter4j" % "twitter4j-stream" % "4.0.4",

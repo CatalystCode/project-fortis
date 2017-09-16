@@ -105,6 +105,7 @@ object ProjectFortis extends App with Loggable {
   // Main starts here
   logInfo("Creating streaming context.")
   val ssc = createStreamingContext()
+  ssc.sparkContext.setLogLevel("ERROR")
 
   while (!attachToContext(ssc)) {
     logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.sscInitRetryAfterMillis} milliseconds.")
