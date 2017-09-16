@@ -23,12 +23,12 @@ class HTMLStreamFactory extends StreamFactoryBase[HTMLPage] with Loggable {
         new HTMLInputDStream(
           urls,
           ssc,
-          storageLevel = StorageLevel.MEMORY_ONLY_SER,
+          storageLevel = StorageLevel.MEMORY_ONLY,
           requestHeaders = Map(
             "User-Agent" -> params.getOrElse("userAgent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36").toString
           ),
           maxDepth = params.getOrElse("maxDepth", "1").toString.toInt,
-          pollingPeriodInSeconds = 15,
+          pollingPeriodInSeconds = params.getOrElse("pollingPeriodInSeconds", "60").toString.toInt,
           cacheEditDistanceThreshold = params.getOrElse("cacheEditDistanceThreshold", "0.0001").toString.toDouble
         )
       }
@@ -41,18 +41,10 @@ class HTMLStreamFactory extends StreamFactoryBase[HTMLPage] with Loggable {
 }
 
 
-import java.net.URL
-import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
-
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.receiver.Receiver
-import org.apache.spark.unsafe.types.UTF8String
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-
-import scala.collection.JavaConversions._
 
 class HTMLInputDStream(siteURLs: Seq[String],
                        ssc: StreamingContext,
@@ -74,6 +66,11 @@ class HTMLInputDStream(siteURLs: Seq[String],
 
 }
 
+import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
+
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.receiver.Receiver
+
 class HTMLReceiver(siteURLs: Seq[String],
                    storageLevel: StorageLevel,
                    maxDepth: Int = 1,
@@ -82,16 +79,17 @@ class HTMLReceiver(siteURLs: Seq[String],
                    cacheEditDistanceThreshold: Double = 0.10)
   extends Receiver[HTMLPage](storageLevel) with Logger {
 
-  private val sources: Seq[HTMLSource] = siteURLs.map(url => new HTMLSource(url))
+  @volatile private var sources: Seq[HTMLSource] = Seq()
   @volatile private var executor: ScheduledThreadPoolExecutor = _
 
   override def onStart(): Unit = {
-    executor = new ScheduledThreadPoolExecutor(2)
+    sources = siteURLs.map(url => new HTMLSource(url))
+    executor = new ScheduledThreadPoolExecutor(1)
 
     // Make sure the polling period does not exceed 1 request per second.
     val normalizedPollingPeriod = Math.max(1, pollingPeriodInSeconds)
 
-    executor.scheduleAtFixedRate(new Thread(s"${this.toString} polling thread") {
+    executor.scheduleAtFixedRate(new Thread("Polling thread") {
       override def run(): Unit = {
         poll()
       }
@@ -103,23 +101,39 @@ class HTMLReceiver(siteURLs: Seq[String],
     if (executor != null) {
       executor.shutdown()
     }
-    sources.foreach(_.reset())
+    sources = Seq()
   }
 
   private[streamfactories] def poll(): Unit = {
     try {
-      sources.foreach(source=>{
-        val pages = source.fetch()
-        store(pages.iterator)
-      })
+      sources.foreach(_.trimCache())
     } catch {
       case e: Exception => {
-        e.printStackTrace()
+        logError("Unable to trim caches", e)
+      }
+    }
+
+    try {
+      sources.flatMap(s => s.fetch())
+        .foreach(page => store(page))
+    } catch {
+      case e: Exception => {
+        logError("Unable to fetch from sources.", e)
       }
     }
   }
 
 }
+
+import java.net.URL
+import java.util.Date
+
+import org.apache.spark.unsafe.types.UTF8String
+import org.jsoup.nodes.Document
+import org.jsoup.{Connection, Jsoup}
+
+import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 private[streamfactories] class HTMLSource(siteURL: String,
                                maxDepth: Int = 1,
@@ -129,10 +143,31 @@ private[streamfactories] class HTMLSource(siteURL: String,
   private val connectTimeoutMillis: Int = sys.env.getOrElse("HTML_SOURCE_CONNECT_TIMEOUT_MILLIS", "500").toInt
   private val cacheTimeMinutes: Int = sys.env.getOrElse("HTML_SOURCE_CACHE_TIME_MINUTES", "30").toInt
 
-  private val cache = mutable.Map[String, Document]()
+  private[streamfactories] val cache = mutable.Map[String, (Document, Long)]()
+  private[streamfactories] var connector = new HTMLConnector()
 
   def reset(): Unit = {
     cache.clear()
+  }
+
+  private[streamfactories] class HTMLConnector extends Serializable {
+    def connect(url: String): Connection = {
+      Jsoup.connect(url).timeout(connectTimeoutMillis).headers(requestHeaders).followRedirects(true)
+    }
+  }
+
+  private[streamfactories] def trimCache(): Unit = {
+    val currentTime = new Date().getTime
+    cache.filter(entry=>{
+      val expiration = entry._2._2
+      currentTime > expiration
+    }).map(_._1).foreach(url=>{
+      cache.remove(url)
+    })
+  }
+
+  private[streamfactories] def createCacheTime(date: Date): Long = {
+    date.getTime + (cacheTimeMinutes * 60 * 1000)
   }
 
   def fetch(): Seq[HTMLPage] = {
@@ -141,28 +176,31 @@ private[streamfactories] class HTMLSource(siteURL: String,
       .filter(pair=>{
         val url = pair._1
         val document = pair._2
-
+        val currentTime = new Date()
         cache.get(url) match {
           case None => {
-            cache.put(url, document)
+            cache.put(url, (document, createCacheTime(currentTime)))
             true
           }
-          case Some(cachedDocument) => {
-            val documentText = document.body().text() match {
-              case null => UTF8String.EMPTY_UTF8
-              case str => UTF8String.fromString(str)
+          case Some((cachedDocument, expirationTime)) => {
+            if (expirationTime < currentTime.getTime) {
+              cache.put(url, (document, createCacheTime(currentTime)))
+              true
+            } else {
+              val documentText = document.body().text() match {
+                case null => UTF8String.EMPTY_UTF8
+                case str => UTF8String.fromString(str)
+              }
+              val cachedDocumentText = cachedDocument.body().text() match {
+                case null => UTF8String.EMPTY_UTF8
+                case str => UTF8String.fromString(str)
+              }
+              val distance = documentText.levenshteinDistance(cachedDocumentText)
+              val totalCharCount = documentText.numChars() + cachedDocumentText.numChars()
+              val distanceAsPercentageOfTotalCount = distance / totalCharCount.toDouble
+              distanceAsPercentageOfTotalCount > cacheEditDistanceThreshold
             }
-            val cachedDocumentText = cachedDocument.body().text() match {
-              case null => UTF8String.EMPTY_UTF8
-              case str => UTF8String.fromString(str)
-            }
-            val distance = documentText.levenshteinDistance(cachedDocumentText)
-            val totalCharCount = documentText.numChars() + cachedDocumentText.numChars()
-            val distanceAsPercentageOfTotalCount = distance / totalCharCount.toDouble
-            cache.put(url, document)
-            distanceAsPercentageOfTotalCount > cacheEditDistanceThreshold
           }
-          case _ => true
         }
       })
       .map(p => HTMLPage(p._1.toString, p._2.html()))
@@ -173,12 +211,13 @@ private[streamfactories] class HTMLSource(siteURL: String,
   private val absolutePathPattern = raw"[/].+".r
   private val blankPattern = raw"\\s+".r
 
-  private[streamfactories] def fetchDocument(url: URL): Option[Document] = {
+  private[streamfactories] def fetchDocument(url: String): Option[Document] = {
     try {
-      Some(Jsoup.parse(url, connectTimeoutMillis))
+      val connection = connector.connect(siteURL)
+      Some(connection.get())
     } catch {
       case e: Exception => {
-        logError(s"Unable to fetch document for $url", e)
+        logError(s"Unable to fetch document for $siteURL", e)
         None
       }
     }
@@ -192,28 +231,31 @@ private[streamfactories] class HTMLSource(siteURL: String,
       case _ => s":${rootURL.getPort}"
     }
 
-    fetchDocument(rootURL) match {
+    fetchDocument(siteURL) match {
       case None => Seq()
       case Some(rootDocument) => {
         if (maxDepth < 1) {
           return Seq((siteURL, rootDocument))
         }
 
-        val childURLs: Seq[URL] = Option(rootDocument.select("a[href]")) match {
-          case None => Seq()
-          case Some(anchors) => anchors
+        val anchors = rootDocument.select("a[href]")
+        val childURLs = anchors match {
+          case null => Seq()
+          case _ => anchors
+            .iterator()
+            .toSeq
             .filter(a=>a.hasText && a.hasAttr("href"))
             .map(a=>{
               val href = a.attr("href")
               try {
                 val url = href match {
-                  case urlPattern() => new URL(href)
-                  case rootPathPattern() => rootURL
-                  case blankPattern() => rootURL
-                  case absolutePathPattern() => new URL(s"${rootURL.getProtocol}://$rootHost$rootPortString$href")
-                  case _ => new URL(s"$siteURL/$href")
+                  case urlPattern() => href
+                  case rootPathPattern() => siteURL
+                  case blankPattern() => siteURL
+                  case absolutePathPattern() => s"${rootURL.getProtocol}://$rootHost$rootPortString$href"
+                  case _ => s"$siteURL/$href"
                 }
-                Some(url)
+                Some(url.replaceAll("[#?]$", ""))
               } catch {
                 case e: Exception => None
               }
@@ -222,15 +264,15 @@ private[streamfactories] class HTMLSource(siteURL: String,
             .map(d=>d.get)
         }
         val childDocuments = childURLs.map(childURL => {
-          if (childURL == rootURL) {
+          if (childURL == siteURL) {
             None
-          } else if (childURL.getHost != rootHost) {
+          } else if (new URL(childURL).getHost != rootHost) {
             None
           }
           else {
             fetchDocument(childURL) match {
               case None => None
-              case Some(childDocument) => Some[(String, Document)](childURL.toString, childDocument)
+              case Some(childDocument) => Some[(String, Document)](childURL, childDocument)
             }
           }
         }).filter(d=>d.isDefined).map(d=>d.get)
@@ -238,7 +280,5 @@ private[streamfactories] class HTMLSource(siteURL: String,
       }
     }
   }
-
-  override def toString: String = s"${super.toString}(${this.siteURL})"
 
 }
