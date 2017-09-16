@@ -41,7 +41,6 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.LOAD_SITE_SETTINGS, this.handleLoadSiteSettings,
             constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
-            constants.ADMIN.REMOVE_STREAMS, this.handleRemoveStreams,
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
@@ -107,11 +106,6 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleModifyStreams(response) {
-      this.loadStreamsColumns(this.dataStore.streams);
-      this.emit("change");
-    },
-
-    handleRemoveStreams(response) {
       this.loadStreamsColumns(this.dataStore.streams);
       this.emit("change");
     },
