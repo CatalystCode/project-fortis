@@ -506,7 +506,6 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
     if (!termFilters || !termFilters.length) return reject('No blacklists to remove specified.');
 
     const termIds = termFilters.map(termFilter => termFilter.id);
-    console.log(termFilters);
     
     const query = `
     DELETE
