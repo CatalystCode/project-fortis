@@ -495,6 +495,9 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
     });
 
     cassandraConnector.executeBatchMutations(mutations)
+    .then(() => {
+      return serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'blacklist'}));
+    })
     .then(() => resolve({ filters: filterRecords }))
     .catch(reject);
   });
@@ -518,6 +521,9 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
     ];
 
     cassandraConnector.executeQuery(query, params)
+    .then(() => {
+      return serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'blacklist'}));
+    })
     .then(() => {
       resolve({
         filters: termFilters
