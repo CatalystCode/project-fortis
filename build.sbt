@@ -26,6 +26,9 @@ libraryDependencies ++= Seq(
 // Bundled dependencies
 libraryDependencies ++= Seq(
   "log4j" % "log4j" % "1.2.17",
+  "com.github.catalystcode" %% "streaming-rss-html" % "1.0.0" excludeAll(),
+  "org.jsoup" % "jsoup" % "1.10.3" excludeAll(),
+  "com.rometools" % "rome" % "1.8.0" excludeAll(),
   "com.microsoft.azure" % "applicationinsights-core" % "1.0.6",
   "com.microsoft.azure" % "applicationinsights-logging-log4j1_2" % "1.0.6",
   "com.github.catalystcode" %% "streaming-instagram" % "0.0.5",
@@ -74,6 +77,7 @@ addArtifact(artifact in (Compile, assembly), assembly)
 //       Once this is done, spark-streaming-eventhubs needs to publish an updated lib containing this change (since they distribute a fat JAR), and then
 //       we can update to that package and remove this shading.
 assemblyShadeRules in assembly := Seq(
+  ShadeRule.rename("com.google.common.**" -> "no_guava.@1").inLibrary("com.google.guava" % "guava" % "14.0.1").inAll,
   ShadeRule.rename("com.microsoft.azure.servicebus.**" -> "com.microsoft.azure.eventhub.servicebus.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.1.2", "com.microsoft.azure" % "azure-eventhubs" % "0.13.1"),
   ShadeRule.rename("scalaj.http.**" -> "eventhub.scalaj.http.@1").inLibrary("com.microsoft.azure" % "spark-streaming-eventhubs_2.11" % "2.1.2")
 )

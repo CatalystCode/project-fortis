@@ -89,7 +89,9 @@ object ProjectFortis extends App with Loggable {
       pipeline("Customevents", new CustomEventAnalyzer),
       pipeline("Bing", new BingAnalyzer),
       pipeline("Radio", new RadioAnalyzer),
-      pipeline("Reddit", new RedditAnalyzer)
+      pipeline("Reddit", new RedditAnalyzer),
+      pipeline("HTML", new HTMLAnalyzer),
+      pipeline("RSS", new RSSAnalyzer)
     ).flatten.reduceOption(_.union(_))
 
     if (fortisEvents.isEmpty) return false

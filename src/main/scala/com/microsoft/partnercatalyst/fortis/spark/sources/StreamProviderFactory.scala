@@ -36,6 +36,16 @@ object StreamProviderFactory {
       )
       .withFactories(
         List(
+          new HTMLStreamFactory
+        )
+      )
+      .withFactories(
+        List(
+          new RSSStreamFactory
+        )
+      )
+      .withFactories(
+        List(
           new TwitterStreamFactory(configurationManager)
         )
       )

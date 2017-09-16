@@ -71,7 +71,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       sourceurl = "",
       title = ""
     ), minZoom = 8)
-    assert(topics.size == 220)
+    assert(topics.size == 180)
     assert(topics.head == ConjunctiveTopic(
       conjunctivetopic = "",
       externalsourceid = "HamillHimself",
@@ -112,7 +112,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       sourceurl = "",
       title = ""
     ), minZoom = 8)
-    assert(topics.size == 55)
+    assert(topics.size == 45)
     assert(topics.head == ConjunctiveTopic(
       conjunctivetopic = "",
       externalsourceid = "HamillHimself",

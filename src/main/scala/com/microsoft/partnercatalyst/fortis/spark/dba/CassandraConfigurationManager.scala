@@ -6,6 +6,8 @@ import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.Connect
 import org.apache.spark.SparkContext
 import com.datastax.spark.connector._
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.TrustedSource
+
 import scala.compat.java8.FunctionConverters._
 
 @SerialVersionUID(100L)
@@ -22,7 +24,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
     }
 
     val pipelineConfigRows = sparkContext.cassandraTable[CassandraSchema.Table.Stream](CassandraSchema.KeyspaceName,
-      CassandraSchema.Table.StreamsName).where("pipelinekey = ?", pipeline).collect()
+      CassandraSchema.Table.StreamsName).where("pipelinekey = ?", pipeline).collect().filter(row=>row.enabled.getOrElse(true))
 
     pipelineConfigRows.map(stream => {
       val trustedSources = connectorToTrustedSources.computeIfAbsent(stream.streamfactory, (fetchTrustedSources _).asJava)
@@ -71,4 +73,10 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
 
     blacklistRdd.collect()
   }
+
+  override def fetchTrustedSources(sparkContext: SparkContext): Seq[TrustedSource] = {
+    sparkContext.cassandraTable[TrustedSource](CassandraSchema.KeyspaceName, CassandraSchema.Table.TrustedSourcesName)
+      .collect()
+  }
+
 }

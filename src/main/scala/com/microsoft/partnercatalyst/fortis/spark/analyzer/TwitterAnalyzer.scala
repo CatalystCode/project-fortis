@@ -7,6 +7,7 @@ import twitter4j.{Status => TwitterStatus}
 @SerialVersionUID(100L)
 class TwitterAnalyzer extends Analyzer[TwitterStatus] with Serializable
   with AnalysisDefaults.EnableAll[TwitterStatus] {
+
   override def toSchema(item: TwitterStatus, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[TwitterStatus] = {
     ExtendedDetails(
       eventid = s"Twitter.${item.getId}",
