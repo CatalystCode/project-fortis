@@ -30,6 +30,7 @@ export const AdminStore = Fluxxor.createStore({
             facebookPages: [],
             osmPlaceGroups: new Map(),
             blacklist: [],
+            blacklistColumns: [],
             locationGridColumns: [],
             locations: new Map(),
             watchlist: [],
@@ -44,7 +45,6 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.REMOVE_STREAMS, this.handleRemoveStreams,
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
-            constants.ADMIN.LOAD_LOCALITIES, this.handleLoadLocalities,
             constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
@@ -98,7 +98,7 @@ export const AdminStore = Fluxxor.createStore({
 
     loadStreamParamsColumns() {
       const columnValues = [
-        {editable: false, key: "key", name: "key"},
+        {key: "key", name: "key"},
         {editable: true, key: "value", name: "value"}
       ];
       const saveAsColumnName = 'streamParamColumns';
@@ -153,12 +153,35 @@ export const AdminStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleLoadBlacklist(response){
-        if(response.filters.filters){
-            this.dataStore.blacklist = response.filters.filters.map(filter=>Object.assign({}, filter, {filteredTerms: JSON.stringify(filter.filteredTerms)}));
-        }
-        this.dataStore.action = response.action || false;
-        this.emit("change");
+    handleLoadBlacklist(response) {
+      this.handleLoadBlackListColumns();
+      let action = false;
+      let rows = [];
+      if (response.response) {
+        action = response.action || false;
+        response.response.forEach(term => {
+          if (term.filteredTerms.constructor === Array) {
+            rows.push({id: term.id, filteredTerms: JSON.stringify(term.filteredTerms)});
+          } else if (typeof term.filteredTerms === 'string') {
+            rows.push({id: term.id, filteredTerms: term.filteredTerms});
+          } else {
+            rows.push({id: term.id, filteredTerms: JSON.stringify([term.filteredTerms])});
+          }
+        });
+      }
+      this.dataStore.blacklist = rows;
+      this.dataStore.action = action;
+      this.emit("change");
+    },
+
+    handleLoadBlackListColumns() {
+      const columnValues = [
+        {key: "id", name: "Id"},
+        {editable: true, key: "filteredTerms", name: "Blacklisted Terms"}
+      ];
+      const saveAsColumnName = 'blacklistColumns';
+            
+      this.loadColumns(columnValues, saveAsColumnName);
     },
 
     handleLoadTopics(response){
@@ -188,20 +211,6 @@ export const AdminStore = Fluxxor.createStore({
       this.loadColumns(columnValues, saveAsColumnName);
     },
 
-    handleLoadLocalities(response){
-        this.dataStore.locations.clear();
-        response.response.forEach(location => {
-            this.dataStore.locations.set(location.name.toLowerCase(), Object.assign({}, location, {coordinates: location.coordinates.join(",")}));
-        });
-
-        if(response.mutatedSiteDefintion && response.mutatedSiteDefintion.name){
-            this.dataStore.settings.properties.targetBbox = response.mutatedSiteDefintion.targetBbox;
-        }
-
-        this.dataStore.action = response.action || false;
-        this.emit("change");
-    },
-
     handlePublishedCustomEvents(response){
         this.dataStore.action = response.action || false;
         this.emit("change");
@@ -214,26 +223,7 @@ export const AdminStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleLoadSettings(response){
-        const {settings, siteList, originalSiteName} = response;
-        this.dataStore.settings = response;
-        this.dataStore.action = response.action || false;
-        if(!siteList){
-            this.dataStore.siteList = this.dataStore.siteList.map(site => {
-                if(site.name === originalSiteName){
-                    return Object.assign({}, site, {name: settings.name});
-                }else{
-                    return site;
-                }
-            });
-        }else{
-            this.dataStore.siteList = siteList;
-        }
-
-        this.loadLocalitiesColumns(settings.properties.supportedLanguages);
-        this.emit("change");
-    },
-
+    
     handleLoadPayloadFail(payload) {
         this.dataStore.error = payload.error;
     }

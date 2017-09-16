@@ -58,6 +58,13 @@ export const twitterAccounts = `fragment TwitterAccountsView on TwitterAccountCo
   }
 }`;
 
+export const blacklist = `fragment BlacklistView on BlacklistCollection {
+  filters {
+    id
+    filteredTerms
+  }
+}`;
+
 export const streams = `fragment StreamsView on StreamCollection {
   streams {
     streamId

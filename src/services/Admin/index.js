@@ -6,16 +6,6 @@ import request from 'request';
 
 const SETTINGS_ENDPOINT = 'settings';
 
-const twitterFragment = `fragment FortisTwitterAcctView on TwitterAccountCollection {
-                            accounts {
-                                    accountName
-                                    consumerKey
-                                    token
-                                    consumerSecret
-                                    tokenSecret
-                            }
-                        }`;
-
 const trustedTwitterFragment = `fragment FortisTrustedTwitterAcctView on TrustedTwitterAccountCollection {
                             accounts {
                                     RowKey
@@ -36,15 +26,6 @@ const fbPageFragment = `fragment FortisDashboardView on FacebookPageCollection {
                         pages {
                             RowKey
                             pageUrl
-                        }
-                      }`;
-
-const blacklistFragment = `fragment FortisDashboardView on BlacklistCollection {
-                        runTime
-                        filters {
-                            filteredTerms
-                            lang
-                            RowKey
                         }
                       }`;
 
@@ -100,42 +81,28 @@ export const SERVICES = {
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
+    fetchBlacklists(callback) {
+      const query = `${AdminFragments.blacklist}${AdminQueries.getBlacklists}`;
+      const variables = {};
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    saveBlacklists(blacklist, callback) {
+      const query = `${AdminFragments.blacklist}${AdminMutations.saveBlacklists}`;
+      const variables = { input: { filters: blacklist } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    removeBlacklists(blacklist, callback) {
+      const query = `${AdminFragments.blacklist}${AdminMutations.removeBlacklists}`;
+      const variables = { input: { filters: blacklist } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
     fetchStreams(callback) {
         const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
         const variables = {};
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-    },
-
-    removeStreams(streams, callback) {
-        const query = `		
-              mutation RemoveStreams($input: StreamListInput!) {		
-                removeStreams(input: $input) {		
-                  streams {		
-                    streamId		
-                    pipelineKey		
-                    pipelineLabel		
-                    pipelineIcon		
-                    streamFactory		
-                    params {		
-                      key		
-                      value		
-                }		
-                   enabled		
-                  }		
-                }		
-              }`;
-
-        const variables = { input: { streams: streams } };
-        const host = process.env.REACT_APP_SERVICE_HOST;
-        const POST = {
-            url: `${host}/api/settings`,
-            method: 'POST',
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
     },
 
   saveStreams(streams, callback) {
@@ -143,27 +110,6 @@ export const SERVICES = {
     const variables = { input: { streams } };
     fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
   },
-
-    saveTwitterAccounts(site, accounts, mutation, callback) {
-        const query = ` ${twitterFragment}
-                      mutation ModifyTwitterAccounts($input: TwitterAccountDefintion!) {
-                            streams: ${mutation}(input: $input) {
-                                ...FortisTwitterAcctView
-                            }
-                        }`;
-
-        const variables = { input: { accounts, site } };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
 
     publishCustomEvents(messages, callback) {
         const query = ` mutation PublishEvents($input: NewMessages!) {
@@ -422,66 +368,5 @@ export const SERVICES = {
         };
 
         request(POST, callback);
-    },
-    getBlacklistTerms(siteId, callback) {
-        let query = `  ${blacklistFragment}
-                          query TermBlacklist($siteId: String!) {
-                              filters: termBlacklist(siteId: $siteId) {
-                                  ...FortisDashboardView
-                              }
-                          }`;
-
-        let variables = { siteId };
-
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    saveBlacklistTerms(site, terms, callback) {
-        const query = `${blacklistFragment}
-                          mutation ModifyBlacklist($input: BlacklistTermDefintion!) {
-                              terms: modifyBlacklist(input: $input) {
-                                  ...FortisDashboardView
-                              }
-                          }`;
-
-        const variables = { input: { terms, site } };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    removeBlacklistTerms(site, terms, callback) {
-        const query = `${blacklistFragment}
-                          mutation RemoveBlacklist($input: BlacklistTermDefintion!) {
-                              terms: removeBlacklist(input: $input) {
-                                  ...FortisDashboardView
-                              }
-                          }`;
-
-        const variables = { input: { terms, site } };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
+    }
 };

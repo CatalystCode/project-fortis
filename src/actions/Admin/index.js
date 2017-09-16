@@ -1,9 +1,62 @@
 import { SERVICES as AdminServices } from '../../services/Admin';
 import { ResponseHandler } from '../shared';
-import parallelAsync from 'async/parallel';
 import constants from '../constants';
+import differenceBy from 'lodash/differenceBy';
+
+function getBlacklistAfterRemove(blacklistBeforeRemove, blacklistRemoved) {
+  return differenceBy(blacklistBeforeRemove, blacklistRemoved, 'id');
+}
 
 const methods = {
+  load_blacklist() {
+    const self = this;
+    AdminServices.fetchBlacklists((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      if (graphqlResponse && !error) {
+        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, { response: graphqlResponse.termBlacklist.filters });
+      } else {
+        const action = 'failed';
+        console.error(`[${error}] occured while loading blacklist.`);
+        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action});
+      }
+    }));
+  },
+
+  save_blacklist(termFilters) {
+    const self = this;
+    AdminServices.saveBlacklists(termFilters, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      let action = false;
+
+      if (graphqlResponse && !error) {
+        action = "saved";
+        const blacklistAfterSave = this.flux.stores.AdminStore.dataStore.blacklist;
+        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action, response: blacklistAfterSave});
+      } else{
+        action = 'failed';
+        console.error(`[${error}] occured while processing blacklist request.`);
+        self.dispatch(constants.ADMIN.LOAD_FAIL, {action});
+      }
+    }));
+  },
+
+  remove_blacklist(termFilters) {
+    const self = this;
+    AdminServices.removeBlacklists(termFilters, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      let action = false;
+
+      if (graphqlResponse && !error) {
+        action = "saved";
+        const blacklistBeforeRemove = this.flux.stores.AdminStore.dataStore.blacklist;
+        const blacklistRemoved = graphqlResponse.removeBlacklist.filters;
+        const blacklistAfterRemove = getBlacklistAfterRemove(blacklistBeforeRemove, blacklistRemoved);
+        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action, response: blacklistAfterRemove});
+      } else {
+        action = 'failed';
+        console.error(`[${error}] occured while processing blacklist request`);
+        self.dispatch(constants.ADMIN.LOAD_FAIL, {action});
+      }
+    }));
+  },
+
     load_streams() {
       const self = this;
       const dataStore = this.flux.stores.AdminStore.dataStore;
@@ -167,25 +220,7 @@ const methods = {
             }
         });
     },
-    save_locations: function(siteId, modifiedLocations, mutatedSiteDefintion){
-        parallelAsync({
-            settings: callback => {
-                AdminServices.createOrReplaceSite(siteId, mutatedSiteDefintion, (error, response, body) => ResponseHandler(error, response, body, callback))
-            },
-            locations: callback => {
-                AdminServices.saveLocations(siteId, modifiedLocations, (error, response, body) => ResponseHandler(error, response, body, callback))
-            }
-        }, (error, results) => {
-                if(!error && Object.keys(results).length === 2
-                          && results.settings.createOrReplaceSite.name){
-                    const action = 'saved';
-                    const response = results.locations.saveLocations.edges;
-                    this.dispatch(constants.ADMIN.LOAD_LOCALITIES, {response, action, mutatedSiteDefintion});
-                }else {
-                    console.error(`[${error}] occured while processing save locations request`);
-                }
-        });
-    },
+
     publish_events: function(events){
         AdminServices.publishCustomEvents(events, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             let action = 'saved';
@@ -199,32 +234,6 @@ const methods = {
                 self.dispatch(constants.ADMIN.PUBLISHED_EVENTS, {action});
             }
         }));
-    },
-    remove_locations: function(siteId, modifiedLocations){
-        const self = this;
-        AdminServices.removeLocations(siteId, modifiedLocations, (error, response, body) => {
-            if(!error && response.statusCode === 200) {
-                const action = 'saved';
-                const response = body.data.removeLocations.edges;
-                self.dispatch(constants.ADMIN.LOAD_LOCALITIES, {response, action});
-            }else{
-                console.error(`[${error}] occured while processing save locations request`);
-            }
-        });
-    },
-   load_localities: function (siteId) {
-        const self = this;
-        const edgeType = "Location";
-        AdminServices.fetchEdges(siteId, edgeType, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        const action = false;
-                        const response = body.data.locations ? body.data.locations.edges : [];
-                        self.dispatch(constants.ADMIN.LOAD_LOCALITIES, {response, action});
-                    }else{
-                        let error = 'Error, could not load keywords for admin page';
-                        self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-                    }
-        });
     },
 
     load_fb_pages: function(siteId) {
@@ -282,53 +291,6 @@ const methods = {
                 action = 'failed';
                 console.error(`[${error}] occured while processing FB pages request`);
                 self.dispatch(constants.ADMIN.LOAD_PLACES, {action});
-            }
-        }));
-    },
-    load_blacklist: function(siteId) {
-        const self = this;
-
-        AdminServices.getBlacklistTerms(siteId, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-            let action = false;
-            if (graphqlResponse && !error) {
-                const { filters } = graphqlResponse;
-                self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action, filters});
-            }else{
-                action = 'failed';
-                console.error(`[${error}] occured while processing FB pages request`);
-                self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action});
-            }
-        }));
-    },
-    remove_blacklist: function(siteId, terms){
-        const self = this;
-        AdminServices.removeBlacklistTerms(siteId, terms, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
-            let action = false;
-
-            if (graphqlResponse && !gError) {
-                const { terms } = graphqlResponse;
-                action = "saved";
-                self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action:action, filters:terms});
-            }else{
-                action = 'failed';
-                console.error(`[${gError}] occured while processing blacklist request`);
-                self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action});
-            }
-        }));
-    },
-    save_blacklist: function(siteId, terms){
-        const self = this;
-        AdminServices.saveBlacklistTerms(siteId, terms, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
-            let action = false;
-
-            if (graphqlResponse && !gError) {
-                const { terms } = graphqlResponse;
-                action = "saved";
-                self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action:action, filters:terms});
-            }else{
-                action = 'failed';
-                console.error(`[${gError}] occured while processing blacklist request`);
-                self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action});
             }
         }));
     },
