@@ -64,6 +64,12 @@ export const getTwitterAccounts = `query TwitterAccounts {
   }
 }`;
 
+export const getBlacklists = `query Blacklist {
+  termBlacklist {
+    ...BlacklistView
+  }
+}`;
+
 export const getStreams = `query Streams {
   streams {
     ...StreamsView

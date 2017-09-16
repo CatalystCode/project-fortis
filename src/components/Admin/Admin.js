@@ -48,10 +48,6 @@ export const Admin = createReactClass({
     }
   },
 
-  componentDidMount(){
-    this.getFlux().actions.ADMIN.load_localities(this.props.siteKey);
-  },
-
   componentWillReceiveProps(nextProps) {
     this.setState(this.getStateFromFlux());
   },
@@ -82,7 +78,7 @@ export const Admin = createReactClass({
                     <Tab>Facebook pages</Tab>
                     <Tab>Trusted Twitter Accounts</Tab>
                     <Tab>Twitter API Accounts</Tab>
-                    <Tab>Blacklisted Term(s)</Tab>
+                    <Tab>Blacklisted Terms</Tab>
                     <Tab>Streams</Tab>
                   </TabList>
                   <TabPanel>
@@ -153,7 +149,7 @@ export const Admin = createReactClass({
                     </div>
                   </TabPanel>
                   <TabPanel>
-                    <h2>Blacklisted Term(s)</h2>
+                    <h2>Blacklisted Terms</h2>
                     <div className="adminTable">
                       {
                         this.state.settings && this.state.settings.properties && this.state.index === BLACKLIST_TAB ?
