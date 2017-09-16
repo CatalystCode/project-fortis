@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
 // Bundled dependencies
 libraryDependencies ++= Seq(
   "log4j" % "log4j" % "1.2.17",
-  "com.github.catalystcode" %% "streaming-rss-html" % "0.0.6" excludeAll(),
+  "com.github.catalystcode" %% "streaming-rss-html" % "1.0.0" excludeAll(),
   "org.jsoup" % "jsoup" % "1.10.3" excludeAll(),
   "com.rometools" % "rome" % "1.8.0" excludeAll(),
   "com.microsoft.azure" % "applicationinsights-core" % "1.0.6",
