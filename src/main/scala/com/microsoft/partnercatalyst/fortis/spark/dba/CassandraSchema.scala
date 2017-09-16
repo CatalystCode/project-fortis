@@ -13,6 +13,7 @@ object CassandraSchema {
     case class Stream(
       pipelinekey: String,
       streamid: String,
+      enabled: Option[Boolean],
       params: Map[String, String],
       pipelineicon: String,
       pipelinelabel: String,
