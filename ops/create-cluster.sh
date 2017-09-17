@@ -61,7 +61,7 @@ readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
 
 #This needs to be exporting to the environment as the creat-react-app assett pipeline polyfills this into the build. 
-export REACT_APP_SERVICE_HOST="${fortis_interface_host}"
+export REACT_APP_SERVICE_HOST="${graphql_service_host}"
 export REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}"
 
 echo "Finished. Installing cassandra cqlsh cli."
