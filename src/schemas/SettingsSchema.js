@@ -4,6 +4,7 @@ module.exports = graphql.buildSchema(`
   type Query {
     sites: SiteCollection
     streams: StreamCollection
+    trustedSources(pipelinekeys: [String]!, sourcename: String): SourceCollection
     siteTerms(translationLanguage: String): TermCollection
     twitterAccounts: TwitterAccountCollection
     trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
@@ -73,6 +74,17 @@ module.exports = graphql.buildSchema(`
   type TermCollection {
     runTime: String
     edges: [SiteTerm]!
+  }
+
+  type SourceCollection {
+    sources: [Source]!
+  }
+
+  type Source {
+    externalsourceid: String
+    sourcetype: String
+    pipelinekey: String
+    rank: String
   }
 
   type Site {
