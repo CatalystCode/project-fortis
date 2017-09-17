@@ -6,6 +6,7 @@ const cassandraConnector = require('../../clients/cassandra/CassandraConnector')
 const { parseFromToDate, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
+const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
 
 function eventToFeature(row) {
   const FeatureType = 'MultiPoint';
@@ -17,6 +18,7 @@ function eventToFeature(row) {
       edges: row.topics,
       messageid: row.eventid,
       sourceeventid: row.sourceeventid,
+      places: row.computedfeatures.places.map(place => place.placeid),
       entities: row.computedfeatures && row.computedfeatures.entities ? row.computedfeatures.entities.map(entity => entity.name) : [],
       eventtime: row.eventtime,
       sentiment: row.computedfeatures && row.computedfeatures.sentiment ? row.computedfeatures.sentiment.neg_avg : -1,
@@ -30,6 +32,20 @@ function eventToFeature(row) {
       body: row.body
     }
   };
+}
+
+function fetchPlacesById(feature) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    let { properties } = feature;
+    const { places } = properties;
+
+    featureServiceClient.fetchById(places, 'bbox,centroid')
+      .then(places => {
+        properties.places = Array.from(new Set(places.map(place=>place.name.toLowerCase())));
+        resolve(Object.assign({}, feature, { properties }));
+      })
+      .catch(reject);
+  });
 }
 
 function queryEventsTable(eventIdResponse, args) {
@@ -161,10 +177,10 @@ function event(args, res) { // eslint-disable-line no-unused-vars
         if (!rows.length) return reject(`No event matching id ${args.messageId} found`);
         if (rows.length > 1) return reject(`Got more than one event with id ${args.messageId}`);
 
-        const feature = eventToFeature(rows[0]);
-
-        resolve(feature);
+        return eventToFeature(rows[0]);
       })
+      .then(fetchPlacesById)
+      .then(resolve)
       .catch(reject);
   });
 }

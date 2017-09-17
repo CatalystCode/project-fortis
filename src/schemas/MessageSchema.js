@@ -83,6 +83,7 @@ module.exports = graphql.buildSchema(`
     sourceeventid: String,
     sentiment: Float,
     entities: [String],
+    places: [String],
     title: String,
     externalsourceid: String,
     summary: String,
