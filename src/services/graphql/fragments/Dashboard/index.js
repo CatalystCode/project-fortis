@@ -96,6 +96,7 @@ export const eventDetailsFragment = `fragment FortisDashboardView on Feature {
         edges,
         eventtime,
         sourceeventid,
+        places,
         externalsourceid,
         sentiment,
         language,

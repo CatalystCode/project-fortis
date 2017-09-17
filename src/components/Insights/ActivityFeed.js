@@ -188,7 +188,7 @@ export default class ActivityFeed extends React.Component {
         const { allSiteTopics } = this.props;
         const edge = fetchTermFromMap(allSiteTopics, term);
 
-        return edge ? edge.translatedname : term;
+        return edge ? edge.translatedname.toLowerCase() : term.toLowerCase();
     }
 
     translateTerms = terms => terms.map(this.translateTerm);
@@ -196,17 +196,17 @@ export default class ActivityFeed extends React.Component {
     getSelectedTopicsAndSearchValue(){
         let tags = [];
         const { maintopic, termFilters } = this.props;
-        const termsInBaseLang = [maintopic].concat(Array.from(termFilters));
+        const termsInBaseLang = [maintopic.toLowerCase()].concat(Array.from(termFilters));
         tags = this.translateTerms(termsInBaseLang);
-        if(this.refs && this.refs.filterTextInput) {
-            tags.push(this.refs.filterTextInput);
+        if(this.refs && this.refs.filterTextInput && this.refs.filterTextInput.value) {
+            tags.push(this.refs.filterTextInput.value);
         }
 
         return tags;
     }
 
     filterElement(event, searchValue) {
-        return event.summary.toLowerCase().indexOf(searchValue) > -1;
+        return event.summary.indexOf(searchValue) > -1;
     }
 
     render() {

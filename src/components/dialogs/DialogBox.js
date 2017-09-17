@@ -8,11 +8,13 @@ import '../../styles/Insights/DialogBox.css';
 
 const dialogWideStyle = {
     width: '80%',
+    height: '80%',
     maxWidth: 'none'
 };
 
 const dialogCompactStyle = {
     width: '80%',
+    height: '80%',
     maxWidth: 'none'
 };
 
