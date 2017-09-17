@@ -4,6 +4,7 @@ import Chip from 'material-ui/Chip';
 import FontIcon from 'material-ui/FontIcon';
 import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
+import constants from '../../actions/constants';
 
 class ActiveFiltersView extends React.Component {
 
@@ -14,7 +15,7 @@ class ActiveFiltersView extends React.Component {
     if (nextProps && nextplaceid === prevplaceid &&
         nextProps.externalsourceid === this.props.externalsourceid &&
         nextProps.maintopic === this.props.maintopic &&
-        nextProps.conjunctiveTermsLength === this.props.conjunctiveTermsLength &&
+        (nextProps.termFilters, this.props.termFilters) &&
         nextProps.dataSource === this.props.dataSource) {
       return false;
     }
@@ -54,10 +55,13 @@ class ActiveFiltersView extends React.Component {
     }
 
     if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
+      const icon = constants.DATA_SOURCES.get(dataSource).icon;
+      
       chips.push({
         type: 'dataSource',
         label: `Publisher: ${dataSource}`,
-        icon: <FontIcon className="material-icons">find_in_page</FontIcon>,
+        icon: <i className={icon} />,
+        //icon: <FontIcon className="material-icons">find_in_page</FontIcon>,
         onDelete: this.props.deleteDataSource,
       });
     }

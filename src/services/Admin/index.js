@@ -82,21 +82,27 @@ export const SERVICES = {
     },
 
     fetchBlacklists(callback) {
-      const query = `${AdminFragments.blacklist}${AdminQueries.getBlacklists}`;
-      const variables = {};
-      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+        const query = `${AdminFragments.blacklist}${AdminQueries.getBlacklists}`;
+        const variables = {};
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     saveBlacklists(blacklist, callback) {
-      const query = `${AdminFragments.blacklist}${AdminMutations.saveBlacklists}`;
-      const variables = { input: { filters: blacklist } };
-      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+        const query = `${AdminFragments.blacklist}${AdminMutations.saveBlacklists}`;
+        const variables = { input: { filters: blacklist } };
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     removeBlacklists(blacklist, callback) {
-      const query = `${AdminFragments.blacklist}${AdminMutations.removeBlacklists}`;
-      const variables = { input: { filters: blacklist } };
-      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+        const query = `${AdminFragments.blacklist}${AdminMutations.removeBlacklists}`;
+        const variables = { input: { filters: blacklist } };
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    fetchTrustedSources(pipelinekeys, sourcename, callback) {
+        const query = `${AdminFragments.trustedsources}${AdminQueries.getTrustedSources}`;
+        const variables = { pipelinekeys, sourcename };
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     fetchStreams(callback) {
@@ -105,11 +111,11 @@ export const SERVICES = {
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
-  saveStreams(streams, callback) {
-    const query = `${AdminFragments.streams}${AdminMutations.saveStreams}`;
-    const variables = { input: { streams } };
-    fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-  },
+    saveStreams(streams, callback) {
+        const query = `${AdminFragments.streams}${AdminMutations.saveStreams}`;
+        const variables = { input: { streams } };
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
 
     publishCustomEvents(messages, callback) {
         const query = ` mutation PublishEvents($input: NewMessages!) {

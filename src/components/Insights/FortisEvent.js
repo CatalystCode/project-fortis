@@ -7,6 +7,14 @@ import styles from '../../styles/Insights/ActivityFeed';
 import Highlighter from 'react-highlight-words';
 
 export default class FortisEvent extends React.Component {
+    constructor(props){
+        super(props);
+
+        this.state = {
+            translated: false
+        };
+    }
+
     getSentimentStyle(sentimentScore) {
         if (sentimentScore >= 0 && sentimentScore < 30) {
             return styles.highlightStyles.positive;
@@ -40,6 +48,7 @@ export default class FortisEvent extends React.Component {
 
             if (translatedSentence && !error) {
                 self.props.updateFeedWithText(eventId, translatedSentence);
+                self.setState({ translated: true });
             } else {
                 console.error(`[${error}] occured while translating sentense`);
             }
@@ -50,6 +59,7 @@ export default class FortisEvent extends React.Component {
         const{ source, originalSource, link, pageLanguage, featureEdges, 
                edges, postedTime, language, sentence, id, sentiment } = this.props;
         const dataSourceSchema = constants.DATA_SOURCES.get(source);
+        const { translated } = this.state;
         const newsItemTitle = originalSource.replace(/http:\/\/www./g, '').replace(/.com\//g, '').replace(/http:\/\//g, '');
 
         return <div className="infinite-list-item" onClick={() => {
@@ -63,10 +73,10 @@ export default class FortisEvent extends React.Component {
                     </div>
                     <div className="row" style={styles.labelRow}>
                         {
-                            pageLanguage !== language ? <button className="btn btn-primary btn-sm"
+                            pageLanguage !== language ? <button className={translated ? "btn btn-success btn-sm" : "btn btn-primary btn-sm"}
                                 style={styles.translateButton}
                                 onClick={ev => { this.translateNewsItem(ev, sentence, language, pageLanguage, id) }} >
-                                Translate
+                                {translated ? "Translated" : "Translate"}
                                                                                     </button> : ''
                         }
                     </div>

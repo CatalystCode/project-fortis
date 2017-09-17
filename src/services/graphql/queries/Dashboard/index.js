@@ -20,7 +20,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
      ... FortisDashboardConjunctiveTermsView
  }`;
  
- export const getHeatmapByTile = `heatmapFeaturesByTile(maintopic:$maintopic, tileid: $tileid, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid, conjunctivetopics: $conjunctivetopics) {
+ export const getHeatmapByTile = `heatmapFeaturesByTile(maintopic:$maintopic, tileid: $tileid, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid, conjunctivetopics: $conjunctivetopics, bbox: $bbox) {
      ...FortisHeatmapViewFeatures
  }`;
  
@@ -71,6 +71,6 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
                              locations: ${getPopularPlaces}
  }`;
  
- export const getHeatmapQuery = `query FetchTileHeatmap($maintopic: String!, $tileid: String!, $zoomLevel: Int!, $fromDate: String!, $toDate: String!, $pipelinekeys: [String]!, $periodType: String!, $externalsourceid: String!, $conjunctivetopics: [String]!) {
+ export const getHeatmapQuery = `query FetchTileHeatmap($maintopic: String!, $tileid: String!, $zoomLevel: Int!, $fromDate: String!, $toDate: String!, $pipelinekeys: [String]!, $periodType: String!, $externalsourceid: String!, $conjunctivetopics: [String]!, $bbox: [Float]) {
          heatmap: ${getHeatmapByTile}
  }`;

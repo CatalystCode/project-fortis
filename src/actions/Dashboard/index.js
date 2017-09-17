@@ -11,7 +11,7 @@ function toDataSources(streams) {
     const allDataSource = {display: 'All', sourceValues: Array.from(new Set(streams.map(stream => stream.pipelineKey))), icon: 'fa fa-share-alt', label: 'all'};
     dataSources.set('all', allDataSource);
 
-    streams.forEach(stream => {
+    streams.filter(stream=>stream.enabled).forEach(stream => {
         const streamDataSource = {display: stream.pipelineLabel, sourceValues: [stream.pipelineKey], label: stream.pipelineKey, icon: stream.pipelineIcon};
         dataSources.set(stream.pipelineKey, streamDataSource);
     });

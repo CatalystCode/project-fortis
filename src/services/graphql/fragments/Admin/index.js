@@ -65,6 +65,15 @@ export const blacklist = `fragment BlacklistView on BlacklistCollection {
   }
 }`;
 
+export const trustedsources = `fragment TrustedSourcesView on SourceCollection {
+  sources {
+    externalsourceid
+    sourcetype
+    pipelinekey
+    rank
+  }
+}`;
+
 export const streams = `fragment StreamsView on StreamCollection {
   streams {
     streamId

@@ -52,7 +52,7 @@ export const SERVICES = {
     },
 
     getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
-                    dataSource, externalsourceid, conjunctivetopics, callback) {
+                    dataSource, externalsourceid, conjunctivetopics, bbox, callback) {
         console.log(`processing tile request [${maintopic}, ${fromDate}, ${toDate}, ${tileid}}]`)
         const topsourcespipelinekey = ActionMethods.DataSources(dataSource);
         const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
@@ -62,7 +62,7 @@ export const SERVICES = {
                        ${DashboardQueries.getHeatmapQuery}`;
         const gqlEndpoint = 'tiles';
         const variables = { fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
-            pipelinekeys, externalsourceid, conjunctivetopics
+            pipelinekeys, externalsourceid, conjunctivetopics, bbox
         };
 
         fetchGqlData(gqlEndpoint, { variables, query }, callback);

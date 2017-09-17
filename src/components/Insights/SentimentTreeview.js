@@ -143,13 +143,17 @@ export default class SentimentTreeview extends React.Component {
         }
     }
 
-    handleDataFetch = (maintopic, termFilters, place) => {
-        const { dataSource, timespanType, datetimeSelection, externalsourceid, fromDate, toDate } = this.props;
-        const bbox = place && place.bbox ? place.bbox : this.props.bbox;
+    handleDataFetch = (maintopic, termFilters, place, dataSource, externalsourceid) => {
+        const { timespanType, datetimeSelection, fromDate, toDate } = this.props;
+        const bbox = place && place.placebbox ? place.placebbox : this.props.bbox;
         const zoomLevel = place && place.zoom ? place.zoom : this.props.zoomLevel;
-
         maintopic = maintopic && !place ? maintopic : this.props.maintopic;
         termFilters = termFilters != null ? termFilters : this.props.termFilters;
+        
+        if(!dataSource) {
+            dataSource = this.props.dataSource;
+            externalsourceid = this.props.externalsourceid;
+        }
         
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, place);
     }
@@ -250,6 +254,7 @@ export default class SentimentTreeview extends React.Component {
                         bbox={this.props.bbox}
                         language={this.props.language}
                         defaultZoom={this.props.defaultZoom}
+                        dataSource={this.props.dataSource}
                         featureservicenamespace={this.props.featureservicenamespace}
                         allSiteTopics={this.props.allSiteTopics}
                         maintopic={this.props.maintopic}

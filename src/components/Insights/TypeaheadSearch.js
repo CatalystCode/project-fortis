@@ -2,6 +2,8 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { fromMapToArray } from './shared';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
+import { SERVICES } from '../../services/Admin';
+import constants from '../../actions/constants';
 import { fetchLocationsFromFeatureService } from '../../services/featureService';
 import '../../styles/Insights/TypeaheadSearch.css';
 
@@ -12,6 +14,7 @@ export default class TypeaheadSearch extends React.Component {
     this.DATASETS = {
       LOCATION: { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' },
       TERM: { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' },
+      SOURCE: { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchTrustedSourcesSuggestions, description: 'Search for trusted sources' }
     };
 
     this.state = {
@@ -32,14 +35,12 @@ export default class TypeaheadSearch extends React.Component {
   parsePlace(suggestion) {
     if (suggestion.layer) {
       const { id, centroid, bbox, name } = suggestion;
-      const { defaultZoom } = this.props;
 
       return {
         placeid: id,
         placecentroid: centroid,
-        bbox: bbox,
-        name: name,
-        zoom: defaultZoom
+        placebbox: bbox,
+        name: name
       };
     }
 
@@ -47,6 +48,12 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   onSuggestionSelected = (event, { suggestion }) => {
+    const { activeDataset } = this.state;
+
+    if(activeDataset.type === 'Source'){
+      return this.props.dashboardRefreshFunc(null, null, null, suggestion.pipelinekey, suggestion.name);
+    }
+
     this.props.dashboardRefreshFunc(suggestion.name, [], this.parsePlace(suggestion));
   }
 
@@ -72,8 +79,37 @@ export default class TypeaheadSearch extends React.Component {
         console.error(`Error while fetching locations matching '${value}' in bbox [${bbox}] from feature service: ${err}`);
         callback([]);
       } else {
-        locationSuggestions.forEach(suggestion => suggestion.icon = this.DATASETS.LOCATION.icon);
+        locationSuggestions.forEach(suggestion => {
+          suggestion.icon = this.DATASETS.LOCATION.icon;
+          suggestion.translatedname = suggestion.name;
+        });
         callback(locationSuggestions);
+      }
+    });
+  }
+
+  fetchTrustedSourcesSuggestions = (value, callback) => {
+    const { dataSource } = this.props;
+    const pipelinekeys = constants.DATA_SOURCES.get(dataSource).sourceValues;
+
+    SERVICES.fetchTrustedSources(pipelinekeys, value, (err, sources) => {
+      if (err) {
+        console.error(`Error while fetching sources matching '${value}': ${err}`);
+        callback([]);
+      } else {
+        const suggestions = sources.body.data.trustedSources.sources
+          .map(suggestion => {
+            const { externalsourceid, pipelinekey } = suggestion;
+
+            return Object.assign({},
+              {
+                name: externalsourceid,
+                translatedname: externalsourceid,
+                icon: constants.DATA_SOURCES.get(pipelinekey).icon
+              }, suggestion);
+          });
+
+        callback(suggestions);
       }
     });
   }
@@ -122,7 +158,10 @@ export default class TypeaheadSearch extends React.Component {
         <InputGroup.Button>
           <DropdownButton id="dataset-switcher-button" componentClass={InputGroup.Button} title={<i className={activeDataset.icon} title={activeDataset.description}></i>}>
             {Object.values(this.DATASETS).map(dataset =>
-              <MenuItem active={dataset === activeDataset} key={dataset.type} onClick={() => this.setState({ activeDataset: dataset })}>
+              <MenuItem 
+                active={dataset === activeDataset}
+                key={dataset.type}
+                onClick={() => this.setState({ activeDataset: dataset })} >
                 <span><i className={dataset.icon} /> {dataset.description}</span>
               </MenuItem>
             )}

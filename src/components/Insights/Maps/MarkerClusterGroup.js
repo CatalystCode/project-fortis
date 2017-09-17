@@ -51,11 +51,12 @@ export default class MarkerClusterGroup extends React.Component {
 
   asyncFetchHeatmapFromTileService(props, callback) {
     const { dataSource, timespanType, termFilters, zoomLevel,
-      maintopic, externalsourceid, fromDate, toDate, heatmapTileIds } = props;
+      maintopic, externalsourceid, fromDate, toDate, heatmapTileIds, 
+      selectedplace, bbox } = props;
 
     async.concat(heatmapTileIds, (tileId, tileCallback) => {
       SERVICES.getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileId, timespanType,
-        dataSource, externalsourceid, Array.from(termFilters), (error, response, heatmap) => {
+        dataSource, externalsourceid, Array.from(termFilters), selectedplace.placeid ? bbox : undefined, (error, response, heatmap) => {
           if (!error) {
             tileCallback(null, heatmap.data.heatmap.features);
           } else {
@@ -75,11 +76,11 @@ export default class MarkerClusterGroup extends React.Component {
 
   getSentimentCategory(level) {
     if (level >= 0 && level < 30) {
-      return "positive";
+      return "negative";
     } else if (level >= 30 && level < 60) {
       return "neutral";
     } else {
-      return "negative";
+      return "positive";
     }
   }
 
