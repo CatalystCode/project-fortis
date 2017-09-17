@@ -17,7 +17,7 @@ readonly sb_conn_str="${11}"
 readonly storage_account_name="${12}"
 readonly storage_account_key="${13}"
 
-readonly fortis_admin_interface="http://${fortis_interface_host}/#/site/${site_name}/admin"
+readonly fortis_admin_interface="${fortis_interface_host}/#/site/${site_name}/admin"
 readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
 readonly eh_path="published-messages"
