@@ -128,22 +128,27 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
       writeLock.unlock()
 
       // Read the service bus message and build delta using data store.
-      val delta = Option(message.getProperties.getOrDefault("dirty", null)) match {
-        case Some(value) => value match {
-          case "settings" =>
-            val siteSettings = configManager.fetchSiteSettings(sparkContext)
-            Delta(transformContext, featureServiceClientUrlBase, siteSettings = Some(siteSettings))
-          case "watchlist" =>
-            val langToWatchlist = configManager.fetchWatchlist(sparkContext)
-            Delta(transformContext, featureServiceClientUrlBase, langToWatchlist = Some(langToWatchlist))
-          case "blacklist" =>
-            val blacklist = configManager.fetchBlacklist(sparkContext)
-            Delta(transformContext, featureServiceClientUrlBase, blacklist = Some(blacklist))
-          case unknown =>
-            logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
+      val delta = Option(message.getProperties) match {
+        case Some(properties) => Option(properties.getOrDefault("dirty", null)) match {
+          case Some(value) => value match {
+            case "settings" =>
+              val siteSettings = configManager.fetchSiteSettings(sparkContext)
+              Delta(transformContext, featureServiceClientUrlBase, siteSettings = Some(siteSettings))
+            case "watchlist" =>
+              val langToWatchlist = configManager.fetchWatchlist(sparkContext)
+              Delta(transformContext, featureServiceClientUrlBase, langToWatchlist = Some(langToWatchlist))
+            case "blacklist" =>
+              val blacklist = configManager.fetchBlacklist(sparkContext)
+              Delta(transformContext, featureServiceClientUrlBase, blacklist = Some(blacklist))
+            case unknown =>
+              logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
+              Delta()
+            }
+          case None =>
+            logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
             Delta()
         }
-        case None =>
+        case None => Delta
           logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
           Delta()
       }

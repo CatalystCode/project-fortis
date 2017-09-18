@@ -1,26 +1,25 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
-import com.datastax.spark.connector._
 import com.datastax.spark.connector.writer.SqlRowWriter
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{Event, HeatmapTile}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraTileBucket}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.SparkSession
+
+import com.datastax.spark.connector._
 
 class HeatmapOfflineAggregator(session: SparkSession, configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] {
-  private val ComputedTilesTable = "computedtiles"
-
   override def aggregate(events: RDD[Event]): RDD[HeatmapTile] = {
     val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
     val tiles = events.flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
 
     tiles.keyBy(r=>{(
-      r.heatmaptileid, r.period,
+      r.period,
       r.periodtype, r.perioddate,
       r.conjunctiontopic1, r.conjunctiontopic2, r.conjunctiontopic3,
       r.tileid, r.tilez,
-      r.pipelinekey, r.externalsourceid
+      r.pipelinekey, r.externalsourceid, r.heatmaptileid
     )}).reduceByKey((a,b)=>{
       val mentionCount = a.mentioncount + b.mentioncount
       val sentimentNumerator = a.avgsentimentnumerator + b.avgsentimentnumerator
@@ -31,15 +30,16 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
     }).values
   }
 
-  private def aggregateTileBuckets(tiles: RDD[HeatmapTile], keyspace: String): DataFrame = {
-    import session.implicits._
-    val tilesComputed = tiles.keyBy(r=>{(
-      r.period,
-      r.periodtype, r.perioddate,
-      r.conjunctiontopic1, r.conjunctiontopic2, r.conjunctiontopic3,
-      r.tileid, r.tilez,
-      r.pipelinekey, r.externalsourceid
-    )}).reduceByKey((a,b)=>{
+  private def aggregateAndSaveTileBuckets(tiles: RDD[HeatmapTile], keyspace: String): Unit = {
+    val tilesComputed = tiles.keyBy(r => {
+      (
+        r.period,
+        r.periodtype, r.perioddate,
+        r.conjunctiontopic1, r.conjunctiontopic2, r.conjunctiontopic3,
+        r.tileid, r.tilez,
+        r.pipelinekey, r.externalsourceid
+      )
+    }).reduceByKey((a, b) => {
       val mentionCount = a.mentioncount + b.mentioncount
       val sentimentNumerator = a.avgsentimentnumerator + b.avgsentimentnumerator
       a.copy(
@@ -48,33 +48,24 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
       )
     }).values.map(CassandraTileBucket(_))
 
-    val tileBucketDF = tilesComputed.toDF()
+    val reparted = tilesComputed.repartitionByCassandraReplica("fortis", "computedtiles")
 
-    tileBucketDF.createOrReplaceTempView("aggregatedtiles")
+    val updatedRows = reparted.leftJoinWithCassandraTable("fortis", "computedtiles").map(pair => {
+      val generatedTile = pair._1
+      val tileFromCassandra = pair._2
+      tileFromCassandra match {
+        case None => generatedTile
+        case Some(cassandraTile) => generatedTile.copy(
+          mentioncount = generatedTile.mentioncount + cassandraTile.getLong("mentioncount"),
+          avgsentimentnumerator = generatedTile.avgsentimentnumerator + cassandraTile.getLong("avgsentimentnumerator")
+        )
+      }
+    })
 
-    val computedTilesSourceDF = session.read.format("org.apache.spark.sql.cassandra")
-      .options(Map("keyspace" -> keyspace, "table" -> ComputedTilesTable))
-      .load()
+    updatedRows.saveToCassandra("fortis", "computedtiles")
 
-    computedTilesSourceDF.createOrReplaceTempView(ComputedTilesTable)
-
-    val cassandraSave = session.sql(IncrementalUpdateQuery)
-
-    cassandraSave
-  }
-
-  private def IncrementalUpdateQuery: String = {
-    val GroupedBaseColumnNames = Seq("periodtype", "period", "conjunctiontopic1", "conjunctiontopic2", "conjunctiontopic3", "perioddate", "tileid", "tilez", "pipelinekey", "externalsourceid").mkString(",a.")
-
-    s"SELECT a.$GroupedBaseColumnNames, " +
-    s"       a.mentioncount + IF(IsNull(b.mentioncount), 0, b.mentioncount) as mentioncount, " +
-    s"       a.avgsentimentnumerator + IF(IsNull(b.avgsentimentnumerator), 0, b.avgsentimentnumerator) as avgsentimentnumerator " +
-    s"FROM   aggregatedtiles a " +
-    s"LEFT OUTER JOIN ${ComputedTilesTable} b " +
-    s" ON a.pipelinekey = b.pipelinekey and a.periodtype = b.periodtype and a.period = b.period " +
-    s"    and a.externalsourceid = b.externalsourceid and a.conjunctiontopic1 = b.conjunctiontopic1 " +
-    s"    and a.conjunctiontopic2 = b.conjunctiontopic2 and a.conjunctiontopic3 = b.conjunctiontopic3 " +
-    s"    and a.tileid = b.tileid and a.tilez = b.tilez"
+    updatedRows.unpersist(blocking = true)
+    reparted.unpersist(blocking = true)
   }
 
   override def aggregateAndSave(events: RDD[Event], keyspace: String): Unit = {
@@ -84,13 +75,10 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
       case _ => {
         implicit val rowWriter = SqlRowWriter.Factory
         tiles.saveToCassandra(keyspace, "heatmap")
-
-        val tileBuckets = aggregateTileBuckets(tiles, keyspace)
-        tileBuckets.write
-          .format("org.apache.spark.sql.cassandra")
-          .mode(SaveMode.Append)
-          .options(Map("keyspace" -> keyspace, "table" -> ComputedTilesTable)).save
+        aggregateAndSaveTileBuckets(tiles, keyspace)
       }
     }
+
+    tiles.unpersist(blocking = true)
   }
 }
