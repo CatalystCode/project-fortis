@@ -13,8 +13,10 @@ class PlaceRecognizer(
 
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 
-  def extractPlaces(text: String): List[String] = {
-    entityRecognizer.extractEntities(text).filter(OpeNER.entityIsPlace).map(_.getStr)
+  def extractPlacesAndOccurrance(text: String): Seq[(String, Int)] = {
+    entityRecognizer.extractEntities(text)
+      .filter(OpeNER.entityIsPlace)
+      .map(place => (place.getStr, place.getSpans.size()))
   }
 
   protected def createEntityRecognizer(): EntityRecognizer = {
