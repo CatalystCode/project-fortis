@@ -7,6 +7,8 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraConju
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ConjunctiveTopic, Event}
 import org.apache.spark.rdd.RDD
 
+import com.datastax.spark.connector._
+
 class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManager) extends OfflineAggregator[ConjunctiveTopic] {
 
   override def aggregate(events: RDD[Event]): RDD[ConjunctiveTopic] = {
@@ -32,6 +34,8 @@ class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManag
         topics.saveToCassandra(keyspace, "conjunctivetopics")
       }
     }
+
+    topics.unpersist(blocking = true)
   }
 
 }
