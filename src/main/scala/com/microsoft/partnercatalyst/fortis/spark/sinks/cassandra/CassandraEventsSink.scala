@@ -66,6 +66,8 @@ object CassandraEventsSink extends Loggable {
             writeEventBatchToEventTagTables(eventBatchDF, sparkSession)
           }
 
+          eventBatchDF.unpersist(blocking = true)
+
           val eventsExploded = fortisEventsRDD.flatMap(event=>{
             Seq(
               event,
@@ -87,6 +89,11 @@ object CassandraEventsSink extends Loggable {
               }
             }
           })
+
+          fortisEventsRDDRepartitioned.unpersist(blocking = true)
+          eventsExploded.unpersist(blocking = true)
+          fortisEventsRDD.unpersist(blocking = true)
+          eventsRDD.unpersist(blocking = true)
         }
       }
     }}

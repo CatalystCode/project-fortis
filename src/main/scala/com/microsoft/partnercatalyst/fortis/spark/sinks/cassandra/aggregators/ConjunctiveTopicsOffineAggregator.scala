@@ -34,6 +34,8 @@ class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManag
         topics.saveToCassandra(keyspace, "conjunctivetopics")
       }
     }
+
+    topics.unpersist(blocking = true)
   }
 
 }
