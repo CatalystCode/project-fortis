@@ -145,7 +145,7 @@ export default class SentimentTreeview extends React.Component {
 
     handleDataFetch = (maintopic, termFilters, place, dataSource, externalsourceid) => {
         const { timespanType, datetimeSelection, fromDate, toDate } = this.props;
-        const bbox = place && place.placebbox ? place.placebbox : this.props.bbox;
+        const bbox = place && place.placeid && place.placebbox.length ? place.placebbox : this.props.bbox;
         const zoomLevel = place && place.zoom ? place.zoom : this.props.zoomLevel;
         maintopic = maintopic && !place ? maintopic : this.props.maintopic;
         termFilters = termFilters != null ? termFilters : this.props.termFilters;
