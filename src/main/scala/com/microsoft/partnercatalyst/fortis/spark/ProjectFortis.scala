@@ -60,6 +60,9 @@ object ProjectFortis extends App with Loggable {
       .set("spark.kryo.registrator", "com.microsoft.partnercatalyst.fortis.spark.serialization.KryoRegistrator")
       .set("spark.kryoserializer.buffer", "128k")
       .set("spark.kryoserializer.buffer.max", "64m")
+      .set("spark.network.timeout", "800")
+      .set("spark.sql.broadcastTimeout", "1200")
+      .set("spark.rpc.askTimeout", "30")
     CassandraConfig.init(conf, batchDuration, fortisSettings)
 
     val sparkContext = new SparkContext(conf)

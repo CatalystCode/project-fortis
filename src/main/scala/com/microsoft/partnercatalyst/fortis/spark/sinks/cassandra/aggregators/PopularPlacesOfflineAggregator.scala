@@ -38,6 +38,8 @@ class PopularPlacesOfflineAggregator(configurationManager: ConfigurationManager)
         places.saveToCassandra(keyspace, "popularplaces")
       }
     }
+
+    places.unpersist(blocking = true)
   }
 
 }
