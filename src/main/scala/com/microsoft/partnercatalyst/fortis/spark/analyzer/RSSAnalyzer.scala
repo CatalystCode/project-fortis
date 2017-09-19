@@ -24,7 +24,7 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
       body = body,
       imageurl = None,
       title = item.title,
-      externalsourceid = item.source.title,
+      externalsourceid = item.source.uri,
       pipelinekey = "RSS",
       sourceurl = item.uri,
       sharedLocations = List(),
