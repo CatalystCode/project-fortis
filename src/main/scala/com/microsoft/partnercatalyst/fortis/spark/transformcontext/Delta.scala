@@ -66,8 +66,8 @@ private[transformcontext] object Delta {
           new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace))
       ),
       sentimentDetectorAuth = updatedField(
-        siteSettings.get.translationsvctoken != transformContext.siteSettings.translationsvctoken,
-        SentimentDetectorAuth(siteSettings.get.translationsvctoken)
+        siteSettings.get.cogtextsvctoken != transformContext.siteSettings.cogtextsvctoken,
+        SentimentDetectorAuth(siteSettings.get.cogtextsvctoken)
       ),
       langToKeywordExtractor = langToWatchlist.map(_.mapValues(new KeywordExtractor(_))),
       blacklist = blacklist
