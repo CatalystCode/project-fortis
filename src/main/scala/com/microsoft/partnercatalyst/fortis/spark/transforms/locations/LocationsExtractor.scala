@@ -9,6 +9,7 @@ class LocationsExtractor private[locations](
   lookup: Map[String, Set[Location]],
   featureServiceClient: FeatureServiceClient,
   placeRecognizer: Option[PlaceRecognizer] = None,
+  locationLimit: Int = Int.MaxValue,
   ngrams: Int = 3
 ) extends Serializable with Loggable {
 
@@ -17,20 +18,31 @@ class LocationsExtractor private[locations](
       return List()
     }
 
-    val candidatePlaces = extractCandidatePlaces(text).toSet
-    val locationsInGeofence = candidatePlaces.flatMap(place => lookup.get(place.toLowerCase)).flatten
-    locationsInGeofence.map(_.copy(confidence = Some(0.5)))
+    val candidatePlaces = extractCandidatePlaces(text)
+    val locationSetsInGeofence = candidatePlaces.flatMap(place =>
+      lookup.get(place._1.toLowerCase).map((_, place._2))
+    )
+
+    val locations = locationSetsInGeofence.flatMap(location => location._1.map((_, location._2)))
+    val topLocations = locations.sortBy(_._2)(Ordering[Int].reverse).take(locationLimit)
+
+    topLocations.map(_._1.copy(confidence = Some(0.5)))
   }
 
-  private def extractCandidatePlaces(text: String): Iterable[String] = {
-    var candidatePlaces = Iterable[String]()
+  private def extractCandidatePlaces(text: String): Seq[(String, Int)] = {
+    // TODO: use max heap
+    var candidatePlaces = Seq[(String, Int)]()
+
     if (placeRecognizer.isDefined) {
-      candidatePlaces = placeRecognizer.get.extractPlaces(text)
+      candidatePlaces = placeRecognizer.get.extractPlacesAndOccurrance(text)
     }
+
+    // TODO: ngrams will be very expensive on large text. Limit text or use summary only?
     if (candidatePlaces.isEmpty) {
       logDebug("Falling back to ngrams approach")
-      candidatePlaces = StringUtils.ngrams(text, ngrams)
+      candidatePlaces = StringUtils.ngrams(text, ngrams).groupBy(str => str).mapValues(_.length).toSeq
     }
+
     candidatePlaces
   }
 }

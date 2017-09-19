@@ -11,6 +11,7 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get =
 import com.microsoft.partnercatalyst.fortis.spark.logging.{Loggable, Timer}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.streaming.Time
@@ -58,17 +59,16 @@ object CassandraEventsSink extends Loggable {
             new HeatmapOfflineAggregator(sparkSession, configurationManager)
           )
 
-          val eventBatchDF = Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
-            fetchEventBatch(batchid, fortisEventsRDD, sparkSession)
+          val filteredEvents = removeDuplicates(batchid, fortisEventsRDD)
+          Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
+            filteredEvents.cache()
           }
 
           Timer.time(Telemetry.logSinkPhase("writeTagTables", _, _, batchSize)) {
-            writeEventBatchToEventTagTables(eventBatchDF, sparkSession)
+            writeEventBatchToEventTagTables(filteredEvents, sparkSession.sparkContext)
           }
 
-          eventBatchDF.unpersist(blocking = true)
-
-          val eventsExploded = fortisEventsRDD.flatMap(event=>{
+          val eventsExploded = filteredEvents.flatMap(event=>{
             Seq(
               event,
               event.copy(externalsourceid = "all"),
@@ -92,6 +92,7 @@ object CassandraEventsSink extends Loggable {
 
           fortisEventsRDDRepartitioned.unpersist(blocking = true)
           eventsExploded.unpersist(blocking = true)
+          filteredEvents.unpersist(blocking = true)
           fortisEventsRDD.unpersist(blocking = true)
           eventsRDD.unpersist(blocking = true)
         }
@@ -102,41 +103,26 @@ object CassandraEventsSink extends Loggable {
       events.saveToCassandra(KeyspaceName, TableEvent, writeConf = WriteConf(ifNotExists = true))
     }
 
-    def fetchEventBatch(batchid: String, events: RDD[Event], session: SparkSession): Dataset[Event] = {
-      import session.implicits._
+    def removeDuplicates(batchid: String, events: RDD[Event]): RDD[Event] = {
+      events.repartitionByCassandraReplica(KeyspaceName, TableEventBatches)
+      val filteredEvents = events.joinWithCassandraTable(
+        KeyspaceName,
+        TableEventBatches,
+        selectedColumns = SomeColumns()
+      ).map(_._1)
 
-      Timer.time(Telemetry.logSinkPhase("addedEventsDF", _, _, -1)) {
-        val addedEventsDF = session.read.format(CassandraFormat)
-          .options(Map("keyspace" -> KeyspaceName, "table" -> TableEventBatches))
-          .load()
-        addedEventsDF.createOrReplaceTempView(TableEventBatches)
-        addedEventsDF
-      }
-
-      val filteredEvents = Timer.time(Telemetry.logSinkPhase("filteredEvents", _, _, -1)) {
-        val ds = session.sql(s"select eventid, pipelinekey from $TableEventBatches where batchid = '$batchid'")
-        val eventsDS = events.toDF().as[Event]
-        val filteredEvents = eventsDS.join(ds, Seq("eventid", "pipelinekey")).as[Event]
-        filteredEvents
-      }
-
-      Timer.time(Telemetry.logSinkPhase("filteredEvents.cache", _, _, -1)) {
-        filteredEvents.cache()
-        filteredEvents
-      }
+      filteredEvents
     }
 
-    def writeEventBatchToEventTagTables(eventDS: Dataset[Event], session: SparkSession): Unit = {
-      import session.implicits._
-
-      val defaultZoom = configurationManager.fetchSiteSettings(session.sparkContext).defaultzoom
+    def writeEventBatchToEventTagTables(events: RDD[Event], sparkContext: SparkContext): Unit = {
+      val defaultZoom = configurationManager.fetchSiteSettings(sparkContext).defaultzoom
 
       Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventTopics", _, _, -1)) {
-        eventDS.flatMap(CassandraEventTopicSchema(_)).rdd.saveToCassandra(KeyspaceName, TableEventTopics)
+        events.flatMap(CassandraEventTopicSchema(_)).saveToCassandra(KeyspaceName, TableEventTopics)
       }
 
       Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventPlaces", _, _, -1)) {
-        eventDS.flatMap(CassandraEventPlacesSchema(_, defaultZoom)).rdd.saveToCassandra(KeyspaceName, TableEventPlaces)
+        events.flatMap(CassandraEventPlacesSchema(_, defaultZoom)).saveToCassandra(KeyspaceName, TableEventPlaces)
       }
     }
   }
