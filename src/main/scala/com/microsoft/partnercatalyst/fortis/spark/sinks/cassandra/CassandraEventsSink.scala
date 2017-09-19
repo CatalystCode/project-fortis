@@ -108,7 +108,7 @@ object CassandraEventsSink extends Loggable {
       val filteredEvents = events.joinWithCassandraTable(
         KeyspaceName,
         TableEventBatches,
-        selectedColumns = SomeColumns()
+        selectedColumns = PartitionKeyColumns
       ).map(_._1)
 
       filteredEvents
