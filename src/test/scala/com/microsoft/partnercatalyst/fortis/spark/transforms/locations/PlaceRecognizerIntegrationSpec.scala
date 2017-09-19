@@ -18,7 +18,7 @@ class PlaceRecognizerIntegrationSpec extends IntegrationTestSpec {
 
     testCases.foreach(test => {
       val recognizer = new PlaceRecognizer(modelsProvider, Some(test._2))
-      val places = recognizer.extractPlaces(test._1)
+      val places = recognizer.extractPlacesAndOccurrance(test._1)
       assert(places == test._3)
     })
   }

@@ -38,8 +38,9 @@ class LocationsExtractorFactory(
     this
   }
 
-  def create(placeRecognizer: Option[PlaceRecognizer] = None, ngrams: Int = 3): LocationsExtractor = {
-    new LocationsExtractor(lookup, featureServiceClient, placeRecognizer, ngrams)
+  // TODO: make location limit tunable from site settings?
+  def create(placeRecognizer: Option[PlaceRecognizer] = None, locationLimit: Int = 5, ngrams: Int = 3): LocationsExtractor = {
+    new LocationsExtractor(lookup, featureServiceClient, placeRecognizer, locationLimit, ngrams)
   }
 
   def fetch(latitude: Double, longitude: Double): Iterable[Location] = {
