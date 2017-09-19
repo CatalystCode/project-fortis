@@ -15,7 +15,7 @@ class ActiveFiltersView extends React.Component {
     if (nextProps && nextplaceid === prevplaceid &&
         nextProps.externalsourceid === this.props.externalsourceid &&
         nextProps.maintopic === this.props.maintopic &&
-        (nextProps.termFilters, this.props.termFilters) &&
+        nextProps.conjunctiveTermsLength === this.props.conjunctiveTermsLength &&
         nextProps.dataSource === this.props.dataSource) {
       return false;
     }

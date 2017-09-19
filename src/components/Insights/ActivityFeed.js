@@ -62,7 +62,7 @@ export default class ActivityFeed extends React.Component {
 
         if (dataSource === constants.DEFAULT_DATA_SOURCE) {
             for (let [source, value] of constants.DATA_SOURCES.entries()) {
-                let icon = <i style={iconStyle} className={value.icon} />;
+                let icon = <i style={iconStyle} className={`fa ${value.icon}`} />;
                 let tab = <Tab key={source}
                     label={value.label}
                     value={source}
@@ -73,7 +73,7 @@ export default class ActivityFeed extends React.Component {
             }
         } else {
             let tabSchema = constants.DATA_SOURCES.get(filteredSource);
-            let icon = <i style={iconStyle} className={tabSchema.icon} />;
+            let icon = <i style={iconStyle} className={`fa ${tabSchema.icon}`} />;
             let tab = <Tab key={tabSchema.label}
                 label={tabSchema.label}
                 value={filteredSource}
@@ -179,7 +179,7 @@ export default class ActivityFeed extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if(hasChanged(this.props, nextProps)) {
-          this.setState(Object.assign({}, this.resetNewsFeed(), {filteredSource: this.props.dataSource, isInfiniteLoading: true}));
+          this.setState(Object.assign({}, this.resetNewsFeed(), {filteredSource: nextProps.dataSource, isInfiniteLoading: true}));
           setTimeout(() => this.processNewsFeed(nextProps), ActivityConsts.INFINITE_LOAD_DELAY_MS);
         }
     }

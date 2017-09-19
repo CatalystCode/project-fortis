@@ -69,7 +69,7 @@ export default class FortisEvent extends React.Component {
             <div className="row">
                 <div className="col-lg-2" style={styles.labelColumn}>
                     <div className="row" style={styles.labelRow}>
-                        <i style={styles.sourceLogo} className={`${dataSourceSchema.icon} fa-4x`}></i>
+                        <i style={styles.sourceLogo} className={`fa ${dataSourceSchema.icon} fa-4x`}></i>
                     </div>
                     <div className="row" style={styles.labelRow}>
                         {

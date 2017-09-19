@@ -95,7 +95,7 @@ export default class EventDetails extends React.Component {
 
                                 <p className="subheading">Sources</p>
                                 <div className="drop">
-                                    <i style={styles.sourceLogo} className={`${dataSourceSchema.icon} fa-4x`}></i>
+                                    <i style={styles.sourceLogo} className={`fa ${dataSourceSchema.icon} fa-4x`}></i>
                                     {
                                         <Chip key={externalsourceid} style={styles.chip}>
                                             <Avatar icon={<FontIcon className="material-icons">share</FontIcon>} />

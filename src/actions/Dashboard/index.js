@@ -8,10 +8,10 @@ import { momentGetFromToRange } from '../../utils/Utils';
 function toDataSources(streams) {
     const dataSources = new Map();
 
+    streams = streams.filter(stream=>stream.enabled);
     const allDataSource = {display: 'All', sourceValues: Array.from(new Set(streams.map(stream => stream.pipelineKey))), icon: 'fa fa-share-alt', label: 'all'};
     dataSources.set('all', allDataSource);
-
-    streams.filter(stream=>stream.enabled).forEach(stream => {
+    streams.forEach(stream => {
         const streamDataSource = {display: stream.pipelineLabel, sourceValues: [stream.pipelineKey], label: stream.pipelineKey, icon: stream.pipelineIcon};
         dataSources.set(stream.pipelineKey, streamDataSource);
     });
