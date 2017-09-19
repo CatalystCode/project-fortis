@@ -20,6 +20,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
     def fetchTrustedSources(connectorName: String): Seq[String] = {
       sparkContext.cassandraTable(CassandraSchema.KeyspaceName, CassandraSchema.Table.TrustedSourcesName)
         .select("externalsourceid")
+        .where("pipelinekey = ?", connectorName)
         .map(row => row.getString("externalsourceid")).collect()
     }
 
