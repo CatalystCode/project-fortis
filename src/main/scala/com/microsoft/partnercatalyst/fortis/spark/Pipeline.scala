@@ -31,8 +31,8 @@ object Pipeline {
     val configs = configurationManager.fetchConnectorConfigs(ssc.sparkContext, name)
     val sourceStream = streamProvider.buildStream[T](ssc, configs)
 
-    val entityModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/opener/opener-$language.zip", settings.modelsDir)
-    val sentimentModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/sentiment/sentiment-$language.zip", settings.modelsDir)
+    val entityModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/opener/opener-$language.zip")
+    val sentimentModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/sentiment/sentiment-$language.zip")
 
     sourceStream.map(_.transform(rdd => {
       // Note: this block executes on the driver, whereas the operations applied to 'rdd' (i.e. rdd.map(_))
