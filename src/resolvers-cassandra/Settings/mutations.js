@@ -5,6 +5,9 @@ const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const blobStorageClient = require('../../clients/storage/BlobStorageClient');
 const serviceBusClient = require('../../clients/servicebus/ServiceBusClient');
+const appInsightsProps = require('./AppInsightsProps');
+const appInsightsMetrics = require('./AppInsightsMetrics');
+const appInsightsConstants = require('../AppInsightsConstants');
 const { withRunTime, limitForInClause } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
@@ -533,6 +536,56 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function modifyTrustedSources(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const sources = args && args.input && args.input.sources;
+    if (!sources || !sources.length) return reject('No trusted sources to insert specified.');
+
+    let mutations = [];
+    sources.forEach(source => {
+      mutations.push({
+        query: `INSERT INTO fortis.trustedsources (pipelinekey, externalsourceid, sourcetype, rank, insertiontime) 
+        VALUES (?, ?, ?, ?, toTimestamp(now()));`,
+        params: [source.pipelinekey, source.externalsourceid, source.sourcetype, source.rank]
+      });
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(() => {
+      resolve({ sources });
+    })
+    .catch(reject);
+  });
+}
+
+function removeTrustedSources(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const sources = args && args.input && args.input.sources;
+    if (!sources || !sources.length) return reject('No trusted sources to remove specified.');
+
+    let mutations = [];
+    sources.forEach(source => {
+      mutations.push({
+        query: `
+        DELETE
+        FROM fortis.trustedsources
+        WHERE pipelinekey = ?
+        AND externalsourceid = ?
+        AND sourcetype = ?
+        AND rank = ?;
+        `,
+        params: [source.pipelinekey, source.externalsourceid, source.sourcetype, source.rank]
+      });
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(() => {
+      resolve({ sources });
+    })
+    .catch(reject);
+  });
+}
+
 module.exports = {
   createOrReplaceSite: createOrReplaceSite,
   createSite: trackEvent(createSite, 'createSite'),
@@ -548,6 +601,12 @@ module.exports = {
   removeTrustedTwitterAccounts: trackEvent(withRunTime(removeTrustedTwitterAccounts), 'removeTrustedTwitterAccounts'),
   modifyTwitterAccounts: trackEvent(withRunTime(modifyTwitterAccounts), 'modifyTwitterAccounts'),
   removeTwitterAccounts: trackEvent(withRunTime(removeTwitterAccounts), 'removeTwitterAccounts'),
+  modifyTrustedSources: trackEvent(withRunTime(modifyTrustedSources), 'modifyTrustedSources',  
+  appInsightsProps.extraProps(appInsightsConstants.OPERATIONS.modify, appInsightsConstants.TABLES.trustedsources, appInsightsConstants.COLLECTIONS.sources), 
+  appInsightsMetrics.extraMetrics(appInsightsConstants.COLLECTIONS.sources)),  
+  removeTrustedSources: trackEvent(withRunTime(removeTrustedSources), 'removeTrustedSources', 
+  appInsightsProps.extraProps(appInsightsConstants.OPERATIONS.remove, appInsightsConstants.TABLES.trustedsources, appInsightsConstants.COLLECTIONS.sources), 
+  appInsightsMetrics.extraMetrics(appInsightsConstants.COLLECTIONS.sources)), 
   modifyBlacklist: trackEvent(withRunTime(modifyBlacklist), 'modifyBlacklist'),
   removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist')
 };

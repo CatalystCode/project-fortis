@@ -21,6 +21,8 @@ module.exports = graphql.buildSchema(`
     editSite(input: EditableSiteSettings!): Site
     modifyStreams(input: StreamListInput!): StreamCollection
     removeStreams(input: StreamListInput!): StreamCollection
+    modifyTrustedSources(input: SourceListInput!): SourceCollection
+    removeTrustedSources(input: SourceListInput!): SourceCollection
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     createOrReplaceSite(input: SiteDefinition!): Site
@@ -81,10 +83,23 @@ module.exports = graphql.buildSchema(`
   }
 
   type Source {
-    externalsourceid: String
-    sourcetype: String
-    pipelinekey: String
-    rank: String
+    rowKey: String,
+    externalsourceid: String,
+    sourcetype: String,
+    pipelinekey: String,
+    rank: String,
+  }
+
+  input SourceListInput {
+    sources: [SourceInput]!
+  }
+  
+  input SourceInput {
+    rowKey: String,
+    externalsourceid: String,
+    sourcetype: String,
+    pipelinekey: String,
+    rank: String,
   }
 
   type Site {

@@ -62,6 +62,32 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function cassandraRowToStream(row) {
+  if (row.enabled == null) row.enabled = false;
+  return {
+    streamId: row.streamid,
+    pipelineKey: row.pipelinekey,
+    pipelineLabel: row.pipelinelabel,
+    pipelineIcon: row.pipelineicon,
+    streamFactory: row.streamfactory,
+    params: paramsToParamsEntries(row.params),
+    enabled: row.enabled
+  };
+}
+
+function paramsToParamsEntries(params) {
+  const paramsEntries = [];
+  for (const key of Object.keys(params)) {
+    let value = params[key];
+    let paramsEntry = {
+      key,
+      value
+    };
+    paramsEntries.push(paramsEntry);
+  }
+  return paramsEntries;
+}
+
 function trustedSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const query = 'SELECT * FROM fortis.trustedsources where pipelinekey IN ?';
@@ -78,21 +104,9 @@ function trustedSources(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-function cassandraRowToStream(row) {
-  if (row.enabled == null) row.enabled = false;
-  return {
-    streamId: row.streamid,
-    pipelineKey: row.pipelinekey,
-    pipelineLabel: row.pipelinelabel,
-    pipelineIcon: row.pipelineicon,
-    streamFactory: row.streamfactory,
-    params: paramsToParamsEntries(row.params),
-    enabled: row.enabled
-  };
-}
-
 function cassandraRowToSource(row) {
   return {
+    rowKey: row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank,
     externalsourceid: row.externalsourceid,
     sourcetype: row.sourcetype,
     pipelinekey: row.pipelinekey,
@@ -106,19 +120,6 @@ function trustedSourceFilter(row, namequery) {
   }
 
   return true;
-}
-
-function paramsToParamsEntries(params) {
-  const paramsEntries = [];
-  for (const key of Object.keys(params)) {
-    let value = params[key];
-    let paramsEntry = {
-      key,
-      value
-    };
-    paramsEntries.push(paramsEntry);
-  }
-  return paramsEntries;
 }
 
 function cassandraRowToTwitterAccount(row) {
