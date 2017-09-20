@@ -67,6 +67,7 @@ export const blacklist = `fragment BlacklistView on BlacklistCollection {
 
 export const trustedsources = `fragment TrustedSourcesView on SourceCollection {
   sources {
+    rowKey
     externalsourceid
     sourcetype
     pipelinekey

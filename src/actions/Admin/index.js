@@ -3,8 +3,8 @@ import { ResponseHandler } from '../shared';
 import constants from '../constants';
 import differenceBy from 'lodash/differenceBy';
 
-function getBlacklistAfterRemove(blacklistBeforeRemove, blacklistRemoved) {
-  return differenceBy(blacklistBeforeRemove, blacklistRemoved, 'id');
+function getListAfterRemove(listBeforeRemove, itemsRemoved, keyBy) {
+  return differenceBy(listBeforeRemove, itemsRemoved, keyBy);
 }
 
 const methods = {
@@ -47,7 +47,7 @@ const methods = {
         action = "saved";
         const blacklistBeforeRemove = this.flux.stores.AdminStore.dataStore.blacklist;
         const blacklistRemoved = graphqlResponse.removeBlacklist.filters;
-        const blacklistAfterRemove = getBlacklistAfterRemove(blacklistBeforeRemove, blacklistRemoved);
+        const blacklistAfterRemove = getListAfterRemove(blacklistBeforeRemove, blacklistRemoved, 'id');
         self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action, response: blacklistAfterRemove});
       } else {
         action = 'failed';
@@ -124,7 +124,7 @@ const methods = {
     save_settings(settings) {
       const self = this;
 
-      AdminServices.editSite(settings, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      AdminServices.modifySite(settings, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse && !error) {
           const action = 'saved';
           self.dispatch(constants.ADMIN.SAVE_SITE_SETTINGS, {settings: settings, action: action});
@@ -189,6 +189,59 @@ const methods = {
             self.dispatch(constants.ADMIN.LOAD_TOPICS, {response, action});
           } else {
             let error = 'Error, could not load keywords for admin page';
+            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+          }
+        }))
+      }
+    },
+
+    load_trusted_sources(pipelineKeys, sourceName) {
+      const self = this;
+      const dataStore = this.flux.stores.AdminStore.dataStore;
+      if (!dataStore.loading) {
+        AdminServices.fetchTrustedSources(pipelineKeys, sourceName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+          if (graphqlResponse && !error) {
+            const response = graphqlResponse.trustedSources.sources
+            const action = false;
+            self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response, action});
+          } else {
+            let error = 'Error, could not load trusted sources for admin page';
+            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+          }
+        }))
+      }
+    },
+
+    save_trusted_sources(sources) {
+      const self = this;
+      const dataStore = this.flux.stores.AdminStore.dataStore;
+      if (!dataStore.loading) {
+        AdminServices.saveTrustedSources(sources, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+          if (graphqlResponse && !error) {
+            const trustedSourcesAfterSave = this.flux.stores.AdminStore.dataStore.trustedSources;
+            const action = 'saved';
+            self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterSave, action});
+          } else {
+            let error = 'Error, could not load trusted sources for admin page';
+            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+          }
+        }))
+      }
+    },
+
+    remove_trusted_sources(sources) {
+      const self = this;
+      const dataStore = this.flux.stores.AdminStore.dataStore;
+      if (!dataStore.loading) {
+        AdminServices.removeTrustedSources(sources, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+          if (graphqlResponse && !error) {
+            const action = 'saved';
+            const trustedSourcesBeforeRemove = this.flux.stores.AdminStore.dataStore.trustedSources;
+            const trustedSourcesRemoved = graphqlResponse.removeTrustedSources.sources
+            const trustedSourcesAfterRemove = getListAfterRemove(trustedSourcesBeforeRemove, trustedSourcesRemoved, 'rowKey');
+            self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterRemove, action});
+          } else {
+            let error = 'Error, could not load trusted sources for admin page';
             self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
           }
         }))

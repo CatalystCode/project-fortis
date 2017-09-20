@@ -43,7 +43,7 @@ export const BlacklistEditor = createReactClass({
     },
 
     render() {
-      let state = this.getFlux().store("AdminStore").getState();
+      const state = this.getFlux().store("AdminStore").getState();
 
       return (
         <DataGrid 

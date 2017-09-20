@@ -34,6 +34,8 @@ export const AdminStore = Fluxxor.createStore({
             locationGridColumns: [],
             locations: new Map(),
             watchlist: [],
+            trustedSources: [],
+            trustedSourcesColumns: [],
             action: false,
             error: null
         };
@@ -44,6 +46,7 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
             constants.ADMIN.REMOVE_STREAMS, this.handleRemoveStreams,
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
+            constants.ADMIN.LOAD_TRUSTED_SOURCES, this.handleLoadTrustedSources,
             constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
@@ -209,6 +212,25 @@ export const AdminStore = Fluxxor.createStore({
       });
 
       this.loadColumns(columnValues, saveAsColumnName);
+    },
+
+    handleLoadTrustedSources(response) {
+      this.dataStore.trustedSources = response.response || [];
+      this.dataStore.action = response.action || false;
+      this.handleLoadTrustedSourcesColumns();
+      this.emit("change");
+    },
+
+    handleLoadTrustedSourcesColumns() {
+      const columnValues = [
+        {editable: true, key: "pipelinekey", name: "Pipeline Key"},
+        {editable: true, key: "externalsourceid", name: "External Source Id"},
+        {editable: true, key: "sourcetype", name: "Source Type"},
+        {editable: true, key: "rank", name: "Rank"},
+      ];
+      const saveAsColumnName = 'trustedSourcesColumns';
+      this.loadColumns(columnValues, saveAsColumnName);
+      this.emit("change");
     },
 
     handlePublishedCustomEvents(response){

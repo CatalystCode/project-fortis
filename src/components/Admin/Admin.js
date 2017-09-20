@@ -6,7 +6,7 @@ import { AdminSettings } from './AdminSettings';
 import { AdminWatchlist } from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
 import { FacebookPagesEditor } from './FacebookPagesEditor';
-import { AdminTrustedTwitterAcc } from './AdminTrustedTwitterAcc';
+import { TrustedSources } from './TrustedSources';
 import { BlacklistEditor } from './BlacklistEditor';
 import { StreamEditor } from './StreamEditor';
 import { AdminTwitterAccounts } from './AdminTwitterAccounts';
@@ -21,7 +21,7 @@ const WATCHLIST_TAB = 1;
 const LOCATIONS_TAB = 2;
 const CUSTOM_EVENTS_TAB = 3;
 const FB_PAGES_TAB = 4;
-const TRUSTED_TWITTER_ACCTS = 5;
+const TRUSTED_SOURCES = 5;
 const TWITTER_ACCOUNTS_TAB = 6;
 const BLACKLIST_TAB = 7;
 const STREAM_TAB = 8;
@@ -76,7 +76,7 @@ export const Admin = createReactClass({
                     <Tab>Geofence / Monitored places</Tab>
                     <Tab>Event Import</Tab>
                     <Tab>Facebook pages</Tab>
-                    <Tab>Trusted Twitter Accounts</Tab>
+                    <Tab>Trusted Sources</Tab>
                     <Tab>Twitter API Accounts</Tab>
                     <Tab>Blacklisted Terms</Tab>
                     <Tab>Streams</Tab>
@@ -131,11 +131,11 @@ export const Admin = createReactClass({
                     </div>
                   </TabPanel>
                   <TabPanel>
-                    <h2>Trusted Twitter Accounts</h2>
+                    <h2>Trusted Sources</h2>
                     <div className="adminTable">
                       {
-                        this.state.settings && this.state.settings.properties && this.state.index === TRUSTED_TWITTER_ACCTS ?
-                        <AdminTrustedTwitterAcc {...this.props}/> : undefined
+                        this.state.settings && this.state.settings.properties && this.state.index === TRUSTED_SOURCES ?
+                        <TrustedSources {...this.props}/> : undefined
                       }
                     </div>
                   </TabPanel>

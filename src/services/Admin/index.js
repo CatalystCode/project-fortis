@@ -105,6 +105,18 @@ export const SERVICES = {
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
+    saveTrustedSources(sources, callback) {
+      const query = `${AdminFragments.trustedsources}${AdminMutations.saveTrustedSources}`;
+      const variables = { input: { sources } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    removeTrustedSources(sources, callback) {
+      const query = `${AdminFragments.trustedsources}${AdminMutations.removeTrustedSources}`;
+      const variables = { input: { sources } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
     fetchStreams(callback) {
         const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
         const variables = {};

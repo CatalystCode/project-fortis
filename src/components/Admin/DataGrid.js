@@ -160,7 +160,7 @@ export const DataGrid = createReactClass({
            newRow[this.props.guidAutofillColumn] = guid();
       }
 
-      rows.push(newRow);
+      rows.unshift(newRow);
       this.setState({rows});
   },
 handleGridRowsUpdated(updatedRowData) {
