@@ -34,10 +34,24 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
 
   private[analyzer] def fetchDocument(item: RSSEntry): Option[Document] = {
     try {
-      Some(Jsoup.parse(new URL(item.uri), 10*1000))
+      fetchDocument(item.uri)
     } catch {
       case e: Exception => {
-        logError(s"Unable to fetch from RSS entry URL: ${item.uri}", e)
+        if (item.links.nonEmpty) {
+          fetchDocument(item.links.head.href)
+        } else {
+          None
+        }
+      }
+    }
+  }
+
+  private[analyzer] def fetchDocument(url: String): Option[Document] = {
+    try {
+      Some(Jsoup.parse(new URL(url), 10*1000))
+    } catch {
+      case e: Exception => {
+        logError(s"Unable to fetch from RSS entry URL: ${url}", e)
         None
       }
     }
