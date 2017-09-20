@@ -5,8 +5,6 @@ const azure = require('azure-sb');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 const SERVICE_BUS_CONNECTION_STRING = process.env.FORTIS_SB_CONN_STR;
 
-const client = azure.createServiceBusService(SERVICE_BUS_CONNECTION_STRING);
-
 /**
  * @param {string} queue
  * @param {string} message
@@ -17,6 +15,13 @@ function sendStringMessage(queue, message) {
     if (typeof message !== 'string') return reject('Message must be of type string.');
     if (!message || !message.length) {
       return reject('No message to be sent to service bus.');
+    }
+
+    let client;
+    try {
+      client = azure.createServiceBusService(SERVICE_BUS_CONNECTION_STRING);
+    } catch (exception) {
+      return reject(exception);
     }
 
     const serviceBusMessage = { body: message };
