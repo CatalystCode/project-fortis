@@ -12,11 +12,7 @@ import org.jsoup.nodes.Document
 class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] with Loggable {
 
   override def toSchema(item: RSSEntry, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RSSEntry] = {
-    val document = fetchDocument(item)
-    val body = document match {
-      case Some(doc) => doc.body().text()
-      case _ => readDescription(item)
-    }
+    val body = readDescription(item)
     ExtendedDetails(
       eventid = s"RSS.${item.uri}",
       sourceeventid = item.uri,
@@ -58,11 +54,14 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
   }
 
   private[analyzer] def readDescription(item: RSSEntry): String = {
-    item.description.contentType match {
-      case "text/html" => {
-        Jsoup.parse(item.description.value).text()
-      }
-      case _ => {
+    if (item == null || item.description == null || item.description.value == null) {
+      return ""
+    }
+
+    try {
+      Jsoup.parse(item.description.value).text()
+    } catch {
+      case e: Exception => {
         item.description.value
       }
     }
