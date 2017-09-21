@@ -38,7 +38,7 @@ class LocationsExtractor private[locations](
     }
 
     // TODO: ngrams will be very expensive on large text. Limit text or use summary only?
-    if (candidatePlaces.isEmpty) {
+    if (candidatePlaces.isEmpty && (placeRecognizer.isEmpty || !placeRecognizer.get.isValid)) {
       logDebug("Falling back to ngrams approach")
       candidatePlaces = StringUtils.ngrams(text, ngrams).groupBy(str => str).mapValues(_.length).toSeq
     }
