@@ -73,8 +73,15 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
   }
 
   private[analyzer] def readDescription(item: RSSEntry): String = {
-    if (item == null || item.description == null || item.description.value == null) {
-      return ""
+    if (item == null || item.description == null || item.description.value == null || item.description.value.isEmpty) {
+      return fetchDocument(item) match {
+        case Some(document) => try {
+          document.body().text()
+        } catch {
+          case _: Exception => ""
+        }
+        case _ => ""
+      }
     }
 
     try {
