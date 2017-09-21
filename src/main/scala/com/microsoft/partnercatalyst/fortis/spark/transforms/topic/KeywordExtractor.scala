@@ -31,8 +31,8 @@ class KeywordExtractor(keywords: Iterable[String]) extends Serializable {
     }
 
     val tokens = Tokenizer(text.toLowerCase)
-    // TODO: This take(10) is a temporary fix that we can replace with a smarter limit based on top (mentioned) keywords
-    tokens.tails.flatMap(findMatches(_).map(Tag(_, confidence = None))).toList.take(sys.env.getOrElse("FORTIS_KEYWORD_COUNT_MAX", "8").toInt)
+    val occurances = tokens.tails.flatMap(findMatches(_).map(Tag(_, confidence = None))).toIterable.groupBy(_.name.toLowerCase)
+    occurances.toSeq.sortBy(_._2.size)(Ordering[Int].reverse).take(6).map(_._2.head).toList
   }
 
   private def initializeTrie(keywords: Iterable[String]): PatriciaTrie[String] = {
