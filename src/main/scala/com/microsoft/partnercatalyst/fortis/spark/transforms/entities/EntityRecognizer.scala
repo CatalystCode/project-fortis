@@ -31,7 +31,7 @@ class EntityRecognizer(
     }
   }
 
-  def isValid: Boolean = language.isDefined && OpeNER.EnabledLanguages.contains(language)
+  def isValid: Boolean = language.isDefined && OpeNER.EnabledLanguages.contains(language.get)
 
   private def extractEntitiesUsingModels(text: String, resourcesDirectory: String): List[Entity] = {
     try {
