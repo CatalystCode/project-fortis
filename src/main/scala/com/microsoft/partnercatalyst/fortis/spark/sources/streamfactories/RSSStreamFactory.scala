@@ -19,7 +19,6 @@ class RSSStreamFactory extends StreamFactoryBase[RSSEntry] with Loggable {
     val params = connectorConfig.parameters
     connectorConfig.parameters.get("feedUrls") match {
       case Some(feedUrls:String) => {
-        val urls = feedUrls.split("[|]")
         new RSSInputDStream(
           params.getTrustedSources,
           storageLevel = StorageLevel.MEMORY_ONLY,

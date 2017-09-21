@@ -101,7 +101,6 @@ object CassandraTileBucket {
       avgsentimentnumerator = item.avgsentimentnumerator,
       externalsourceid = item.externalsourceid,
       perioddate = item.perioddate,
-      period = item.period,
       conjunctiontopic1 = item.conjunctiontopic1,
       conjunctiontopic2 = item.conjunctiontopic2,
       conjunctiontopic3 = item.conjunctiontopic3,
@@ -124,7 +123,6 @@ object CassandraHeatmapTiles {
         pipelinekey = item.pipelinekey,
         perioddate = Period(item.eventtime, periodType).startTime(),
         periodtype = periodType.periodTypeName,
-        period = periodType.format(item.eventtime),
         tileid = tileId.tileId,
         tilez = tileId.zoom,
         heatmaptileid = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom + DETAIL_ZOOM_DELTA).tileId,
@@ -134,21 +132,6 @@ object CassandraHeatmapTiles {
         externalsourceid = item.externalsourceid,
         mentioncount = item.computedfeatures.mentions,
         avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * FortisUdfFunctions.DoubleToLongConversionFactor).toLong
-    )
-  }
-}
-
-object CassandraEventTopicSchema {
-  def apply(item: Event): Seq[EventTopics] = {
-    for {
-      kw <- item.computedfeatures.keywords
-    } yield EventTopics(
-      pipelinekey = item.pipelinekey,
-      eventid = item.eventid,
-      topic = kw.toLowerCase,
-      eventtime = item.eventtime,
-      insertiontime = new Date().getTime,
-      externalsourceid = item.externalsourceid
     )
   }
 }
