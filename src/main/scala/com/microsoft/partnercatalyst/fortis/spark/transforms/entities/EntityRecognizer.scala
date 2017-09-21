@@ -17,7 +17,7 @@ class EntityRecognizer(
 ) extends Serializable with Loggable {
 
   def extractEntities(text: String): List[Entity] = {
-    if (language.isEmpty || !OpeNER.EnabledLanguages.contains(language)) {
+    if (!isValid) {
       return List()
     }
 
@@ -30,6 +30,8 @@ class EntityRecognizer(
         extractEntitiesUsingModels(text, resourcesDirectory)
     }
   }
+
+  def isValid: Boolean = language.isDefined && OpeNER.EnabledLanguages.contains(language)
 
   private def extractEntitiesUsingModels(text: String, resourcesDirectory: String): List[Entity] = {
     try {
