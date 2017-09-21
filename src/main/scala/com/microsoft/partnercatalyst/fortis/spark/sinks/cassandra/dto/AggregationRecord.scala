@@ -3,7 +3,6 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto
 trait AggregationRecord {
   val perioddate: Long
   val periodtype: String
-  val period: String
   val pipelinekey: String
   val mentioncount: Long
   val avgsentimentnumerator: Long
