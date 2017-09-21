@@ -60,7 +60,7 @@ function trackDependency(promiseFunc, dependencyName, callName) {
   return dependencyTracker;
 }
 
-function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
+function trackEvent(promiseFunc, eventName, extraPropsFunc) {
   extraPropsFunc = extraPropsFunc || ((returnValue, err) => ({})); // eslint-disable-line no-unused-vars
 
   function eventTracker(...args) {
@@ -68,25 +68,23 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
       const start = new Date();
       promiseFunc(...args)
       .then(returnValue => {
-        const properties = extraPropsFunc(returnValue, null);
-        properties.duration = new Date() - start;
-        properties.success = true;
-        const metrics = extraMetricsFunc(returnValue, null);
+        const props = extraPropsFunc(returnValue, null);
+        props.duration = new Date() - start;
+        props.success = true;
         if (client) {
-          client.trackEvent(eventName, properties, metrics);
+          client.trackEvent(eventName, props);
         }
-        console.log(JSON.stringify({event: eventName, properties, args: args && args.length && args[0], metrics}));
+        console.log(JSON.stringify({event: eventName, properties: props, args: args && args.length && args[0]}));
         resolve(returnValue);
       })
       .catch(err => {
-        const properties = extraPropsFunc(null, err);
-        properties.duration = new Date() - start;
-        properties.success = false;
-        const metrics = extraMetricsFunc(null, err);
+        const props = extraPropsFunc(null, err);
+        props.duration = new Date() - start;
+        props.success = false;
         if (client) {
-          client.trackEvent(eventName, properties, metrics);
+          client.trackEvent(eventName, props);
         }
-        console.error(JSON.stringify({event: eventName, properties, err, args: args && args.length && args[0], metrics}));
+        console.error(JSON.stringify({event: eventName, properties: props, err, args: args && args.length && args[0]}));
         reject(err);
       })
       .catch(reject);
