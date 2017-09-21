@@ -12,11 +12,7 @@ import org.jsoup.nodes.Document
 class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] with Loggable {
 
   override def toSchema(item: RSSEntry, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RSSEntry] = {
-    val document = fetchDocument(item)
-    val body = document match {
-      case Some(doc) => doc.body().text()
-      case _ => readDescription(item)
-    }
+    val body = readDescription(item)
     ExtendedDetails(
       eventid = s"RSS.${item.uri}",
       sourceeventid = item.uri,
@@ -34,21 +30,38 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
 
   private[analyzer] def fetchDocument(item: RSSEntry): Option[Document] = {
     try {
-      Some(Jsoup.parse(new URL(item.uri), 10*1000))
+      fetchDocument(item.uri)
     } catch {
       case e: Exception => {
-        logError(s"Unable to fetch from RSS entry URL: ${item.uri}", e)
+        if (item.links.nonEmpty) {
+          fetchDocument(item.links.head.href)
+        } else {
+          None
+        }
+      }
+    }
+  }
+
+  private[analyzer] def fetchDocument(url: String): Option[Document] = {
+    try {
+      Some(Jsoup.parse(new URL(url), 10*1000))
+    } catch {
+      case e: Exception => {
+        logError(s"Unable to fetch from RSS entry URL: ${url}", e)
         None
       }
     }
   }
 
   private[analyzer] def readDescription(item: RSSEntry): String = {
-    item.description.contentType match {
-      case "text/html" => {
-        Jsoup.parse(item.description.value).text()
-      }
-      case _ => {
+    if (item == null || item.description == null || item.description.value == null) {
+      return ""
+    }
+
+    try {
+      Jsoup.parse(item.description.value).text()
+    } catch {
+      case e: Exception => {
         item.description.value
       }
     }
