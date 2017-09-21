@@ -19,6 +19,8 @@ class PlaceRecognizer(
       .map(place => (place.getStr, place.getSpans.size()))
   }
 
+  def isValid: Boolean = entityRecognizer.isValid
+
   protected def createEntityRecognizer(): EntityRecognizer = {
     new EntityRecognizer(modelsProvider, language)
   }

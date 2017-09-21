@@ -44,12 +44,12 @@ object CassandraEventsSink extends Loggable {
           val batchid = UUID.randomUUID().toString
           val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
 
-          Timer.time(Telemetry.logSinkPhase("fortisEventsRDD.cache", _, _, -1)) {
-            fortisEventsRDD.cache()
+          val fortisEventsRDDRepartitioned = Timer.time(Telemetry.logSinkPhase("fortisEventsRDD.cache", _, _, -1)) {
+            fortisEventsRDD.repartition(2 * sparkSession.sparkContext.defaultParallelism).cache()
           }
 
           Timer.time(Telemetry.logSinkPhase("writeEvents", _, _, batchSize)) {
-            writeFortisEvents(fortisEventsRDD)
+            writeFortisEvents(fortisEventsRDDRepartitioned)
           }
 
           val offlineAggregators = Seq[OfflineAggregator[_]](
@@ -58,7 +58,7 @@ object CassandraEventsSink extends Loggable {
             new HeatmapOfflineAggregator(sparkSession, configurationManager)
           )
 
-          val filteredEvents = removeDuplicates(batchid, fortisEventsRDD)
+          val filteredEvents = removeDuplicates(batchid, fortisEventsRDDRepartitioned)
           Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
             filteredEvents.cache()
           }
@@ -75,13 +75,11 @@ object CassandraEventsSink extends Loggable {
             )
           })
 
-          val fortisEventsRDDRepartitioned = eventsExploded.repartition(2 * sparkSession.sparkContext.defaultParallelism).cache()
-
           offlineAggregators.foreach(aggregator => {
             val aggregatorName = aggregator.getClass.getSimpleName
             Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.$aggregatorName", _, _, -1)) {
               try {
-                aggregator.aggregateAndSave(fortisEventsRDDRepartitioned, KeyspaceName)
+                aggregator.aggregateAndSave(eventsExploded, KeyspaceName)
               } catch {
                 case e: Exception =>
                   logError(s"Failed performing offline aggregation $aggregatorName", e)
@@ -89,9 +87,9 @@ object CassandraEventsSink extends Loggable {
             }
           })
 
-          fortisEventsRDDRepartitioned.unpersist(blocking = true)
           eventsExploded.unpersist(blocking = true)
           filteredEvents.unpersist(blocking = true)
+          fortisEventsRDDRepartitioned.unpersist(blocking = true)
           fortisEventsRDD.unpersist(blocking = true)
           eventsRDD.unpersist(blocking = true)
         }

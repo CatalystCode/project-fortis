@@ -64,6 +64,7 @@ class KeywordExtractorSpec extends FlatSpec {
     assert(matches.head == keywords.head)
   }
 
+  /* Note: disabled since only top N words are returned. TODO: add relevant tests for new behavior.
   it should "find keywords many times" in {
     val keywords = List(
       "{testing}"
@@ -75,4 +76,5 @@ class KeywordExtractorSpec extends FlatSpec {
     assert(matches.length == 2)
     assert(matches.forall(term => term == "{testing}"))
   }
+  */
 }
