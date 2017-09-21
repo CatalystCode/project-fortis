@@ -13,8 +13,9 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
 
   override def toSchema(item: RSSEntry, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RSSEntry] = {
     val body = readDescription(item)
+    val url = getSourceUrlFromItem(item)
     ExtendedDetails(
-      eventid = s"RSS.${item.uri}",
+      eventid = s"RSS.${url.getOrElse(item.uri)}",
       sourceeventid = item.uri,
       eventtime = item.publishedDate,
       body = body,
@@ -22,10 +23,28 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
       title = item.title,
       externalsourceid = item.source.uri,
       pipelinekey = "RSS",
-      sourceurl = item.uri,
+      sourceurl = url.getOrElse(""),
       sharedLocations = List(),
       original = item
     )
+  }
+
+  private[analyzer] def getSourceUrlFromItem(item: RSSEntry): Option[String] = {
+    getSourceUrl(item.uri) match {
+      case Some(url) => Some(url)
+      case _ => {
+        if (item.links == null || item.links.isEmpty) None
+        else getSourceUrl(item.links.head.href)
+      }
+    }
+  }
+
+  private[analyzer] def getSourceUrl(url: String): Option[String] = {
+    try {
+      Option(new URL(url).toURI.toASCIIString)
+    } catch {
+      case _: Exception => None
+    }
   }
 
   private[analyzer] def fetchDocument(item: RSSEntry): Option[Document] = {
