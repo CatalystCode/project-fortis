@@ -20,7 +20,6 @@ import org.apache.spark.streaming.dstream.DStream
 object CassandraEventsSink extends Loggable {
   private val KeyspaceName = "fortis"
   private val TableEvent = "events"
-  private val TableEventTopics = "eventtopics"
   private val TableEventPlaces = "eventplaces"
   private val TableEventBatches = "eventbatches"
   private val CassandraFormat = "org.apache.spark.sql.cassandra"
@@ -116,10 +115,6 @@ object CassandraEventsSink extends Loggable {
 
     def writeEventBatchToEventTagTables(events: RDD[Event], sparkContext: SparkContext): Unit = {
       val defaultZoom = configurationManager.fetchSiteSettings(sparkContext).defaultzoom
-
-      Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventTopics", _, _, -1)) {
-        events.flatMap(CassandraEventTopicSchema(_)).saveToCassandra(KeyspaceName, TableEventTopics)
-      }
 
       Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventPlaces", _, _, -1)) {
         events.flatMap(CassandraEventPlacesSchema(_, defaultZoom)).saveToCassandra(KeyspaceName, TableEventPlaces)

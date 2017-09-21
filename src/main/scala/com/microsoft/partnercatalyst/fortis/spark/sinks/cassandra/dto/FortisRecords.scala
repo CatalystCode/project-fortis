@@ -25,15 +25,6 @@ case class EventBatchEntry(
   pipelinekey: String
 ) extends Serializable
 
-case class EventTopics(
-  pipelinekey: String,
-  insertiontime: Long,
-  eventid: String,
-  externalsourceid: String,
-  eventtime: Long,
-  topic: String
-) extends Serializable
-
 case class EventPlaces(
   pipelinekey: String,
   insertiontime: Long,
@@ -69,7 +60,6 @@ case class HeatmapTile(
                          override val externalsourceid: String,
                          override val perioddate: Long,
                          override val periodtype: String,
-                         override val period: String,
                          override val pipelinekey: String,
                          override val mentioncount: Long,
                          override val avgsentimentnumerator: Long,
@@ -85,7 +75,6 @@ case class ComputedTile(
                         override val externalsourceid: String,
                         override val perioddate: Long,
                         override val periodtype: String,
-                        override val period: String,
                         override val pipelinekey: String,
                         override val mentioncount: Long,
                         override val avgsentimentnumerator: Long,
@@ -105,7 +94,6 @@ case class PopularTopicAggregate(
   override val perioddate: Long,
   override val externalsourceid: String,
   override val periodtype: String,
-  override val period: String,
   override val pipelinekey: String,
   override val mentioncount: Long,
   override val avgsentimentnumerator: Long,

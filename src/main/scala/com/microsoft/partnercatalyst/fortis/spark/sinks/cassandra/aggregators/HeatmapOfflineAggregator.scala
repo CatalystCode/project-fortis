@@ -15,7 +15,6 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
     val tiles = events.flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
 
     tiles.keyBy(r=>{(
-      r.period,
       r.periodtype, r.perioddate,
       r.conjunctiontopic1, r.conjunctiontopic2, r.conjunctiontopic3,
       r.tileid, r.tilez,
@@ -33,7 +32,6 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
   private def aggregateAndSaveTileBuckets(tiles: RDD[HeatmapTile], keyspace: String): Unit = {
     val tilesComputed = tiles.keyBy(r => {
       (
-        r.period,
         r.periodtype, r.perioddate,
         r.conjunctiontopic1, r.conjunctiontopic2, r.conjunctiontopic3,
         r.tileid, r.tilez,
