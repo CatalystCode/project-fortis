@@ -142,7 +142,7 @@ object Pipeline {
         .map(addKeywords)
         .filter(item => hasKeywords(item.analysis))
         .map(item => addLocations(item))
-        .filter(item => !hasBlacklistedLocations(item))
+        .filter(item => item.analysis.locations.nonEmpty && !hasBlacklistedLocations(item))
         .map(item => addEntities(item))
         .filter(item => !hasBlacklistedEntities(item))
         .map(item => addSentiments(addSummary(item)))
