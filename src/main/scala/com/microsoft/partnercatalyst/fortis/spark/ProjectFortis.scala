@@ -81,6 +81,7 @@ object ProjectFortis extends App with Loggable {
     def pipeline[T: TypeTag](name: String, analyzer: Analyzer[T]) =
       Pipeline(name, analyzer, ssc, streamProvider, transformContextProvider, configManager)
 
+    val siteSettings = configManager.fetchSiteSettings(ssc.sparkContext)
     // Attach each pipeline (aka code path)
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
@@ -94,7 +95,7 @@ object ProjectFortis extends App with Loggable {
       pipeline("Radio", new RadioAnalyzer),
       pipeline("Reddit", new RedditAnalyzer),
       pipeline("HTML", new HTMLAnalyzer),
-      pipeline("RSS", new RSSAnalyzer)
+      pipeline("RSS", new RSSAnalyzer(siteSettings.defaultlanguage.get))
     ).flatten.reduceOption(_.union(_))
 
     if (fortisEvents.isEmpty) return false

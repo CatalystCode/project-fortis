@@ -143,13 +143,7 @@ object Pipeline {
         .map(addKeywords)
         .filter(item => hasKeywords(item.analysis))
         .map(item => addLocations(item))
-        .filter(item => {
-          val result = item.analysis.locations.nonEmpty && !hasBlacklistedLocations(item)
-          if (!result) {
-            println(s"locations filtering out event: ${item.details.body}")
-          }
-          result
-        })
+        .filter(item => item.analysis.locations.nonEmpty && !hasBlacklistedLocations(item))
         .map(item => addEntities(item))
         .filter(item => !hasBlacklistedEntities(item))
         .map(item => addSentiments(addSummary(item)))

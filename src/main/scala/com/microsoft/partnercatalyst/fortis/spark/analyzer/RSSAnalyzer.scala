@@ -5,11 +5,12 @@ import java.net.URL
 import com.github.catalystcode.fortis.spark.streaming.rss.RSSEntry
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
+import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 @SerialVersionUID(100L)
-class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] with Loggable {
+class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] with Loggable {
 
   override def toSchema(item: RSSEntry, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RSSEntry] = {
     val body = getBody(item)
@@ -28,6 +29,14 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
       sharedLocations = List(),
       original = item
     )
+  }
+
+
+  override def detectLanguage(details: ExtendedDetails[RSSEntry], languageDetector: LanguageDetector): Option[String] = {
+    super.detectLanguage(details, languageDetector) match {
+      case Some(language) => Some(language)
+      case _ => Some(defaultLanguage)
+    }
   }
 
   private[analyzer] def getSourceUrlFromItem(item: RSSEntry): Option[String] = {
@@ -78,9 +87,9 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
   }
 
   private[analyzer] def getBody(item: RSSEntry): String = {
-    readDescription(item) match {
+    readLinkedDocument(item) match {
       case Some(text) => text
-      case _ => readLinkedDocument(item).getOrElse("")
+      case _ => readDescription(item).getOrElse("")
     }
   }
 

@@ -31,14 +31,17 @@ class KeywordExtractor(language: String, keywords: Iterable[String]) extends Ser
       result
     }
 
-    val tokens = Tokenizer(text.toLowerCase)
-    val occurances = tokens.tails.flatMap(findMatches(_).map(Tag(_, confidence = None))).toIterable.groupBy(v=>TextNormalizer(v.name.toLowerCase, language))
+    val tokens = Tokenizer(TextNormalizer(text.toLowerCase, language))
+    val occurances = tokens.tails.flatMap(findMatches(_).map(Tag(_, confidence = None))).toIterable.groupBy(_.name.toLowerCase)
     occurances.toSeq.sortBy(_._2.size)(Ordering[Int].reverse).take(6).map(_._2.head).toList
   }
 
   private def initializeTrie(keywords: Iterable[String]): PatriciaTrie[String] = {
     val trie = new PatriciaTrie[String]()
-    keywords.foreach(k => trie.put(TextNormalizer(k.toLowerCase, language), k))
+    keywords.foreach(k => {
+      trie.put(k.toLowerCase, k)
+      trie.put(TextNormalizer(k.toLowerCase, language), k)
+    })
 
     trie
   }
