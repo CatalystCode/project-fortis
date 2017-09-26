@@ -87,9 +87,9 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
   }
 
   private[analyzer] def getBody(item: RSSEntry): String = {
-    readLinkedDocument(item) match {
+    readDescription(item) match {
       case Some(text) => text
-      case _ => readDescription(item).getOrElse("")
+      case _ => readLinkedDocument(item).getOrElse("")
     }
   }
 
