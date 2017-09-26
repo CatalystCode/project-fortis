@@ -4,9 +4,49 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const isObject = require('lodash/isObject');
 const json2csv = require('json2csv');
+const NodeCache = require('node-cache');
 const uuidv4 = require('uuid/v4');
 const { createFile } = require('../clients/storage/BlobStorageClient');
 const cassandraConnector = require('../clients/cassandra/CassandraConnector');
+
+const FORTIS_DATA_STORE_TTL = 1200;
+
+const memoryStore = new NodeCache( { stdTTL: FORTIS_DATA_STORE_TTL} );
+
+function termsFilter(term, categoryFilter) {
+  if (categoryFilter) {
+    return term.category && term.category === categoryFilter;
+  }
+
+  return true;
+}
+
+function getTermsFromCache() {
+  return memoryStore.get('terms');
+}
+
+function setTermsCache(terms) {
+  memoryStore.set('terms', terms);
+}
+
+function getTermsByCategory(translationLanguage, category) {
+  let watchlistTerms = getTermsFromCache();
+
+  return new Promise((resolve, reject) => {
+    if (watchlistTerms) {
+      return resolve({
+        edges: watchlistTerms.filter(term => termsFilter(term, category))
+      });
+    }
+
+    getSiteTerms(translationLanguage, category)
+      .then(watchlistTermsRsp => {
+        resolve({
+          edges: watchlistTermsRsp.edges.filter(term => termsFilter(term, category))
+        });
+      }).catch(reject);
+  });
+}
 
 function cassandraRowToSite(row) {
   // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
@@ -30,6 +70,18 @@ function cassandraRowToSite(row) {
   };
 }
 
+function transformWatchlist(item, translatedlanguage) {
+  return {
+    topicid: item.topicid,
+    name: item.topic,
+    category: item.category,
+    translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ?
+      (item.translations || {})[translatedlanguage] : item.topic,
+    translatednamelang: translatedlanguage,
+    namelang: item.lang_code
+  };
+}
+
 function getSiteDefintion() {
   return new Promise((resolve, reject) => {
     const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
@@ -41,6 +93,21 @@ function getSiteDefintion() {
         resolve({ site: cassandraRowToSite(rows[0]) });
       })
       .catch(reject);
+  });
+}
+
+function getSiteTerms(translationLanguage, category) {
+  return new Promise((resolve, reject) => {
+    const termsQuery = 'SELECT topicid, topic, translations, lang_code, category FROM fortis.watchlist';
+    cassandraConnector.executeQuery(termsQuery, [])
+      .then(rows => {
+        const watchlistTerms = rows.map(item => transformWatchlist(item, translationLanguage));
+        setTermsCache(watchlistTerms);
+
+        resolve({
+          edges: watchlistTerms.filter(term => termsFilter(term, category))
+        });
+      }).catch(reject);
   });
 }
 
@@ -180,7 +247,13 @@ module.exports = {
   toConjunctionTopics,
   tilesForBbox,
   tilesForLocations,
+  termsFilter,
+  getSiteTerms,
   limitForInClause,
+  getTermsFromCache,
+  getTermsByCategory,
+  setTermsCache,
+  transformWatchlist,
   getSiteDefintion,
   fromTopicListToConjunctionTopics,
   withCsvExporter,

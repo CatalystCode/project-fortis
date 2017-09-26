@@ -33,6 +33,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.17.1",
     "nconf": "^0.8.4",
+    "node-cache": "^4.1.1",
     "pg": "^6.1.2",
     "postgres-client": "^1.0.1",
     "promise": "^7.1.1",

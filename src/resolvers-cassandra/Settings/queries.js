@@ -3,41 +3,18 @@
 const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { withRunTime, getSiteDefintion } = require('../shared');
+const { withRunTime, getTermsByCategory, getSiteDefintion } = require('../shared');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 
 const PIPELINE_KEY_TWITTER = 'twitter';
 const CONNECTOR_FACEBOOK = 'Facebook';
 
-function transformWatchlist(item, translatedlanguage) {
-  return {
-    topicid: item.topicid,
-    name: item.topic,
-    translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ?
-      (item.translations || {})[translatedlanguage] : item.topic,
-    translatednamelang: translatedlanguage,
-    namelang: item.lang_code
-  };
-}
-
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const translationLanguage = args.translationLanguage;
+    const { translationLanguage, category } = args;
 
-    const query = `
-    SELECT topicid, topic, translations, lang_code
-    FROM fortis.watchlist
-    `.trim();
-
-    const params = [];
-    cassandraConnector.executeQuery(query, params)
-      .then(rows =>
-        resolve({
-          edges: rows
-            .map(item => transformWatchlist(item, translationLanguage))
-            .filter(term => term.translatedname)
-        })
-      ).catch(reject);
+    getTermsByCategory(translationLanguage, category)
+      .then(resolve).catch(reject);
   });
 }
 
@@ -95,6 +72,7 @@ function cassandraRowToSource(row) {
   return {
     externalsourceid: row.externalsourceid,
     sourcetype: row.sourcetype,
+    displayname: row.displayname || row.externalsourceid,
     pipelinekey: row.pipelinekey,
     rank: row.rank
   };
