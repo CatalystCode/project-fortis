@@ -18,8 +18,10 @@ object TextNormalizer {
     "es" -> SpanishNormalizer()
   )
 
+  private val defaultNormalizer = DefaultNormalizer()
+
   def apply(text: String, locale: String): String = {
-    normalizersByLocale.getOrElse(locale, DefaultNormalizer()).normalizeText(text)
+    normalizersByLocale.getOrElse(locale, defaultNormalizer).normalizeText(text)
   }
 
 }

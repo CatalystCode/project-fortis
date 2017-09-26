@@ -122,9 +122,8 @@ object Pipeline {
       }
 
       def addLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
-        val placeRecognizer = Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))
-        val locationsExtractor = locationsExtractorFactory.value.create(placeRecognizer)
-        val locations = analyzer.extractLocations(event.details, locationsExtractor)
+        val locations = analyzer.extractLocations(event.details,
+          locationsExtractorFactory.value.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))))
         event.copy(analysis = event.analysis.copy(locations = locations))
       }
 
