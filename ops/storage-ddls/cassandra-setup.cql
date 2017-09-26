@@ -86,6 +86,7 @@ CREATE TABLE watchlist(
 CREATE TABLE blacklist(
     id uuid,
     conjunctivefilter frozen<list<text>>,
+    type text,
     PRIMARY KEY (id)
 );
 
@@ -255,8 +256,7 @@ AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, e
      AND tilez IS NOT NULL
      AND tileid IS NOT NULL
      AND perioddate IS NOT NULL
-PRIMARY KEY ((periodtype, externalsourceid, tilez, pipelinekey, tileid), perioddate, mentioncount, 
-             conjunctiontopic1, conjunctiontopic2, conjunctiontopic3)
+PRIMARY KEY ((periodtype, externalsourceid, tilez, pipelinekey, tileid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), perioddate, mentioncount)
 WITH CLUSTERING ORDER BY (perioddate DESC, mentioncount DESC);
 
 CREATE MATERIALIZED VIEW eventplacesbysource
