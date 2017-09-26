@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, Location}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.transforms.language.TextNormalizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature.toLocation
 
@@ -10,6 +11,7 @@ import scala.collection.mutable
 @SerialVersionUID(100L)
 class LocationsExtractorFactory(
   featureServiceClient: FeatureServiceClient,
+  languages: Seq[String],
   geofence: Geofence,
   layersIncluded: Seq[String] = List("macroregion", "region", "macrocounty", "county", "metroarea", "localadmin", "locality", "borough", "macrohood", "neighbourhood")
 ) extends Serializable with Loggable {
@@ -25,9 +27,15 @@ class LocationsExtractorFactory(
       if (oldLocation == null) {
         logDebug(s"Got new location for name $locationName: ${newLocation.wofId}")
         map(locationName) = newLocation
+        languages.foreach(language=>{
+          map(TextNormalizer(locationName, language)) = newLocation
+        })
       } else if (newLocation < oldLocation) {
         logDebug(s"Discarding location ${oldLocation.wofId} for name $locationName as we now have more granular location ${newLocation.wofId}")
         map(locationName) = newLocation
+        languages.foreach(language=>{
+          map(TextNormalizer(locationName, language)) = newLocation
+        })
       } else {
         logDebug(s"Ignoring location ${newLocation.wofId} for name $locationName since we already have more granular location ${oldLocation.wofId}")
       }

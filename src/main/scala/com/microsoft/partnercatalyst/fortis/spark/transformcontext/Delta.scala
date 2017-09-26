@@ -56,6 +56,7 @@ private[transformcontext] object Delta {
         || siteSettings.get.featureservicenamespace != transformContext.siteSettings.featureservicenamespace,
         new LocationsExtractorFactory(
           new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace),
+          siteSettings.get.getAllLanguages(),
           siteSettings.get.getGeofence()).buildLookup()
       ),
       imageAnalyzer = updatedField(
@@ -69,7 +70,7 @@ private[transformcontext] object Delta {
         siteSettings.get.cogtextsvctoken != transformContext.siteSettings.cogtextsvctoken,
         SentimentDetectorAuth(siteSettings.get.cogtextsvctoken)
       ),
-      langToKeywordExtractor = langToWatchlist.map(_.mapValues(new KeywordExtractor(_))),
+      langToKeywordExtractor = langToWatchlist.map(m=>m.transform((lang, terms)=>new KeywordExtractor(lang, terms))),
       blacklist = blacklist
     )
   }
