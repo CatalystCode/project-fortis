@@ -12,17 +12,12 @@ const dialogWideStyle = {
     maxWidth: 'none'
 };
 
-const dialogCompactStyle = {
-    width: '80%',
-    height: '80%',
-    maxWidth: 'none'
-};
-
 export default class DialogBox extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            open: false
+            open: false,
+            enabledStreams: this.props.enabledStreams
         };
     }
 
@@ -54,7 +49,7 @@ export default class DialogBox extends React.Component {
                 onTouchTap={this.close}
             />,
         ];
-        const dialogStyle = this.renderDialogStyle();
+
         return (
             <Dialog
                 actions={actions}
@@ -62,21 +57,13 @@ export default class DialogBox extends React.Component {
                 open={this.state.open}
                 onRequestClose={this.close}
                 autoScrollBodyContent={true}
-                contentStyle={dialogStyle}
+                contentStyle={dialogWideStyle}
             >
                 <div className="content">
                     <EventDetails {...this.state} />
                 </div>
             </Dialog>
         );
-    }
-
-    renderDialogStyle() {
-        if (!this.state || !this.state.data) {
-            return dialogCompactStyle;
-        }
-
-        return dialogWideStyle;
     }
 
     renderText(title) {

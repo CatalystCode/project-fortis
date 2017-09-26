@@ -135,9 +135,9 @@ export default class HeatMap extends React.Component {
         {selectedplace.placeid ? this.renderRectangle(selectedplace.placebbox) : undefined}
 
         <MarkerClusterGroup
-          clusterColorField={"avgsentiment"}
-          clusterValueField={"mentions"}
-          {...this.props}
+            clusterColorField={"avgsentiment"}
+            clusterValueField={"mentions"}
+            {...this.props}
         />
       </Map>
     )

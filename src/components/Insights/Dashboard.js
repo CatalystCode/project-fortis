@@ -5,8 +5,8 @@ import SentimentTreeview from './SentimentTreeview';
 import GraphCard from '../Graphics/GraphCard';
 import ActivityFeed from './ActivityFeed';
 import CsvExporter from './CsvExporter';
+import TopicCloud from './TopicCloud';
 import TimeSeriesGraph from './TimeSeriesGraph';
-import PopularTermsChart from './PopularTermsChart';
 import PopularLocationsChart from './PopularLocationsChart';
 import PopularSourcesChart from './PopularSourcesChart';
 import ReactGridLayout from 'react-grid-layout';
@@ -66,12 +66,12 @@ export default class Dashboard extends React.Component {
   }
 
   filterLiterals() {
-    const { dataSource, zoomLevel, selectedplace, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
+    const { dataSource, zoomLevel, enabledStreams, selectedplace, flux, bbox, timespanType, termFilters, maintopic, externalsourceid, datetimeSelection, fromDate, toDate, language } = this.props;
     const defaultLanguage = this.props.settings.defaultLanguage;
     const defaultZoom = parseInt(this.props.settings.defaultZoomLevel, 10);
     const conjunctiveTermsLength = termFilters.size;
 
-    return Object.assign({}, { zoomLevel, dataSource, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 
+    return Object.assign({}, { zoomLevel, dataSource, enabledStreams, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 
        termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
   }
 
@@ -143,7 +143,7 @@ export default class Dashboard extends React.Component {
     return (
       <div key={'topics'} className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
-          <PopularTermsChart
+          <TopicCloud
             allSiteTopics={this.props.fullTermList}
             popularTerms={this.props.popularTerms}
             {...this.filterLiterals() }

@@ -16,7 +16,7 @@ export const TrustedSources = createReactClass({
     },
 
     getAllPipelineKeys() {
-      return constants.DATA_SOURCES.get('all').sourceValues;
+      return this.props.enabledStreams.get(constants.DEFAULT_EXTERNAL_SOURCE).sourceValues;
     },
 
     getStateFromFlux() {

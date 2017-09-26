@@ -1,7 +1,6 @@
 import RadioButton from 'material-ui/RadioButton';
 import RadioButtonGroup from 'material-ui/RadioButton/RadioButtonGroup';
 import React from 'react';
-import constants from '../../actions/constants';
 
 const styles={
     label: {
@@ -37,7 +36,9 @@ export default class DataSourceFilter extends React.Component {
 
   renderDataSourceRadioOpts(iconStyle){
     let buttons = [];
-    for (let [source, value] of constants.DATA_SOURCES.entries()) {
+    const { enabledStreams } = this.props;
+
+    for (let [source, value] of enabledStreams.entries()) {
         buttons.push(<RadioButton labelStyle={styles.radioLabel} style={styles.radioButton} key={source} value={source} label={<div style={styles.labelContainer}><i style={iconStyle} className={value.icon}></i><span style={styles.label}>{value.display}</span></div>} />)
     }
 

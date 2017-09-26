@@ -1,10 +1,5 @@
 import moment from 'moment';
 
-function InvalidPropException(propName) {
-   this.propName = propName;
-   this.name = "InvalidPropException";
-}
-
 export const FromToDateFormat = "YYYY-MM-DD HH:mm:ss";
 
 export function guid (){
@@ -33,46 +28,6 @@ export function momentToggleFormats(dateString, fromFormat, targetFormat){
           fromDate: moment().subtract(months, 'months').format("MM/DD/YYYY"),
           toDate: moment().format("MM/DD/YYYY"),
       };
- }
-
-function GetSitePrefixKey(siteKey){
-     let propNamePrefix;
-
-     if(process.env.REACT_APP_SITES){
-         let sitePrefixes = process.env.REACT_APP_SITES.split(',');
-
-         if(sitePrefixes.length > 0){
-             let site = sitePrefixes.find(site=>site.startsWith(siteKey+":"));
-             let siteSplit = site.split(':');
-
-             if(siteSplit.length === 2){
-                 propNamePrefix = siteSplit[1];
-             }
-         }
-     }
-     
-     if(!propNamePrefix){
-         throw new InvalidPropException(siteKey);
-     }
-
-     return propNamePrefix;
-} 
-
-export function getEnvPropValue(siteKey, propValueJSONStr){
-     let propertyJSON = JSON.parse(propValueJSONStr);
-     let sitePrefix = GetSitePrefixKey(siteKey);
-
-     if(Object.keys(propertyJSON).length === 0){
-         throw new InvalidPropException(propValueJSONStr);
-     }
-
-     let propValue = propertyJSON[sitePrefix];
-
-     if(!propValue){
-         throw new InvalidPropException(sitePrefix);
-     }
-
-     return propValue;
  }
 
 // converts date string using date format

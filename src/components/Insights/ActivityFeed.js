@@ -46,9 +46,9 @@ export default class ActivityFeed extends React.Component {
     }
 
     fetchSentences(props, callback) {
-        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters } = props;
+        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters, enabledStreams } = props;
         const { pageState, filteredSource } = this.state;
-        const pipelinekeys = constants.DATA_SOURCES.get(filteredSource).sourceValues;
+        const pipelinekeys = enabledStreams.get(filteredSource).sourceValues;
         const externalsourceid = props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? props.externalsourceid : null;
         const fulltextTerm = "";
 
@@ -58,10 +58,10 @@ export default class ActivityFeed extends React.Component {
     renderDataSourceTabs(iconStyle) {
         let tabs = [];
         const { filteredSource } = this.state;
-        const { dataSource } = this.props;
+        const { dataSource, enabledStreams } = this.props;
 
         if (dataSource === constants.DEFAULT_DATA_SOURCE) {
-            for (let [source, value] of constants.DATA_SOURCES.entries()) {
+            for (let [source, value] of enabledStreams.entries()) {
                 let icon = <i style={iconStyle} className={`fa ${value.icon}`} />;
                 let tab = <Tab key={source}
                     label={value.label}
@@ -72,7 +72,7 @@ export default class ActivityFeed extends React.Component {
                 tabs.push(tab);
             }
         } else {
-            let tabSchema = constants.DATA_SOURCES.get(filteredSource);
+            let tabSchema = enabledStreams.get(filteredSource);
             let icon = <i style={iconStyle} className={`fa ${tabSchema.icon}`} />;
             let tab = <Tab key={tabSchema.label}
                 label={tabSchema.label}
@@ -211,7 +211,7 @@ export default class ActivityFeed extends React.Component {
 
     render() {
         const { isInfiniteLoading, filteredSource, searchValue, elements } = this.state;
-        const { language, infiniteScrollHeight } = this.props;
+        const { language, infiniteScrollHeight, enabledStreams } = this.props;
         //todo: this is a tactical workaround until we arrive at a storage solution that supports full text searches 
         const renderedElements = searchValue ? elements.filter(event => this.filterElement(event, searchValue)) : elements;
         const selectedTags = this.getSelectedTopicsAndSearchValue();
@@ -242,6 +242,7 @@ export default class ActivityFeed extends React.Component {
                                 originalSource={feature.externalsourceid}
                                 postedTime={feature.eventtime}
                                 sentiment={feature.sentiment}
+                                enabledStreams={enabledStreams}
                                 coordinates={feature.coordinates}
                                 link={feature.link}
                                 featureEdges={translatedEdges}

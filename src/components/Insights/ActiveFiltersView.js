@@ -4,7 +4,6 @@ import Chip from 'material-ui/Chip';
 import FontIcon from 'material-ui/FontIcon';
 import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
-import constants from '../../actions/constants';
 
 class ActiveFiltersView extends React.Component {
 
@@ -24,7 +23,8 @@ class ActiveFiltersView extends React.Component {
   }
 
   getChips = () => {
-    const { dataSource, externalsourceid, selectedplace, maintopic, termFilters } = this.props;
+    const { dataSource, externalsourceid, selectedplace, maintopic, 
+            termFilters, enabledStreams } = this.props;
     const chips = [];
 
     if (maintopic) {
@@ -55,7 +55,7 @@ class ActiveFiltersView extends React.Component {
     }
 
     if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
-      const icon = constants.DATA_SOURCES.get(dataSource).icon;
+      const icon = enabledStreams.get(dataSource).icon;
       
       chips.push({
         type: 'dataSource',

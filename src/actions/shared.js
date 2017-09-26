@@ -1,16 +1,3 @@
-import constants from './constants'
-
-function DataSourceLookup (requestedSource) {
-    // eslint-disable-next-line
-    for (let [source, value] of constants.DATA_SOURCES.entries()) {
-        if(value.sourceValues.indexOf(requestedSource) > -1){
-            return value;
-        }
-    }
-
-    return undefined;
-}
-
 function ResponseHandler (error, response, body, callback) {
     if(!error && response.statusCode === 200 && body.data && !body.errors) {
         callback(undefined, body.data);
@@ -20,10 +7,9 @@ function ResponseHandler (error, response, body, callback) {
     }
 }
 
-const DataSources = source => constants.DATA_SOURCES.has(source) ? constants.DATA_SOURCES.get(source).sourceValues : undefined;
+const DataSources = (source, enabledStreams) => enabledStreams.has(source) ? enabledStreams.get(source).sourceValues : undefined;
 
 module.exports = {
-    DataSourceLookup,
     ResponseHandler,
     DataSources
 };

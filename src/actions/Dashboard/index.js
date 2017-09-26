@@ -22,12 +22,12 @@ function toDataSources(streams) {
     return dataSources;
 }
 
-function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate) {
+function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category) {
     let { configuration, terms, streams } = settings;
     configuration = configuration && configuration.site && configuration.site.properties;
     const dataSources = toDataSources((streams && streams.streams) || []);
 
-    DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel,
+    DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel, category, 
         (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
             if (!err) {
                 callback(null, Object.assign({}, { terms, dataSources }, { configuration }, topics ));
@@ -38,24 +38,26 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate) {
 }
 
 function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
-    bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, includeCsv, callback) {
+    bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, 
+    includeCsv, enabledStreams, category, callback) {
 
     DashboardServices.getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, 
         bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, !!includeCsv,
-        (err, response, body) => ResponseHandler(err, response, body, callback));
+        enabledStreams, category, (err, response, body) => ResponseHandler(err, response, body, callback));
 }
 
-function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, callback) {
-    const { configuration, topics } = resultUnion;
+function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback) {
+    const { configuration, topics, dataSources } = resultUnion;
 
     if (topics.edges.length) {
         const includeCsv = false;
         const maintopic = topics.edges[0].name;//grab the most commonly mentioned term
         //we're defaulting the timeseriesmaintopics to the most popular on the initial load so we can show all in the timeseries
         fetchFullChartData(fromDate, toDate, timespanType, constants.DEFAULT_DATA_SOURCE, maintopic, configuration.targetBbox,
-            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name), includeCsv,
+            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name), 
+            includeCsv, dataSources, category, 
             (err, chartData) => {
-                const response = Object.assign({}, chartData, resultUnion);
+                const response = Object.assign({}, chartData, resultUnion, category);
 
                 if (err) {
                     console.error(`initializing dashboard error occured ${err}`);
@@ -74,7 +76,7 @@ function isMostPopularTopicSelected(maintopic, popularTopics){
 }
 
 const methods = {
-    initializeDashboard() {
+    initializeDashboard(category) {
         let self = this;
         let dataStore = this.flux.stores.DataStore.dataStore;
         const { timespanType, datetimeSelection } = dataStore;
@@ -84,11 +86,11 @@ const methods = {
 
         seqAsync(
             //Load the site settings
-            callback => AdminServices.getDashboardSiteDefinition(null, (error, response, body) => ResponseHandler(error, response, body, callback)),
+            callback => AdminServices.getDashboardSiteDefinition(null, category, (error, response, body) => ResponseHandler(error, response, body, callback)),
             //Load the top 5 most popular terms
-            (settings, callback) => fetchCommonTerms(settings, callback, timespanType, fromDate, toDate),
+            (settings, callback) => fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category),
             //Merged Results(Settings + Full Term List + Popular Terms)
-            (resultUnion, callback) => fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, callback)
+            (resultUnion, callback) => fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback)
         )((error, results) => {
             if (!error) {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
@@ -101,10 +103,11 @@ const methods = {
         zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
         let self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;
+        const { category, popularTerms, enabledStreams } = dataStore;
 
-        let timeserieslabels = isMostPopularTopicSelected(maintopic, dataStore.popularTerms) ? dataStore.popularTerms.map(topic=>topic.name) : [maintopic];
+        let timeserieslabels = isMostPopularTopicSelected(maintopic, popularTerms) ? popularTerms.map(topic=>topic.name) : [maintopic];
 
-        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeserieslabels, includeCsv, (err, chartData) => {
+        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeserieslabels, includeCsv, enabledStreams, category, (err, chartData) => {
             if (!err) {
                 const placeid = place && place.placeid ? place.placeid : "";
                 const name = place && place.name ? place.name : "";
@@ -119,18 +122,6 @@ const methods = {
                 console.error(`[${err}] occured while processing tile visualization re-sync request`);
             }
         })
-    },
-    loadDetail(siteKey, messageId, dataSources, sourcePropeties) {
-        let self = this;
-        DashboardServices.FetchMessageDetail(siteKey, messageId, dataSources, sourcePropeties, (error, response, body) => {
-            if (!error && response.statusCode === 200 && body.data) {
-                const data = body.data;
-                self.dispatch(constants.DASHBOARD.LOAD_DETAIL, data);
-            } else {
-                console.error(`[${error}] occured while processing message request`);
-                self.dispatch(constants.DASHBOARD.LOAD_DETAIL_ERROR, error);
-            }
-        });
     },
     changeLanguage(language) {
         const self = this;

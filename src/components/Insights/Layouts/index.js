@@ -1,7 +1,7 @@
 const layout = {
     "lg": [
-      { "i": "locations", "x": 0, "y": 0, "w": 4, "h": 8},
-      { "i": "topics", "x": 4, "y": 0, "w": 4, "h": 8},
+      { "i": "topics", "x": 0, "y": 0, "w": 4, "h": 8},
+      { "i": "locations", "x": 4, "y": 0, "w": 4, "h": 8},
       { "i": "sources", "x": 8, "y": 0, "w": 4, "h": 8},
       { "i": "timeline", "x": 12, "y": 0, "w": 12, "h": 8 },
       { "i": "watchlist", "x": 0, "y": 9, "w": 5, "h": 16},

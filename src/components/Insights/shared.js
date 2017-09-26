@@ -21,6 +21,33 @@ function innerJoin(arr1, arr2) {
     return Array.from(out);
 }
 
+function getSentimentAttributes(avgsentiment) {
+    let color = '#4CAF50', tooltip = 'success', icon = 'sentiment_very_satisfied', style = 'positiveSentiment';
+
+    if (avgsentiment < 0.3) {
+        color = '#a43834';
+        icon = 'sentiment_very_dissatisfied';
+        style = 'negativeSentiment';
+        tooltip = 'error';
+    } else if (avgsentiment < 0.45) {
+        color = '#FF9800';
+        icon = 'sentiment_dissatisfied';
+        style = 'neutralNegativeSentiment';
+        tooltip = 'warning';
+    } else if (avgsentiment < 0.60) {
+        color = ' #f0c20c';
+        icon = 'sentiment_neutral';
+        style = 'neutralSentiment';
+        tooltip = 'warning';
+    } else if (avgsentiment < 0.8) {
+        color = ' #FDD835';
+        icon = 'sentiment_satisfied';
+        style = 'neutralPositiveSentiment';
+    }
+
+    return { color, icon, style, tooltip};
+}
+
 function hasChanged(prevProps, nextProps) {
     const nextplaceid = nextProps.selectedplace.placeid || "";
     const prevplaceid = prevProps.selectedplace.placeid || "";
@@ -47,5 +74,6 @@ module.exports = {
     fetchTermFromMap,
     fromMapToArray,
     innerJoin,
+    getSentimentAttributes,
     hasChanged
 }

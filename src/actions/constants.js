@@ -35,20 +35,13 @@ module.exports = {
              format: "MMMM YYYY", reactWidgetFormat: "MMMM YYYY", blobFormat: "[month]-YYYY-MM", rangeFormat: "month", timeseriesType: "hour"
          }
     },
-    DATA_SOURCES: new Map([["all", {"display": "All", "sourceValues":["Twitter", "Facebook", "acled", "reddit", "Bing"], "icon": "fa fa-share-alt", "label": "All"}],
-                     ["Facebook", {"display": "Facebook", "sourceValues":["Facebook"], "icon": "fa fa-facebook-official", "label": ""}],
-                     ["Twitter", {"display": "Twitter", "sourceValues":["Twitter"], "label": "", "icon": "fa fa-twitter"}],
-                     ["acled", {"display": "acled", "sourceValues":["acled"], "label": "", "icon": "fa fa-font"}],
-                     ["TadaWeb", {"display": "Tadaweb", "sourceValues":["TadaWeb"], "label": "", "icon": "fa fa-text-width"}],
-                     ["custom", {"display": "Imported Events", "sourceValues":["custom"], "label": "", "icon": "fa fa-upload"}]
-                   ]),
     MOMENT_FORMATS: {
         "timeScaleDate": "MM/DD/YY HH:00"
     },
     LANGUAGE_CODE_ENG: "en",
     CHART_STYLE: {
         BG_FILL: "#30303d",
-        COLORS: ['#CD0D74', '#2f4074', '#7e6596', '#fdd400', '#84b761', '#b6d2ff']
+        COLORS: ['#CD0D74', '#8A0CCF', '#2A0CD0', '#0D52D1', '#0D8ECF', '#04D215', '#B0DE09', '#F8FF01', '#FCD202', '#FF9E01', '#FF6600', '#FF0F00']
     },
     SENTIMENT_COLOR_MAPPING : {
         "negative": "red",

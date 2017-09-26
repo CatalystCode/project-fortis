@@ -5,7 +5,6 @@ import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import MapViewPort from './MapViewPort';
 import Highlighter from 'react-highlight-words';
-import constants from '../../actions/constants';
 import Chip from 'material-ui/Chip';
 import { blue300, indigo900 } from 'material-ui/styles/colors';
 
@@ -40,9 +39,11 @@ const styles = {
 export default class EventDetails extends React.Component {
     render() {
         // show details
-        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, link, places } = this.props.properties;
+        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, 
+                link, places } = this.props.properties;
+        const { enabledStreams } = this.props;
         const dateText = getHumanDateFromNow(eventtime);
-        const dataSourceSchema = constants.DATA_SOURCES.get(pipelinekey);
+        const dataSourceSchema = enabledStreams.get(pipelinekey);
         const tags = edges || [];
 
         return (

@@ -21,7 +21,7 @@ export const getAdminSiteDefinition = `query sites {
   }
 }`;
 
-export const getPipelineTerms = `siteTerms(translationLanguage:$translationLanguage){
+export const getPipelineTerms = `siteTerms(translationLanguage:$translationLanguage, category: $category){
   edges {
     name
     translatedname
@@ -37,11 +37,11 @@ export const getPipelineStreams = `streams {
   }
 }`;
 
-export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!) {
+export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!, category: String) {
    terms: ${getPipelineTerms}
 }`;
 
-export const getPipelineDefinition = `query PipelineDefintion($translationLanguage: String) {
+export const getPipelineDefinition = `query PipelineDefintion($translationLanguage: String, $category: String) {
     terms: ${getPipelineTerms}
     streams: ${getPipelineStreams}
     configuration: ${getAdminSite}
@@ -53,8 +53,8 @@ export const getSite = `query Sites {
   }
 }`;
 
-export const getTopics = `query SiteTerms($translationLanguage: String) {
-  siteTerms(translationLanguage: $translationLanguage) {
+export const getTopics = `query SiteTerms($translationLanguage: String, category: String) {
+  siteTerms(translationLanguage: $translationLanguage, category: $category) {
     ...TopicsView
   }
 }`;

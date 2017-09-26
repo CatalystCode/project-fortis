@@ -12,7 +12,7 @@ export const AppPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   componentDidMount() {
-    this.getFlux().actions.DASHBOARD.initializeDashboard();
+    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
   },
 
   getStateFromFlux() {

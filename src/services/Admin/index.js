@@ -30,11 +30,11 @@ const fbPageFragment = `fragment FortisDashboardView on FacebookPageCollection {
                       }`;
 
 export const SERVICES = {
-    getDashboardSiteDefinition(translationLanguage, callback) {
+    getDashboardSiteDefinition(translationLanguage, category, callback) {
         const query = ` ${AdminFragments.siteSettingsFragment}
                       ${AdminQueries.getPipelineDefinition}`;
 
-        const variables = { translationLanguage };
+        const variables = { translationLanguage, category };
         const host = process.env.REACT_APP_SERVICE_HOST
         const POST = {
             url: `${host}/api/settings`,

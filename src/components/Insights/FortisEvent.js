@@ -57,8 +57,9 @@ export default class FortisEvent extends React.Component {
 
     render() {
         const{ source, originalSource, link, pageLanguage, featureEdges, 
-               edges, postedTime, language, sentence, id, sentiment } = this.props;
-        const dataSourceSchema = constants.DATA_SOURCES.get(source);
+               edges, postedTime, language, sentence, id, sentiment, 
+               enabledStreams } = this.props;
+        const dataSourceSchema = enabledStreams.get(source);
         const { translated } = this.state;
         const newsItemTitle = originalSource.replace(/http:\/\/www./g, '').replace(/.com\//g, '').replace(/http:\/\//g, '');
 

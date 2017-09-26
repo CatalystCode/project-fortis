@@ -63,7 +63,7 @@ html, body, #leafletMap {
 }
 
 .neutralNegativeSentiment{
-  background-color: #FF9800
+  background-color: #FF9800;
 }
 
 .neutralSentiment{
@@ -84,6 +84,10 @@ html, body, #leafletMap {
 
 .neutralNegativeSentimentIcon{
   color: #FF9800
+}
+
+.loadingPage {
+  color: #fff;
 }
 
 .neutralSentimentIcon{

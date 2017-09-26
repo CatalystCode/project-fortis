@@ -4,7 +4,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  }
  }`;
  
- export const getPopularTerms = `topTerms(bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid, csv: $csv) {
+ export const getPopularTerms = `topTerms(bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, zoomLevel:$zoomLevel, periodType: $periodType, externalsourceid: $externalsourceid, csv: $csv, category: $category) {
      ... FortisPopularTermsView
  }`;
  
@@ -47,7 +47,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  }`;
  
  
- export const getPopularTermsQuery = `query PopularTerms($bbox: [Float]!, $zoomLevel: Int!, $limit: Int!, $fromDate: String!, $toDate: String!, $pipelinekeys: [String]!, $periodType: String!, $externalsourceid: String!, $csv: Boolean) {
+ export const getPopularTermsQuery = `query PopularTerms($bbox: [Float]!, $zoomLevel: Int!, $limit: Int!, $fromDate: String!, $toDate: String!, $pipelinekeys: [String]!, $periodType: String!, $externalsourceid: String!, $csv: Boolean, $category: String) {
      topics: ${getPopularTerms}
  }`;
  
@@ -63,7 +63,7 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  
  export const DashboardQuery = `query DashboardQuery($bbox: [Float]!, $zoomLevel: Int!, $limit: Int!, $fromDate: String!, $toDate: String!, 
                          $pipelinekeys: [String]!, $timePeriodType: String!, $periodType: String!, $externalsourceid: String!, $csv: Boolean,
-                         $maintopic: String!, $timeseriesmaintopics: [String]!, $conjunctivetopics: [String]!, $topsourcespipelinekey: [String]!) {
+                         $maintopic: String!, $timeseriesmaintopics: [String]!, $conjunctivetopics: [String]!, $topsourcespipelinekey: [String]!, $category: String) {
                              topics: ${getPopularTerms} , 
                              sources: ${getTopSources},
                              conjunctiveterms: ${getConjunctiveTerms},

@@ -252,6 +252,7 @@ export default class SentimentTreeview extends React.Component {
                     <TypeaheadSearch
                         dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
+                        enabledStreams={this.props.enabledStreams}
                         language={this.props.language}
                         defaultZoom={this.props.defaultZoom}
                         dataSource={this.props.dataSource}
@@ -268,6 +269,7 @@ export default class SentimentTreeview extends React.Component {
                         deleteSelectedPlace={this.deleteSelectedPlace}
                         deleteDataSource={this.deleteDataSource}
                         dataSource={this.props.dataSource}
+                        enabledStreams={this.props.enabledStreams}
                         maintopic={this.props.maintopic}
                         conjunctiveTermsLength={this.props.conjunctiveTermsLength}
                         deleteMainTopic={undefined /* we always require a topic to be defined */}

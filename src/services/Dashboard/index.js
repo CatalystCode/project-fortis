@@ -7,13 +7,14 @@ import request from 'request';
 
 export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
-        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, csv, callback) {
+        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, csv, 
+        enabledStreams, category, callback) {
         const timePeriodType = constants.TIMESPAN_TYPES[periodType].timeseriesType;
-        const topsourcespipelinekey = ActionMethods.DataSources(dataSource);
+        const topsourcespipelinekey = ActionMethods.DataSources(dataSource, enabledStreams);
         const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
         ? [dataSource] : topsourcespipelinekey;
 
-        const limit = 5;
+        const limit = 10;
         const gqlEndpoint = 'edges';
 
         const selectionFragments = `${DashboardFragments.topSourcesFragment}
@@ -28,14 +29,14 @@ export const SERVICES = {
         const variables = {
             bbox, limit, fromDate, topsourcespipelinekey, pipelinekeys,
             toDate, zoomLevel, periodType, timePeriodType, externalsourceid, maintopic,
-            timeseriesmaintopics, conjunctivetopics, csv
+            timeseriesmaintopics, conjunctivetopics, csv, category
         };
         fetchGqlData(gqlEndpoint, { variables, query }, callback);
     },
     
-    getCommonTerms(periodType, fromDate, toDate, bbox, zoomLevel, callback) {
+    getCommonTerms(periodType, fromDate, toDate, bbox, zoomLevel, category, callback) {
         const pipelinekeys = [constants.DEFAULT_DATA_SOURCE];
-        const limit = 5;
+        const limit = 12;
         const csv = false;
         const externalsourceid = constants.DEFAULT_EXTERNAL_SOURCE;
         const selectionFragments = `${DashboardFragments.termsFragment}`;
@@ -45,16 +46,17 @@ export const SERVICES = {
 
         const variables = {
             bbox, limit, fromDate, pipelinekeys,
-            toDate, zoomLevel, periodType, externalsourceid,
+            toDate, zoomLevel, periodType, externalsourceid, category, 
             csv
         };
         fetchGqlData(gqlEndpoint, { variables, query }, callback);
     },
 
     getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
-                    dataSource, externalsourceid, conjunctivetopics, bbox, callback) {
+                    dataSource, externalsourceid, conjunctivetopics, bbox, 
+                    enabledStreams, callback) {
         console.log(`processing tile request [${maintopic}, ${fromDate}, ${toDate}, ${tileid}}]`)
-        const topsourcespipelinekey = ActionMethods.DataSources(dataSource);
+        const topsourcespipelinekey = ActionMethods.DataSources(dataSource, enabledStreams);
         const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
         ? [dataSource] : topsourcespipelinekey;
 

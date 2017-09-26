@@ -80,9 +80,9 @@ export default class MarkerClusterGroup extends LayerGroup {
     });
 
     // Add markers leafletElements to the markerClusterGroup
-    this.leafletElement.addLayers(leafletMarkers);
+    this.layerContainer.addLayer(this.leafletElement);
+    setTimeout(()=>this.leafletElement.addLayers(leafletMarkers), 500);
     // Add clustered markers to the leaflet map
-    !this.props.children && this.layerContainer.addLayer(this.leafletElement);
   }
 
   initEventListeners(markerClusterGroup) {

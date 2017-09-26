@@ -3,7 +3,6 @@ import Autosuggest from 'react-autosuggest';
 import { fromMapToArray } from './shared';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
 import { SERVICES } from '../../services/Admin';
-import constants from '../../actions/constants';
 import { fetchLocationsFromFeatureService } from '../../services/featureService';
 import '../../styles/Insights/TypeaheadSearch.css';
 
@@ -51,7 +50,7 @@ export default class TypeaheadSearch extends React.Component {
     const { activeDataset } = this.state;
 
     if(activeDataset.type === 'Source'){
-      return this.props.dashboardRefreshFunc(null, null, null, suggestion.pipelinekey, suggestion.name);
+      return this.props.dashboardRefreshFunc(null, null, null, suggestion.pipelinekey, suggestion.value);
     }
 
     this.props.dashboardRefreshFunc(suggestion.name, [], this.parsePlace(suggestion));
@@ -89,8 +88,8 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   fetchTrustedSourcesSuggestions = (value, callback) => {
-    const { dataSource } = this.props;
-    const pipelinekeys = constants.DATA_SOURCES.get(dataSource).sourceValues;
+    const { dataSource, enabledStreams } = this.props;
+    const pipelinekeys = enabledStreams.get(dataSource).sourceValues;
 
     SERVICES.fetchTrustedSources(pipelinekeys, value, (err, sources) => {
       if (err) {
@@ -99,13 +98,14 @@ export default class TypeaheadSearch extends React.Component {
       } else {
         const suggestions = sources.body.data.trustedSources.sources
           .map(suggestion => {
-            const { externalsourceid, pipelinekey } = suggestion;
+            const { displayname, externalsourceid, pipelinekey } = suggestion;
 
             return Object.assign({},
               {
-                name: externalsourceid,
+                name: displayname,
+                value: externalsourceid,
                 translatedname: externalsourceid,
-                icon: constants.DATA_SOURCES.get(pipelinekey).icon
+                icon: enabledStreams.get(pipelinekey).icon
               }, suggestion);
           });
 

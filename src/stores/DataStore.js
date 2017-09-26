@@ -33,6 +33,7 @@ export const DataStore = Fluxxor.createStore({
             settings: {},
             title: "",
             logo: "",
+            category :"",
             conjunctivetopics: [],
             externalsourceid: constants.DEFAULT_EXTERNAL_SOURCE,
             selectedplace: {},
@@ -41,6 +42,7 @@ export const DataStore = Fluxxor.createStore({
             targetBbox: [],
             popularTerms: [],
             topSources: [],
+            enabledStreams: new Map(),
             timeSeriesCsv: "",
             popularLocationsCsv: "",
             popularTermsCsv: "",
@@ -88,20 +90,19 @@ export const DataStore = Fluxxor.createStore({
     },
 
     intializeSettings(graphqlResponse) {
-        const { terms, configuration, topics, dataSources } = graphqlResponse;
+        const { terms, configuration, topics, dataSources, category } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
 
-        // pretty bad hack... do this properly at some point by pulling the DATA_SOURCES into the store
-        constants.DATA_SOURCES = dataSources;
-
+        this.dataStore.enabledStreams = dataSources;
         this.dataStore.dataSource = constants.DEFAULT_DATA_SOURCE;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
         this.dataStore.title = title;
         this.dataStore.fromDate = fromDate;
         this.dataStore.toDate = toDate;
         this.dataStore.logo = logo;
+        this.dataStore.category = category;
         this.dataStore.language = defaultLanguage;
         this.dataStore.zoomLevel = defaultZoomLevel;
         this.dataStore.bbox = targetBbox || [];
