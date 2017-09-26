@@ -22,7 +22,7 @@ object LocationsExtractorSpec {
   )
 }
 
-class TestLocationsExtractorFactory(client: FeatureServiceClient) extends LocationsExtractorFactory(client, geofence = null) {
+class TestLocationsExtractorFactory(client: FeatureServiceClient) extends LocationsExtractorFactory(client, languages = Seq(), geofence = null) {
   def getLookup: Map[String, Set[Location]] = lookup
 }
 

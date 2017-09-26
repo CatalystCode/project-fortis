@@ -39,8 +39,6 @@ class EntityRecognizer(
       OpeNER.posAnnotate(resourcesDirectory, language.get, kaf)
       OpeNER.nerAnnotate(resourcesDirectory, language.get, kaf)
 
-      logDebug(s"Analyzed text $text in language $language: $kaf")
-
       kaf.getEntities.toList
     } catch {
       case ex @ (_ : NullPointerException | _ : IOError | _ : IOException) =>

@@ -122,8 +122,9 @@ object Pipeline {
       }
 
       def addLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
-        val locations = analyzer.extractLocations(event.details,
-          locationsExtractorFactory.value.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))))
+        val placeRecognizer = Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))
+        val locationsExtractor = locationsExtractorFactory.value.create(placeRecognizer)
+        val locations = analyzer.extractLocations(event.details, locationsExtractor)
         event.copy(analysis = event.analysis.copy(locations = locations))
       }
 
@@ -142,7 +143,13 @@ object Pipeline {
         .map(addKeywords)
         .filter(item => hasKeywords(item.analysis))
         .map(item => addLocations(item))
-        .filter(item => item.analysis.locations.nonEmpty && !hasBlacklistedLocations(item))
+        .filter(item => {
+          val result = item.analysis.locations.nonEmpty && !hasBlacklistedLocations(item)
+          if (!result) {
+            println(s"locations filtering out event: ${item.details.body}")
+          }
+          result
+        })
         .map(item => addEntities(item))
         .filter(item => !hasBlacklistedEntities(item))
         .map(item => addSentiments(addSummary(item)))

@@ -10,7 +10,7 @@ class KeywordExtractorSpec extends FlatSpec {
       "quick brown fox"
     )
 
-    val extractor = new KeywordExtractor(keywords)
+    val extractor = new KeywordExtractor("en", keywords)
 
     val matches = extractor.extractKeywords("The quick brown fox.").map(_.name)
     assert(keywords.forall(keyword => matches.contains(keyword)))
@@ -21,7 +21,7 @@ class KeywordExtractorSpec extends FlatSpec {
       "brown fox"
     )
 
-    val extractor = new KeywordExtractor(keywords)
+    val extractor = new KeywordExtractor("en", keywords)
 
     // "brown fox" should not be found since "brown" is not prefixed by a word boundary
     var matches = extractor.extractKeywords("The quickbrown fox.")
@@ -47,7 +47,7 @@ class KeywordExtractorSpec extends FlatSpec {
       "BROwN FoX"
     )
 
-    val extractor = new KeywordExtractor(keywords)
+    val extractor = new KeywordExtractor("en", keywords)
 
     val matches = extractor.extractKeywords("The quick browN fOx").map(_.name)
     assert(matches.head == keywords.head)
@@ -58,7 +58,7 @@ class KeywordExtractorSpec extends FlatSpec {
       "{testing}"
     )
 
-    val extractor = new KeywordExtractor(keywords)
+    val extractor = new KeywordExtractor("en", keywords)
 
     val matches = extractor.extractKeywords("Testing{testing}123").map(_.name)
     assert(matches.head == keywords.head)

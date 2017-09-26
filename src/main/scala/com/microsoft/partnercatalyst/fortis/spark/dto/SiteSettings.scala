@@ -17,6 +17,13 @@ case class SiteSettings(
 )
  {
 
+  def getAllLanguages(): Seq[String] = {
+    defaultlanguage match {
+      case None => languages
+      case Some(language) => (Set(language) ++ languages.toSet).toSeq
+    }
+  }
+
   def getGeofence(): Geofence = Geofence(
     north = geofence(0),
     west = geofence(1),

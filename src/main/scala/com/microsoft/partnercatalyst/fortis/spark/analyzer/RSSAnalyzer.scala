@@ -12,15 +12,16 @@ import org.jsoup.nodes.Document
 class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] with Loggable {
 
   override def toSchema(item: RSSEntry, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RSSEntry] = {
-    val body = readDescription(item)
+    val body = getBody(item)
     val url = getSourceUrlFromItem(item)
+    val title = getTitle(item)
     ExtendedDetails(
       eventid = s"RSS.${url.getOrElse(item.uri)}",
       sourceeventid = item.uri,
       eventtime = item.publishedDate,
       body = body,
       imageurl = None,
-      title = item.title,
+      title = title,
       externalsourceid = item.source.uri,
       pipelinekey = "RSS",
       sourceurl = url.getOrElse(""),
@@ -48,11 +49,15 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
   }
 
   private[analyzer] def fetchDocument(item: RSSEntry): Option[Document] = {
+    if (item == null) {
+      return None
+    }
+
     try {
       fetchDocument(item.uri)
     } catch {
       case e: Exception => {
-        if (item.links.nonEmpty) {
+        if (item.links != null && item.links.nonEmpty) {
           fetchDocument(item.links.head.href)
         } else {
           None
@@ -72,23 +77,48 @@ class RSSAnalyzer extends Analyzer[RSSEntry] with Serializable with AnalysisDefa
     }
   }
 
-  private[analyzer] def readDescription(item: RSSEntry): String = {
-    if (item == null || item.description == null || item.description.value == null || item.description.value.isEmpty) {
-      return fetchDocument(item) match {
-        case Some(document) => try {
-          document.body().text()
-        } catch {
-          case _: Exception => ""
-        }
-        case _ => ""
+  private[analyzer] def getBody(item: RSSEntry): String = {
+    readDescription(item) match {
+      case Some(text) => text
+      case _ => readLinkedDocument(item).getOrElse("")
+    }
+  }
+
+  private[analyzer] def readLinkedDocument(item: RSSEntry): Option[String] = {
+    return fetchDocument(item) match {
+      case Some(document) => try {
+        Some(document.body().text())
+      } catch {
+        case _: Exception => None
       }
+      case _ => None
+    }
+  }
+
+  private[analyzer] def readDescription(item: RSSEntry): Option[String] = {
+    if (item == null || item.description == null || item.description.value == null) {
+      return None
     }
 
     try {
-      Jsoup.parse(item.description.value).text()
+      Some(Jsoup.parse(item.description.value).text())
     } catch {
       case e: Exception => {
-        item.description.value
+        Some(item.description.value)
+      }
+    }
+  }
+
+  private[analyzer] def getTitle(item: RSSEntry): String = {
+    if (item == null || item.title == null) {
+      return ""
+    }
+
+    try {
+      Jsoup.parse(item.title).text()
+    } catch {
+      case e: Exception => {
+        ""
       }
     }
   }

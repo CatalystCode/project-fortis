@@ -25,7 +25,7 @@ object OpeNER {
     createNerAnnotate(resourcesDirectory, language).annotateNEs(kaf)
   }
 
-  def entityIsPlace(entity: Entity): Boolean = entityIs(entity, Set("location", "gpe"))
+  def entityIsPlace(entity: Entity): Boolean = entityIs(entity, Set("location", "gpe", "loc"))
 
   def entityIsPerson(entity: Entity): Boolean = entityIs(entity, Set("person", "organization"))
 
