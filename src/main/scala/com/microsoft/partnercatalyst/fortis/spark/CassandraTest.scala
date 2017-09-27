@@ -74,8 +74,12 @@ object CassandraTest {
         title = "twitter post" ),
       analysis = Analysis(
         sentiments = List(.5),
-        locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1), Location(wofId = "wof-85680959", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 14.21, longitude = 43.1)),
-        keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="car", confidence = Option(1.0))),
+        locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+          Location(wofId = "wof-85670486", name = "neverlandI", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+          Location(wofId = "wof-85670487", name = "neverlandII", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+          Location(wofId = "wof-85670488", name = "neverlandIII", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+          Location(wofId = "wof-85670489", name = "neverlandIV", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
+        keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="car", confidence = Option(1.0)), Tag(name ="bomb", confidence = Option(1.0)), Tag(name ="hello", confidence = Option(1.0)), Tag(name ="team", confidence = Option(1.0))),
        //todo genders = List(Tag(name = "male", confidence = Option(1.0)), Tag(name ="female", confidence = Option(1.0))),
         entities = List(Tag(name = "putin", confidence = Option(1.0))),
         language = Option("en")
@@ -94,7 +98,11 @@ object CassandraTest {
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
-          locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
+          locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670486", name = "neverlandI", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670487", name = "neverlandII", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670488", name = "neverlandIII", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670489", name = "neverlandIV", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
           keywords = List(Tag(name = "isis", confidence = Option(1.0)),
             Tag(name ="car", confidence = Option(1.0)),
             Tag(name ="bomb", confidence = Option(1.0)),
@@ -117,8 +125,12 @@ object CassandraTest {
           title = "twitter post" ),
         analysis = Analysis(
           sentiments = List(.6),
-          locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
-          keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="fear", confidence = Option(1.0)), Tag(name ="bomb", confidence = Option(1.0)), Tag(name ="fatalities", confidence = Option(1.0))),
+          locations = List(Location(wofId = "wof-85670485", name = "neverland", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670486", name = "neverlandI", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670487", name = "neverlandII", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670488", name = "neverlandIII", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1),
+            Location(wofId = "wof-85670489", name = "neverlandIV", layer = "country", confidence = Option(1.0), latitude = 12.21, longitude = 43.1)),
+          keywords = List(Tag(name = "isis", confidence = Option(1.0)), Tag(name ="car", confidence = Option(1.0)), Tag(name ="bomb", confidence = Option(1.0)), Tag(name ="hello", confidence = Option(1.0)), Tag(name ="team", confidence = Option(1.0))),
           //todo genders = List(Tag(name = "male", confidence = Option(1.0)), Tag(name ="female", confidence = Option(1.0))),
           entities = List(Tag(name = "putin", confidence = Option(1.0))),
           language = Option("en")
@@ -129,22 +141,5 @@ object CassandraTest {
     CassandraEventsSink(dstream, sparksession, configurationManager)
     ssc.start()
     ssc.awaitTermination()
-    /*   = "twitter",
-      externalsourceid = "cnn",
-      batchid = batchid,
-      computedfeatures = Features(mentions = 100,
-                                  sentiment = Sentiment(pos_avg = 1.5f, neg_avg = 1.0f),
-                                  gender = Gender(male_mentions = 3l, female_mentions = 10l),
-                                  keywords = List("isis", "car"),
-                                  places = List(Place(placeid = "1212", centroidlat = 21.23, centroidlon = 56.23)),
-                                  entities = List()),
-      insertiontime = now.getEpochSecond,
-      eventtime = now.getEpochSecond,
-      eventid = "1122",
-      eventlangcode = "en",
-      sourceurl = "http://cnn.com",
-      body = "test message a new change",
-      title = "twitter post")))*/
-
   }
 }

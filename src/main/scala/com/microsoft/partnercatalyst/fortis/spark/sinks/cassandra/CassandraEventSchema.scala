@@ -35,13 +35,12 @@ object CassandraEventSchema {
 
 object CassandraPopularPlaces {
   def apply(item: Event, minZoom: Int): Seq[PopularPlace] = {
-    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
-
     for {
       kw <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       location <- item.computedfeatures.places
       periodType <- Utils.getCassandraPeriodTypes
-      tileid <- tiles
+      zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
+      tileid = TileUtils.tile_id_from_lat_long(location.centroidlat, location.centroidlon, zoom)
     } yield PopularPlace(
       pipelinekey = item.pipelinekey,
       placeid = location.placeid,
@@ -138,12 +137,11 @@ object CassandraHeatmapTiles {
 
 object CassandraEventPlacesSchema {
   def apply(item: Event, minZoom: Int): Seq[EventPlaces] = {
-    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
-
     for {
       ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       location <- item.computedfeatures.places
-      tileid <- tiles
+      zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
+      tileid = TileUtils.tile_id_from_lat_long(location.centroidlat, location.centroidlon, zoom)
     } yield EventPlaces(
       pipelinekey = item.pipelinekey,
       centroidlat = location.centroidlat,
