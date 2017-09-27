@@ -10,7 +10,7 @@ object Constants {
   val SscShutdownDelayMillis = 60*1000
 
   val maxKeywordsPerEventDefault = 5
-  val maxLocationsPerEventDefault = 3
+  val maxLocationsPerEventDefault = 4
 
   object Env {
     val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
