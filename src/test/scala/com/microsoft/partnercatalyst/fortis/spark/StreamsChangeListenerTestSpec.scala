@@ -24,7 +24,9 @@ class StreamsChangeListenerTestSpec extends FlatSpec with BeforeAndAfter {
     None,
     7,
     7,
-    None
+    None,
+    maxKeywordsPerEvent = 5,
+    maxLocationsPerEvent = 3
   )
 
   before {

@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transformcontext
 
+import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
@@ -31,7 +32,7 @@ private[transformcontext] object Delta {
     featureServiceClientUrlBase: String,
     siteSettings: Option[SiteSettings] = None,
     langToWatchlist: Option[Map[String, Seq[String]]] = None,
-    blacklist: Option[Seq[BlacklistedTerm]] = None): Delta =
+    blacklist: Option[Seq[BlacklistedTerm]] = None)(implicit settings: FortisSettings): Delta =
   {
     // Note that parameters are call-by-name
     def updatedField[T](isDirty: => Boolean, newVal: => T): Option[T] = {
@@ -57,7 +58,9 @@ private[transformcontext] object Delta {
         new LocationsExtractorFactory(
           new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace),
           siteSettings.get.getAllLanguages(),
-          siteSettings.get.getGeofence()).buildLookup()
+          siteSettings.get.getGeofence(),
+          maxLocationsDefault = settings.maxLocationsPerEvent
+        ).buildLookup()
       ),
       imageAnalyzer = updatedField(
         siteSettings.get.cogvisionsvctoken != transformContext.siteSettings.cogvisionsvctoken
@@ -70,7 +73,9 @@ private[transformcontext] object Delta {
         siteSettings.get.cogtextsvctoken != transformContext.siteSettings.cogtextsvctoken,
         SentimentDetectorAuth(siteSettings.get.cogtextsvctoken)
       ),
-      langToKeywordExtractor = langToWatchlist.map(m=>m.transform((lang, terms)=>new KeywordExtractor(lang, terms))),
+      langToKeywordExtractor = langToWatchlist.map(
+        m => m.transform((lang, terms)=>new KeywordExtractor(lang, terms, settings.maxKeywordsPerEvent))
+      ),
       blacklist = blacklist
     )
   }

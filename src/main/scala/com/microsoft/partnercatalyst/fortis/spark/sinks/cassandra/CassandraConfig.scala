@@ -16,7 +16,7 @@ object CassandraConfig {
       .setIfMissing("spark.cassandra.auth.password", CassandraPassword)
       .setIfMissing("spark.cassandra.connection.keep_alive_ms", envOrElse("CASSANDRA_KEEP_ALIVE_MS", (batchDuration.milliseconds * 2).toString))
       .setIfMissing("spark.cassandra.connection.factory", "com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.FortisConnectionFactory")
-      .set("spark.cassandra.output.batch.size.rows", "1")
-      .set("spark.cassandra.output.concurrent.writes", "2000")
+      .set("spark.cassandra.output.batch.size.bytes", "5120")
+      .set("spark.cassandra.output.concurrent.writes", "16")
   }
 }

@@ -38,7 +38,9 @@ object ProjectFortis extends App with Loggable {
       appInsightsKey = envOrNone(Constants.Env.AppInsightsKey),
       sscInitRetryAfterMillis = envOrElse(Constants.Env.SscInitRetryAfterMillis, Constants.SscInitRetryAfterMillis.toString).toLong,
       sscShutdownDelayMillis = envOrElse(Constants.Env.SscShutdownDelayMillis, Constants.SscShutdownDelayMillis.toString).toLong,
-      modelsDir = envOrNone(Constants.Env.LanguageModelDir)
+      modelsDir = envOrNone(Constants.Env.LanguageModelDir),
+      maxKeywordsPerEvent = envOrElse(Constants.Env.MaxKeywordsPerEvent, Constants.maxKeywordsPerEventDefault.toString).toInt,
+      maxLocationsPerEvent = envOrElse(Constants.Env.MaxLocationsPerEvent, Constants.maxLocationsPerEventDefault.toString).toInt
     )
   }
 

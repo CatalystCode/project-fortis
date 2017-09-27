@@ -9,6 +9,9 @@ object Constants {
   val SscInitRetryAfterMillis = 60*1000
   val SscShutdownDelayMillis = 60*1000
 
+  val maxKeywordsPerEventDefault = 5
+  val maxLocationsPerEventDefault = 4
+
   object Env {
     val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
     val HighlyAvailableProgressDir = "HA_PROGRESS_DIR"
@@ -22,5 +25,7 @@ object Constants {
     val ManagementBusCommandQueueName = "FORTIS_SB_COMMAND_QUEUE"
     val SscInitRetryAfterMillis = "FORTIS_SSC_INIT_RETRY_AFTER_MILLIS"
     val SscShutdownDelayMillis = "FORTIS_SSC_SHUTDOWN_DELAY_MILLIS"
+    val MaxKeywordsPerEvent = "FORTIS_EVENT_MAX_KEYWORDS"
+    val MaxLocationsPerEvent = "FORTIS_EVENT_MAX_LOCATIONS"
   }
 }
