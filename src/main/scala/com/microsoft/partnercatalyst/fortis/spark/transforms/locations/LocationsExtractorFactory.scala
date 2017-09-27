@@ -13,7 +13,8 @@ class LocationsExtractorFactory(
   featureServiceClient: FeatureServiceClient,
   languages: Seq[String],
   geofence: Geofence,
-  layersIncluded: Seq[String] = List("macroregion", "region", "macrocounty", "county", "metroarea", "localadmin", "locality", "borough", "macrohood", "neighbourhood")
+  layersIncluded: Seq[String] = List("macroregion", "region", "macrocounty", "county", "metroarea", "localadmin", "locality", "borough", "macrohood", "neighbourhood"),
+  maxLocationsDefault: Int = Int.MaxValue
 ) extends Serializable with Loggable {
 
   protected var lookup: Map[String, Set[Location]] = _
@@ -47,7 +48,7 @@ class LocationsExtractorFactory(
   }
 
   // TODO: make location limit tunable from site settings?
-  def create(placeRecognizer: Option[PlaceRecognizer] = None, locationLimit: Int = 5, ngrams: Int = 3): LocationsExtractor = {
+  def create(placeRecognizer: Option[PlaceRecognizer] = None, locationLimit: Int = maxLocationsDefault, ngrams: Int = 3): LocationsExtractor = {
     new LocationsExtractor(lookup, featureServiceClient, placeRecognizer, locationLimit, ngrams)
   }
 

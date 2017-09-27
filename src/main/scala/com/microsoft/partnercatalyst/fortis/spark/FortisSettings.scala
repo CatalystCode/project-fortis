@@ -11,5 +11,7 @@ case class FortisSettings(
   appInsightsKey: Option[String],
   sscInitRetryAfterMillis: Long,
   sscShutdownDelayMillis: Long,
-  modelsDir: Option[String]
+  modelsDir: Option[String],
+  maxKeywordsPerEvent: Int,
+  maxLocationsPerEvent: Int
 )
