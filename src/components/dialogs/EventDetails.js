@@ -5,6 +5,7 @@ import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import MapViewPort from './MapViewPort';
 import Highlighter from 'react-highlight-words';
+import { extractHostnameIfExists } from '../Insights/shared';
 import Chip from 'material-ui/Chip';
 import { blue300, indigo900 } from 'material-ui/styles/colors';
 
@@ -100,7 +101,7 @@ export default class EventDetails extends React.Component {
                                     {
                                         <Chip key={externalsourceid} style={styles.chip}>
                                             <Avatar icon={<FontIcon className="material-icons">share</FontIcon>} />
-                                            {externalsourceid}
+                                            {extractHostnameIfExists(externalsourceid)}
                                         </Chip>
                                     }
                                 </div>

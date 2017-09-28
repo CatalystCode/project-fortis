@@ -1,3 +1,5 @@
+import url from 'url';
+
 function fetchTermFromMap(termMap, termLookup, selectedLanguage, defaultLanguage) {
     return termMap.get(termLookup) || { name: termLookup, translatedname: termLookup };
 }
@@ -7,6 +9,12 @@ function fromMapToArray(termMap, termLookup) {
 
     return Array.from(termMap.values())
         .filter(topic => topic.translatedname.toLowerCase().indexOf(name) > -1);
+}
+
+function extractHostnameIfExists(name){
+    const urlParts = url.parse(name);
+
+    return urlParts.hostname ? urlParts.hostname.replace(/(www\.)|(\.com)/g,'') : name;
 }
 
 function innerJoin(arr1, arr2) {
@@ -75,5 +83,6 @@ module.exports = {
     fromMapToArray,
     innerJoin,
     getSentimentAttributes,
+    extractHostnameIfExists,
     hasChanged
 }

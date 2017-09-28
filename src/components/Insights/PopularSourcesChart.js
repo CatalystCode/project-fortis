@@ -2,7 +2,7 @@ import React from 'react';
 import DoughnutChart from '../Graphics/DoughnutChart';
 import { Cell } from 'recharts';
 import constants from '../../actions/constants';
-import { hasChanged } from './shared';
+import { hasChanged, extractHostnameIfExists } from './shared';
 
 export default class PopularSourcesChart extends React.Component {
     constructor(props) {
@@ -17,8 +17,8 @@ export default class PopularSourcesChart extends React.Component {
 
     handleClick(data, activeIndex) {
         const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, selectedplace  } = this.props;
-        const { name } = data;
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), name, null, selectedplace);
+        const { externalsourcename } = data;
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourcename, null, selectedplace);
         this.setState({ activeIndex });
     }
 
@@ -36,7 +36,7 @@ export default class PopularSourcesChart extends React.Component {
             let color = constants.CHART_STYLE.COLORS[index];
             colorCells.push(<Cell key={0} fill={color} />);
 
-            dataProvider.push(Object.assign({}, { value, name }));
+            dataProvider.push(Object.assign({}, { value: value, name: extractHostnameIfExists(name), externalsourcename: name }));
         });
 
         this.setState({ colorCells, dataProvider, activeIndex });

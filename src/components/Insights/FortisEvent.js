@@ -2,6 +2,7 @@ import React from 'react';
 import { SERVICES } from '../../services/Dashboard';
 import { getHumanDateFromNow } from '../../utils/Utils.js';
 import constants from '../../actions/constants';
+import { extractHostnameIfExists } from './shared';
 import '../../styles/Insights/ActivityFeed.css';
 import styles from '../../styles/Insights/ActivityFeed';
 import Highlighter from 'react-highlight-words';
@@ -61,7 +62,7 @@ export default class FortisEvent extends React.Component {
                enabledStreams } = this.props;
         const dataSourceSchema = enabledStreams.get(source);
         const { translated } = this.state;
-        const newsItemTitle = originalSource.replace(/http:\/\/www./g, '').replace(/.com\//g, '').replace(/http:\/\//g, '');
+        const newsItemTitle = extractHostnameIfExists(originalSource);
 
         return <div className="infinite-list-item" onClick={() => {
             this.props.handleOpenDialog(this.props.id)
@@ -80,14 +81,6 @@ export default class FortisEvent extends React.Component {
                                 {translated ? "Translated" : "Translate"}
                                                                                     </button> : ''
                         }
-                    </div>
-                    <div className="row" style={styles.labelRow}>
-                        {
-                            this.props.trusted ? <i style={styles.trustedColor} className="fa fa-check" aria-hidden="true">
-                                <span style={styles.trustedColor}>Trusted</span>
-                            </i> : ''
-                        }
-
                     </div>
                 </div>
                 <div className="col-lg-10">

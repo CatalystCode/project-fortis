@@ -11,7 +11,7 @@ import numeralLibs from 'numeral';
 import { fetchTermFromMap, hasChanged } from './shared';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
 
-const TopRowHeight = 120;
+const TopRowHeight = 180;
 const parentTermsName = "Term Filters";
 
 decorators.Toggle = (props) => {

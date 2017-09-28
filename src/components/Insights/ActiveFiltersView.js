@@ -4,6 +4,7 @@ import Chip from 'material-ui/Chip';
 import FontIcon from 'material-ui/FontIcon';
 import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
+import { extractHostnameIfExists } from './shared';
 
 class ActiveFiltersView extends React.Component {
 
@@ -69,7 +70,7 @@ class ActiveFiltersView extends React.Component {
     if (externalsourceid && externalsourceid !== DEFAULT_EXTERNAL_SOURCE) {
       chips.push({
         type: 'externalsourceid',
-        label: `Source: ${externalsourceid}`,
+        label: `Source: ${extractHostnameIfExists(externalsourceid)}`,
         icon: <FontIcon className="material-icons">share</FontIcon>,
         onDelete: this.props.deleteExternalSourceId,
       });
