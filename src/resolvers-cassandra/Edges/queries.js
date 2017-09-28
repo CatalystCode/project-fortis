@@ -5,10 +5,11 @@ const moment = require('moment');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { tilesForBbox, BlacklistPlaceList, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
 const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
+//todo: this is a temporary ugly hack until Nate adds the blacklist place feature
 const MaxFetchedRows = 1000;
 
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
@@ -73,6 +74,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
                   layer: row.layer,
                   avgsentimentnumerator: Long.ZERO
                 }))
+                  .filter(item=>BlacklistPlaceList().indexOf(item.name.toLowerCase()) === -1)
                   .slice(0, responseSize)
               });
             })

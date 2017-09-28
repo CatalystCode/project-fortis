@@ -9,6 +9,8 @@ const uuidv4 = require('uuid/v4');
 const { createFile } = require('../clients/storage/BlobStorageClient');
 const cassandraConnector = require('../clients/cassandra/CassandraConnector');
 
+const BlacklistPlaces = ['colombia'];
+
 const FORTIS_DATA_STORE_TTL = 1200;
 
 const memoryStore = new NodeCache( { stdTTL: FORTIS_DATA_STORE_TTL} );
@@ -19,6 +21,11 @@ function termsFilter(term, categoryFilter) {
   }
 
   return true;
+}
+
+//todo: a temporary hack until we have the formal place blacklist filter in place
+function BlacklistPlaceList(){
+  return BlacklistPlaces;
 }
 
 function getTermsFromCache() {
@@ -253,6 +260,7 @@ module.exports = {
   getTermsFromCache,
   getTermsByCategory,
   setTermsCache,
+  BlacklistPlaceList,
   transformWatchlist,
   getSiteDefintion,
   fromTopicListToConjunctionTopics,
