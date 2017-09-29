@@ -48,7 +48,8 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
 
     val reparted = tilesComputed.repartitionByCassandraReplica("fortis", "computedtiles")
 
-    val updatedRows = reparted.leftJoinWithCassandraTable("fortis", "computedtiles", joinColumns = PrimaryKeyColumns).map(pair => {
+    val joinColumns = SomeColumns("periodtype", "conjunctiontopic1", "conjunctiontopic2", "conjunctiontopic3", "tilez", "pipelinekey", "externalsourceid", "tileid", "perioddate")
+    val updatedRows = reparted.leftJoinWithCassandraTable("fortis", "computedtiles", joinColumns = joinColumns).map(pair => {
       val generatedTile = pair._1
       val tileFromCassandra = pair._2
       tileFromCassandra match {
