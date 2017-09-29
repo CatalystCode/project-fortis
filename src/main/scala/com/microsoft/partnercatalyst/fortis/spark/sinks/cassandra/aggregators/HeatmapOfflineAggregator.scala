@@ -6,10 +6,10 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{Event, He
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraTileBucket}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-
 import com.datastax.spark.connector._
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 
-class HeatmapOfflineAggregator(session: SparkSession, configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] {
+class HeatmapOfflineAggregator(session: SparkSession, configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] with Loggable {
   override def aggregate(events: RDD[Event]): RDD[HeatmapTile] = {
     val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
     val tiles = events.flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
@@ -48,7 +48,8 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
 
     val reparted = tilesComputed.repartitionByCassandraReplica("fortis", "computedtiles")
 
-    val updatedRows = reparted.leftJoinWithCassandraTable("fortis", "computedtiles", joinColumns = PrimaryKeyColumns).map(pair => {
+    val joinColumns = SomeColumns("periodtype", "conjunctiontopic1", "conjunctiontopic2", "conjunctiontopic3", "tilez", "pipelinekey", "externalsourceid", "tileid", "perioddate")
+    val updatedRows = reparted.leftJoinWithCassandraTable("fortis", "computedtiles", joinColumns = joinColumns).map(pair => {
       val generatedTile = pair._1
       val tileFromCassandra = pair._2
       tileFromCassandra match {
@@ -73,7 +74,13 @@ class HeatmapOfflineAggregator(session: SparkSession, configurationManager: Conf
       case _ => {
         implicit val rowWriter = SqlRowWriter.Factory
         tiles.saveToCassandra(keyspace, "heatmap")
-        aggregateAndSaveTileBuckets(tiles, keyspace)
+        try {
+          aggregateAndSaveTileBuckets(tiles, keyspace)
+        } catch {
+          case e: Exception => {
+            logError(s"Failed to write aggregate tiles to keyspace ${keyspace}", e)
+          }
+        }
       }
     }
 
