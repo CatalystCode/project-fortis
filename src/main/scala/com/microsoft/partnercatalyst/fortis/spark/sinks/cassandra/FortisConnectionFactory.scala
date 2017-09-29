@@ -10,11 +10,7 @@ object FortisConnectionFactory extends CassandraConnectionFactory {
       .clusterBuilder(conf)
       .withLoadBalancingPolicy(
         new TokenAwarePolicy(
-          new DCAwareRoundRobinPolicy.Builder()
-            // Denote that our data center should always be treated as local
-            // TODO: uncomment once we can get this predictably from deployment
-            //.withLocalDc("dc-eastus2-cassandra")
-            .build()
+          new DCAwareRoundRobinPolicy.Builder().build()
         )
       )
       .withPoolingOptions(poolingOptions)
@@ -24,7 +20,6 @@ object FortisConnectionFactory extends CassandraConnectionFactory {
   private def poolingOptions: PoolingOptions = {
     // Reference: http://docs.datastax.com/en/developer/java-driver/3.1/manual/pooling/
 
-    // Note: remote options are set as well, but they should not be used as all nodes are local.
     new PoolingOptions()
       // Cassandra binary protocol v3 can support up to 32768 requests per connection.
       .setMaxRequestsPerConnection(HostDistance.LOCAL, 32768)
