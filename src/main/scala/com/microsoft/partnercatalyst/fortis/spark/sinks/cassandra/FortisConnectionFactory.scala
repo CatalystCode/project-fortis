@@ -12,7 +12,8 @@ object FortisConnectionFactory extends CassandraConnectionFactory {
         new TokenAwarePolicy(
           new DCAwareRoundRobinPolicy.Builder()
             // Denote that our data center should always be treated as local
-            .withLocalDc("dc-eastus2-cassandra")
+            // TODO: uncomment once we can get this predictably from deployment
+            //.withLocalDc("dc-eastus2-cassandra")
             .build()
         )
       )
