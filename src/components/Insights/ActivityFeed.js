@@ -188,7 +188,7 @@ export default class ActivityFeed extends React.Component {
         const { allSiteTopics } = this.props;
         const edge = fetchTermFromMap(allSiteTopics, term);
 
-        return edge ? edge.translatedname.toLowerCase() : term.toLowerCase();
+        return edge && edge.translatedname ? edge.translatedname.toLowerCase() : term.toLowerCase();
     }
 
     translateTerms = terms => terms.map(this.translateTerm);

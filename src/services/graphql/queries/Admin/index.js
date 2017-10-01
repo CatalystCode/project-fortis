@@ -37,7 +37,7 @@ export const getPipelineStreams = `streams {
   }
 }`;
 
-export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!, category: String) {
+export const getPipelineWatchlist = `query PipelineDefintion($translationLanguage: String!, $category: String) {
    terms: ${getPipelineTerms}
 }`;
 

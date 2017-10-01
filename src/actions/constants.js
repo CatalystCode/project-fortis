@@ -20,7 +20,7 @@ module.exports = {
              format: "YYYY-MM", blobFormat: "[month]-YYYY-MM", rangeFormat: "month", timeseriesType: "hour"
          },
          'week': {
-             format: "YYYY-WW", blobFormat: "[week]-YYYY-WW", rangeFormat: "week", timeseriesType: "hour"
+             format: "YYYY-ww", blobFormat: "[week]-YYYY-WW", rangeFormat: "week", timeseriesType: "hour"
          },
          'year': {
              format: "YYYY", blobFormat: "[year]-YYYY", rangeFormat: "year", timeseriesType: "day"
@@ -61,13 +61,13 @@ module.exports = {
     DEFAULT_TIMESERIES_PERIOD: "hour",
     DEFAULT_DATA_SOURCE: "all",
     DEFAULT_EXTERNAL_SOURCE: "all",
-    DEFAULT_TIMESPAN_TYPE: "month",
-    DEFAULT_TIMEPERIOD_FORMAT: "YYYY-MM",
+    DEFAULT_TIMESPAN_TYPE: "week",
+    DEFAULT_TIMEPERIOD_FORMAT: "YYYY-ww",
     ACTIVITY_FEED: {
         NEWS_FEED_SEARCH_CONTAINER_HEIGHT: 115,
         SERVICE_DATETIME_FORMAT: "MM/DD/YYYY HH:mm:s A",
         ELEMENT_ITEM_HEIGHT: 80,
-        OFFSET_INCREMENT: 60,
+        OFFSET_INCREMENT: 90,
         INFINITE_LOAD_DELAY_MS: 1800
     },    
     ANNUAL_TIMESERIES_PERIOD: "day",

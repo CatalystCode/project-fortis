@@ -1,6 +1,6 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
-import { fromMapToArray } from './shared';
+import { fromMapToArray, fetchTermFromMap } from './shared';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
 import { SERVICES } from '../../services/Admin';
 import { fetchLocationsFromFeatureService } from '../../services/featureService';
@@ -28,7 +28,10 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setTopicToState(nextProps.maintopic);
+    const { allSiteTopics } = nextProps;
+    const edge = fetchTermFromMap(allSiteTopics, nextProps.maintopic);
+
+    this.setTopicToState(edge.translatedname);
   }
 
   parsePlace(suggestion) {

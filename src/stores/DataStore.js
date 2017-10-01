@@ -119,6 +119,7 @@ export const DataStore = Fluxxor.createStore({
     syncTimeSeriesData(mutatedTimeSeries) {
         this.dataStore.timeSeriesGraphData = { labels: [], graphData: [] };
         this.dataStore.heatmapTileIds = [];
+        const dateFormat = 'YYYY-MM-DD HH:mm';
 
         if (mutatedTimeSeries && mutatedTimeSeries.graphData && mutatedTimeSeries.labels && mutatedTimeSeries.graphData.length) {
             const { labels, graphData, tiles } = mutatedTimeSeries;
@@ -126,13 +127,14 @@ export const DataStore = Fluxxor.createStore({
             this.dataStore.timeSeriesCsv = (mutatedTimeSeries.csv && mutatedTimeSeries.csv.url) || "";
             
             const timeseriesMap = makeMap(graphData, item=>item.date, item=>{
-                let timeSeriesEntry = {date: item.date};
+                // eslint-disable-next-line
+                let timeSeriesEntry = {date: moment.utc(new Number(item.date)).format(dateFormat)};
                 timeSeriesEntry[item.name] = item.mentions;
 
                 return timeSeriesEntry;
             });
 
-            let sorted = Array.from(timeseriesMap.values()).sort((a, b)=>moment(a.date).unix() > moment(b.date).unix());
+            let sorted = Array.from(timeseriesMap.values()).sort((a, b)=>moment.utc(a.date).diff(moment.utc(b.date)));
             this.dataStore.timeSeriesGraphData.graphData = sorted;
             this.dataStore.heatmapTileIds = tiles;
         }

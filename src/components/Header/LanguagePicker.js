@@ -4,7 +4,7 @@ import MenuItem from 'material-ui/MenuItem';
 
 class LanguagePicker extends React.Component {
   changeLanguage(event, index, value) {
-    this.props.flux.actions.DASHBOARD.changeLanguage(value);
+    this.props.flux.actions.DASHBOARD.changeLanguage(value, this.props.category);
   }
 
   render() {

@@ -79,6 +79,7 @@ class Header extends React.Component {
       <LanguagePicker
         supportedLanguages={this.props.supportedLanguages}
         language={this.props.language}
+        category={this.props.category}
         flux={this.props.flux}
       />
     );

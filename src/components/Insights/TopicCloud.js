@@ -41,7 +41,7 @@ export default class TopicCloud extends Component {
     customRenderer(tag, size, color) {
         const fontSize = size + 'px';
         const { selectedTopic } = this.state;
-        const key = tag.key || tag.value;
+        let key = tag.value || tag.defaultName;
         const valueText = numeralLibs(tag.count).format(tag.count > 1000 ? '+0.0a' : '0a')
 
         let style = Object.assign({}, styles, { color, fontSize });
@@ -50,20 +50,22 @@ export default class TopicCloud extends Component {
         const tooltipStyle = {fontWeight: 800, color: '#000'};
         const tooltipValueStyle = {color: '#000'};
 
-        const tooltip = <span style={tooltipValueStyle}><span style={tooltipStyle}>{tag.value}</span> - {valueText} Mentions</span>;
-        if (tag.value.toLowerCase() === selectedTopic.toLowerCase()) {
+        if (key.toLowerCase() === selectedTopic.toLowerCase()) {
             style = Object.assign({}, style, selectedStyle);
+            key = `*${key}*`;
         }
+
+        const tooltip = <span style={tooltipValueStyle}><span style={tooltipStyle}>{key}</span> - {valueText} Mentions</span>;
 
         return <span key={`${key}-container`}>
                     <span data-tip
-                        data-for={`tip-${tag.value}`}
+                        data-for={`tip-${key}`}
                         className='tag-cloud-tag'
                         style={style}
-                        key={key}>{sentimentIcon}{tag.value}
+                        key={key}>{sentimentIcon}{key}
                     </span>
-                    <ReactTooltip key={`tip-${tag.value}`}
-                        id={`tip-${tag.value}`}
+                    <ReactTooltip key={`tip-${key}`}
+                        id={`tip-${key}`}
                         type={tag.tooltip}>
                         <span>{tooltip}</span>
                     </ReactTooltip>

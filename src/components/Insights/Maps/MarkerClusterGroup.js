@@ -17,6 +17,7 @@ export default class MarkerClusterGroup extends React.Component {
     };
 
     this.clusterIconFunction = this.clusterIconFunction.bind(this);
+    this.onMarkerClick = this.onMarkerClick.bind(this);
     this.asyncFetchHeatmapFromTileService = this.asyncFetchHeatmapFromTileService.bind(this);
   }
 
@@ -106,6 +107,10 @@ export default class MarkerClusterGroup extends React.Component {
     });
   }
 
+  onMarkerClick(marker){
+    this.props.moveMapToNewLocation(marker.options.tile.id);
+  }
+
   buildHeatmap = heatmaps => heatmaps.map(this.tileToMarker);
 
   render() {
@@ -127,6 +132,7 @@ export default class MarkerClusterGroup extends React.Component {
           wrapperOptions={{ enableDefaultStyle: true }}
           ref="clusterGroup"
           markers={markers}
+          onMarkerClick={this.onMarkerClick}
           options={config}
         /> : null
     );

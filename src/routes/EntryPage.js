@@ -17,12 +17,12 @@ export const EntryPage = createReactClass({
     const { dataSource, bbox, termFilters, maintopic, externalsourceid, datetimeSelection, 
             fromDate, toDate, language, zoomLevel, settings, timespanType, enabledStreams, 
             conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
-            timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
+            timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv, category, 
             topSources, trustedSources, fullTermList, selectedplace } = this.getStateFromFlux();
 
     return Object.assign({}, { dataSource, maintopic, termFilters, bbox, enabledStreams, 
                                externalsourceid, datetimeSelection, fromDate, toDate, language,
-                               zoomLevel, settings, timespanType, heatmapTileIds, 
+                               zoomLevel, settings, timespanType, heatmapTileIds, category, 
                                conjunctivetopics, timeSeriesGraphData, popularLocations, popularTerms,
                                timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
                                topSources, trustedSources, fullTermList, selectedplace });

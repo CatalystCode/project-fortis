@@ -53,10 +53,10 @@ export const SERVICES = {
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
-    getWatchlist(translationLanguage, callback) {
+    getWatchlist(translationLanguage, category, callback) {
         const query = ` ${AdminQueries.getPipelineWatchlist}`;
 
-        const variables = { translationLanguage };
+        const variables = { translationLanguage, category };
         const host = process.env.REACT_APP_SERVICE_HOST
         const POST = {
             url: `${host}/api/settings`,

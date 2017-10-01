@@ -28,6 +28,7 @@ export const AppPage = createReactClass({
             {...this.props.params}
             title={this.state.title}
             logo={this.state.logo}
+            category={this.props.params.siteKey}
             language={this.state.language}
             supportedLanguages={this.state.supportedLanguages}
             settings={this.state.settings} />
@@ -39,7 +40,7 @@ export const AppPage = createReactClass({
       </div>
      </MuiThemeProvider> : 
     <div className="loadingPage">
-      <h1>Loading {this.props.params.siteKey}</h1>
+      <h1>loading {this.props.params.siteKey} watcher...</h1>
     </div>
   )}
 });

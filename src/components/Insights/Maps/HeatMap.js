@@ -2,6 +2,7 @@ import MarkerClusterGroup from './MarkerClusterGroup';
 import { Map, TileLayer, ZoomControl, Rectangle } from 'react-leaflet';
 import constants from '../../../actions/constants';
 import React from 'react';
+import { tileFromTileId } from 'geotile';
 import { hasChanged } from '../shared';
 import '../../../styles/Insights/HeatMap.css';
 
@@ -16,6 +17,7 @@ export default class HeatMap extends React.Component {
     const bounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[1], targetBbox[0]], [targetBbox[3], targetBbox[2]]] : [];
     this.onViewportChanged = this.onViewportChanged.bind(this);
     this.updateBounds = this.asyncInvokeDashboardRefresh.bind(this);
+    this.changeMapBoundsWithTile = this.changeMapBoundsWithTile.bind(this);
     const maxbounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
 
     this.state = {
@@ -73,18 +75,24 @@ export default class HeatMap extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { placeid } = this.state;
+    const { placeid, defaultZoom } = this.state;
 
     if (hasChanged(this.props, nextProps) && nextProps.selectedplace.placeid && placeid !== nextProps.selectedplace.placeid) {
-      this.moveMapToNewLocation(nextProps);
+      this.moveMapToNewLocation(nextProps, defaultZoom);
     }
   }
 
-  moveMapToNewLocation(props) {
+  moveMapToNewLocation(props, zoom) {
     const { selectedplace } = props;
-    const { defaultZoom } = this.state;
-    this.refs.map.leafletElement.setView(selectedplace.placecentroid, defaultZoom);
+    this.refs.map.leafletElement.setView(selectedplace.placecentroid, zoom);
     this.setState({ placeid: selectedplace.placeid });
+  }
+
+  changeMapBoundsWithTile(tileid){
+    const {latitudeNorth, latitudeSouth, longitudeWest, longitudeEast } = tileFromTileId(tileid)
+    const bounds = [[latitudeNorth, longitudeWest], [latitudeSouth, longitudeEast]];
+
+    this.refs.map.leafletElement.fitBounds(bounds);
   }
 
   formatLeafletBounds(bbox) {
@@ -137,6 +145,7 @@ export default class HeatMap extends React.Component {
         <MarkerClusterGroup
             clusterColorField={"avgsentiment"}
             clusterValueField={"mentions"}
+            moveMapToNewLocation={this.changeMapBoundsWithTile}
             {...this.props}
         />
       </Map>

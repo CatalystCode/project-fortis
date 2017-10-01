@@ -4,7 +4,7 @@ import Chip from 'material-ui/Chip';
 import FontIcon from 'material-ui/FontIcon';
 import '../../styles/Insights/ActiveFiltersView.css';
 import { DEFAULT_EXTERNAL_SOURCE, DEFAULT_DATA_SOURCE } from '../../actions/constants';
-import { extractHostnameIfExists } from './shared';
+import { extractHostnameIfExists, fetchTermFromMap } from './shared';
 
 class ActiveFiltersView extends React.Component {
 
@@ -15,6 +15,7 @@ class ActiveFiltersView extends React.Component {
     if (nextProps && nextplaceid === prevplaceid &&
         nextProps.externalsourceid === this.props.externalsourceid &&
         nextProps.maintopic === this.props.maintopic &&
+        nextProps.language === this.props.language &&
         nextProps.conjunctiveTermsLength === this.props.conjunctiveTermsLength &&
         nextProps.dataSource === this.props.dataSource) {
       return false;
@@ -25,13 +26,14 @@ class ActiveFiltersView extends React.Component {
 
   getChips = () => {
     const { dataSource, externalsourceid, selectedplace, maintopic, 
-            termFilters, enabledStreams } = this.props;
+            termFilters, enabledStreams, allSiteTopics } = this.props;
     const chips = [];
+    const edge = fetchTermFromMap(allSiteTopics, maintopic);
 
     if (maintopic) {
       chips.push({
         type: 'maintopic',
-        label: `Topic: ${maintopic}`,
+        label: `Topic: ${edge.translatedname}`,
         icon: <FontIcon className="fa fa-tag" />,
         onDelete: this.props.deleteMainTopic,
       });

@@ -57,7 +57,7 @@ function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, ca
             configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name), 
             includeCsv, dataSources, category, 
             (err, chartData) => {
-                const response = Object.assign({}, chartData, resultUnion, category);
+                const response = Object.assign({}, chartData, resultUnion, { category });
 
                 if (err) {
                     console.error(`initializing dashboard error occured ${err}`);
@@ -123,10 +123,10 @@ const methods = {
             }
         })
     },
-    changeLanguage(language) {
+    changeLanguage(language, category) {
         const self = this;
 
-        AdminServices.getWatchlist(language, (error, response, body) => {
+        AdminServices.getWatchlist(language, category, (error, response, body) => {
             if(!error && response.statusCode === 200 && body.data && !body.errors) {
                 const { terms } = body.data;
 
