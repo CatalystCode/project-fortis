@@ -1,6 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
+const moment = require('moment');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const { parseFromToDate, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
@@ -24,7 +25,7 @@ function eventToFeature(row) {
       sentiment: row.computedfeatures && row.computedfeatures.sentiment ? row.computedfeatures.sentiment.neg_avg : -1,
       title: row.title,
       fullText: row.body,
-      summary: row.summary,
+      summary: row.summary || row.title,
       externalsourceid: row.externalsourceid,
       language: row.eventlangcode,
       pipelinekey: row.pipelinekey,
@@ -69,9 +70,11 @@ function queryEventsTable(eventIdResponse, args) {
     if (eventIdResponse.rows.length) {
       cassandraConnector.executeQuery(eventsQuery, eventsParams)
         .then(rows => {
+          const sortedEvents = rows.sort((a, b)=>moment.utc(b.eventtime.getTime()).diff(moment.utc(a.eventtime.getTime())));
+
           resolve({
             type: 'FeatureCollection',
-            features: rows.map(eventToFeature),
+            features: sortedEvents.map(eventToFeature),
             bbox: args.bbox,
             pageState: eventIdResponse.pageState
           });
@@ -189,7 +192,7 @@ function translate(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     getSiteDefintion()
       .then(sitesettings => {
-        return translatorService.translate(sitesettings.site.properties.translationsvctoken,
+        return translatorService.translate(sitesettings.site.properties.translationSvcToken,
           args.sentence,
           args.fromLanguage,
           args.toLanguage);

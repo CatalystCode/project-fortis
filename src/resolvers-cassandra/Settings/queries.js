@@ -12,8 +12,9 @@ const CONNECTOR_FACEBOOK = 'Facebook';
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { translationLanguage, category } = args;
+    const ignoreCache = true;
 
-    getTermsByCategory(translationLanguage, category)
+    getTermsByCategory(translationLanguage, category, ignoreCache)
       .then(resolve).catch(reject);
   });
 }

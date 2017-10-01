@@ -36,11 +36,11 @@ function setTermsCache(terms) {
   memoryStore.set('terms', terms);
 }
 
-function getTermsByCategory(translationLanguage, category) {
+function getTermsByCategory(translationLanguage, category, ignoreCache) {
   let watchlistTerms = getTermsFromCache();
 
   return new Promise((resolve, reject) => {
-    if (watchlistTerms) {
+    if (watchlistTerms && !ignoreCache) {
       return resolve({
         edges: watchlistTerms.filter(term => termsFilter(term, category))
       });
@@ -83,7 +83,7 @@ function transformWatchlist(item, translatedlanguage) {
     name: item.topic,
     category: item.category,
     translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ?
-      (item.translations || {})[translatedlanguage] : item.topic,
+      (item.translations || {})[translatedlanguage] || item.topic : item.topic,
     translatednamelang: translatedlanguage,
     namelang: item.lang_code
   };
