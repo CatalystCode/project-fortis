@@ -48,7 +48,7 @@ kubectl get -o yaml --export configmap spark-master-conf -n spark > ./spark-mast
 ```
 
 #### Terminate the Spark job and delete all Spark cluster resources
-Data ingestion and analysis will be offline after this step until the upgrade is completed through the following steps:
+Data ingestion and analysis will be offline after this step until the remaining upgrade steps have been completed.
 
 ```bash
 kubectl delete namespace spark
