@@ -29,8 +29,8 @@ export HELM_HOME=/home/fortisadmin/; export KUBECONFIG=/home/fortisadmin/.kube/c
 cd /var/lib/waagent/custom-script/download/0/fortisdeploy/ops/
 ```
 
-#### Backup your blob account name and key which will be needed later during the upgrade
-
+#### Manually backup your blob account name and key
+These will be needed later during the upgrade.
 ```bash
 cat deis-apps/fortis-services/.env | grep USER_
 ```
