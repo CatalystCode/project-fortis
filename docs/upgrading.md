@@ -76,7 +76,7 @@ kubectl create -f ./spark-namespace.yaml
 #### Recreate the `configmap` from backup
 
 ```bash
-kubectl create -f ./spark-master-conf.bck.yaml
+kubectl create -f ./spark-master-conf.bck.yaml -n spark
 ```
 
 #### Install the latest version of the Spark Job
