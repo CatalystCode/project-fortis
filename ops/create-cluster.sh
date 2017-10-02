@@ -30,12 +30,6 @@ echo "Finished. Now deploying"
 ./deis-apps/fortis-services/deploy-app.sh
 echo "Finished. Now installing DEIS fortis interface"
 ./deis-apps/fortis-interface/create-app.sh
-echo "Finished. Now deploying"
-./deis-apps/fortis-interface/deploy-app.sh
-#echo "Finished. Now installing DEIS feature service"
-#./deis-apps/feature-service/create-app.sh
-#echo "Finished. Now deploying"
-#./deis-apps/feature-service/deploy-app.sh
 
 sleep 10
 readonly max_retry_count=50
@@ -55,7 +49,6 @@ done
 
 readonly graphql_service_host="http://fortis-services.${DEIS_ROUTER_HOST_ROOT}.nip.io"
 readonly fortis_interface_host="http://fortis-interface.${DEIS_ROUTER_HOST_ROOT}.nip.io"
-readonly feature_service_db_conn_str="${FEATURE_SERVICE_DB_CONNECTION_STRING}"
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly spark_config_map_name="spark-master-conf"
@@ -63,6 +56,9 @@ readonly spark_config_map_name="spark-master-conf"
 #This needs to be exporting to the environment as the creat-react-app assett pipeline polyfills this into the build. 
 export REACT_APP_SERVICE_HOST="${graphql_service_host}"
 export REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}"
+
+echo "Finished. Now deploying"
+./deis-apps/fortis-interface/deploy-app.sh
 
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_extlb_host}"
