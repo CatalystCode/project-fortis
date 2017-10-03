@@ -49,7 +49,7 @@ class LocationsExtractorFactory(
 
   // TODO: make location limit tunable from site settings?
   def create(placeRecognizer: Option[PlaceRecognizer] = None, locationLimit: Int = maxLocationsDefault, ngrams: Int = 3): LocationsExtractor = {
-    new LocationsExtractor(lookup, featureServiceClient, placeRecognizer, locationLimit, ngrams)
+    new LuceneLocationsExtractor(lookup, featureServiceClient, locationLimit, ngrams)
   }
 
   def fetch(latitude: Double, longitude: Double): Iterable[Location] = {

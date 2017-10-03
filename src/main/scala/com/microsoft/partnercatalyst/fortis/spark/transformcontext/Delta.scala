@@ -6,7 +6,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysi
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetectorAuth
-import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.KeywordExtractor
+import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{KeywordExtractor, LuceneKeywordExtractor}
 
 /**
   * Holds the next set of values for the fields of the current transform context. If the value of a field here is
@@ -74,7 +74,7 @@ private[transformcontext] object Delta {
         SentimentDetectorAuth(siteSettings.get.cogtextsvctoken)
       ),
       langToKeywordExtractor = langToWatchlist.map(
-        m => m.transform((lang, terms)=>new KeywordExtractor(lang, terms, settings.maxKeywordsPerEvent))
+        m => m.transform((lang, terms)=>new LuceneKeywordExtractor(lang, terms, settings.maxKeywordsPerEvent))
       ),
       blacklist = blacklist
     )

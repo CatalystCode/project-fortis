@@ -45,6 +45,9 @@ private[analyzer] object AnalysisDefaults {
   trait EnableEntity[T] {
     this: Analyzer[T] =>
     override def extractEntities(details: ExtendedDetails[T], peopleRecognizer: PeopleRecognizer): List[Tag] = {
+      if (!sys.env.getOrElse("FORTIS_ENTITY_RECOGNIZER_ENABLED", "false").toBoolean) {
+        return List()
+      }
       val bodyEntities = peopleRecognizer.extractPeople(details.body)
       val titleEntities = peopleRecognizer.extractPeople(details.title)
       (titleEntities ::: bodyEntities).map(entity => Tag(entity, confidence = None))
