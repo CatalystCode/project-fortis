@@ -39,6 +39,7 @@ libraryDependencies ++= Seq(
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.twitter4j" % "twitter4j-stream" % "4.0.4",
   "org.apache.commons" % "commons-collections4" % "4.1",
+  "org.apache.lucene" % "lucene-analyzers-common" % "7.0.0",
   "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.1.2" exclude("com.microsoft.azure", "azure-eventhubs"),
   "com.microsoft.azure" % "azure-servicebus" % "1.0.0-PREVIEW-3",
   "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
