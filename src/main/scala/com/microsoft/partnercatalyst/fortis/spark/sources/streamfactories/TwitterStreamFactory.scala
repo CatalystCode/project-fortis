@@ -69,7 +69,7 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
           .filter(source=>source.pipelinekey.equalsIgnoreCase("twitter"))
           .map(source=>source.externalsourceid).toSet
 
-        stream.filter(status=>{ trustedSourceScreenNames.contains(status.getUser.getScreenName) })
+        stream.filter(status=>{ trustedSourceScreenNames.contains(status.getUser.getScreenName) && !status.isRetweet })
       }
     }
   }
