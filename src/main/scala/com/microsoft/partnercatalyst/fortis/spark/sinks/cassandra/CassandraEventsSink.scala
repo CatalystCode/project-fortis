@@ -55,7 +55,7 @@ object CassandraEventsSink extends Loggable {
           val offlineAggregators = Seq[OfflineAggregator[_]](
             new ConjunctiveTopicsOffineAggregator(configurationManager),
             new PopularPlacesOfflineAggregator(configurationManager),
-            new HeatmapOfflineAggregator(sparkSession, configurationManager)
+            new HeatmapOfflineAggregator(configurationManager)
           )
 
           val filteredEvents = removeDuplicates(batchid, fortisEventsRDDRepartitioned)
