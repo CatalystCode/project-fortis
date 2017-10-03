@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.topic
 
-trait KeyphraseExtractor {
+trait KeyphraseExtractor extends Serializable {
 
   def extractKeyphrases(input: String): Set[Keyphrase]
 

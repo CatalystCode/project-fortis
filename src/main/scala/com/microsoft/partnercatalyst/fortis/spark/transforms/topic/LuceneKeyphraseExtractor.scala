@@ -10,13 +10,14 @@ import org.apache.lucene.analysis.fr.FrenchAnalyzer
 import org.apache.lucene.analysis.hi.HindiAnalyzer
 import org.apache.lucene.analysis.pt.PortugueseAnalyzer
 import org.apache.lucene.analysis.ru.RussianAnalyzer
+import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.analysis.tokenattributes.{CharTermAttribute, OffsetAttribute}
 
 import scala.collection.mutable
 
-class LuceneKeyphraseExtractor(language: String, keyphrases: Set[String]) extends KeyphraseExtractor {
+class LuceneKeyphraseExtractor(language: String, keyphrases: Set[String], maxKeywords: Int = Int.MaxValue) extends KeyphraseExtractor {
 
-  private val analyzer: Analyzer = LuceneKeyphraseExtractor.analyzersByLanguage(language)
+  private val analyzer: Analyzer = LuceneKeyphraseExtractor.analyzersByLanguage.getOrElse(language, new StandardAnalyzer())
   private val keyphraseTries = LuceneKeyphraseExtractor.createTries(analyzer, keyphrases)
 
   override def extractKeyphrases(text: String): Set[Keyphrase] = {
@@ -36,7 +37,7 @@ class LuceneKeyphraseExtractor(language: String, keyphrases: Set[String]) extend
         })
       }
 
-      collectors.flatMap(_.getKeyphrases()).toSet
+      collectors.flatMap(_.getKeyphrases()).toList.sortBy(_.count)(Ordering[Int].reverse).take(maxKeywords).toSet
     }
     finally {
       tokenStream.close()
