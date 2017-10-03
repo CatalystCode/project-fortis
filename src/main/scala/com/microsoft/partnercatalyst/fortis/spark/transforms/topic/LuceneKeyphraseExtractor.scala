@@ -79,7 +79,6 @@ object LuceneKeyphraseExtractor{
     result.toMap
   }
 
-
   def collectTokens(analyzer: Analyzer, phrase: String): Seq[String] = {
     val stream = analyzer.tokenStream(null, phrase)
     try {

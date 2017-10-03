@@ -5,12 +5,11 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.Fe
 import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.LuceneKeyphraseExtractor
 
 class LuceneLocationsExtractor(
-                                lookup: Map[String, Set[Location]],
-                                featureServiceClient: FeatureServiceClient,
-                                placeRecognizer: Option[PlaceRecognizer] = None,
-                                locationLimit: Int = Int.MaxValue,
-                                ngrams: Int = 3
-                              ) extends LocationsExtractor(lookup, featureServiceClient, placeRecognizer, locationLimit, ngrams) {
+  lookup: Map[String, Set[Location]],
+  featureServiceClient: FeatureServiceClient,
+  locationLimit: Int = Int.MaxValue,
+  ngrams: Int = 3
+) extends LocationsExtractor(lookup, featureServiceClient, None, locationLimit, ngrams) {
 
   lazy private val keyphraseExtractor = new LuceneKeyphraseExtractor("UNKNOWN", lookup.keySet, locationLimit)
 
