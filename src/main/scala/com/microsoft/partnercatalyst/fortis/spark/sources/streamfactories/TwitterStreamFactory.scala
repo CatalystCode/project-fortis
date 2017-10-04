@@ -39,10 +39,12 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
 
     val query = new FilterQuery
 
-    val keywordsAdded = appendWatchlist(query, ssc.sparkContext, configurationManager)
-    if (!keywordsAdded) {
-      logInfo(s"No keywords used for Twitter consumerKey $consumerKey. Returning empty stream.")
-      return ssc.queueStream(new mutable.Queue[RDD[Status]])
+    if (params.getOrElse("watchlistFilteringEnabled", "true").toString.toBoolean) {
+      val keywordsAdded = appendWatchlist(query, ssc.sparkContext, configurationManager)
+      if (!keywordsAdded) {
+        logInfo(s"No keywords used for Twitter consumerKey $consumerKey. Returning empty stream.")
+        return ssc.queueStream(new mutable.Queue[RDD[Status]])
+      }
     }
 
     val languagesAdded = addLanguages(query, ssc.sparkContext, configurationManager)
@@ -62,18 +64,23 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
       query = Some(query)
     )
 
-    def isOriginalTweet(status: Status) : Boolean = {
-      !status.isRetweet && status.getRetweetedStatus == null
-    }
-
     params.getOrElse("trustedSourceFilterEnabled", "true").toString.toBoolean match {
-      case false => stream
+      case false => stream.filter(status=>{
+        def isOriginalTweet(status: Status) : Boolean = {
+          !status.isRetweet && status.getRetweetedStatus == null
+        }
+        isOriginalTweet(status)
+      })
       case true => {
         val trustedSourceScreenNames = configurationManager.fetchTrustedSources(sparkContext = ssc.sparkContext)
           .filter(source=>source.pipelinekey.equalsIgnoreCase("twitter"))
           .map(source=>source.externalsourceid).toSet
 
         stream.filter(status=>{
+          def isOriginalTweet(status: Status) : Boolean = {
+            !status.isRetweet && status.getRetweetedStatus == null
+          }
+
           if (!isOriginalTweet(status)) {
             false
           } else {
