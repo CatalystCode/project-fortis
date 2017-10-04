@@ -88,8 +88,8 @@ object ProjectFortis extends App with Loggable {
     // 'fortisEvents' is the stream of analyzed data aggregated (union) from all pipelines
     val fortisEvents = List(
       pipeline("Twitter", new TwitterAnalyzer),
-      pipeline("Facebookpost", new FacebookPostAnalyzer),
-      pipeline("Facebookcomment", new FacebookCommentAnalyzer),
+      pipeline("Facebook", new FacebookPostAnalyzer),
+      pipeline("Facebook", new FacebookCommentAnalyzer),
       pipeline("Instagram", new InstagramAnalyzer),
       pipeline("Tadaweb", new TadawebAnalyzer),
       pipeline("Customevents", new CustomEventAnalyzer),

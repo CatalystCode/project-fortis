@@ -29,7 +29,7 @@ object Pipeline {
     configurationManager: ConfigurationManager
   )(implicit settings: FortisSettings): Option[DStream[FortisEvent]] = {
     val configs = configurationManager.fetchConnectorConfigs(ssc.sparkContext, name)
-    val sourceStream = streamProvider.buildStream[T](ssc, configs)
+    val sourceStream = streamProvider.buildStream[T](ssc, configs, ignoreUnsupportedConfigs = true)
 
     val entityModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/opener/opener-$language.zip")
     val sentimentModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/sentiment/sentiment-$language.zip")

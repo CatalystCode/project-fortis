@@ -50,6 +50,7 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
   def buildStream[A: TypeTag](
     streamingContext: StreamingContext,
     configs: List[ConnectorConfig],
+    ignoreUnsupportedConfigs: Boolean = false,
     typeName: Option[String] = None): Option[DStream[A]] = {
 
     if (configs.isEmpty)
@@ -62,7 +63,7 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
     )
 
     def throwUnsupported: PartialFunction[ConnectorConfig, DStream[A]] = {
-      case _ => throw new UnsupportedConnectorConfigException
+      case _ if !ignoreUnsupportedConfigs => throw new UnsupportedConnectorConfigException
     }
 
     val createStream: PartialFunction[ConnectorConfig, DStream[A]] = factories.map(_.createStream(streamingContext)).reduceOption(_.orElse(_)) match {
@@ -70,8 +71,7 @@ class StreamProvider private(typeToFactories: Map[String, List[StreamFactory[_]]
       case None => throwUnsupported
     }
 
-    val combinedStream = configs.collect(createStream).reduce(_.union(_))
-    Some(combinedStream)
+    configs.collect(createStream).reduceOption(_.union(_))
   }
 
   private def typeNameOrDefault[A: TypeTag](typeName: Option[String] = None): String = {
