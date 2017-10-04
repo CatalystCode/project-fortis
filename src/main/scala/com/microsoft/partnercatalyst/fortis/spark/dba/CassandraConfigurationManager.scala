@@ -1,12 +1,11 @@
 package com.microsoft.partnercatalyst.fortis.spark.dba
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, Geofence, SiteSettings}
+import com.datastax.spark.connector._
+import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.SparkContext
-import com.datastax.spark.connector._
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.TrustedSource
 
 import scala.compat.java8.FunctionConverters._
 
@@ -73,11 +72,6 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
       .map(row => BlacklistedTerm(row.getList[String]("conjunctivefilter").toSet))
 
     blacklistRdd.collect()
-  }
-
-  override def fetchTrustedSources(sparkContext: SparkContext): Seq[TrustedSource] = {
-    sparkContext.cassandraTable[TrustedSource](CassandraSchema.KeyspaceName, CassandraSchema.Table.TrustedSourcesName)
-      .collect()
   }
 
 }
