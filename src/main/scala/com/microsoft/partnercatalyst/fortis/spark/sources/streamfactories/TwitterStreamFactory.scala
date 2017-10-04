@@ -64,35 +64,22 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
       query = Some(query)
     )
 
-    params.getOrElse("trustedSourceFilterEnabled", "true").toString.toBoolean match {
-      case false => stream.filter(status=>{
-        def isOriginalTweet(status: Status) : Boolean = {
-          !status.isRetweet && status.getRetweetedStatus == null
-        }
-        isOriginalTweet(status)
-      })
-      case true => {
-        val trustedSourceScreenNames = configurationManager.fetchTrustedSources(sparkContext = ssc.sparkContext)
-          .filter(source=>source.pipelinekey.equalsIgnoreCase("twitter"))
-          .map(source=>source.externalsourceid).toSet
-
-        stream.filter(status=>{
-          def isOriginalTweet(status: Status) : Boolean = {
-            !status.isRetweet && status.getRetweetedStatus == null
-          }
-
-          if (!isOriginalTweet(status)) {
-            false
-          } else {
-            if (trustedSourceScreenNames.isEmpty) {
-              true
-            } else {
-              trustedSourceScreenNames.contains(status.getUser.getScreenName)
-            }
-          }
-        })
+    val trustedSourceScreenNames = params.getTrustedSources.toSet
+    stream.filter(status=>{
+      def isOriginalTweet(status: Status) : Boolean = {
+        !status.isRetweet && status.getRetweetedStatus == null
       }
-    }
+
+      if (!isOriginalTweet(status)) {
+        false
+      } else {
+        if (trustedSourceScreenNames.isEmpty) {
+          true
+        } else {
+          trustedSourceScreenNames.contains(status.getUser.getScreenName)
+        }
+      }
+    })
   }
 
   private[streamfactories] def appendWatchlist(query: FilterQuery, sparkContext: SparkContext, configurationManager: ConfigurationManager): Boolean = {
