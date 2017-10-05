@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.dba
 import java.util.concurrent.ConcurrentHashMap
 
 import com.datastax.spark.connector._
-import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedItem, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.SparkContext
@@ -66,10 +66,10 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
     langToTermPairRdd.collectAsMap().toMap
   }
 
-  override def fetchBlacklist(sparkContext: SparkContext): Seq[BlacklistedTerm] = {
+  override def fetchBlacklist(sparkContext: SparkContext): Seq[BlacklistedItem] = {
     val blacklistRdd = sparkContext.cassandraTable(CassandraSchema.KeyspaceName, CassandraSchema.Table.BlacklistName)
       .select("conjunctivefilter")
-      .map(row => BlacklistedTerm(row.getList[String]("conjunctivefilter").toSet))
+      .map(row => BlacklistedItem(row.getList[String]("conjunctivefilter").toSet))
 
     blacklistRdd.collect()
   }

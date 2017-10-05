@@ -1,6 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.transformcontext
 
-import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedItem, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
@@ -11,7 +11,7 @@ import org.apache.spark.broadcast.Broadcast
 case class TransformContext(
   siteSettings: SiteSettings = null,
   langToKeywordExtractor: Broadcast[Map[String, KeywordExtractor]] = null,
-  blacklist: Broadcast[Seq[BlacklistedTerm]] = null,
+  blacklist: Broadcast[Seq[BlacklistedItem]] = null,
   locationsExtractorFactory: Broadcast[LocationsExtractorFactory] = null,
 
   // The following objects have a small serialized forms. Consequently, we don't bother to broadcast them

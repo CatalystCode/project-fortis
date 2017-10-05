@@ -50,6 +50,9 @@ object Pipeline {
       val sentimentDetectorAuth = transformContext.sentimentDetectorAuth
       val languageDetector = new LocalLanguageDetector()
 
+      val maxKeywordsPerEvent = settings.maxKeywordsPerEvent
+      val maxLocationsPerEvent = settings.maxLocationsPerEvent
+
       // Broadcast variables
       val langToKeywordExtractor = transformContext.langToKeywordExtractor
       val blacklist = transformContext.blacklist
@@ -80,7 +83,7 @@ object Pipeline {
               case Some(extractor) => event.copy(
                 analysis = event.analysis.copy(
                   // Take maxKeywordsPerEvent which will prioritize title keywords over body. 
-                  keywords = analyzer.extractKeywords(event.details, extractor).take(settings.maxKeywordsPerEvent).map(
+                  keywords = analyzer.extractKeywords(event.details, extractor).take(maxKeywordsPerEvent).map(
                     tag => tag.copy(name = tag.name.toLowerCase(locale))
                   )
                 )
@@ -105,8 +108,17 @@ object Pipeline {
         analyzer.hasBlacklistedTerms(event.details, new Blacklist(blacklist.value))
       }
 
-      def hasBlacklistedLocations(event: ExtendedFortisEvent[T]): Boolean = {
-        analyzer.hasBlacklistedLocations(event.details, event.analysis, new Blacklist(blacklist.value))
+      def removeBlacklistedLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
+        val blacklisted = new Blacklist(blacklist.value)
+        event.copy(analysis = event.analysis.copy(
+          locations = event.analysis.locations.filter(loc => !blacklisted.matchesLocation(Set(loc.name)))
+        ))
+      }
+
+      def limitLocationsToMax(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
+        event.copy(analysis = event.analysis.copy(
+          locations = event.analysis.locations.take(maxLocationsPerEvent)
+        ))
       }
 
       def hasBlacklistedEntities(event: ExtendedFortisEvent[T]): Boolean = {
@@ -126,8 +138,13 @@ object Pipeline {
 
       def addLocations(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         val locations = analyzer.extractLocations(event.details,
-          locationsExtractorFactory.value.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language))))
-        event.copy(analysis = event.analysis.copy(locations = locations))
+          locationsExtractorFactory.value.create(Some(new PlaceRecognizer(entityModelsProvider, event.analysis.language)))
+        )
+
+        event.copy(analysis = event.analysis.copy(
+          // Note: we add shared locations to the analysis to simplify downstream processing
+          locations = event.details.sharedLocations ::: locations
+        ))
       }
 
       def addSummary(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
@@ -145,7 +162,9 @@ object Pipeline {
         .map(addKeywords)
         .filter(item => hasKeywords(item.analysis))
         .map(item => addLocations(item))
-        .filter(item => item.analysis.locations.nonEmpty && !hasBlacklistedLocations(item))
+        .map(item => removeBlacklistedLocations(item))
+        .filter(item => item.analysis.locations.nonEmpty)
+        .map(item => limitLocationsToMax(item))
         .map(item => addEntities(item))
         .filter(item => !hasBlacklistedEntities(item))
         .map(item => addSentiments(addSummary(item)))

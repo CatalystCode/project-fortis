@@ -14,7 +14,6 @@ trait Analyzer[T] {
 
   def toSchema(item: T, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[T]
   def hasBlacklistedTerms(details: ExtendedDetails[T], blacklist: Blacklist): Boolean
-  def hasBlacklistedLocations(details: ExtendedDetails[T], analysis: Analysis, blacklist: Blacklist): Boolean
   def hasBlacklistedEntities(analysis: Analysis, blacklist: Blacklist): Boolean
   def extractKeywords(details: ExtendedDetails[T], keywordExtractor: KeywordExtractor): List[Tag]
   def extractLocations(details: ExtendedDetails[T], locationsExtractor: LocationsExtractor): List[Location]
