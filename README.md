@@ -4,6 +4,8 @@
 Deploy your own Fortis pipeline to an azure subscription through a single click. 
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.svg)](https://deploy.azure.com/?repository=https://github.com/catalystcode/fortis-containers/tree/master?ptmpl=azuredeploy.parameters.json)
+![fortisadminoverview](https://user-images.githubusercontent.com/7635865/31245700-cd8193be-a9d0-11e7-9558-e78dd15951a2.png)
+
 
 ## Pipeline Architecture
 A fully containerized realtime spark pipeline powered off Kubernetes. 
@@ -18,6 +20,10 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
 * Graphql Services: https://github.com/CatalystCode/project-fortis-services
 * Kubernetes Helm Charts: https://github.com/CatalystCode/charts
 
+## Documentation
+- [Deploy to Azure Steps]()
+- [Upgrading the Fortis Spark Pipeline](docs/upgrading.md)
+- [Upgrading the Fortis Interface](docs/interface-upgrade.md)
 
 ![image](https://user-images.githubusercontent.com/7635865/27882830-e785819c-6193-11e7-9b27-5fc452f23b1a.png)
 
