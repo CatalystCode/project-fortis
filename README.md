@@ -25,6 +25,9 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
 - [Upgrading the Fortis Spark Pipeline](docs/upgrading.md)
 - [Upgrading the Fortis Interface](docs/interface-upgrade.md)
 
+## Demo Videos
+- [Dashboard Walkthrough in Spanish](aka.ms/fortis-colombia-demo)
+
 ![image](https://user-images.githubusercontent.com/7635865/27882830-e785819c-6193-11e7-9b27-5fc452f23b1a.png)
 
 ## Deployment Prerequisites
