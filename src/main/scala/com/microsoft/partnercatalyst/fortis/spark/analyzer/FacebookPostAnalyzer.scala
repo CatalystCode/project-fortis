@@ -16,14 +16,20 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with
       eventtime = Option(Option(item.post.getUpdatedTime).getOrElse(item.post.getCreatedTime)).getOrElse(new Date()).getTime,
       body = Option(item.post.getMessage).getOrElse(""),
       title = Option(item.post.getCaption).getOrElse(""),
-      imageurl = None,
+      imageurl = Option(item.post.getIcon) match {
+        case Some(icon) => Option(icon.toString)
+        case None => Some("")
+      },
       externalsourceid = item.pageId,
       pipelinekey = "Facebook",
       sharedLocations = Option(item.post.getPlace).map(_.getLocation) match {
         case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
         case None => List()
       },
-      sourceurl = s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}",
+      sourceurl = Option(item.post.getPermalinkUrl) match {
+        case Some(url) => url.toString
+        case None => s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}"
+      },
       original = item
     )
   }
