@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
+import java.util.Date
+
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookComment
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
@@ -11,8 +13,8 @@ class FacebookCommentAnalyzer extends Analyzer[FacebookComment] with Serializabl
     ExtendedDetails(
       eventid = s"Facebook.comment.${item.comment.getId}",
       sourceeventid = item.comment.getId,
-      eventtime = item.comment.getCreatedTime.getTime,
-      body = item.comment.getMessage,
+      eventtime = Option(item.comment.getCreatedTime).getOrElse(new Date()).getTime,
+      body = Option(item.comment.getMessage).getOrElse(""),
       title = s"Post ${item.postId}: Comment",
       externalsourceid = item.pageId,
       pipelinekey = "Facebook",
