@@ -69,7 +69,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
   override def fetchBlacklist(sparkContext: SparkContext): Seq[BlacklistedItem] = {
     val blacklistRdd = sparkContext.cassandraTable(CassandraSchema.KeyspaceName, CassandraSchema.Table.BlacklistName)
       .select("conjunctivefilter")
-      .map(row => BlacklistedItem(row.getList[String]("conjunctivefilter").toSet, row.getBoolean("isLocation")))
+      .map(row => BlacklistedItem(row.getList[String]("conjunctivefilter").toSet, row.getBoolean("islocation")))
 
     blacklistRdd.collect()
   }
