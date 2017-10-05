@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transformcontext
 
 import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
-import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedTerm, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedItem, SiteSettings}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.{ImageAnalysisAuth, ImageAnalyzer}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.LocationsExtractorFactory
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
@@ -15,7 +15,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.topic.{KeywordExtra
 private[transformcontext] class Delta private(
   val siteSettings: Option[SiteSettings],
   val langToKeywordExtractor: Option[Map[String, KeywordExtractor]],
-  val blacklist: Option[Seq[BlacklistedTerm]],
+  val blacklist: Option[Seq[BlacklistedItem]],
   val locationsExtractorFactory: Option[LocationsExtractorFactory],
   val imageAnalyzer: Option[ImageAnalyzer],
   val sentimentDetectorAuth: Option[SentimentDetectorAuth]
@@ -32,7 +32,7 @@ private[transformcontext] object Delta {
     featureServiceClientUrlBase: String,
     siteSettings: Option[SiteSettings] = None,
     langToWatchlist: Option[Map[String, Seq[String]]] = None,
-    blacklist: Option[Seq[BlacklistedTerm]] = None)(implicit settings: FortisSettings): Delta =
+    blacklist: Option[Seq[BlacklistedItem]] = None)(implicit settings: FortisSettings): Delta =
   {
     // Note that parameters are call-by-name
     def updatedField[T](isDirty: => Boolean, newVal: => T): Option[T] = {

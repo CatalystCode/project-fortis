@@ -21,7 +21,6 @@ private[analyzer] object AnalysisDefaults {
     with EnableEntity[T]
     with EnableLanguage[T]
     with EnableBlacklist[T]
-    with EnableLocationsBlacklist[T]
     with EnableEntitiesBlacklist[T]
     with EnableSummary[T]
     with EnableSentiment[T] {
@@ -72,15 +71,6 @@ private[analyzer] object AnalysisDefaults {
     this: Analyzer[T] =>
     override def hasBlacklistedTerms(details: ExtendedDetails[T], blacklist: Blacklist): Boolean = {
       blacklist.matches(details.body) || blacklist.matches(details.title)
-    }
-  }
-
-  trait EnableLocationsBlacklist[T] {
-    this: Analyzer[T] =>
-    override def hasBlacklistedLocations(details: ExtendedDetails[T], analysis: Analysis, blacklist: Blacklist): Boolean = {
-      val sharedLocations = details.sharedLocations.map(_.name).toSet
-      val analyzedLocations = analysis.locations.map(_.name).toSet
-      blacklist.matches(sharedLocations) || blacklist.matches(analyzedLocations)
     }
   }
 
