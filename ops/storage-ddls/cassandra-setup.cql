@@ -86,7 +86,7 @@ CREATE TABLE watchlist(
 CREATE TABLE blacklist(
     id uuid,
     conjunctivefilter frozen<list<text>>,
-    isLocation boolean,
+    islocation boolean,
     PRIMARY KEY (id)
 );
 
