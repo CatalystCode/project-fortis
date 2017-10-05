@@ -11,11 +11,15 @@ class Blacklist(blacklist: Seq[BlacklistedItem]) extends Serializable {
     }
 
     val tokens = Tokenizer(text).toSet
-    blacklist.exists(entry => entry.conjunctiveFilter.forall(tokens.contains))
+    blacklist
+      .filter(!_.isLocation)
+      .exists(entry => entry.conjunctiveFilter.forall(tokens.contains))
   }
 
   def matches(terms: Set[String]): Boolean = {
-    blacklist.exists(entry => entry.conjunctiveFilter.forall(terms.contains))
+    blacklist
+      .filter(!_.isLocation)
+      .exists(entry => entry.conjunctiveFilter.forall(terms.contains))
   }
 
   def matchesLocation(locations: Set[String]): Boolean = {
