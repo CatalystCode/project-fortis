@@ -16,10 +16,10 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
   private lazy val connectorToTrustedSources = new ConcurrentHashMap[String, Seq[String]]()
 
   override def fetchConnectorConfigs(sparkContext: SparkContext, pipeline: String): List[ConnectorConfig] = {
-    def fetchTrustedSources(connectorName: String): Seq[String] = {
+    def fetchTrustedSources(pipelineKey: String): Seq[String] = {
       sparkContext.cassandraTable(CassandraSchema.KeyspaceName, CassandraSchema.Table.TrustedSourcesName)
         .select("externalsourceid")
-        .where("pipelinekey = ?", connectorName)
+        .where("pipelinekey = ?", pipelineKey)
         .map(row => row.getString("externalsourceid")).collect()
     }
 
@@ -27,7 +27,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
       CassandraSchema.Table.StreamsName).where("pipelinekey = ?", pipeline).collect().filter(row=>row.enabled.getOrElse(true))
 
     pipelineConfigRows.map(stream => {
-      val trustedSources = connectorToTrustedSources.computeIfAbsent(stream.streamfactory, (fetchTrustedSources _).asJava)
+      val trustedSources = connectorToTrustedSources.computeIfAbsent(pipeline, (fetchTrustedSources _).asJava)
 
       ConnectorConfig(
         stream.streamfactory,
