@@ -32,7 +32,7 @@ install_azure_cli() {
 }
 
 create_fat_jar() {
-  sbt ++${TRAVIS_SCALA_VERSION} assembly
+  sbt ++${TRAVIS_SCALA_VERSION} 'set test in assembly := {}' assembly
 }
 
 publish_fat_jar() {
