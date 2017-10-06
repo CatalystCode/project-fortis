@@ -3,8 +3,9 @@
 const xml2js = require('xml2js');
 const Promise = require('promise');
 const request = require('request');
-const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+const { trackEvent, trackException } = require('../appinsights/AppInsightsClient');
 const deprecated = require('./deprecated');
+const loggingClient = require('../appinsights/LoggingClient');
 
 const TOKEN_URL_BASE = process.env.TRANSLATION_SERVICE_TOKEN_HOST || 'https://api.cognitive.microsoft.com';
 const TRANSLATOR_URL_BASE = process.env.TRANSLATION_SERVICE_TRANSLATOR_HOST || 'https://api.microsofttranslator.com';
@@ -31,6 +32,13 @@ function getAccessTokenForTranslation(token) {
 
     request.post(POST, (err, response, body) => {
       if (response.statusCode !== 200 || err) {
+        try {
+          err = JSON.parse(body);
+        } catch (exception) {
+          trackException(err);
+          return reject(err);
+        }
+        trackException(err);
         return reject(err);
       } else {
         resolve({
@@ -59,6 +67,7 @@ function TranslateSentenceArrayWithToken(access_token, wordsToTranslate, fromLan
   return new Promise((resolve, reject) => {
     request.post(POST, (err, response, body) => {
       if (err || !response || response.statusCode !== 200) {
+        trackException(err);
         return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
       } else {
         xml2js.parseString(body, (err, result) => {
@@ -66,6 +75,7 @@ function TranslateSentenceArrayWithToken(access_token, wordsToTranslate, fromLan
             const translatedPhrases = result.ArrayOfTranslateArrayResponse.TranslateArrayResponse;
             resolve(wordsToTranslate.map((phrase, index) => Object.assign({}, { originalSentence: phrase, translatedSentence: translatedPhrases[index].TranslatedText })));
           } else {
+            trackException(err);
             return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
           }
         });
@@ -86,12 +96,14 @@ function TranslateWithToken(access_token, sentence, fromLanguage, toLanguage) {
   return new Promise((resolve, reject) => {
     request(options, function (err, response, body) {
       if (err || !response || response.statusCode !== 200) {
+        trackException(err);
         return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
       } else {
         xml2js.parseString(body, (err, result) => {
           if (!err & !!result && !!result['string'] && !!result['string']['_']) {
             resolve(result['string']['_']);
           } else {
+            trackException(err);
             return reject(err || 'Failed to pull data from: ' + JSON.stringify(response));
           }
         });
@@ -100,15 +112,21 @@ function TranslateWithToken(access_token, sentence, fromLanguage, toLanguage) {
   });
 }
 
-function translateSentenceArray(wordsToTranslate, fromLanguage, toLanguage) {
+function translateSentenceArray(token, wordsToTranslate, fromLanguage, toLanguage) {
   return new Promise((resolve, reject) => {
-    getAccessTokenForTranslation()
+    getAccessTokenForTranslation(token)
       .then(authBody => {
         TranslateSentenceArrayWithToken(authBody.token, wordsToTranslate, fromLanguage, toLanguage)
           .then(result => resolve({ translatedSentence: result }))
-          .catch(reject);
+          .catch(error => {
+            trackException(error);
+            reject(error);
+          });
       })
-      .catch(reject);
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 
@@ -118,13 +136,19 @@ function translate(token, sentence, fromLanguage, toLanguage) {
       .then(authBody => {
         TranslateWithToken(authBody.token, sentence, fromLanguage, toLanguage)
           .then(result => resolve({ translatedSentence: result }))
-          .catch(reject);
+          .catch(error => {
+            trackException(error);
+            reject(error);
+          });
       })
-      .catch(reject);
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 
 module.exports = {
-  translateSentenceArray: trackDependency(translateSentenceArray, 'MsftTranslator', 'translateSentenceArray'),
-  translate: trackDependency(translate, 'MsftTranslator', 'translate')
+  translateSentenceArray: trackEvent(translateSentenceArray, 'MicrosoftTranslator', loggingClient.translateExtraProps(), loggingClient.translateWordsExtraMetrics()),
+  translate: trackEvent(translate, 'MicrosoftTranslator', loggingClient.translateExtraProps(), loggingClient.translateExtraMetrics())
 };

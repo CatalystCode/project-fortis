@@ -4,7 +4,8 @@ const Promise = require('promise');
 const cassandra = require('cassandra-driver');
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
-const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+const { trackDependency, trackException } = require('../appinsights/AppInsightsClient');
+const loggingClient = require('../appinsights/LoggingClient');
 
 const FETCH_SIZE = process.env.FETCH_SIZE || 1000;
 const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
@@ -38,8 +39,15 @@ const client = new cassandra.Client(options);
  */
 function executeBatchMutations(mutations) {
   return new Promise((resolve, reject) => {
-    if (!client) return reject('No Cassandra client defined');
-    if (!mutations || !mutations.length) return reject('No mutations defined');
+    if (!client) {
+      loggingClient.logCassandraClientUndefined();
+      return reject('No Cassandra client defined');
+    }
+
+    if (!mutations || !mutations.length) {
+      loggingClient.logNoMutationsDefined();
+      return reject('No mutations defined');
+    }
   
     let chunkedMutations = chunk(mutations, MAX_OPERATIONS_PER_BATCH);
 
@@ -57,7 +65,10 @@ function executeBatchMutations(mutations) {
       }
     },
     (err) => {
-      if (err) reject(err);
+      if (err) {
+        trackException(err);
+        reject(err);
+      }
       else resolve({numBatchMutations: chunkedMutations.length});
     });
   });
@@ -71,6 +82,11 @@ function executeBatchMutations(mutations) {
  */
 function executeQuery(query, params, options) {
   return new Promise((resolve, reject) => {
+    if (!client) {
+      loggingClient.logCassandraClientUndefined();
+      return reject('No Cassandra client defined');
+    }
+
     try {
       const rows = [];
       const stream = client.stream(query, params, options)
@@ -81,12 +97,16 @@ function executeQuery(query, params, options) {
           }
         })
         .on('error', err => {
-          if (err) reject(err);
+          if (err) {
+            loggingClient.logExecuteQueryError();
+            reject(err);
+          }
         })
         .on('end', () => {
           resolve(rows);
         });
     } catch (exception) {
+      trackException(exception);
       reject(exception);
     }
   });
@@ -101,6 +121,11 @@ function executeQuery(query, params, options) {
  */
 function executeQueryWithPageState(query, params, pageState, fetchSize) {
   return new Promise((resolve, reject) => {
+    if (!client) {
+      loggingClient.logCassandraClientUndefined();
+      return reject('No Cassandra client defined');
+    }
+
     const DEFAULT_FETCH = 15;
 
     let options = {
@@ -116,7 +141,10 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
       pageState: result.pageState, 
       rows: result.rows
     }))
-    .catch(reject);
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
   });
 }
 

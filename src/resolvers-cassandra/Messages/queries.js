@@ -212,8 +212,15 @@ function translate(args, res) { // eslint-disable-line no-unused-vars
 
 function translateWords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    translatorService.translateSentenceArray(args.words, args.fromLanguage, args.toLanguage)
-      .then(result => {
+    getSiteDefintion()
+      .then(sitesettings => {
+        return translatorService.translateSentenceArray(
+          sitesettings.site.properties.translationSvcToken,
+          args.words,
+          args.fromLanguage,
+          args.toLanguage
+        );
+      }).then(result => {
         const words = result.translatedSentence;
 
         resolve({

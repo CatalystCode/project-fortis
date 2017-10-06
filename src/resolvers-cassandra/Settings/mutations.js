@@ -4,9 +4,10 @@ const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const blobStorageClient = require('../../clients/storage/BlobStorageClient');
-const serviceBusClient = require('../../clients/servicebus/ServiceBusClient');
+const streamingController = require('../../clients/streaming/StreamingController');
 const { withRunTime, limitForInClause } = require('../shared');
-const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
+const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
+const loggingClient = require('../../clients/appinsights/LoggingClient');
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
 const STREAM_PIPELINE_TWITTER = 'twitter';
 const STREAM_CONNECTOR_TWITTER = 'Twitter';
@@ -14,9 +15,6 @@ const STREAM_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
 const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
 const TRUSTED_SOURCES_RANK_DEFAULT = 10;
-
-const SERVICE_BUS_CONFIG_QUEUE = process.env.FORTIS_SB_CONFIG_QUEUE || 'configuration';
-const SERVICE_BUS_COMMAND_QUEUE = process.env.FORTIS_SB_COMMAND_QUEUE || 'command';
 
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
@@ -36,14 +34,17 @@ function _insertTopics(siteType) {
     blobStorageClient.fetchJson(uri)
     .then(response => {
       return response.map(topic => ({
-        query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertiontime) 
+        query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertiontime,category) 
                 VALUES (?, ?, ?, ?, toTimestamp(now()));`,
-        params: [uuid(), topic.topic, topic.lang_code, topic.translations]
+        params: [uuid(), topic.topic, topic.lang_code, topic.translations, topic.category]
       }));
     })
     .then(response => {
       mutations = response;
       return cassandraConnector.executeBatchMutations(response);
+    })
+    .then(() => {
+      streamingController.notifyWatchlistUpdate();
     })
     .then(() => {
       resolve({
@@ -97,7 +98,7 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
       }]);
     })
     .then(() => {
-      serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
+      streamingController.notifySiteSettingsUpdate();
     })
     .then(() => { 
       resolve({
@@ -155,7 +156,7 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
       }]);
     })
     .then(() => {
-      serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'settings'}));
+      streamingController.restartStreaming();
     })
     .then(() => { 
       resolve({
@@ -176,39 +177,68 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
 
 function removeKeywords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args || !args.edges || !args.edges.length) return reject('No keywords to remove specified');
+    if (!args || !args.input || !args.input.edges || !args.input.edges.length) {
+      loggingClient.logNoKeywordsToRemove();
+      return reject('No keywords to remove specified.');
+    } 
 
-    const mutations = args.edges.map(edge => ({
-      mutation: 'DELETE FROM fortis.watchlist WHERE keyword = ?',
-      params: [edge.name]
+    const mutations = args.input.edges.map(edge => ({
+      query: 'DELETE FROM fortis.watchlist WHERE topic = ? AND lang_code = ?',
+      params: [edge.name, edge.namelang]
     }));
 
     cassandraConnector.executeBatchMutations(mutations)
+    .then(() => {
+      streamingController.notifyWatchlistUpdate();
+    })
     .then(_ => { // eslint-disable-line no-unused-vars
       resolve({
-        edges: args.edges
+        edges: args.input.edges
       });
     })
-    .catch(reject);
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
   });
 }
 
 function addKeywords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    if (!args || !args.edges || !args.edges.length) return reject('No keywords to add specified');
+    if (!args || !args.input || !args.input.edges || !args.input.edges.length) {
+      loggingClient.logNoKeywordsToAdd();
+      return reject('No keywords to add specified.');
+    }
 
-    const mutations = args.edges.map(edge => ({
-      mutation: 'INSERT INTO fortis.watchlist (keyword) VALUES (?)',
-      params: [edge.name]
-    }));
+    let mutations = [];
+    args.input.edges.forEach(edge => {
+      let params = paramEntryToMap(edge.translations);
+      mutations.push({
+        query: `INSERT INTO fortis.watchlist (
+          topic,
+          lang_code,
+          category,
+          insertiontime,
+          topicid,
+          translations
+        ) VALUES (?,?,?,dateof(now()),?,?)`,
+        params: [edge.name, edge.namelang, edge.category, edge.topicid, params]
+      });
+    });
 
     cassandraConnector.executeBatchMutations(mutations)
+    .then(() => {
+      streamingController.notifyWatchlistUpdate();
+    })
     .then(_ => { // eslint-disable-line no-unused-vars
       resolve({
-        edges: args.edges
+        edges: args.input.edges
       });
     })
-    .catch(reject);
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
   });
 }
 
@@ -269,7 +299,7 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeBatchMutations(mutations)
     .then(() => {
-      serviceBusClient.sendStringMessage(SERVICE_BUS_COMMAND_QUEUE, JSON.stringify({'dirty': 'streams'}));
+      streamingController.restartStreaming();
     })
     .then(() => {
       resolve({
@@ -295,7 +325,7 @@ function removeStreams(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeBatchMutations(deletions)
     .then(() => {
-      serviceBusClient.sendStringMessage(SERVICE_BUS_COMMAND_QUEUE, JSON.stringify({'dirty': 'streams'}));
+      streamingController.restartStreaming();
     })
     .then(() => {
       resolve({
@@ -496,7 +526,7 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeBatchMutations(mutations)
     .then(() => {
-      return serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'blacklist'}));
+      streamingController.notifyBlacklistUpdate();
     })
     .then(() => resolve({ filters: filterRecords }))
     .catch(reject);
@@ -522,7 +552,7 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
     cassandraConnector.executeQuery(query, params)
     .then(() => {
-      return serviceBusClient.sendStringMessage(SERVICE_BUS_CONFIG_QUEUE, JSON.stringify({'dirty': 'blacklist'}));
+      streamingController.notifyBlacklistUpdate();
     })
     .then(() => {
       resolve({
@@ -539,8 +569,8 @@ module.exports = {
   removeSite: trackEvent(removeSite, 'removeSite'),
   modifyStreams: trackEvent(withRunTime(modifyStreams), 'modifyStreams'),
   removeStreams: trackEvent(removeStreams, 'removeStreams'),
-  removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords'),
-  addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords'),
+  removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
+  addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords', loggingClient.addKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
   editSite: trackEvent(withRunTime(editSite), 'editSite'),
   modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
   removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),

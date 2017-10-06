@@ -52,24 +52,27 @@ module.exports = graphql.buildSchema(`
   }
 
   input Term {
+    topicid: String!,
     name: String!
     translatedname: String
     namelang: String
-    translatednamelang: String
+    translatednamelang: String,
+    category: String,
+    translations: [ParamsEntryInput]
   }
 
   type SiteTerm {
-    topicid: String,
-    name: String!,
-    translatedname: String,
+    topicid: String!,
+    name: String!
+    translatedname: String
+    namelang: String
+    translatednamelang: String,
     category: String,
-    namelang: String,
-    translatednamelang: String
+    translations: [ParamsEntry]
   }
 
   input MutatedTerms {
     edges: [Term]!
-    site: String!
   }
 
   type TermCollection {
