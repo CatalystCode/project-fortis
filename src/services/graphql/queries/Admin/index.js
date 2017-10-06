@@ -53,7 +53,7 @@ export const getSite = `query Sites {
   }
 }`;
 
-export const getTopics = `query SiteTerms($translationLanguage: String, category: String) {
+export const getTopics = `query SiteTerms($translationLanguage: String, $category: String) {
   siteTerms(translationLanguage: $translationLanguage, category: $category) {
     ...TopicsView
   }
