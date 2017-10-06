@@ -3,8 +3,9 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
-
 import java.util.Date
+
+import scala.util.Try
 
 @SerialVersionUID(100L)
 class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with Loggable
@@ -26,10 +27,8 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with
         case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
         case None => List()
       },
-      sourceurl = Option(item.post.getPermalinkUrl) match {
-        case Some(url) => url.toString
-        case None => s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}"
-      },
+      sourceurl = Try(item.post.getPermalinkUrl.toString)
+        .getOrElse(s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}"),
       original = item
     )
   }
