@@ -178,22 +178,55 @@ const methods = {
     },
 
 
-    load_topics(translationLanguage) {
-      const self = this;
-      const dataStore = this.flux.stores.AdminStore.dataStore;
-      if (!dataStore.loading) {
-        AdminServices.fetchTopics(translationLanguage, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-          if (graphqlResponse && !error) {
-            const response = graphqlResponse.siteTerms.edges ? graphqlResponse.siteTerms.edges : [];
-            const action = false;
-            self.dispatch(constants.ADMIN.LOAD_TOPICS, {response, action});
-          } else {
-            let error = 'Error, could not load keywords for admin page';
-            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-          }
-        }))
+  load_topics(translationLanguage) {
+    const self = this;
+    const dataStore = this.flux.stores.AdminStore.dataStore;
+    if (!dataStore.loading) {
+      AdminServices.fetchTopics(translationLanguage, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const response = graphqlResponse.siteTerms.edges ? graphqlResponse.siteTerms.edges : [];
+          const action = "saved";
+          self.dispatch(constants.ADMIN.LOAD_TOPICS, {response, action});
+        } else {
+          let error = 'Error, could not load keywords for admin page';
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }))
+    }
+  },
+
+  save_topics(topics) {
+    const self = this;
+    AdminServices.saveTopics(topics, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      if (graphqlResponse && !error) {
+        const action = "saved";
+        const topicsAfterSave = this.flux.stores.AdminStore.dataStore.watchlist;
+        self.dispatch(constants.ADMIN.LOAD_TOPICS, { action, response: topicsAfterSave});
+      } else {
+        let error = 'Error, could not load keywords for admin page';
+        self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
       }
-    },
+    }));
+  },
+
+  remove_topics(topics) {
+    const self = this;
+    const dataStore = this.flux.stores.AdminStore.dataStore;
+    if (!dataStore.loading) {
+      AdminServices.removeTopics(topics, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const action = "saved";
+          const topicsBeforeRemove = this.flux.stores.AdminStore.dataStore.watchlist;
+          const topicsToRemove = graphqlResponse.removeKeywords.edges;
+          const topicsAfterRemove = getListAfterRemove(topicsBeforeRemove, topicsToRemove, 'topicid');
+          self.dispatch(constants.ADMIN.LOAD_TOPICS, { action, response: topicsAfterRemove });
+        } else {
+          let error = 'Error, could not remove keywords from admin page';
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }));
+    }
+  },
 
     load_trusted_sources(pipelineKeys, sourceName) {
       const self = this;

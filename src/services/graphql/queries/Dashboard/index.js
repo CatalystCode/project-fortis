@@ -35,6 +35,12 @@ export const getMessagesByBbox = `query ByBbox($externalsourceid: String, $zoomL
  export const getPopularPlaces = `topLocations(zoomLevel:$zoomLevel, maintopic:$maintopic, bbox: $bbox, limit: $limit, fromDate: $fromDate, toDate: $toDate, pipelinekeys: $pipelinekeys, conjunctivetopics:$conjunctivetopics, periodType: $periodType, externalsourceid: $externalsourceid, csv: $csv) {
      ... FortisPopularPlacesView
  }`;
+
+ export const getTranslatedWords = `query TranslateWords($words: [String]!, $fromLanguage: String!, $toLanguage:String!) {
+  translateWords(words: $words, fromLanguage: $fromLanguage, toLanguage: $toLanguage) {
+    ...TranslatedWordsView
+  }
+}`;
  
  export const translateEvent = `query FetchEvent($sentence: String!, $fromLanguage: String!, $toLanguage: String!) {
      

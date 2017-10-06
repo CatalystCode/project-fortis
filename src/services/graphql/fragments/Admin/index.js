@@ -40,11 +40,16 @@ export const site = `fragment SiteView on SiteCollection {
 
 export const topics = `fragment TopicsView on TermCollection {
   edges {
-      topicid
-      name
-      translatedname
-      namelang
-      translatednamelang
+    topicid
+    name
+    translatedname
+    namelang
+    translatednamelang
+    category
+    translations {
+      key
+      value
+    }
   }
 }`;
 

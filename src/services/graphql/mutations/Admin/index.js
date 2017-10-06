@@ -4,6 +4,18 @@ export const editSite = `mutation EditSite($input: EditableSiteSettings!) {
   }
 }`;
 
+export const saveTopics = `mutation SaveTopics($input: MutatedTerms) {
+  addKeywords(input: $input) {
+    ...TopicsView
+  }
+}`;
+
+export const removeTopics = `mutation RemoveTopics($input: MutatedTerms) {
+  removeKeywords(input: $input) {
+    ...TopicsView
+  }
+}`;
+
 export const saveTrustedSources = `mutation SaveTrustedSources($input: SourceListInput!) {
   modifyTrustedSources(input: $input) {
     ...TrustedSourcesView

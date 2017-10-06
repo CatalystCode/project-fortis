@@ -5,6 +5,8 @@ import * as DashboardQueries from '../graphql/queries/Dashboard';
 import { fetchGqlData } from '../shared';
 import request from 'request';
 
+const MESSAGES_ENDPOINT = 'messages';
+
 export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
         zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, csv, 
@@ -132,32 +134,11 @@ export const SERVICES = {
     },
 
     translateSentences(words, fromLanguage, toLanguage, callback) {
-        let query = ` fragment FortisDashboardWords on TranslatedWords {
-                        words {
-                            originalSentence
-                            translatedSentence
-                        }
-                     }
-
-                    query Translate($words: [String]!, $fromLanguage: String!, $toLanguage:String!) {
-                        results: translateWords(words: $words, fromLanguage: $fromLanguage, toLanguage:$toLanguage) {
-                            ...FortisDashboardWords
-                        }
-                    }`;
-
-        let variables = { words, fromLanguage, toLanguage };
-
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/messages`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+      const query = `${DashboardFragments.translatedWordsFragment}${DashboardQueries.getTranslatedWords}`;
+      const variables = { words, fromLanguage, toLanguage };
+      fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
     },
+
     translateSentence(sentence, fromLanguage, toLanguage, callback) {
         let query = `${DashboardFragments.translationEventFragment}
                      ${DashboardQueries.translateEvent}

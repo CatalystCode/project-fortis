@@ -70,9 +70,21 @@ export const SERVICES = {
     },
 
     fetchTopics(translationLanguage, callback) {
-        const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
-        const variables = { translationLanguage };
-        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+      const query = `${AdminFragments.topics}${AdminQueries.getTopics}`;
+      const variables = { translationLanguage };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    saveTopics(topics, callback) {
+      const query = `${AdminFragments.topics}${AdminMutations.saveTopics}`;
+      const variables = { input: { edges: topics } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    removeTopics(topics, callback) {
+      const query = `${AdminFragments.topics}${AdminMutations.removeTopics}`;
+      const variables = { input: { edges: topics } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     fetchTwitterAccounts(callback) {

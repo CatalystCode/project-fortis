@@ -31,6 +31,13 @@ export const topSourcesFragment = `fragment FortisTopSourcesView on TopSourcesCo
         }
     }`;
 
+export const translatedWordsFragment = `fragment TranslatedWordsView on TranslatedWords {
+  words {
+    originalSentence
+    translatedSentence
+  }
+}`;
+
 export const translationEventFragment = `fragment TranslationView on TranslationResult{
     translatedSentence
 }`;

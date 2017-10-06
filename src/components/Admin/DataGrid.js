@@ -1,169 +1,173 @@
-import {SERVICES} from '../../services/Dashboard';
+import { SERVICES } from '../../services/Dashboard';
 import ReactDataGrid from 'react-data-grid';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import moment from 'moment';
 // eslint-disable-next-line
-import {guid} from '../../utils/Utils.js';
+import { guid } from '../../utils/Utils.js';
 
-const { Toolbar } = require('react-data-grid-addons');
+const { Toolbar, Data: { Selectors } } = require('react-data-grid-addons');
 const STATE_ACTIONS = {
-    SAVED: "saved",
-    SAVING: "saving",
-    MODIFIED: "changed",
-    TRANSLATED: "translated",
-    TRANSLATING: "translating"
+  SAVED: "saved",
+  SAVING: "saving",
+  MODIFIED: "changed",
+  TRANSLATED: "translated",
+  TRANSLATING: "translating"
 };
 
 const FluxMixin = Fluxxor.FluxMixin(React), StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 const RowRenderer = createReactClass({
-    getRowStyle: function() {
-        return {
-            color: this.getRowBackground()
-        }
-    },
-    getRowBackground: function() {
-        const modifiedRows = this.props.modifiedRows;
-
-        return modifiedRows.has(this.props.row[this.props.rowKey]) ? 'green' : '#000'
-    },
-    render: function() {
-        return (<div style={this.getRowStyle()}><ReactDataGrid.Row forceUpdate={true} {...this.props}/></div>)
+  getRowStyle: function() {
+    return {
+      color: this.getRowBackground()
     }
+  },
+  getRowBackground: function() {
+    const modifiedRows = this.props.modifiedRows;
+
+    return modifiedRows.has(this.props.row[this.props.rowKey]) ? 'green' : '#000'
+  },
+  render: function() {
+    return (<div style={this.getRowStyle()}><ReactDataGrid.Row forceUpdate={true} {...this.props}/></div>)
+  }
 });
 
 const styles = {
-    rowSelectionLabel: {
-        marginLeft: '8px',
-        marginRight: '8px'
-    },
-    actionButton: {
-        marginLeft: '5px'
-    }
+  rowSelectionLabel: {
+    marginLeft: '8px',
+    marginRight: '8px'
+  },
+  actionButton: {
+    marginLeft: '5px'
+  }
 }
 export const DataGrid = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
-  getInitialState(){
-        return{
-            rows :[],
-            filters : {},
-            localAction: false,
-            modifiedRows: new Set(),
-            sortDirection: 1,
-            selectedRowKeys: [],
-            coordinates: {}
-        }
+  getInitialState() {
+    return {
+      rows : [],
+      filters : {},
+      localAction: false,
+      modifiedRows: new Set(),
+      sortDirection: 'NONE',
+      selectedRowKeys: [],
+      coordinates: {}
+    }
   },
   getStateFromFlux() {
-        return this.getFlux().store("AdminStore").getState();
+    return this.getFlux().store("AdminStore").getState();
   },
-  componentDidMount(){
-      const rows = this.props.rows;
-      document.body.addEventListener('paste', this.handlePaste);
-      this.setState({rows: rows, selectedRowKeys: []});
+  componentDidMount() {
+    document.body.addEventListener('paste', this.handlePaste);
   },
-  setStateAsSaving(){
-      this.setState({localAction: STATE_ACTIONS.SAVING, selectedRowKeys: [], filters: {}});
+  setStateAsSaving() {
+    this.setState({localAction: STATE_ACTIONS.SAVING, selectedRowKeys: [], filters: {}});
   },
-  componentWillReceiveProps(nextProps){
-      let selectedRowKeys = this.state.selectedRowKeys;
-      let modifiedRows = this.state.modifiedRows;
-      let localAction = this.state.localAction;
-      let filters = this.state.filters;
-      const rowsToRemove = nextProps.rowsToRemove;
-      const rowsToMerge = nextProps.rowsToMerge;
-      let state = this.getFlux().store("AdminStore").getState();
-      let rows = this.state.rows.length === 0 ? nextProps.rows : this.state.rows;
-      
-      //if the action state === SAVED and the modified rows set has been cleared then mark the state as saved
-      if(state.action === STATE_ACTIONS.SAVED && localAction === STATE_ACTIONS.SAVING){
-          localAction = STATE_ACTIONS.SAVED;
-          rows = nextProps.rows;
-      }else{
-          //if the parent component marks rows to be selected
-          if(nextProps.selectedRowKeys){
-             //merge the requested row keys as selected
-            selectedRowKeys = Array.from(nextProps.selectedRowKeys);
+  componentWillReceiveProps(nextProps) {
+    let selectedRowKeys = this.state.selectedRowKeys;
+    let modifiedRows = this.state.modifiedRows;
+    let localAction = this.state.localAction;
+    let filters = this.state.filters;
+    const rowsToRemove = nextProps.rowsToRemove;
+    const rowsToMerge = nextProps.rowsToMerge;
+    let state = this.getFlux().store("AdminStore").getState();
+    let rows = this.state.rows.length === 0 ? nextProps.rows : this.state.rows;
+    
+    //if the action state === SAVED and the modified rows set has been cleared then mark the state as saved
+    if(state.action === STATE_ACTIONS.SAVED && localAction === STATE_ACTIONS.SAVING){
+        localAction = STATE_ACTIONS.SAVED;
+        rows = nextProps.rows;
+    }else{
+        //if the parent component marks rows to be selected
+        if(nextProps.selectedRowKeys){
+            //merge the requested row keys as selected
+          selectedRowKeys = Array.from(nextProps.selectedRowKeys);
+        }
+
+        //if the parent component marks rows to be discarded
+        if(rowsToRemove && rowsToRemove.length > 0){
+              rowsToRemove.forEach(rowKey=>{
+                  let rowIndex = this.lookupRowIdByKey(rowKey);
+                  if(rowIndex > -1){
+                      rows.splice(rowIndex, 1);
+                      modifiedRows.delete(rowKey);
+                  }
+              });
           }
 
-          //if the parent component marks rows to be discarded
-          if(rowsToRemove && rowsToRemove.length > 0){
-                rowsToRemove.forEach(rowKey=>{
-                    let rowIndex = this.lookupRowIdByKey(rowKey);
-                    if(rowIndex > -1){
-                        rows.splice(rowIndex, 1);
-                        modifiedRows.delete(rowKey);
-                    }
-                });
-           }
+          //if there's rows which the parent component would like to merge onto the grid
+          if(rowsToMerge && rowsToMerge.length > 0){
+              //grab a list of new row keys to add to the grid
+              const existingRowKeys = rows.map(row=>row[this.props.rowKey]);
+              const newRowKeys = rowsToMerge.map(row=>row[this.props.rowKey]);
+              //make sure the row is not added as a dupe.
+              const rowsToAdd = rowsToMerge.filter(row=>existingRowKeys.indexOf(row[this.props.rowKey]) === -1);
+              //merge the new rows with the existing rows
+              rows = rowsToAdd.concat(rows);
+              //mark the newly added rows as modified
+              modifiedRows = new Set(Array.from(modifiedRows).concat(Array.from(newRowKeys)));
+          }
 
-           //if there's rows which the parent component would like to merge onto the grid
-           if(rowsToMerge && rowsToMerge.length > 0){
-                //grab a list of new row keys to add to the grid
-                const existingRowKeys = rows.map(row=>row[this.props.rowKey]);
-                const newRowKeys = rowsToMerge.map(row=>row[this.props.rowKey]);
-                //make sure the row is not added as a dupe.
-                const rowsToAdd = rowsToMerge.filter(row=>existingRowKeys.indexOf(row[this.props.rowKey]) === -1);
-                //merge the new rows with the existing rows
-                rows = rowsToAdd.concat(rows);
-                //mark the newly added rows as modified
-                modifiedRows = new Set(Array.from(modifiedRows).concat(Array.from(newRowKeys)));
-           }
-
-           //mark the state of the grid as MODIFIED if the modified rowset isnt empty
-           if(modifiedRows.size > 0){
-               localAction = STATE_ACTIONS.MODIFIED;
-           }
+          //mark the state of the grid as MODIFIED if the modified rowset isnt empty
+          if(modifiedRows.size > 0){
+              localAction = STATE_ACTIONS.MODIFIED;
+          }
+    }
+    
+    this.setState({rows, localAction, selectedRowKeys, modifiedRows, filters});
+  },
+  lookupRowIdByKey(rowKey) {
+    let targetRowId = -1;
+    this.state.rows.forEach((row, index)=>{
+      if(row[this.props.rowKey] === rowKey) {
+          targetRowId = index;
       }
-      
-      this.setState({rows, localAction, selectedRowKeys, modifiedRows, filters});
-  },
-  lookupRowIdByKey(rowKey){
-      let targetRowId = -1;
-      this.state.rows.forEach((row, index)=>{
-          if(row[this.props.rowKey] === rowKey){
-              targetRowId = index;
-          }
-      });
+    });
 
-      return targetRowId;
+    return targetRowId;
   },
   onCellSelected(coordinates) {
-        this.setState({selectedRow: coordinates.rowIdx, selectedColumn: coordinates.idx - 1});
+    this.setState({selectedRow: coordinates.rowIdx, selectedColumn: coordinates.idx - 1});
   },
   removeSelectedRows(){
-      //grab the rowKeys for all selected rows
-      const selectedRows = this.state.rows.filter(row=>this.state.selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
-                                          .map(row=>{
-                                                    delete row.isSelected;
+    //grab the rowKeys for all selected rows
+    const selectedRows = this.state.rows.filter(row=>this.state.selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
+                                        .map(row=>{
+                                                  delete row.isSelected;
 
-                                                    return row;
-                                           });
-      
-      //remove any selected rows that were marked as modified
-      let modifiedRows = new Set(Array.from(this.state.modifiedRows).filter(rowKey => this.state.selectedRowKeys.indexOf(rowKey) === -1));
-      this.setState({filters: {}, localAction: STATE_ACTIONS.SAVING, modifiedRows: modifiedRows});
-      this.props.handleRemove(selectedRows);
+                                                  return row;
+                                          });
+    
+    //remove any selected rows that were marked as modified
+    let modifiedRows = new Set(Array.from(this.state.modifiedRows).filter(rowKey => this.state.selectedRowKeys.indexOf(rowKey) === -1));
+    const selectedRowKeys = [];
+    this.setState({filters: {}, localAction: STATE_ACTIONS.SAVING, modifiedRows: modifiedRows, selectedRowKeys});
+    this.props.handleRemove(selectedRows);
+  },
+  getRows() {
+    return Selectors.getRows(this.state);
   },
   getSize() {
-      return this.state.rows.length;
+      //return this.state.rows.length;
+      return Selectors.getRows(this.state).length;
   },
   handleAddRow(e){
-      let newRow = {}, rows = this.state.rows || [];
+    let newRow = {}, rows = this.state.rows || [];
 
-      this.props.columns.forEach(column=>{
-          newRow[column.key] = "";
-      });
+    this.props.columns.forEach(column=>{
+      newRow[column.key] = "";
+    });
 
-      if(this.props.guidAutofillColumn){
-           newRow[this.props.guidAutofillColumn] = guid();
-      }
+    if(this.props.guidAutofillColumn) {
+      newRow[this.props.guidAutofillColumn] = guid();
+    }
 
-      rows.unshift(newRow);
-      this.setState({rows});
+    rows.push(newRow);
+    
+    this.setState({rows});
   },
-handleGridRowsUpdated(updatedRowData) {
+  handleGridRowsUpdated(updatedRowData) {
       let rows = this.state.rows;
       const localAction = STATE_ACTIONS.MODIFIED;
       let modifiedRows = this.state.modifiedRows;
@@ -187,7 +191,7 @@ handleGridRowsUpdated(updatedRowData) {
                           }
                           
                           modifiedRows.delete(rowKey);
-                          this.setState({ modifiedRows, localAction, rows });
+                          this.setState({ modifiedRows, localAction, rows});
                       });
                   }
               }
@@ -199,35 +203,20 @@ handleGridRowsUpdated(updatedRowData) {
 
       this.setState({modifiedRows, localAction, rows});
   },
-  rowGetter(rowIdx){
-    return this.state.rows[rowIdx] || {};
+  rowGetter(index) {
+    return Selectors.getRows(this.state)[index];
   },
-  onClearFilters(){
+
+  isEmptyObject(obj) {
+    return Object.getOwnPropertyNames(obj).length === 0;
+  },
+  onClearFilters() {
     this.setState({filters: {} });
   },
   handleGridSort(sortColumn, sortDirection) {
-    const rows = this.state.rows.sort((a, b) => {
-        let aLower = a[sortColumn];
-        let bLower = b[sortColumn];
-
-        if(typeof (aLower) === "string")
-        {
-         aLower = aLower.toLowerCase();
-         bLower = bLower.toLowerCase();
-        }
-
-        if (aLower < bLower){
-            return -1;
-        }else if (aLower > bLower){
-            return  1;
-        }else{
-            return 0;
-        }
-    });
-
-    this.setState({rows: rows});
+    this.setState({sortColumn, sortDirection});
   },
-  handlePaste(e){
+  handlePaste(e) {
       const pastedText = e.clipboardData.getData('text/plain');
       let currentRow = this.state.selectedRow;
       let currentColumn = this.state.selectedColumn;
@@ -236,9 +225,9 @@ handleGridRowsUpdated(updatedRowData) {
       const activeColumn = currentColumn > -1 ? this.props.columns[currentColumn] : undefined;
 
       if(pastedText && currentColumn  > -1 && activeColumn.key !== (this.props.guidAutofillColumn || "")){
-          const pastedRows = pastedText.split("\n");
+          const pastedRows = pastedText.split("\n").filter(x => x);
           pastedRows.forEach(pastedRow => {
-              const columnData = pastedRow.split("\t");
+              const columnData = pastedRow.split("\t").filter(x => x);
               currentColumn = this.state.selectedColumn;
               let rowData = currentRow < rows.length ? rows[currentRow] : {};
               if(this.props.guidAutofillColumn && !rowData[this.props.guidAutofillColumn]){
@@ -347,54 +336,79 @@ handleGridRowsUpdated(updatedRowData) {
         var rowIndexes = rows.map(r => r.row[this.props.rowKey]);
         this.setState({selectedRowKeys: this.state.selectedRowKeys.filter(i => rowIndexes.indexOf(i) === -1 )});
     },
-    handleFilterChange(filter){
-        let newFilters = Object.assign({}, this.state.filters);
-        
-        if (filter.filterTerm) {
-            newFilters[filter.column.key] = filter;
+    handleFilterChange(filter) {
+      let newFilters = Object.assign({}, this.state.filters);
+      
+      if (filter.filterTerm) {
+        newFilters[filter.column.key] = filter;
+      } else {
+        delete newFilters[filter.column.key];
+      }
+
+      this.setState({filters: newFilters});
+    },
+    translateSelectedRows() {
+      const { sourceField, targetField } = this.props.translatableFields;
+      let selectedRowKeys = this.state.selectedRowKeys;
+      let self = this;
+      let modifiedRows = this.state.modifiedRows;
+      this.setState({localAction: STATE_ACTIONS.TRANSLATING});
+      let phrasesToTranslate = this.state.rows.filter(row=>selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
+                                                .map(row=>row[sourceField.key]);
+      
+      phrasesToTranslate = this.removeUnsetPhrasesToTranslate(phrasesToTranslate);
+
+      SERVICES.translateSentences(phrasesToTranslate, sourceField.language, targetField.language, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          const translationMap = new Map();
+
+          if (body && body.data && body.data.translateWords && body.data.translateWords.words && body.data.translateWords.words.length) {
+            body.data.translateWords.words.forEach(translatedPhrase=>{
+                translationMap.set(translatedPhrase.originalSentence, translatedPhrase.translatedSentence);
+            });
+          }
+
+          const mutatedRows = this.state.rows.map(row => {
+            const translatedPhrase = translationMap.get(row[sourceField.key]);
+            if (translatedPhrase) {
+                row[targetField.key] = translatedPhrase;
+                modifiedRows.add(row[self.props.rowKey])
+                selectedRowKeys.splice(selectedRowKeys.indexOf(row[self.props.rowKey]), 1);
+            }
+            return row;
+          });
+
+          self.setState({
+            modifiedRows: modifiedRows, 
+            localAction: STATE_ACTIONS.TRANSLATED, 
+            rows: mutatedRows, 
+            selectedRowKeys: selectedRowKeys
+          });
         } else {
-            delete newFilters[filter.column.key];
+          console.error(`[${error}] occured while processing translation request`);
         }
-
-        this.setState({filters: newFilters});
+      });
     },
-    translateSelectedRows(){
-        const {sourceField, targetField} = this.props.translatableFields;
-        let selectedRowKeys = this.state.selectedRowKeys;
-        let self = this;
-        let modifiedRows = this.state.modifiedRows;
-        this.setState({localAction: STATE_ACTIONS.TRANSLATING});
-        const phrasesToTranslate = this.state.rows.filter(row=>selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
-                                                  .map(row=>row[sourceField.key]);
 
-        SERVICES.translateSentences(phrasesToTranslate, sourceField.language, targetField.language, (error, response, body) => {
-                if(!error && response.statusCode === 200) {
-                    const translationMap = new Map();
-                    body.data.results.words.forEach(translatedPhrase=>{
-                        translationMap.set(translatedPhrase.originalSentence, translatedPhrase.translatedSentence);
-                    });
-
-                    const mutatedRows = this.state.rows.map(row=>{
-                        const translatedPhrase = translationMap.get(row[sourceField.key]);
-                        if(translatedPhrase){
-                            row[targetField.key] = translatedPhrase;
-                            modifiedRows.add(row[self.props.rowKey])
-                            selectedRowKeys.splice(selectedRowKeys.indexOf(row[self.props.rowKey]), 1);
-                        }
-
-                        return row;
-                    });
-
-                    self.setState({modifiedRows: modifiedRows, localAction: STATE_ACTIONS.TRANSLATED, rows: mutatedRows, selectedRowKeys: selectedRowKeys});
-                }else{
-                    console.error(`[${error}] occured while processing translation request`);
-                }
-         });
+    removeUnsetPhrasesToTranslate(phrases) {
+      return phrases.filter(phrases => phrases);
     },
+
     getValidFilterValues(columnId) {
-        let values = this.state.rows.map(r => r[columnId]);
-        return values.filter((item, i, a) => { return i === a.indexOf(item); });
+      let values = this.state.rows.map(r => r[columnId]);
+      return values.filter((item, i, a) => { return i === a.indexOf(item); });
     },
+
+    hasPhrasesToTranslate() {
+      const { sourceField } = this.props.translatableFields;
+      const selectedRowKeys = this.state.selectedRowKeys;
+      const phrasesToTranslate = this.state.rows.filter(row => selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
+                                                .map(row => row[sourceField.key])
+                                                .filter(row => row.length > 0);
+      if (phrasesToTranslate.length > 0) return true;
+      else return false;
+    },
+
     render() {
         let rowText = this.state.selectedRowKeys.length === 1 ? 'row' : 'rows';
         let toolBarProps = {};
@@ -438,11 +452,11 @@ handleGridRowsUpdated(updatedRowData) {
                    : undefined
             }
             {
-                this.state.selectedRowKeys.length > 0 && this.props.translatableFields && (this.state.localAction !== STATE_ACTIONS.TRANSLATED || this.state.localAction !== STATE_ACTIONS.TRANSLATING) ? 
-                       <button style={styles.actionButton} onClick={this.translateSelectedRows} type="button" className="btn btn-default btn-sm">
-                             <i className="fa fa-language" aria-hidden="true"></i> Translate Selection(s)
-                       </button>
-                   : undefined
+              this.hasPhrasesToTranslate() ? 
+                <button style={styles.actionButton} onClick={this.translateSelectedRows} type="button" className="btn btn-default btn-sm">
+                  <i className="fa fa-language" aria-hidden="true"></i> Translate Selection(s)
+                </button>
+              : undefined
             }
             <span style={styles.rowSelectionLabel}>{this.state.selectedRowKeys.length} {rowText} selected</span>
             <ReactDataGrid
@@ -457,6 +471,7 @@ handleGridRowsUpdated(updatedRowData) {
                   onGridRowsUpdated={this.handleGridRowsUpdated}
                   toolbar={<Toolbar enableFilter={true} {...toolBarProps}/>}
                   getValidFilterValues={this.getValidFilterValues}
+                  onAddFilter={this.handleFilterChange}
                   rowsCount={this.getSize()}
                   onClearFilters={this.onClearFilters}
                   rowSelection={{
