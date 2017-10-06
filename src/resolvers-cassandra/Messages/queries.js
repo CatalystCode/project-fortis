@@ -21,7 +21,7 @@ function eventToFeature(row) {
       sourceeventid: row.sourceeventid,
       places: row.computedfeatures.places.map(place => place.placeid),
       entities: row.computedfeatures && row.computedfeatures.entities ? row.computedfeatures.entities.map(entity => entity.name) : [],
-      eventtime: row.eventtime,
+      eventtime: row.eventtime.getTime(),
       sentiment: row.computedfeatures && row.computedfeatures.sentiment ? row.computedfeatures.sentiment.neg_avg : -1,
       title: row.title,
       fullText: row.body,

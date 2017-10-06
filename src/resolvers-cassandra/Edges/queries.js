@@ -172,6 +172,10 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
     getTermsByCategory(null, args.category)
       .then(terms => {
 
+        if(!terms.edges.length){
+          return resolve({edges: []});
+        }
+        
         const query = `
           SELECT mentioncount, conjunctiontopic1, avgsentimentnumerator
           FROM fortis.populartopics
