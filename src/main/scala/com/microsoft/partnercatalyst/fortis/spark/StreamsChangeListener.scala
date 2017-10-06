@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark
 
 import java.time.{Duration, Instant}
-import java.util.concurrent.{CompletableFuture, Executors, ScheduledFuture, TimeUnit}
+import java.util.concurrent._
 
 import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
@@ -60,7 +60,7 @@ object StreamsChangeListener {
   private[spark] class CommandMessageHandler(settings: FortisSettings) extends IMessageHandler with Loggable {
 
     private val initializedAt = Instant.now()
-    private val scheduler = Executors.newScheduledThreadPool(1)
+    private val scheduler = Executors.newScheduledThreadPool(2)
     private var scheduledTask : Option[ScheduledFuture[_]] = None
     var currentContext: Option[StreamingContext] = None
 
@@ -69,33 +69,33 @@ object StreamsChangeListener {
     }
 
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      logInfo(s"Service Bus message received ${message}.")
+      System.err.println(s"Service Bus message received ${message}.")
 
       if (message.getEnqueuedTimeUtc.isBefore(this.initializedAt)) {
-        logInfo(s"Service Bus message ignored since it predates listener initialization.")
+        System.err.println(s"Service Bus message ignored since it predates listener initialization.")
         return CompletableFuture.completedFuture(null)
       }
 
       this.scheduledTask match {
         case Some(task) => {
-          logInfo(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.sscShutdownDelayMillis} milliseconds from now.")
+          System.err.println(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.sscShutdownDelayMillis} milliseconds from now.")
           task.cancel(false)
         }
         case None => {
-          logInfo(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.sscShutdownDelayMillis} milliseconds.")
+          System.err.println(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.sscShutdownDelayMillis} milliseconds.")
         }
       }
 
       this.currentContext match {
         case Some(context) => {
           this.scheduledTask = Some(this.scheduler.schedule(
-            new ContextStopRunnable(settings, context),
+            new ContextStopRunnable(settings, context, scheduler),
             settings.sscShutdownDelayMillis,
             TimeUnit.MILLISECONDS
           ))
         }
         case None => {
-          logError(s"No streaming context set; Nothing to stop.")
+          System.err.println(s"No streaming context set; Nothing to stop.")
         }
       }
 
@@ -103,15 +103,27 @@ object StreamsChangeListener {
     }
   }
 
-  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext) extends Runnable with Loggable {
+  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ExecutorService) extends Runnable with Loggable {
     override def run(): Unit = {
       StreamsChangeListener.suggestedExitCode = 10
-      logInfo(s"Requesting streaming context stop now.")
-      ssc.stop(stopSparkContext = true, stopGracefully = false)
-      logInfo(s"Streaming context stop complete; Cleaning up...")
-      if (!settings.progressDir.isEmpty) {
-        Path(settings.progressDir).deleteRecursively()
+      System.err.println(s"Requesting streaming context stop now.")
+      val timeoutTask = scheduler.submit(new TimeoutRunnable)
+      try {
+        ssc.stop(stopSparkContext = true, stopGracefully = false)
+        timeoutTask.cancel(false)
+        System.err.println(s"Streaming context stop complete; Cleaning up...")
+        if (!settings.progressDir.isEmpty) {
+          Path(settings.progressDir).deleteRecursively()
+        }
+      } catch {
+        case e => e.printStackTrace(System.err)
       }
+    }
+  }
+
+  private[spark] class TimeoutRunnable extends Runnable {
+    override def run(): Unit = {
+      System.exit(StreamsChangeListener.suggestedExitCode)
     }
   }
 
