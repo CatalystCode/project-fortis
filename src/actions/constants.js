@@ -7,7 +7,9 @@ module.exports = {
     MAP: {
         MINZOOM: 8,
         MAXZOOM: 8,
-        DEBOUNCE: 3000
+        DEBOUNCE: 3000,
+        MAPBOX_ACCESS_TOKEN: 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg',
+        TILE_LAYER_URL: 'https://api.mapbox.com/styles/v1/erikschlegel/cj82h6wyt9rel2st658r6teto/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg'
     },
     TIMESPAN_TYPES : {
          'hour': {

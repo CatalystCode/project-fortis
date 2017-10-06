@@ -190,51 +190,6 @@ export const SERVICES = {
 
         request(POST, callback);
     },
-
-    saveLocations(site, edges, callback) {
-        const query = `${""}//locationEdgeFragment}
-                        mutation SaveLocations($input: EdgeLocations!) {
-                            saveLocations(input: $input) {
-                                ...FortisDashboardLocationEdges
-                            }
-                        }`;
-
-        const variables = { input: { site, edges } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/edges`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-
-    removeLocations(site, edges, callback) {
-        const query = `${""}//locationEdgeFragment}
-                        mutation removeLocations($input: EdgeLocations!) {
-                            removeLocations(input: $input) {
-                                ...FortisDashboardLocationEdges
-                            }
-                        }`;
-
-        const variables = { input: { site, edges } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/edges`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-
     editSite(site, callback) {
         const query = `mutation EditSite($input: EditableSiteSettings!) {
           editSite(input: $input) {

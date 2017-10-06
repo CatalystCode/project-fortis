@@ -82,6 +82,7 @@
     "react-infinite": "^0.10.0",
     "react-konva": "^1.1.1",
     "react-leaflet": "^1.6.5",
+    "react-leaflet-draw": "^0.16.0",
     "react-leaflet-markercluster": "^1.1.6",
     "react-list-view": "^1.0.0",
     "react-progress-bar-plus": "^1.2.0",

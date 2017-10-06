@@ -10,7 +10,7 @@ import { TrustedSources } from './TrustedSources';
 import { BlacklistEditor } from './BlacklistEditor';
 import { StreamEditor } from './StreamEditor';
 import { AdminTwitterAccounts } from './AdminTwitterAccounts';
-import { AdminLocations } from './AdminLocations';
+import AdminLocations from './AdminLocations';
 import '../../styles/Admin/Admin.css'
 
 const FluxMixin = Fluxxor.FluxMixin(React);
@@ -97,7 +97,7 @@ export const Admin = createReactClass({
                       <div className="adminTable">
                         {
                           this.state.settings && this.state.settings.properties && this.state.watchlist && this.state.index === WATCHLIST_TAB ?
-                          <AdminWatchlist {...this.props}/>
+                          <AdminWatchlist {...this.props} />
                           : undefined
                         }
                       </div>
@@ -107,7 +107,9 @@ export const Admin = createReactClass({
                     <div className="adminTable">
                       {
                         this.state.settings && this.state.settings.properties && this.state.locations && this.state.index === LOCATIONS_TAB ?
-                        <AdminLocations {...this.props} rows={ Array.from(this.state.locations.values())} />
+                        <AdminLocations name={this.state.settings.name}
+                                        {...this.props} 
+                                        {...this.state.settings.properties} />
                         : undefined
                       }
                     </div>

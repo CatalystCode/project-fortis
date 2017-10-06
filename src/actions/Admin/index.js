@@ -124,7 +124,7 @@ const methods = {
     save_settings(settings) {
       const self = this;
 
-      AdminServices.modifySite(settings, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      AdminServices.editSite(settings, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse && !error) {
           const action = 'saved';
           self.dispatch(constants.ADMIN.SAVE_SITE_SETTINGS, {settings: settings, action: action});
@@ -261,7 +261,7 @@ const methods = {
             }
         });
     },
-    save_keywords: function(siteId, modifiedKeywords){
+    save_keywords(siteId, modifiedKeywords){
         const self = this;
         AdminServices.saveKeywords(siteId, modifiedKeywords, (error, response, body) => {
             if(!error && response.statusCode === 200) {
@@ -274,7 +274,7 @@ const methods = {
         });
     },
 
-    publish_events: function(events){
+    publish_events(events){
         AdminServices.publishCustomEvents(events, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
             let action = 'saved';
             const self = this;
@@ -285,142 +285,6 @@ const methods = {
                 action = 'failed';
                 console.error(`[${error}] occured while processing message request`);
                 self.dispatch(constants.ADMIN.PUBLISHED_EVENTS, {action});
-            }
-        }));
-    },
-
-    load_fb_pages: function(siteId) {
-        const self = this;
-        const days = 30;
-
-        AdminServices.getAdminFbPages(siteId, days, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-            let action = false;
-            if (graphqlResponse && !error) {
-                const { pages, analytics } = graphqlResponse;
-
-                pages.pages.forEach(page => {
-                    for(var i = 0;i < analytics.analytics.length; i++) {
-                        if (page.pageUrl === analytics.analytics[i].Name) {
-                            page.Count = analytics.analytics[i].Count;
-                            page.LastUpdated = analytics.analytics[i].LastUpdated;
-                            break;
-                        }
-                        page.Count = 0;
-                    }
-                });
-
-                self.dispatch(constants.ADMIN.LOAD_FB_PAGES, {action, pages});
-            }else{
-                action = 'failed';
-                console.error(`[${error}] occured while processing FB pages request`);
-                self.dispatch(constants.ADMIN.LOAD_FB_PAGES, {action});
-            }
-        }));
-    },
-    load_trusted_twitter_accts: function(siteId) {
-        const self = this;
-
-        AdminServices.getTrustedTwitterAccounts(siteId, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-            let action = false;
-            if (graphqlResponse && !error) {
-                const { accounts } = graphqlResponse;
-                self.dispatch(constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, {action, accounts});
-            }else{
-                action = 'failed';
-                console.error(`[${error}] occured while processing Trusted Twitter Accounts request`);
-                self.dispatch(constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, {action});
-            }
-        }));
-    },
-    load_places_inside_bbox: function(siteId, bbox) {
-        const self = this;
-
-        AdminServices.getPlacesByBBox(siteId, bbox, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-            let action = false;
-            if (graphqlResponse && !error) {
-                const { features } = graphqlResponse;
-                self.dispatch(constants.ADMIN.LOAD_PLACES, {action, features});
-            }else{
-                action = 'failed';
-                console.error(`[${error}] occured while processing FB pages request`);
-                self.dispatch(constants.ADMIN.LOAD_PLACES, {action});
-            }
-        }));
-    },
-    remove_fb_pages: function(siteId, pages){
-        const self = this;
-        AdminServices.removeFbPages(siteId, pages, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
-            let action = false;
-
-            if (graphqlResponse && !gError) {
-                const { pages } = graphqlResponse;
-                action = "saved";
-                self.dispatch(constants.ADMIN.LOAD_FB_PAGES, {action, pages});
-            }else{
-                action = 'failed';
-                console.error(`[${gError}] occured while processing FB pages request`);
-                self.dispatch(constants.ADMIN.LOAD_FB_PAGES, {action});
-            }
-        }));
-    },
-
-    remove_trusted_twitter_accts: function(siteId, accounts){
-        const self = this;
-        AdminServices.removeTrustedTwitterAccts(siteId, accounts, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
-            let action = false;
-
-            if (graphqlResponse && !gError) {
-                const { accounts } = graphqlResponse;
-                action = "saved";
-                self.dispatch(constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, {action, accounts});
-            }else{
-                action = 'failed';
-                console.error(`[${gError}] occured while processing Trusted Twitter Accounts request`);
-                self.dispatch(constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, {action});
-            }
-        }));
-    },
-
-    save_fb_pages: function(siteId, pages){
-        const self = this;
-
-        // Only add the RowKey and pageUrl in the Azure Table Storage
-        let filteredInput = [];
-        pages.forEach(page => {
-            let filteredPage = {};
-            filteredPage.RowKey = page.RowKey;
-            filteredPage.pageUrl = page.pageUrl;
-            filteredInput.push(filteredPage);
-        });
-
-        AdminServices.saveFbPages(siteId, filteredInput, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
-            let action = false;
-
-            if (graphqlResponse && !gError) {
-                const { pages } = graphqlResponse;
-                action = "saved";
-                self.dispatch(constants.ADMIN.LOAD_FB_PAGES, {action, pages});
-            }else{
-                action = 'failed';
-                console.error(`[${gError}] occured while processing FB pages request`);
-                self.dispatch(constants.ADMIN.LOAD_FB_PAGES, {action});
-            }
-        }));
-    },
-
-    save_trusted_twitter_accts: function(siteId, accounts){
-        const self = this;
-        AdminServices.saveTrustedTwitterAccts(siteId, accounts, (error, response, body) => ResponseHandler(error, response, body, (gError, graphqlResponse) => {
-            let action = false;
-
-            if (graphqlResponse && !gError) {
-                const { accounts } = graphqlResponse;
-                action = "saved";
-                self.dispatch(constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, {action, accounts});
-            }else{
-                action = 'failed';
-                console.error(`[${gError}] occured while processing Trusted Twitter Accounts request`);
-                self.dispatch(constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, {action});
             }
         }));
     }

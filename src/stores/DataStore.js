@@ -128,13 +128,13 @@ export const DataStore = Fluxxor.createStore({
             
             const timeseriesMap = makeMap(graphData, item=>item.date, item=>{
                 // eslint-disable-next-line
-                let timeSeriesEntry = {date: moment.utc(new Number(item.date)).format(dateFormat)};
+                let timeSeriesEntry = {date: moment(new Number(item.date)).format(dateFormat)};
                 timeSeriesEntry[item.name] = item.mentions;
 
                 return timeSeriesEntry;
             });
 
-            let sorted = Array.from(timeseriesMap.values()).sort((a, b)=>moment.utc(a.date).diff(moment.utc(b.date)));
+            let sorted = Array.from(timeseriesMap.values()).sort((a, b)=>moment(a.date).diff(moment(b.date)));
             this.dataStore.timeSeriesGraphData.graphData = sorted;
             this.dataStore.heatmapTileIds = tiles;
         }

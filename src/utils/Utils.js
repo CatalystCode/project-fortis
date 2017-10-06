@@ -37,7 +37,8 @@ export function getHumanDate(dateString, dateFormat="YYYY-MM-DD", newDateFormat=
 }
 
 export function getHumanDateFromNow(dateString, dateFormat="MM/DD/YYYY HH:mm:s A") {
-    return moment(dateString).fromNow();
+    // eslint-disable-next-line
+    return moment(new Number(dateString)).fromNow();
 }
 
 // array helpers

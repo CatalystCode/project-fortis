@@ -5,9 +5,7 @@ import React from 'react';
 import { tileFromTileId } from 'geotile';
 import { hasChanged } from '../shared';
 import '../../../styles/Insights/HeatMap.css';
-
-const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg';  // FIXME: should this really be checked in?
-const TILE_LAYER_URL = 'https://api.mapbox.com/styles/v1/erikschlegel/cj82h6wyt9rel2st658r6teto/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg';  // FIXME: should this be configurable?
+import 'leaflet/dist/leaflet.css';
 
 export default class HeatMap extends React.Component {
   constructor(props) {
@@ -130,11 +128,11 @@ export default class HeatMap extends React.Component {
         useFlyTo={true}
         zoomControl={false} >
 
-        <TileLayer url={TILE_LAYER_URL}
+        <TileLayer url={constants.MAP.TILE_LAYER_URL}
           maxZoom={maxzoom}
           minZoom={defaultZoom}
           attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
-          accessToken={MAPBOX_ACCESS_TOKEN} />
+          accessToken={constants.MAP.MAPBOX_ACCESS_TOKEN} />
 
         <ZoomControl
           position={'topright'}
