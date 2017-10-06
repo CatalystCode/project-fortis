@@ -28,7 +28,10 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with
         case None => List()
       },
       sourceurl = Try(item.post.getPermalinkUrl.toString)
-        .getOrElse(s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}"),
+        .getOrElse(
+          Try(item.post.getLink.toString)
+          .getOrElse(s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}")
+        ),
       original = item
     )
   }
