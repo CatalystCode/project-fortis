@@ -31,10 +31,9 @@ class KeywordSummarizer(
 
     val trimmedSentence = sentence.replaceAll("\\s+", " ")
 
-    val keyword = keywords.head
-    val keywordFirstOccurrence = trimmedSentence.toLowerCase().indexOf(keyword.toLowerCase())
+    val keywordFirstOccurrence = indexOfFirstKeywordFound(trimmedSentence.toLowerCase())
     if (keywordFirstOccurrence == -1) {
-      return None
+      return Some(keywords.mkString(" "))
     }
     if (keywordFirstOccurrence < maxLeftCharacters) {
       return Option(trimmedSentence.substring(0, if (trimmedSentence.length > maxLength) maxLength else trimmedSentence.length))
@@ -51,4 +50,15 @@ class KeywordSummarizer(
 
     Option(trimmedSentence.substring(leftIndex + 1, if (leftIndex + maxLength < trimmedSentence.length) leftIndex + maxLength else trimmedSentence.length))
   }
+
+  private def indexOfFirstKeywordFound(sentence: String): Int = {
+    for (k <- keywords) {
+      val index = sentence.indexOf(k.toLowerCase())
+      if (index != -1) {
+        return index
+      }
+    }
+    return -1
+  }
+
 }
