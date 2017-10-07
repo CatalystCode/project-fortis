@@ -3,23 +3,19 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { AdminSettings } from './AdminSettings';
 import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
-import { FacebookPagesEditor } from './FacebookPagesEditor';
 import { TrustedSources } from './TrustedSources';
 import { BlacklistEditor } from './BlacklistEditor';
 import { StreamEditor } from './StreamEditor';
-import { AdminTwitterAccounts } from './AdminTwitterAccounts';
-import { AdminLocations } from './AdminLocations';
+import AdminLocations from './AdminLocations';
 import '../../styles/Admin/Admin.css';
 
 const SETTINGS_TAB = 0;
 const WATCHLIST_TAB = 1;
 const LOCATIONS_TAB = 2;
 const CUSTOM_EVENTS_TAB = 3;
-const FB_PAGES_TAB = 4;
-const TRUSTED_SOURCES = 5;
-const TWITTER_ACCOUNTS_TAB = 6;
-const BLACKLIST_TAB = 7;
-const STREAM_TAB = 8;
+const TRUSTED_SOURCES = 4;
+const BLACKLIST_TAB = 5;
+const STREAM_TAB = 6;
 
 const styles = {
   container: {
@@ -63,9 +59,7 @@ class Admin extends React.Component {
                     <Tab>Watchlist</Tab>
                     <Tab>Geofence / Monitored places</Tab>
                     <Tab>Event Import</Tab>
-                    <Tab>Facebook pages</Tab>
                     <Tab>Trusted Sources</Tab>
-                    <Tab>Twitter API Accounts</Tab>
                     <Tab>Blacklisted Terms</Tab>
                     <Tab>Streams</Tab>
                   </TabList>
@@ -94,8 +88,10 @@ class Admin extends React.Component {
                     <h2>Monitored Places&nbsp; / Geo-Fence<small></small></h2>
                     <div className="adminTable">
                       {
-                        this.props.settings && this.props.settings.properties && this.state.locations && this.state.index === LOCATIONS_TAB ?
-                        <AdminLocations {...this.props} rows={ Array.from(this.state.locations.values())} />
+                        this.props.settings && this.props.settings.properties && this.state.index === LOCATIONS_TAB ?
+                        <AdminLocations name={this.props.settings.name}
+                                         {...this.props} 
+                                         {...this.props.settings.properties} />
                         : undefined
                       }
                     </div>
@@ -110,29 +106,11 @@ class Admin extends React.Component {
                     </div>
                   </TabPanel>
                   <TabPanel>
-                    <h2>Facebook pages</h2>
-                    <div className="adminTable">
-                      {
-                        this.props.settings && this.props.settings.properties && this.state.index === FB_PAGES_TAB ?
-                        <FacebookPagesEditor {...this.props}/> : undefined
-                      }
-                    </div>
-                  </TabPanel>
-                  <TabPanel>
                     <h2>Trusted Sources</h2>
                     <div className="adminTable">
                       {
                         this.props.settings && this.props.settings.properties && this.state.index === TRUSTED_SOURCES ?
                         <TrustedSources {...this.props}/> : undefined
-                      }
-                    </div>
-                  </TabPanel>
-                  <TabPanel>
-                    <h2>Twitter API Accounts</h2>
-                    <div>
-                      {
-                        this.props.settings && this.props.settings.properties && this.state.index === TWITTER_ACCOUNTS_TAB ?
-                        <AdminTwitterAccounts {...this.props}/> : undefined
                       }
                     </div>
                   </TabPanel>
