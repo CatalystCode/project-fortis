@@ -1,5 +1,6 @@
 import React from 'react';
 import { SERVICES } from '../../services/Dashboard';
+import { SERVICES as ADMIN_SERVICES } from '../../services/Admin';
 import '../../styles/Insights/ActivityFeed.css';
 import styles from '../../styles/Insights/ActivityFeed';
 import Infinite from 'react-infinite';
@@ -11,6 +12,20 @@ import DialogBox from '../dialogs/DialogBox';
 import { fetchTermFromMap, innerJoin, hasChanged } from './shared';
 
 const ActivityConsts = constants.ACTIVITY_FEED;
+
+function prettifyExternalSourceIds(elementsMutated, trustedSources) {
+    const externalsourceIdToDisplayName = {};
+    trustedSources.forEach(source => {
+        externalsourceIdToDisplayName[source.externalsourceid] = source.displayname;
+    });
+
+    elementsMutated.forEach(element => {
+        const externalSourceDisplayName = externalsourceIdToDisplayName[element.externalsourceid];
+        if (externalSourceDisplayName) {
+            element.externalsourceid = externalSourceDisplayName;
+        }
+    });
+}
 
 export default class ActivityFeed extends React.Component {
     constructor(props) {
@@ -52,7 +67,18 @@ export default class ActivityFeed extends React.Component {
         const externalsourceid = props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? props.externalsourceid : null;
         const fulltextTerm = "";
 
-        SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, callback);
+        ADMIN_SERVICES.fetchTrustedSources(pipelinekeys, "", (trustedSourcesErr, trustedSourcesResponse, trustedSourcesBody) => {
+            let trustedSources;
+            if (!trustedSourcesErr && trustedSourcesResponse.statusCode === 200 && trustedSourcesBody.data) {
+                trustedSources = trustedSourcesBody.data.trustedSources.sources;
+            } else {
+                trustedSources = [];
+            }
+
+            SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, (sentencesErr, response, body) => {
+                callback(sentencesErr, response, body, trustedSources);
+            });
+        })
     }
 
     renderDataSourceTabs(iconStyle) {
@@ -113,12 +139,13 @@ export default class ActivityFeed extends React.Component {
     buildElements(props, callback) {
         let self = this;
 
-        this.fetchSentences(props, (error, response, body) => {
+        this.fetchSentences(props, (error, response, body, trustedSources) => {
             if (!error && response.statusCode === 200 && body.data) {
                 const { elements, processedEventids } = self.state;
                 const newsFeedPage = body.data.messages ? body.data.messages.features.filter(feature => feature.properties.summary && feature.properties.summary.length && !processedEventids.has(feature.properties.messageid)).map(this.parseEvent) : [];
-                
+
                 const elementsMutated = elements.concat(newsFeedPage);
+                prettifyExternalSourceIds(elementsMutated, trustedSources);
                 const pageStateMutated = body.data.messages ? body.data.messages.pageState || null : null;
                 const processedEventIdsMutated= new Set(Array.from(processedEventids).concat(newsFeedPage.map(msg=>msg.messageid)));
 
