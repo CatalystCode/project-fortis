@@ -103,11 +103,11 @@ object StreamsChangeListener {
     }
   }
 
-  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ExecutorService) extends Runnable with Loggable {
+  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ScheduledExecutorService) extends Runnable with Loggable {
     override def run(): Unit = {
       StreamsChangeListener.suggestedExitCode = 10
       System.err.println(s"Requesting streaming context stop now.")
-      val timeoutTask = scheduler.submit(new TimeoutRunnable)
+      val timeoutTask = scheduler.schedule(new TimeoutRunnable(), 30L, TimeUnit.SECONDS)
       try {
         ssc.stop(stopSparkContext = true, stopGracefully = false)
         timeoutTask.cancel(false)
