@@ -19,6 +19,8 @@ module.exports = {
   removeBlacklist: mutations.removeBlacklist,
   removeKeywords: mutations.removeKeywords,
   addKeywords: mutations.addKeywords,
+  addTrustedSources: mutations.addTrustedSources,
+  removeTrustedSources: mutations.removeTrustedSources,
 
   siteTerms: queries.siteTerms,
   sites: queries.sites,

@@ -30,6 +30,8 @@ module.exports = graphql.buildSchema(`
     removeTrustedTwitterAccounts(input: TrustedTwitterAccountDefintion!): TrustedTwitterAccountCollection
     modifyBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
     removeBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
+    addTrustedSources(input: SourceListInput): SourceCollection
+    removeTrustedSources(input: SourceListInput): SourceCollection
   }
 
   type SiteProperties {
@@ -84,12 +86,28 @@ module.exports = graphql.buildSchema(`
     sources: [Source]!
   }
 
+  input SourceListInput {
+    sources: [SourceInput]!
+  }
+
+  input SourceInput {
+    rowKey: String,
+    externalsourceid: String!,
+    sourcetype: String!,
+    displayname: String,
+    pipelinekey: String!,
+    rank: String!,
+    reportingcategory: String
+  }
+
   type Source {
-    externalsourceid: String
-    sourcetype: String
-    displayname: String
-    pipelinekey: String
-    rank: String
+    rowKey: String,
+    externalsourceid: String!,
+    sourcetype: String,
+    displayname: String,
+    pipelinekey: String,
+    rank: String,
+    reportingcategory: String
   }
 
   type Site {

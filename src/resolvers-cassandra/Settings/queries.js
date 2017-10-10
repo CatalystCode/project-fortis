@@ -43,9 +43,10 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
 
 function trustedSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM fortis.trustedsources where pipelinekey IN ?';
+    const pipelineKeysPlaceholder = getPlaceholderString(args.pipelinekeys);
+    const query = `SELECT * FROM fortis.trustedsources where pipelinekey IN (${pipelineKeysPlaceholder})`;
     const params = [
-      args.pipelinekeys
+      ...args.pipelinekeys
     ];
 
     cassandraConnector.executeQuery(query, params)
@@ -55,6 +56,19 @@ function trustedSources(args, res) { // eslint-disable-line no-unused-vars
       }))
       .catch(reject);
   });
+}
+
+function getPlaceholderString(items) {
+  if (!items || !items.length) return '';
+  let placeholder = '';
+  for (let i = 0; i < items.length; i++) {
+    if (i === items.length - 1) {
+      placeholder += '?';
+    } else {
+      placeholder += '?,';
+    }
+  }
+  return placeholder;
 }
 
 function cassandraRowToStream(row) {
@@ -72,17 +86,19 @@ function cassandraRowToStream(row) {
 
 function cassandraRowToSource(row) {
   return {
+    rowKey: row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank,
     externalsourceid: row.externalsourceid,
     sourcetype: row.sourcetype,
     displayname: row.displayname || row.externalsourceid,
     pipelinekey: row.pipelinekey,
-    rank: row.rank
+    rank: row.rank,
+    reportingcategory: row.reportingcategory
   };
 }
 
-function trustedSourceFilter(row, namequery) {
-  if (namequery) {
-    return row.externalsourceid.toLowerCase().indexOf(namequery.toLowerCase()) > -1;
+function trustedSourceFilter(row, pipelineKey) {
+  if (pipelineKey) {
+    return row.pipelinekey.toLowerCase().indexOf(pipelineKey.toLowerCase()) > -1;
   }
 
   return true;

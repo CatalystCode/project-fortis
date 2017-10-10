@@ -175,6 +175,74 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.input || !args.input.sources || !args.input.sources.length) {
+      //loggingClient.logNoKeywordsToAdd();
+      return reject('No trustedsources to add specified.');
+    }
+
+    let mutations = [];
+    args.input.sources.forEach(source => {
+      mutations.push({
+        query: `INSERT INTO fortis.trustedsources (
+          pipelinekey,
+          externalsourceid,
+          sourcetype,
+          rank,
+          displayname,
+          insertiontime,
+          reportingcategory
+        ) VALUES (?,?,?,?,?,dateof(now()),?)`,
+        params: [
+          source.pipelinekey, 
+          source.externalsourceid, 
+          source.sourcetype, 
+          source.rank,
+          source.displayname,
+          source.reportingcategory
+        ]
+      });
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(_ => { // eslint-disable-line no-unused-vars
+      resolve({
+        sources: args.input.sources
+      });
+    })
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
+  });
+}
+
+function removeTrustedSources(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.input || !args.input.sources || !args.input.sources.length) {
+      //loggingClient.logNoKeywordsToRemove();
+      return reject('No trusted sources to remove specified.');
+    } 
+
+    const mutations = args.input.sources.map(source => ({
+      query: 'DELETE FROM fortis.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND sourcetype = ? AND rank = ?',
+      params: [source.pipelinekey, source.externalsourceid, source.sourcetype, source.rank]
+    }));
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(_ => { // eslint-disable-line no-unused-vars
+      resolve({
+        sources: args.input.sources
+      });
+    })
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
+  });
+}
+
 function removeKeywords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.input || !args.input.edges || !args.input.edges.length) {
@@ -579,5 +647,7 @@ module.exports = {
   modifyTwitterAccounts: trackEvent(withRunTime(modifyTwitterAccounts), 'modifyTwitterAccounts'),
   removeTwitterAccounts: trackEvent(withRunTime(removeTwitterAccounts), 'removeTwitterAccounts'),
   modifyBlacklist: trackEvent(withRunTime(modifyBlacklist), 'modifyBlacklist'),
-  removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist')
+  removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist'),
+  addTrustedSources: trackEvent(withRunTime(addTrustedSources), 'addTrustedSources'),
+  removeTrustedSources: trackEvent(withRunTime(removeTrustedSources), 'removeTrustedSources')
 };
