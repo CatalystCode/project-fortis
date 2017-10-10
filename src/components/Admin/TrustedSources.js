@@ -1,6 +1,9 @@
 import { DataGrid } from './DataGrid';
 import React from 'react';
 import { getColumns } from './shared';
+const { Editors, Formatters } = require('react-data-grid-addons');
+const { DropDownEditor } = Editors;
+const { DropDownFormatter } = Formatters;
 
 const TRANSLATED_NAME = "translatedname";
 
@@ -34,10 +37,17 @@ class TrustedSources extends React.Component {
   }
 
   getTrustedSourcesColumns() {
+    const pipelineKeys = [
+      { id: 'Twitter', value: 'Twitter', text: 'Twitter', title: 'Twitter' },
+      { id: 'Facebook', value: 'Facebook', text: 'Facebook', title: 'Facebook' }
+    ];
+
     const columnValues = [
+      {key: "pipelinekey", name: "Pipeline Key", editor: <DropDownEditor options={pipelineKeys}/>, formatter: <DropDownFormatter options={pipelineKeys} value='Facebook'/>},
+      {editable: true, filterable: true, sortable: true, key: "externalsourceid", name: "External Source Id"},
       {editable: true, filterable: true, sortable: true, key: "reportingcategory", name: "Category"},
-      {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
       {editable: true, filterable: true, sortable: true, key: "sourcetype", name: "Source Type"},
+      {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
       {editable: true, filterable: true, sortable: true, key: "rank", name: "Rank"},
     ];
 
