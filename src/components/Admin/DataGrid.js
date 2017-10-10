@@ -400,6 +400,7 @@ export const DataGrid = createReactClass({
     },
 
     hasPhrasesToTranslate() {
+      if (!this.props.translatableFields) return;
       const { sourceField } = this.props.translatableFields;
       const selectedRowKeys = this.state.selectedRowKeys;
       const phrasesToTranslate = this.state.rows.filter(row => selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
