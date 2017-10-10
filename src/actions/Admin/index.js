@@ -235,7 +235,7 @@ const methods = {
         AdminServices.fetchTrustedSources(pipelineKeys, sourceName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
           if (graphqlResponse && !error) {
             const response = graphqlResponse.trustedSources.sources
-            const action = false;
+            const action = "saved";
             self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response, action});
           } else {
             let error = 'Error, could not load trusted sources for admin page';

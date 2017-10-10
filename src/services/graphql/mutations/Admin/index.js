@@ -17,7 +17,7 @@ export const removeTopics = `mutation RemoveTopics($input: MutatedTerms) {
 }`;
 
 export const saveTrustedSources = `mutation SaveTrustedSources($input: SourceListInput!) {
-  modifyTrustedSources(input: $input) {
+  addTrustedSources(input: $input) {
     ...TrustedSourcesView
   }
 }`;

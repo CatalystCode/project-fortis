@@ -112,9 +112,9 @@ export const SERVICES = {
     },
 
     fetchTrustedSources(pipelinekeys, sourcename, callback) {
-        const query = `${AdminFragments.trustedsources}${AdminQueries.getTrustedSources}`;
-        const variables = { pipelinekeys, sourcename };
-        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+      const query = `${AdminFragments.trustedsources}${AdminQueries.getTrustedSources}`;
+      const variables = { pipelinekeys, sourcename };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     saveTrustedSources(sources, callback) {
