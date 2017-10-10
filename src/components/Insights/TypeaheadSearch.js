@@ -2,7 +2,6 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { fromMapToArray, fetchTermFromMap } from './shared';
 import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
-import { SERVICES } from '../../services/Admin';
 import { fetchLocationsFromFeatureService } from '../../services/featureService';
 import '../../styles/Insights/TypeaheadSearch.css';
 
@@ -13,7 +12,7 @@ export default class TypeaheadSearch extends React.Component {
     this.DATASETS = {
       LOCATION: { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' },
       TERM: { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' },
-      SOURCE: { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchTrustedSourcesSuggestions, description: 'Search for trusted sources' }
+      SOURCE: { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchSourcesSuggestions, description: 'Search for trusted sources' }
     };
 
     this.state = {
@@ -90,31 +89,24 @@ export default class TypeaheadSearch extends React.Component {
     });
   }
 
-  fetchTrustedSourcesSuggestions = (value, callback) => {
-    const { dataSource, enabledStreams } = this.props;
+  fetchSourcesSuggestions = (value, callback) => {
+    const { dataSource, enabledStreams, trustedSources } = this.props;
     const pipelinekeys = enabledStreams.get(dataSource).sourceValues;
+    const activeTrustedSources = trustedSources.filter(source => pipelinekeys.indexOf(source.pipelinekey) >= 0);
 
-    SERVICES.fetchTrustedSources(pipelinekeys, value, (err, sources) => {
-      if (err) {
-        console.error(`Error while fetching sources matching '${value}': ${err}`);
-        callback([]);
-      } else {
-        const suggestions = sources.body.data.trustedSources.sources
-          .map(suggestion => {
-            const { displayname, externalsourceid, pipelinekey } = suggestion;
+    const suggestions = activeTrustedSources
+    .map(suggestion => {
+      const { displayname, externalsourceid, pipelinekey } = suggestion;
 
-            return Object.assign({},
-              {
-                name: displayname,
-                value: externalsourceid,
-                translatedname: externalsourceid,
-                icon: enabledStreams.get(pipelinekey).icon
-              }, suggestion);
-          });
-
-        callback(suggestions);
-      }
+      return Object.assign({}, {
+        name: displayname,
+        value: externalsourceid,
+        translatedname: externalsourceid,
+        icon: enabledStreams.get(pipelinekey).icon
+      }, suggestion);
     });
+
+    callback(suggestions);
   }
 
   onSuggestionsFetchRequested = ({ value }) => {

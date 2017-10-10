@@ -12,6 +12,20 @@ import { fetchTermFromMap, innerJoin, hasChanged } from './shared';
 
 const ActivityConsts = constants.ACTIVITY_FEED;
 
+function prettifyExternalSourceIds(elementsMutated, trustedSources) {
+    const externalsourceIdToDisplayName = {};
+    trustedSources.forEach(source => {
+        externalsourceIdToDisplayName[source.externalsourceid] = source.displayname;
+    });
+
+    elementsMutated.forEach(element => {
+        const externalSourceDisplayName = externalsourceIdToDisplayName[element.externalsourceid];
+        if (externalSourceDisplayName) {
+            element.externalsourceid = externalSourceDisplayName;
+        }
+    });
+}
+
 export default class ActivityFeed extends React.Component {
     constructor(props) {
         super(props);
@@ -46,13 +60,16 @@ export default class ActivityFeed extends React.Component {
     }
 
     fetchSentences(props, callback) {
-        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters, enabledStreams } = props;
+        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters, enabledStreams, trustedSources } = props;
         const { pageState, filteredSource } = this.state;
         const pipelinekeys = enabledStreams.get(filteredSource).sourceValues;
         const externalsourceid = props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? props.externalsourceid : null;
         const fulltextTerm = "";
+        const activeTrustedSources = trustedSources.filter(source => pipelinekeys.indexOf(source.pipelinekey) >= 0);
 
-        SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, callback);
+        SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, (error, response, body) => {
+            callback(error, response, body, activeTrustedSources);
+        });
     }
 
     renderDataSourceTabs(iconStyle) {
@@ -113,12 +130,13 @@ export default class ActivityFeed extends React.Component {
     buildElements(props, callback) {
         let self = this;
 
-        this.fetchSentences(props, (error, response, body) => {
+        this.fetchSentences(props, (error, response, body, trustedSources) => {
             if (!error && response.statusCode === 200 && body.data) {
                 const { elements, processedEventids } = self.state;
                 const newsFeedPage = body.data.messages ? body.data.messages.features.filter(feature => feature.properties.summary && feature.properties.summary.length && !processedEventids.has(feature.properties.messageid)).map(this.parseEvent) : [];
-                
+
                 const elementsMutated = elements.concat(newsFeedPage);
+                prettifyExternalSourceIds(elementsMutated, trustedSources);
                 const pageStateMutated = body.data.messages ? body.data.messages.pageState || null : null;
                 const processedEventIdsMutated= new Set(Array.from(processedEventids).concat(newsFeedPage.map(msg=>msg.messageid)));
 

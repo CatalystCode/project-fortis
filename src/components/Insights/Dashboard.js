@@ -109,6 +109,7 @@ export default class Dashboard extends React.Component {
           {bbox.length ?
             <ActivityFeed
               allSiteTopics={this.props.fullTermList}
+              trustedSources={this.props.trustedSources}
               infiniteScrollHeight={this.isHeatmapFullScreen() ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
               {...this.filterLiterals() }
             />
@@ -195,6 +196,7 @@ export default class Dashboard extends React.Component {
       <div key={'watchlist'}>
         <GraphCard>
           <SentimentTreeview
+            trustedSources={this.props.trustedSources}
             conjunctivetopics={this.props.conjunctivetopics}
             defaultBbox={this.props.settings.targetBbox}
             allSiteTopics={this.props.fullTermList}
