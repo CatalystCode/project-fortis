@@ -90,7 +90,7 @@ export const DataStore = Fluxxor.createStore({
     },
 
     intializeSettings(graphqlResponse) {
-        const { terms, configuration, topics, dataSources, category } = graphqlResponse;
+        const { terms, configuration, topics, dataSources, category, trustedSources } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
@@ -110,6 +110,7 @@ export const DataStore = Fluxxor.createStore({
         this.dataStore.supportedLanguages = supportedLanguages;
         this.dataStore.maintopic = topics.edges.length ? topics.edges[0].name : '';
         this.dataStore.settings = configuration;
+        this.dataStore.trustedSources = trustedSources;
         this.syncChartDataToStore(graphqlResponse);
 
         this.dataStore.termFilters.clear();

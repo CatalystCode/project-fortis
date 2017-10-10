@@ -1,6 +1,5 @@
 import React from 'react';
 import { SERVICES } from '../../services/Dashboard';
-import { SERVICES as ADMIN_SERVICES } from '../../services/Admin';
 import '../../styles/Insights/ActivityFeed.css';
 import styles from '../../styles/Insights/ActivityFeed';
 import Infinite from 'react-infinite';
@@ -61,24 +60,16 @@ export default class ActivityFeed extends React.Component {
     }
 
     fetchSentences(props, callback) {
-        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters, enabledStreams } = props;
+        const { bbox, fromDate, zoomLevel, toDate, maintopic, termFilters, enabledStreams, trustedSources } = props;
         const { pageState, filteredSource } = this.state;
         const pipelinekeys = enabledStreams.get(filteredSource).sourceValues;
         const externalsourceid = props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? props.externalsourceid : null;
         const fulltextTerm = "";
+        const activeTrustedSources = trustedSources.filter(source => pipelinekeys.indexOf(source.pipelinekey) >= 0);
 
-        ADMIN_SERVICES.fetchTrustedSources(pipelinekeys, "", (trustedSourcesErr, trustedSourcesResponse, trustedSourcesBody) => {
-            let trustedSources;
-            if (!trustedSourcesErr && trustedSourcesResponse.statusCode === 200 && trustedSourcesBody.data) {
-                trustedSources = trustedSourcesBody.data.trustedSources.sources;
-            } else {
-                trustedSources = [];
-            }
-
-            SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, (sentencesErr, response, body) => {
-                callback(sentencesErr, response, body, trustedSources);
-            });
-        })
+        SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, (error, response, body) => {
+            callback(error, response, body, activeTrustedSources);
+        });
     }
 
     renderDataSourceTabs(iconStyle) {

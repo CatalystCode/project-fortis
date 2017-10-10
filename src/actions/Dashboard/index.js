@@ -46,6 +46,24 @@ function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
         enabledStreams, category, (err, response, body) => ResponseHandler(err, response, body, callback));
 }
 
+function fetchAllTrustedSources(resultsUnion, callback) {
+    const { dataSources } = resultsUnion;
+    const pipelineKeys = dataSources.get('all').sourceValues;
+
+    AdminServices.fetchTrustedSources(pipelineKeys, '', (trustedSourcesErr, response, body) => {
+        ResponseHandler(trustedSourcesErr, response, body, (err, data) => {
+            if (err) {
+                console.error(`Non-fatal error while fetching trusted sources: ${err}`)
+                callback(null, resultsUnion);
+            } else {
+                const trustedSources = data.trustedSources && data.trustedSources.sources;
+                resultsUnion.trustedSources = trustedSources;
+                callback(null, resultsUnion);
+            }
+        });
+    });
+}
+
 function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback) {
     const { configuration, topics, dataSources } = resultUnion;
 
@@ -90,7 +108,9 @@ const methods = {
             //Load the top 5 most popular terms
             (settings, callback) => fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category),
             //Merged Results(Settings + Full Term List + Popular Terms)
-            (resultUnion, callback) => fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback)
+            (resultUnion, callback) => fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback),
+            //Merged Results(Settings + Full Term List + Popular Terms)
+            (resultUnion2, callback) => fetchAllTrustedSources(resultUnion2, callback),
         )((error, results) => {
             if (!error) {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
