@@ -12,7 +12,7 @@ export default class TypeaheadSearch extends React.Component {
     this.DATASETS = {
       LOCATION: { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' },
       TERM: { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' },
-      SOURCE: { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchTrustedSourcesSuggestions, description: 'Search for trusted sources' }
+      SOURCE: { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchSourcesSuggestions, description: 'Search for trusted sources' }
     };
 
     this.state = {
@@ -89,7 +89,7 @@ export default class TypeaheadSearch extends React.Component {
     });
   }
 
-  fetchTrustedSourcesSuggestions = (value, callback) => {
+  fetchSourcesSuggestions = (value, callback) => {
     const { dataSource, enabledStreams, trustedSources } = this.props;
     const pipelinekeys = enabledStreams.get(dataSource).sourceValues;
     const activeTrustedSources = trustedSources.filter(source => pipelinekeys.indexOf(source.pipelinekey) >= 0);
