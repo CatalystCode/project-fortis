@@ -196,6 +196,7 @@ export default class Dashboard extends React.Component {
       <div key={'watchlist'}>
         <GraphCard>
           <SentimentTreeview
+            trustedSources={this.props.trustedSources}
             conjunctivetopics={this.props.conjunctivetopics}
             defaultBbox={this.props.settings.targetBbox}
             allSiteTopics={this.props.fullTermList}

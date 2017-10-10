@@ -250,6 +250,7 @@ export default class SentimentTreeview extends React.Component {
                 </Subheader>
                 <div style={styles.searchBox}>
                     <TypeaheadSearch
+                        trustedSources={this.props.trustedSources}
                         dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
                         enabledStreams={this.props.enabledStreams}
