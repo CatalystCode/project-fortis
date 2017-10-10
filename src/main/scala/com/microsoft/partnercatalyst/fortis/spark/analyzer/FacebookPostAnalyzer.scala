@@ -27,12 +27,19 @@ class FacebookPostAnalyzer extends Analyzer[FacebookPost] with Serializable with
         case Some(location) => locationFetcher(location.getLatitude, location.getLongitude).toList
         case None => List()
       },
-      sourceurl = Try(item.post.getPermalinkUrl.toString)
-        .getOrElse(
-          Try(item.post.getLink.toString)
-          .getOrElse(s"https://www.facebook.com/${item.pageId}/posts/${item.post.getId}")
-        ),
+      sourceurl = getSourceURL(item),
       original = item
     )
   }
+
+  def getSourceURL(item: FacebookPost): String = {
+    Try(item.post.getPermalinkUrl.toString).getOrElse(
+      Try(item.post.getLink.toString).getOrElse(
+        Try(s"https://www.facebook.com/${item.post.getPermalinkUrl.getFile.replaceFirst("^[/]", "")}").getOrElse(
+          s"https://www.facebook.com/${item.pageId}/posts"
+        )
+      )
+    )
+  }
+
 }
