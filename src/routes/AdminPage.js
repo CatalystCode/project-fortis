@@ -26,6 +26,7 @@ export const AdminPage = createReactClass({
       settings,
       watchlist,
       trustedSources,
+      streams,
       translatableFields,
       enabledStreams
     } = this.getStateFromFlux();
@@ -34,6 +35,7 @@ export const AdminPage = createReactClass({
       settings,
       watchlist,
       trustedSources,
+      streams,
       translatableFields,
       enabledStreams
     });

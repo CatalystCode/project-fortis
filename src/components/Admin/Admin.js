@@ -5,7 +5,7 @@ import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
 import TrustedSources from './TrustedSources';
 import { BlacklistEditor } from './BlacklistEditor';
-import { StreamEditor } from './StreamEditor';
+import StreamEditor from './StreamEditor';
 import AdminLocations from './AdminLocations';
 import '../../styles/Admin/Admin.css';
 
