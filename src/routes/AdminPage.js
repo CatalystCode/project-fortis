@@ -25,13 +25,17 @@ export const AdminPage = createReactClass({
     const { 
       settings,
       watchlist,
-      translatableFields
+      trustedSources,
+      translatableFields,
+      enabledStreams
     } = this.getStateFromFlux();
 
     return Object.assign({}, { 
       settings,
       watchlist,
-      translatableFields
+      trustedSources,
+      translatableFields,
+      enabledStreams
     });
   },
 
