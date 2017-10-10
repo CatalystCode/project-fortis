@@ -4,7 +4,7 @@ const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const { withRunTime, getTermsByCategory, getSiteDefintion } = require('../shared');
-const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
+const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 
 const PIPELINE_KEY_TWITTER = 'twitter';
@@ -16,7 +16,11 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     const ignoreCache = true;
 
     getTermsByCategory(translationLanguage, category, ignoreCache)
-      .then(resolve).catch(reject);
+      .then(resolve)
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 
@@ -37,7 +41,10 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
           streams
         });
       })
-      .catch(reject);
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 
@@ -202,7 +209,7 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 module.exports = {
   sites: trackEvent(withRunTime(sites), 'sites'),
-  streams: trackEvent(withRunTime(streams), 'streams'),
+  streams: trackEvent(withRunTime(streams), 'streams', loggingClient.streamsExtraProps(), loggingClient.streamsExtraMetrics()),
   siteTerms: trackEvent(withRunTime(terms), 'terms', loggingClient.termsExtraProps(), loggingClient.keywordsExtraMetrics()),
   trustedSources: trackEvent(withRunTime(trustedSources), 'trustedsources'),
   twitterAccounts: trackEvent(withRunTime(twitterAccounts), 'twitterAccounts'),

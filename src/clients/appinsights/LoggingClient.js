@@ -37,6 +37,31 @@ function termsExtraProps() {
   });
 }
 
+function streamsExtraProps() {
+  return () => ({
+    operation: 'query',
+    table: 'streams',
+    success: 'true'
+  });
+}
+
+function modifyStreamsExtraProps() {
+  return () => ({
+    operation: 'modify',
+    table: 'streams',
+    success: 'true'
+  });
+}
+
+function streamsExtraMetrics() {
+  return (graphqlResult) => {
+    const totalRows = graphqlResult.streams.length;
+    return {
+      totalRows
+    };
+  };
+}
+
 function addKeywordsExtraProps() {
   return () => ({
     operation: 'modify',
@@ -55,7 +80,7 @@ function removeKeywordsExtraProps() {
 
 function keywordsExtraMetrics() {
   return (graphqlResult) => {
-    const totalRows = graphqlResult.edges.length; //TODO
+    const totalRows = graphqlResult.edges.length;
     return {
       totalRows
     };
@@ -78,6 +103,17 @@ function logNoKeywordsToRemove() {
     client: constants.CLIENTS.cassandra,
     operation: 'remove',
     table: 'watchlist',
+    success: 'false'
+  },{
+    numToMutate: 0
+  });
+}
+
+function logNoStreamParamsToEdit() {
+  trackSyncEvent('cassandra', { 
+    client: constants.CLIENTS.cassandra,
+    operation: 'modify',
+    table: 'streams',
     success: 'false'
   },{
     numToMutate: 0
@@ -114,11 +150,15 @@ module.exports = {
   logNoMutationsDefined,
   logExecuteQueryError,
   termsExtraProps,
+  streamsExtraProps,
+  modifyStreamsExtraProps,
+  streamsExtraMetrics,
   addKeywordsExtraProps,
   removeKeywordsExtraProps,
   keywordsExtraMetrics,
   logNoKeywordsToAdd,
   logNoKeywordsToRemove,
+  logNoStreamParamsToEdit,
   translateExtraProps,
   translateExtraMetrics,
   translateWordsExtraMetrics
