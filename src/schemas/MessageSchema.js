@@ -17,6 +17,7 @@ module.exports = graphql.buildSchema(`
 
   type Mutation {
     publishEvents(input: NewMessages): [String]
+    restartPipeline: Boolean
   }
 
   input NewMessages {

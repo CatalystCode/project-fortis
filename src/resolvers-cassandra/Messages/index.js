@@ -5,6 +5,7 @@ const queries = require('./queries');
 
 module.exports = {
   publishEvents: mutations.publishEvents,
+  restartPipeline: mutations.restartPipeline,
 
   byLocation: queries.byLocation,
   byBbox: queries.byBbox,
