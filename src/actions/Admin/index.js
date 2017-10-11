@@ -8,6 +8,19 @@ function getListAfterRemove(listBeforeRemove, itemsRemoved, keyBy) {
 }
 
 const methods = {
+  restart_pipeline() {
+    const self = this;
+    AdminServices.restartPipeline((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+      if (graphqlResponse && !error) {
+        self.dispatch(constants.ADMIN.RESTART_PIPELINE, { response: graphqlResponse.restartPipeline });
+      } else {
+        const action = 'failed';
+        console.error(`Failed to restart pipeline`);
+        self.dispatch(constants.ADMIN.RESTART_PIPELINE, {action});
+      }
+    }));
+  },
+
   load_blacklist() {
     const self = this;
     AdminServices.fetchBlacklists((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {

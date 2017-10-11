@@ -1,5 +1,6 @@
 import { DataGrid } from './DataGrid';
 import React from 'react';
+import { Button } from 'react-bootstrap'; 
 import { getColumns } from './shared';
 const { Editors, Formatters } = require('react-data-grid-addons');
 const { DropDownEditor } = Editors;
@@ -32,8 +33,22 @@ class TrustedSources extends React.Component {
     return row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank;
   }
 
-  handleRemove(rows) {
-    this.props.flux.actions.ADMIN.remove_trusted_sources(rows);
+  handleRemove(rows) {    
+    const sourcesWithAllFieldsSet = this.filterSourcesWithUnsetFields(rows);
+    if (this.trustedSourcesToRemoveExist(sourcesWithAllFieldsSet)) {
+      this.props.flux.actions.ADMIN.remove_trusted_sources(sourcesWithAllFieldsSet);
+    } else {
+      this.props.flux.actions.ADMIN.load_trusted_sources(PIPELINE_KEYS);
+    }
+  }
+
+  filterSourcesWithUnsetFields(sources) {
+    return sources.filter(source => source.pipelinekey.length > 0 || source.externalsourceid.length > 0 || source.sourcetype.length > 0 || source.rank.length > 0)
+  }
+
+  trustedSourcesToRemoveExist(sources) {
+    const shouldRemove = sources.length > 0;
+    return shouldRemove;
   }
 
   getTrustedSourcesColumns() {
@@ -68,16 +83,18 @@ class TrustedSources extends React.Component {
   }
 
   render() {
+    const trustedSourcesColumns = this.getTrustedSourcesColumns();
     return (
-      this.getTrustedSourcesColumns().length > 0 ? 
+      trustedSourcesColumns.length > 0  ? 
         <DataGrid 
           rowHeight={40}
           minHeight={500}
           rowKey='rowKey'
+          guidAutofillColumn='rowKey'
           handleSave={this.handleSave}
           handleRemove={this.handleRemove}
           translatableFields={null}
-          columns={this.getTrustedSourcesColumns()}
+          columns={trustedSourcesColumns}
           rows={this.props.trustedSources} />
         : <div />
     );

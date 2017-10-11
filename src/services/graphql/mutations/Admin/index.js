@@ -1,3 +1,7 @@
+export const restartPipeline = `mutation RestartPipeline {
+  restartPipeline
+}`;
+
 export const editSite = `mutation EditSite($input: EditableSiteSettings!) {
   editSite(input: $input) {
     name

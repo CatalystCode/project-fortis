@@ -5,6 +5,7 @@ import { fetchGqlData } from '../shared';
 import request from 'request';
 
 const SETTINGS_ENDPOINT = 'settings';
+const MESSAGES_ENDPOINT = 'messages';
 
 const trustedTwitterFragment = `fragment FortisTrustedTwitterAcctView on TrustedTwitterAccountCollection {
                             accounts {
@@ -30,6 +31,11 @@ const fbPageFragment = `fragment FortisDashboardView on FacebookPageCollection {
                       }`;
 
 export const SERVICES = {
+  restartPipeline(callback) {
+    const query = `${AdminMutations.restartPipeline}`;
+    fetchGqlData(MESSAGES_ENDPOINT, { query }, callback);
+  },
+
     getDashboardSiteDefinition(translationLanguage, category, callback) {
         const query = ` ${AdminFragments.siteSettingsFragment}
                       ${AdminQueries.getPipelineDefinition}`;

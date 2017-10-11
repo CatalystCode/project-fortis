@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Button } from 'react-bootstrap'; 
 import { AdminSettings } from './AdminSettings';
 import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
@@ -42,6 +43,10 @@ class Admin extends React.Component {
 
   handleTabChanged(index, last) {
     this.setState({ index: index });
+  }
+
+  restartPipeline() {
+    this.props.flux.actions.ADMIN.restart_pipeline();
   }
 
   render() {
@@ -133,6 +138,9 @@ class Admin extends React.Component {
                     </div>
                   </TabPanel>
                 </Tabs>
+                <div className="row adminContainer">
+                  <Button className="pull-right" bsStyle="danger" onClick={this.restartPipeline()}>Restart Pipeline</Button>
+                </div>
               </div>
             </div>
           </div>
