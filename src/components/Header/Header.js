@@ -42,7 +42,7 @@ class Header extends React.Component {
     return (
       <ul className="nav navbar-nav navbar-left">
         <li>{ this.renderDashboardLink() }</li>
-        <li>{ this.renderFactsLink() }</li>
+        {/*<li>{ this.renderFactsLink() }</li>*/}
         { this.props.siteKey === "dengue" && <li>{ this.renderPredictionsLink() }</li> }
       </ul>
     );
