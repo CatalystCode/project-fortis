@@ -2,11 +2,16 @@
 
 const Promise = require('promise');
 const azure = require('azure-sb'); 
-const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
+const { trackEvent, trackDependency } = require('../appinsights/AppInsightsClient');
+const loggingClient = require('../appinsights/LoggingClient');
 const SERVICE_BUS_CONNECTION_STRING = process.env.FORTIS_SB_CONN_STR;
 
 const SERVICE_BUS_CONFIG_QUEUE = process.env.FORTIS_SB_CONFIG_QUEUE || 'configuration';
 const SERVICE_BUS_COMMAND_QUEUE = process.env.FORTIS_SB_COMMAND_QUEUE || 'command'; 
+
+function restartPipeline() {
+  return notifyUpdate(SERVICE_BUS_COMMAND_QUEUE, { 'dirty': 'streams' });
+}
 
 function restartStreaming() {
   return notifyUpdate(SERVICE_BUS_COMMAND_QUEUE, { 'dirty': 'streams' });
@@ -31,8 +36,8 @@ function notifyUpdate(queue, properties) {
     };
 
     sendQueueMessage(queue, serviceBusMessage)
-      .then(resolve)
-      .catch(reject);
+      .then(resolve(true))
+      .catch(reject(false));
   });
 }
 
@@ -56,6 +61,7 @@ function sendQueueMessage(queue, serviceBusMessage) {
 }
 
 module.exports = {
+  restartPipeline: trackEvent(restartPipeline, 'restartPipeline', loggingClient.restartPipelineExtraProps()),
   restartStreaming: trackDependency(restartStreaming, 'ServiceBus', 'send'),
   notifyWatchlistUpdate: trackDependency(notifyWatchlistUpdate, 'ServiceBus', 'send'),
   notifyBlacklistUpdate: trackDependency(notifyBlacklistUpdate, 'ServiceBus', 'send'),

@@ -29,12 +29,35 @@ function logExecuteQueryError() {
   });
 }
 
+function restartPipelineExtraProps() {
+  return () => ({
+    success: 'true'
+  });
+}
+
 function termsExtraProps() {
   return () => ({
     operation: 'query',
     table: 'watchlist',
     success: 'true'
   });
+}
+
+function trustedSourcesExtraProps() {
+  return () => ({
+    operation: 'query',
+    table: 'trustedsources',
+    success: 'true'
+  });
+}
+
+function trustedSourcesExtraMetrics() {
+  return (graphqlResult) => {
+    const totalRows = graphqlResult.sources.length;
+    return {
+      totalRows
+    };
+  };
 }
 
 function addKeywordsExtraProps() {
@@ -55,7 +78,7 @@ function removeKeywordsExtraProps() {
 
 function keywordsExtraMetrics() {
   return (graphqlResult) => {
-    const totalRows = graphqlResult.edges.length; //TODO
+    const totalRows = graphqlResult.edges.length;
     return {
       totalRows
     };
@@ -113,7 +136,10 @@ module.exports = {
   logCassandraClientUndefined,
   logNoMutationsDefined,
   logExecuteQueryError,
+  restartPipelineExtraProps,
   termsExtraProps,
+  trustedSourcesExtraProps,
+  trustedSourcesExtraMetrics,
   addKeywordsExtraProps,
   removeKeywordsExtraProps,
   keywordsExtraMetrics,
