@@ -1,51 +1,72 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Fluxxor from 'fluxxor';
 import { DataGrid } from './DataGrid';
 import { Glyphicon, Button, Modal } from 'react-bootstrap'; 
+import { getColumns } from './shared';
 
-const FluxMixin = Fluxxor.FluxMixin(React);
-const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
-
-export const StreamParamsButtonFormatter = createReactClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-
-  getInitialState() {
-    return { 
+class StreamParamsButtonFormatter extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = { 
       isShowDetailOn: false,
       params: []
     };
-  },
 
-  getStateFromFlux() {
-    return this.getFlux().store("AdminStore").getState();
-  },
+    this.getStream = this.getStream.bind(this);
+    this.handleShowDetails = this.handleShowDetails.bind(this);
+    this.handleHideDetails = this.handleHideDetails.bind(this);
+    this.handleSave = this.handleSave.bind(this);
+  }
 
   handleSave() {
-    const stream = this.getStream();
-    this.getFlux().actions.ADMIN.save_streams([stream]);
+    const stream = this.prepareStreamsForSave();
+    this.props.flux.actions.ADMIN.save_streams(stream);
     this.handleHideDetails();
-  },
+  }
 
-  getStream() {
-    return this.props.dependentValues;
-  },
+  prepareStreamsForSave() {
+    let stream = this.getStream();
+    if (typeof this.state.params === 'string') {
+      stream.params = JSON.parse(this.state.params);
+    } else {
+      stream.params = this.state.params;
+    }
+    if (stream.constructor !== Array) stream = [stream];
+    return stream;
+  }
 
   handleShowDetails() {
     const stream = this.getStream();
-    const params = stream.params;
+    
+    let params = stream.params;
+    if (typeof stream.params === 'string') {
+      params = JSON.parse(stream.params);
+    }
 
     this.setState({ 
       isShowDetailOn: true,
       params: params
     });
-  },
+  }
+
+  getStream() {
+    return this.props.dependentValues;
+  }
 
   handleHideDetails() {
     this.setState({ 
       isShowDetailOn: false 
     });
-  },
+  }
+
+  getStreamParamColumns() {
+    const columnValues = [
+      {key: "key", name: "key"},
+      {editable: true, key: "value", name: "value"}
+    ];
+
+    return getColumns(columnValues);
+  }
 
   render() {
     return (
@@ -64,7 +85,7 @@ export const StreamParamsButtonFormatter = createReactClass({
               toolbar={null}
               rowKey="key"
               handleSave={this.handleSave}
-              columns={this.state.streamParamColumns}
+              columns={this.getStreamParamColumns()}
               rows={this.state.params}
             />
           </Modal.Body>
@@ -75,4 +96,6 @@ export const StreamParamsButtonFormatter = createReactClass({
       </div>
     );
   }
-});
+}
+
+export default StreamParamsButtonFormatter;

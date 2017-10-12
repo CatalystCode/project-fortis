@@ -64,7 +64,10 @@ const methods = {
       if (!dataStore.loading) {
         AdminServices.fetchStreams((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
           if (graphqlResponse) {
-            const response = graphqlResponse ? graphqlResponse : [];
+            let response = graphqlResponse ? graphqlResponse.streams.streams : [];
+            response.forEach(stream => {
+              stream.params = JSON.stringify(stream.params)
+            });
             const action = false;
             self.dispatch(constants.ADMIN.LOAD_STREAMS, {response, action});
           } else {
@@ -79,9 +82,9 @@ const methods = {
       const self = this;
       AdminServices.saveStreams(streams, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse) {
-          const response = graphqlResponse ? graphqlResponse : [];
-          const action = false;
-          self.dispatch(constants.ADMIN.MODIFY_STREAMS, {response, action});
+          const action = "saved";
+          const streamsAfterSave = this.flux.stores.AdminStore.dataStore.streams;
+          self.dispatch(constants.ADMIN.LOAD_STREAMS, { action, response: streamsAfterSave });
         } else {
           self.dispatch(constants.ADMIN.LOAD_FAIL, { error: `[${error}]: Error, could not load streams for admin page.` });
         }
