@@ -37,7 +37,12 @@ private[analyzer] object AnalysisDefaults {
   trait EnableLocation[T] {
     this: Analyzer[T] =>
     override def extractLocations(details: ExtendedDetails[T], locationsExtractor: LocationsExtractor): List[Location] = {
-      locationsExtractor.analyze(details.body).toList
+      val extractedLocations = locationsExtractor.analyze(details.body).toList
+      if (details.sharedLocations == null || details.sharedLocations.isEmpty) {
+        extractedLocations
+      } else {
+        details.sharedLocations ++ extractedLocations
+      }
     }
   }
 
