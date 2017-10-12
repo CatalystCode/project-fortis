@@ -272,7 +272,10 @@ function paramEntryToMap(paramEntry) {
 function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const streams = args && args.input && args.input.streams;
-    if (!streams || !streams.length) return reject('No streams specified');
+    if (!streams || !streams.length) {
+      loggingClient.logNoStreamParamsToEdit();
+      return reject('No streams specified');
+    }
     
     const mutations = [];
     streams.forEach(stream => {
@@ -306,33 +309,10 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
         streams
       });
     })
-    .catch(reject);
-  });
-}
-
-function removeStreams(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const streams = args && args.input && args.input.streams;
-    if (!streams || !streams.length) return reject('No streams specified');
-
-    let deletions = [];
-    streams.forEach(stream => {
-      deletions.push({
-        query: 'DELETE FROM fortis.streams WHERE streamid = ? AND pipelinekey = ?',
-        params: [stream.streamId, stream.pipelineKey]
-      });
+    .catch(error => {
+      trackException(error);
+      reject(error);
     });
-
-    cassandraConnector.executeBatchMutations(deletions)
-    .then(() => {
-      streamingController.restartStreaming();
-    })
-    .then(() => {
-      resolve({
-        streams
-      });
-    })
-    .catch(reject);
   });
 }
 
@@ -567,8 +547,7 @@ module.exports = {
   createOrReplaceSite: createOrReplaceSite,
   createSite: trackEvent(createSite, 'createSite'),
   removeSite: trackEvent(removeSite, 'removeSite'),
-  modifyStreams: trackEvent(withRunTime(modifyStreams), 'modifyStreams'),
-  removeStreams: trackEvent(removeStreams, 'removeStreams'),
+  modifyStreams: trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()),
   removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
   addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords', loggingClient.addKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
   editSite: trackEvent(withRunTime(editSite), 'editSite'),
