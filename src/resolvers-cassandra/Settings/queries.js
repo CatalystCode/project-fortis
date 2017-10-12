@@ -4,7 +4,7 @@ const Promise = require('promise');
 const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const { withRunTime, getTermsByCategory, getSiteDefintion } = require('../shared');
-const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient').trackEvent;
+const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 
 const PIPELINE_KEY_TWITTER = 'twitter';
