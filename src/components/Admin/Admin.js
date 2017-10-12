@@ -3,9 +3,9 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { AdminSettings } from './AdminSettings';
 import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
-import { TrustedSources } from './TrustedSources';
+import TrustedSources from './TrustedSources';
 import { BlacklistEditor } from './BlacklistEditor';
-import { StreamEditor } from './StreamEditor';
+import StreamEditor from './StreamEditor';
 import AdminLocations from './AdminLocations';
 import '../../styles/Admin/Admin.css';
 

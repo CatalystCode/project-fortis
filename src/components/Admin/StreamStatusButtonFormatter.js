@@ -1,10 +1,5 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Fluxxor from 'fluxxor';
 import { Glyphicon, Button } from 'react-bootstrap'; 
-
-const FluxMixin = Fluxxor.FluxMixin(React);
-const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
 const enableButtonStyle = {
   glyph: "ok",
@@ -18,25 +13,25 @@ const disableButtonStyle = {
   buttonColor: "danger"
 };
 
-export const StreamStatusButtonFormatter = createReactClass({
-  mixins: [FluxMixin, StoreWatchMixin],
+class StreamStatusButtonFormatter extends React.Component {
+  constructor(props) {
+    super(props);
 
-  getInitialState() {
-    return disableButtonStyle;
-  },
+    this.state = {
+      buttonStyle: disableButtonStyle
+    };
 
-  getStateFromFlux() {
-    return this.getFlux().store("AdminStore").getState();
-  },
+    this.toggleState = this.toggleState.bind(this);
+  }
 
   componentDidMount() {
     const state = this.getStreamState();
     this.initializeButtonStyle(state);
-  },
+  }
 
   getStreamState() {
     return this.props.dependentValues.enabled;
-  },
+  }
 
   initializeButtonStyle(state) {
     if (this.isStreamEnabled(state)) {
@@ -44,22 +39,22 @@ export const StreamStatusButtonFormatter = createReactClass({
     } else {
       this.addStyleToButton(disableButtonStyle);
     }
-  },
+  }
 
   isStreamEnabled(state) {
     return state;
-  },
+  }
 
   addStyleToButton(style) {
-    this.setState((prevState, props) => {
-      return style;
+    this.setState({
+      buttonStyle: style
     });
-  },
+  }
 
   toggleState() {
     this.toggleButtonStyle();
     this.toggleStreamState();
-  },
+  }
 
   toggleButtonStyle() {
     const state = this.getStreamState();
@@ -68,41 +63,51 @@ export const StreamStatusButtonFormatter = createReactClass({
     } else {
       this.addStyleToButton(enableButtonStyle);
     }
-  },
+  }
 
   toggleStreamState() {
     const oldState = this.getStreamState();
     const newState = this.getNewState(oldState);
     const streamWithNewState = this.getStreamWithNewState(newState)
     this.saveStreams(streamWithNewState);
-  },
+  }
 
   getNewState(oldState) {
     return !oldState;
-  },
+  }
 
   getStreamWithNewState(newState) {
     const stream = this.getStream();
     stream.enabled = newState;
     return stream;
-  },
+  }
 
   getStream() {
     return this.props.dependentValues;
-  },
+  }
 
-  saveStreams(streams) {
-    if (streams.constructor !== Array) streams = [streams];
-    this.getFlux().actions.ADMIN.save_streams(streams);
-  },
+  saveStreams(stream) {
+    stream = this.prepareStreamsForSave(stream);
+    this.props.flux.actions.ADMIN.save_streams(stream);
+  }
+
+  prepareStreamsForSave(stream) {
+    if (typeof stream.params === 'string') {
+      stream.params = JSON.parse(stream.params);
+    }
+    if (stream.constructor !== Array) stream = [stream];
+    return stream;
+  }
 
   render() {
     return (
       <div>
-        <Button id={this.props.dependentValues.streamId} bsStyle={this.state.buttonColor} bsSize="xsmall" onClick={this.toggleState}>
-          <Glyphicon glyph={this.state.glyph} /> {this.state.text}
+        <Button id={this.props.dependentValues.streamId} bsStyle={this.state.buttonStyle.buttonColor} bsSize="xsmall" onClick={this.toggleState}>
+          <Glyphicon glyph={this.state.buttonStyle.glyph} /> {this.state.buttonStyle.text}
         </Button>
       </div>
     );
   }
-});
+}
+
+export default StreamStatusButtonFormatter;

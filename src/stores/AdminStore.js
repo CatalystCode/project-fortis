@@ -74,13 +74,18 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleLoadStreams(response) {
-      this.dataStore.streams = response.response.streams.streams || [];
+      this.dataStore.streams = response.response || [];
+      this.formatStreamParamsForDataGrid();
       this.dataStore.action = response.action || false;
-
-      this.loadStreamsColumns();
-      this.loadStreamParamsColumns();
-
       this.emit("change");
+    },
+
+    formatStreamParamsForDataGrid() {
+      this.dataStore.streams.forEach(stream => {
+        if (typeof stream.params !== 'string') {
+          stream.params = JSON.stringify(stream.params);
+        }
+      });
     },
 
     loadStreamsColumns() {

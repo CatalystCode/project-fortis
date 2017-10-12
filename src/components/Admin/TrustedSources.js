@@ -1,55 +1,77 @@
 import { DataGrid } from './DataGrid';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Fluxxor from 'fluxxor';
-import constants from '../../actions/constants';
+import { getColumns } from './shared';
 
-const FluxMixin = Fluxxor.FluxMixin(React);
-const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
+const TRANSLATED_NAME = "translatedname";
 
-export const TrustedSources = createReactClass({
-    mixins: [FluxMixin, StoreWatchMixin],
+const PIPELINE_KEYS = ['Twitter', 'Facebook'];
 
-    componentDidMount() {
-      const pipelineKeys = this.getAllPipelineKeys();
-      this.getFlux().actions.ADMIN.load_trusted_sources(pipelineKeys);
-    },
+class TrustedSources extends React.Component {
+  constructor(props) {
+    super(props);
 
-    getAllPipelineKeys() {
-      return this.props.enabledStreams.get(constants.DEFAULT_EXTERNAL_SOURCE).sourceValues;
-    },
+    this.getTrustedSourcesColumns = this.getTrustedSourcesColumns.bind(this);
+    this.getTranslatableFields = this.getTranslatableFields.bind(this);
+    this.handleSave = this.handleSave.bind(this);
+    this.handleRemove = this.handleRemove.bind(this);
+  }
 
-    getStateFromFlux() {
-      return this.getFlux().store("AdminStore").getState();
-    },
+  componentDidMount() {
+    this.props.flux.actions.ADMIN.load_trusted_sources(PIPELINE_KEYS);
+  }
 
-    handleSave(rows) {
-      rows.map(row => this.appendRowKey(row));
-      this.getFlux().actions.ADMIN.save_trusted_sources(rows);
-    },
+  handleSave(rows) {
+    rows.map(row => this.appendRowKey(row));
+    this.props.flux.actions.ADMIN.save_trusted_sources(rows);
+  }
 
-    appendRowKey(source) {
-      return source.rowKey = source.pipelinekey + ',' + source.externalsourceid + ',' + source.sourcetype + ',' + source.rank;
-    },
+  appendRowKey(row) {
+    return row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank;
+  }
 
-    handleRemove(rows) {
-      this.getFlux().actions.ADMIN.remove_trusted_sources(rows);
-    },
+  handleRemove(rows) {
+    this.props.flux.actions.ADMIN.remove_trusted_sources(rows);
+  }
 
-    render() {
-      const state = this.getFlux().store("AdminStore").getState();
+  getTrustedSourcesColumns() {
+    const columnValues = [
+      {editable: true, filterable: true, sortable: true, key: "reportingcategory", name: "Category"},
+      {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
+      {editable: true, filterable: true, sortable: true, key: "sourcetype", name: "Source Type"},
+      {editable: true, filterable: true, sortable: true, key: "rank", name: "Rank"},
+    ];
 
-      return (
-        this.state.trustedSourcesColumns ? 
-          <DataGrid 
-            rowHeight={40}
-            minHeight={500}
-            rowKey="rowKey"
-            handleSave={this.handleSave}
-            handleRemove={this.handleRemove}
-            columns={this.state.trustedSourcesColumns}
-            rows={state.trustedSources} />
-          : <div />
-      );
-    }
-});
+    return getColumns(columnValues);
+  }
+
+  getTranslatableFields() {
+    const defaultLanguage = this.getDefaultLanguage();
+    const alternateLanguage = this.props.settings.properties.supportedLanguages.find(supportedLanguage => supportedLanguage !== defaultLanguage);
+    return { 
+      sourceField: {language: defaultLanguage, key: "name"}, 
+      targetField: {language: alternateLanguage, key: TRANSLATED_NAME}
+    };
+  }
+
+  getDefaultLanguage() {
+    return this.props.settings.properties.defaultLanguage;
+  }
+
+  render() {
+    return (
+      this.getTrustedSourcesColumns().length > 0 ? 
+        <DataGrid 
+          rowHeight={40}
+          minHeight={500}
+          rowKey='rowKey'
+          handleSave={this.handleSave}
+          handleRemove={this.handleRemove}
+          translatableFields={null}
+          columns={this.getTrustedSourcesColumns()}
+          rows={this.props.trustedSources} />
+        : <div />
+    );
+  }
+}
+
+export default TrustedSources;
