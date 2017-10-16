@@ -51,9 +51,34 @@ function trustedSourcesExtraProps() {
   });
 }
 
+function streamsExtraProps() {
+  return () => ({
+    operation: 'query',
+    table: 'streams',
+    success: 'true'
+  });
+}
+
 function trustedSourcesExtraMetrics() {
   return (graphqlResult) => {
     const totalRows = graphqlResult.sources.length;
+    return {
+      totalRows
+    };
+  };
+}
+
+function modifyStreamsExtraProps() {
+  return () => ({
+    operation: 'modify',
+    table: 'streams',
+    success: 'true'
+  });
+}
+
+function streamsExtraMetrics() {
+  return (graphqlResult) => {
+    const totalRows = graphqlResult.streams.length;
     return {
       totalRows
     };
@@ -107,6 +132,17 @@ function logNoKeywordsToRemove() {
   });
 }
 
+function logNoStreamParamsToEdit() {
+  trackSyncEvent('cassandra', { 
+    client: constants.CLIENTS.cassandra,
+    operation: 'modify',
+    table: 'streams',
+    success: 'false'
+  },{
+    numToMutate: 0
+  });
+}
+
 function translateExtraProps() {
   return () => ({
     operation: 'translate',
@@ -140,11 +176,15 @@ module.exports = {
   termsExtraProps,
   trustedSourcesExtraProps,
   trustedSourcesExtraMetrics,
+  streamsExtraProps,
+  modifyStreamsExtraProps,
+  streamsExtraMetrics,
   addKeywordsExtraProps,
   removeKeywordsExtraProps,
   keywordsExtraMetrics,
   logNoKeywordsToAdd,
   logNoKeywordsToRemove,
+  logNoStreamParamsToEdit,
   translateExtraProps,
   translateExtraMetrics,
   translateWordsExtraMetrics

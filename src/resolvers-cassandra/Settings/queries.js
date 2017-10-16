@@ -16,7 +16,11 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
     const ignoreCache = true;
 
     getTermsByCategory(translationLanguage, category, ignoreCache)
-      .then(resolve).catch(reject);
+      .then(resolve)
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 
@@ -37,7 +41,10 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
           streams
         });
       })
-      .catch(reject);
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 
@@ -219,7 +226,7 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 module.exports = {
   sites: trackEvent(withRunTime(sites), 'sites'),
-  streams: trackEvent(withRunTime(streams), 'streams'),
+  streams: trackEvent(withRunTime(streams), 'streams', loggingClient.streamsExtraProps(), loggingClient.streamsExtraMetrics()),
   siteTerms: trackEvent(withRunTime(terms), 'terms', loggingClient.termsExtraProps(), loggingClient.keywordsExtraMetrics()),
   trustedSources: trackEvent(withRunTime(trustedSources), 'trustedsources', loggingClient.trustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()),
   twitterAccounts: trackEvent(withRunTime(twitterAccounts), 'twitterAccounts'),
