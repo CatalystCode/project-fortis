@@ -1,5 +1,4 @@
 import {DataStore} from './stores/DataStore';
-import {FactsStore} from './stores/FactsStore';
 import {AdminStore} from './stores/AdminStore';
 import {methods as DashboardActions} from './actions/Dashboard';
 import {methods as AdminActions} from './actions/Admin';
@@ -17,7 +16,6 @@ let userProfile = constants.USER_PROFILE;
 
 let stores = {
   DataStore: new DataStore(userProfile),
-  FactsStore: new FactsStore(),
   AdminStore: new AdminStore(),
 };
 
