@@ -27,7 +27,6 @@ export const AdminStore = Fluxxor.createStore({
             twitterAccountColumns: [],
             trustedTwitterAccounts: [],
             topicGridColumns: [],
-            facebookPages: [],
             osmPlaceGroups: new Map(),
             blacklist: [],
             blacklistColumns: [],
@@ -46,7 +45,6 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_TRUSTED_SOURCES, this.handleLoadTrustedSources,
-            constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
             constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
             constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
@@ -145,12 +143,6 @@ export const AdminStore = Fluxxor.createStore({
 
     handleLoadTrustedTwitterAccts(response){
         this.dataStore.trustedTwitterAccounts = response.accounts.accounts || [];
-        this.dataStore.action = response.action || false;
-        this.emit("change");
-    },
-
-    handleLoadFacebookPages(response){
-        this.dataStore.facebookPages = response.pages.pages || [];
         this.dataStore.action = response.action || false;
         this.emit("change");
     },
