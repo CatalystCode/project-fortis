@@ -9,15 +9,15 @@ function toDataSources(streams) {
     const dataSources = new Map();
 
     streams = streams.filter(stream=>stream.enabled);
-    const allDataSource = {display: 'All', sourceValues: Array.from(new Set(streams.map(stream => stream.pipelineKey))), icon: 'fa fa-share-alt', label: 'all'};
-    dataSources.set('all', allDataSource);
+    const allDataSource = {display: 'All', sourceValues: Array.from(new Set(streams.map(stream => stream.pipelineKey))), icon: 'fa fa-share-alt', label: constants.PIPELINE_ALL};
+    dataSources.set(constants.PIPELINE_ALL, allDataSource);
     streams.forEach(stream => {
         const streamDataSource = {display: stream.pipelineLabel, sourceValues: [stream.pipelineKey], label: stream.pipelineKey, icon: stream.pipelineIcon};
         dataSources.set(stream.pipelineKey, streamDataSource);
     });
 
-    const importDataSource = {display: 'Imported Events', sourceValues: ['custom'], label: 'custom', icon: 'fa fa-upload'};
-    dataSources.set('custom', importDataSource);
+    const importDataSource = {display: 'Imported Events', sourceValues: [constants.PIPELINE_CUSTOM], label: constants.PIPELINE_CUSTOM, icon: 'fa fa-upload'};
+    dataSources.set(constants.PIPELINE_CUSTOM, importDataSource);
 
     return dataSources;
 }

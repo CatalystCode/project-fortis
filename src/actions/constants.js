@@ -62,6 +62,8 @@ module.exports = {
     },
     DEFAULT_TIMESERIES_PERIOD: "hour",
     DEFAULT_DATA_SOURCE: "all",
+    PIPELINE_ALL: "all",
+    PIPELINE_CUSTOM: "custom",
     DEFAULT_EXTERNAL_SOURCE: "all",
     DEFAULT_TIMESPAN_TYPE: "week",
     DEFAULT_TIMEPERIOD_FORMAT: "YYYY-ww",
