@@ -14,12 +14,12 @@ function eventToFeature(row) {
 
   return {
     type: FeatureType,
-    coordinates: row.computedfeatures.places.map(place => [place.centroidlon, place.centroidlat]),
+    coordinates: row.computedfeatures && row.computedfeatures.places.map(place => [place.centroidlon, place.centroidlat]),
     properties: {
       edges: row.topics,
       messageid: row.eventid,
       sourceeventid: row.sourceeventid,
-      places: row.computedfeatures.places.map(place => place.placeid),
+      places: row.computedfeatures && row.computedfeatures.places.map(place => place.placeid),
       entities: row.computedfeatures && row.computedfeatures.entities ? row.computedfeatures.entities.map(entity => entity.name) : [],
       eventtime: row.eventtime.getTime(),
       sentiment: row.computedfeatures && row.computedfeatures.sentiment ? row.computedfeatures.sentiment.neg_avg : -1,
@@ -160,6 +160,27 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function byPipeline(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.pipelinekeys || !args.pipelinekeys.length) return reject('No pipelines by which to filter specified');
+
+    const pipelineQuery = `
+    SELECT eventid
+    FROM fortis.eventsbypipeline
+    WHERE pipelinekey IN ?
+    `.trim();
+
+    const pipelineParams = [
+      limitForInClause(args.pipelinekeys)
+    ];
+
+    cassandraConnector.executeQueryWithPageState(pipelineQuery, pipelineParams, args.pageState, parseLimit(args.limit))
+      .then(response => queryEventsTable(response, args))
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
 function event(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.messageId) return reject('No event id to fetch specified');
@@ -234,6 +255,7 @@ function translateWords(args, res) { // eslint-disable-line no-unused-vars
 module.exports = {
   byBbox: trackEvent(withRunTime(byBbox), 'messagesForBbox'),
   byEdges: trackEvent(withRunTime(byEdges), 'messagesForEdges'),
+  byPipeline: trackEvent(withRunTime(byPipeline), 'messagesForPipeline'),
   event: trackEvent(event, 'messageForEvent'),
   translate: trackEvent(translate, 'translate'),
   translateWords: trackEvent(translateWords, 'translateWords')
