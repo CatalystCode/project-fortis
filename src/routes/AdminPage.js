@@ -38,6 +38,9 @@ export const AdminPage = createReactClass({
       trustedSources
     } = this.getStateFromFlux().dataStoreState;
 
+    console.log('trustedsources');
+    console.log(trustedSources);
+
     return Object.assign({}, { 
       settings,
       watchlist,

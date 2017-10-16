@@ -23,9 +23,6 @@ export const AdminStore = Fluxxor.createStore({
             settings: {},
             siteList: [],
             loading: false,
-            twitterAccounts: [],
-            twitterAccountColumns: [],
-            trustedTwitterAccounts: [],
             topicGridColumns: [],
             osmPlaceGroups: new Map(),
             blacklist: [],
@@ -45,8 +42,6 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_TRUSTED_SOURCES, this.handleLoadTrustedSources,
-            constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
-            constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
             constants.ADMIN.CREATE_SITE, this.handleCreateSite,
             constants.ADMIN.LOAD_BLACKLIST, this.handleLoadBlacklist,
@@ -118,32 +113,6 @@ export const AdminStore = Fluxxor.createStore({
 
     handleLoadPayload(payload) {
         this.dataStore.settings = Object.assign(this.dataStore.settings, payload);
-        this.emit("change");
-    },
-
-    handleLoadTwitterAccounts(response) {
-      this.loadTwitterAccountsColumns();
-      this.dataStore.twitterAccounts = response.response.twitterAccounts.accounts;
-      this.dataStore.action = response.action || false;
-      this.emit("change");
-    },
-
-    loadTwitterAccountsColumns() {
-      const columnValues = [
-        {key: "consumerKey", name: "Consumer Key"},
-        {key: "consumerSecret", name: "Consumer Secret"},
-        {key: "accessToken", name: "Access Token"},
-        {key: "accessTokenSecret", name: "Access Token Secret"},
-        {key: "userIds", name: "User Ids"}
-      ];
-      const saveAsColumnName = 'twitterAccountColumns';
-
-      this.loadColumns(columnValues, saveAsColumnName);
-    },
-
-    handleLoadTrustedTwitterAccts(response){
-        this.dataStore.trustedTwitterAccounts = response.accounts.accounts || [];
-        this.dataStore.action = response.action || false;
         this.emit("change");
     },
 

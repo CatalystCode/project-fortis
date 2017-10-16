@@ -7,29 +7,6 @@ import request from 'request';
 const SETTINGS_ENDPOINT = 'settings';
 const MESSAGES_ENDPOINT = 'messages';
 
-const trustedTwitterFragment = `fragment FortisTrustedTwitterAcctView on TrustedTwitterAccountCollection {
-                            accounts {
-                                    RowKey
-                                    acctUrl
-                            }
-                        }`;
-
-const fbPageAnalyticsFragment = `fragment FortisAdminSettingsView on FacebookPageAnalyticsCollection {
-                        analytics {
-                            Name,
-                            Count,
-                            LastUpdated
-                        }
-                      }`;
-
-const fbPageFragment = `fragment FortisDashboardView on FacebookPageCollection {
-                        runTime
-                        pages {
-                            RowKey
-                            pageUrl
-                        }
-                      }`;
-
 export const SERVICES = {
   restartPipeline(callback) {
     const query = `${AdminMutations.restartPipeline}`;
@@ -91,12 +68,6 @@ export const SERVICES = {
       const query = `${AdminFragments.topics}${AdminMutations.removeTopics}`;
       const variables = { input: { edges: topics } };
       fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
-    },
-
-    fetchTwitterAccounts(callback) {
-        const query = `${AdminFragments.twitterAccounts}${AdminQueries.getTwitterAccounts}`;
-        const variables = {};
-        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     fetchBlacklists(callback) {
@@ -165,28 +136,6 @@ export const SERVICES = {
         request(POST, callback);
     },
 
-    getTrustedTwitterAccounts(siteId, callback) {
-        let query = `  ${trustedTwitterFragment}
-                        query TrustedTwitterAccounts($siteId: String!) {
-                            accounts: trustedTwitterAccounts(siteId: $siteId) {
-                                ...FortisTrustedTwitterAcctView
-                            }
-                        }`;
-
-        let variables = { siteId };
-
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-
     saveKeywords(site, edges, callback) {
         const query = `${""}//termsEdgeFragment}
                         mutation AddKeywords($input: EdgeTerms!) {
@@ -242,116 +191,6 @@ export const SERVICES = {
         let host = process.env.REACT_APP_SERVICE_HOST
         var POST = {
             url: `${host}/api/edges`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    getAdminFbPages(siteId, days, callback) {
-        let query = ` ${fbPageFragment},
-                      ${fbPageAnalyticsFragment}
-                           query FacebookPages($siteId: String!, $days: Int!) {
-                              pages: facebookPages(siteId: $siteId) {
-                                  ...FortisDashboardView
-                              },
-                              analytics: facebookAnalytics(siteId: $siteId, days: $days)
-                              {
-                                  ...FortisAdminSettingsView
-                              }
-                          }`;
-
-        let variables = { siteId, days };
-
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    saveFbPages(site, pages, callback) {
-        const query = `${fbPageFragment}
-                          mutation ModifyFacebookPages($input: FacebookPageListInput!) {
-                              pages: modifyFacebookPages(input: $input) {
-                                  ...FortisDashboardView
-                              }
-                          }`;
-
-        const variables = { input: { pages, site } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    saveTrustedTwitterAccts(site, accounts, callback) {
-        const query = `${trustedTwitterFragment}
-                          mutation ModifyTrustedTwitterAccounts($input: TrustedTwitterAccountDefintion!) {
-                              accounts: modifyTrustedTwitterAccounts(input: $input) {
-                                  ...FortisTrustedTwitterAcctView
-                              }
-                          }`;
-
-        const variables = { input: { accounts, site } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    removeFbPages(site, pages, callback) {
-        const query = `${fbPageFragment}
-                          mutation RemoveFacebookPages($input: FacebookPageListInput!) {
-                              pages: removeFacebookPages(input: $input) {
-                                  ...FortisDashboardView
-                              }
-                          }`;
-
-        const variables = { input: { pages, site } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
-    },
-    removeTrustedTwitterAccts(site, accounts, callback) {
-        const query = `${trustedTwitterFragment}
-                          mutation RemoveTrustedTwitterAccounts($input: TrustedTwitterAccountDefintion!) {
-                              accounts: removeTrustedTwitterAccounts(input: $input) {
-                                  ...FortisTrustedTwitterAcctView
-                              }
-                          }`;
-
-        const variables = { input: { accounts, site } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
             method: "POST",
             json: true,
             withCredentials: false,

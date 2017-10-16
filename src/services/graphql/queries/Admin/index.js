@@ -59,12 +59,6 @@ export const getTopics = `query SiteTerms($translationLanguage: String, $categor
   }
 }`;
 
-export const getTwitterAccounts = `query TwitterAccounts {
-  twitterAccounts {
-    ...TwitterAccountsView
-  }
-}`;
-
 export const getTrustedSources = `query TrustedSources($pipelinekeys: [String]!, $sourcename: String) {
   trustedSources(pipelinekeys: $pipelinekeys, sourcename: $sourcename) {
     ...TrustedSourcesView
