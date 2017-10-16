@@ -10,7 +10,6 @@ import { Router, hashHistory } from 'react-router';
 import {routes} from './routes/routes';
 import constants from './actions/constants';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
 
 let userProfile = constants.USER_PROFILE;
 
