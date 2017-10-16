@@ -74,6 +74,12 @@ function getPlaceholderString(items) {
   return placeholder;
 }
 
+function trustedSourceFilter(row, pipelineKey) {
+  if (pipelineKey) {
+    return row.pipelinekey.toLowerCase().indexOf(pipelineKey.toLowerCase()) > -1;
+  }
+}
+
 function cassandraRowToStream(row) {
   if (row.enabled == null) row.enabled = false;
   return {
@@ -97,14 +103,6 @@ function cassandraRowToSource(row) {
     rank: row.rank,
     reportingcategory: row.reportingcategory
   };
-}
-
-function trustedSourceFilter(row, pipelineKey) {
-  if (pipelineKey) {
-    return row.pipelinekey.toLowerCase().indexOf(pipelineKey.toLowerCase()) > -1;
-  }
-
-  return true;
 }
 
 function paramsToParamsEntries(params) {
