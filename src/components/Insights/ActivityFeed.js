@@ -65,7 +65,7 @@ export default class ActivityFeed extends React.Component {
         const pipelinekeys = enabledStreams.get(filteredSource).sourceValues;
         const externalsourceid = props.externalsourceid !== constants.DEFAULT_EXTERNAL_SOURCE ? props.externalsourceid : null;
         const fulltextTerm = "";
-        const activeTrustedSources = trustedSources.filter(source => pipelinekeys.indexOf(source.pipelinekey) >= 0);
+        const activeTrustedSources = (trustedSources || []).filter(source => pipelinekeys.indexOf(source.pipelinekey) >= 0);
 
         SERVICES.FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, ActivityConsts.OFFSET_INCREMENT, pageState, [maintopic].concat(Array.from(termFilters)), pipelinekeys, fulltextTerm, (error, response, body) => {
             callback(error, response, body, activeTrustedSources);
