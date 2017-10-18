@@ -61,12 +61,13 @@ export const DataStore = Fluxxor.createStore({
         this.bindActions(
             constants.DASHBOARD.INITIALIZE, this.intializeSettings,
             constants.DASHBOARD.RELOAD_CHARTS, this.handleReloadChartData,
-            constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange
+            constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange,
+            constants.DASHBOARD.LOAD_TRUSTED_SOURCES, this.handleTrustedSourceChange
         );
     },
 
     getState() {
-        return this.dataStore;
+      return this.dataStore;
     },
 
     handleLanguageChange(gqlRespomse) {
@@ -94,7 +95,7 @@ export const DataStore = Fluxxor.createStore({
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
-
+        
         this.dataStore.enabledStreams = dataSources;
         this.dataStore.dataSource = constants.DEFAULT_DATA_SOURCE;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
@@ -162,5 +163,10 @@ export const DataStore = Fluxxor.createStore({
         this.syncChartDataToStore(changedData);
         this.syncFilterSelections(changedData);
         this.emit("change");
+    },
+
+    handleTrustedSourceChange(response) {
+      this.dataStore.trustedSources = response.response;
+      this.emit("change");
     }
 });
