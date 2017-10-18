@@ -1,14 +1,10 @@
 'use strict';
 
 const Promise = require('promise');
-const facebookAnalyticsClient = require('../../clients/facebook/FacebookAnalyticsClient');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const { withRunTime, getTermsByCategory, getSiteDefintion } = require('../shared');
 const { trackException, trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
-
-const PIPELINE_KEY_TWITTER = 'twitter';
-const CONNECTOR_FACEBOOK = 'Facebook';
 
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
@@ -50,41 +46,18 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
 
 function trustedSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const pipelineKeysPlaceholder = getPlaceholderString(args.pipelinekeys);
-    const query = `SELECT * FROM fortis.trustedsources where pipelinekey IN (${pipelineKeysPlaceholder})`;
-    const params = [
-      ...args.pipelinekeys
-    ];
+    const query = 'SELECT * FROM fortis.trustedsources';
+    const params = [];
 
     cassandraConnector.executeQuery(query, params)
       .then(rows => resolve({
         sources: rows.map(cassandraRowToSource)
-          .filter(source => trustedSourceFilter(source, args.sourcename))
       }))
       .catch(error => {
         trackException(error);
         reject(error);
       });
   });
-}
-
-function getPlaceholderString(items) {
-  if (!items || !items.length) return '';
-  let placeholder = '';
-  for (let i = 0; i < items.length; i++) {
-    if (i === items.length - 1) {
-      placeholder += '?';
-    } else {
-      placeholder += '?,';
-    }
-  }
-  return placeholder;
-}
-
-function trustedSourceFilter(row, pipelineKey) {
-  if (pipelineKey) {
-    return row.pipelinekey.toLowerCase().indexOf(pipelineKey.toLowerCase()) > -1;
-  }
 }
 
 function cassandraRowToStream(row) {
@@ -125,86 +98,6 @@ function paramsToParamsEntries(params) {
   return paramsEntries;
 }
 
-function cassandraRowToTwitterAccount(row) {
-  return {
-    userIds: row.params.userIds,
-    consumerKey: row.params.consumerKey,
-    consumerSecret: row.params.consumerSecret,
-    accessToken: row.params.accessToken,
-    accessTokenSecret: row.params.accessTokenSecret
-  };
-}
-
-function twitterAccounts(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const sourcesByPipelineKey = 'SELECT params FROM fortis.streams WHERE pipelinekey = ?';
-    cassandraConnector.executeQuery(sourcesByPipelineKey, [PIPELINE_KEY_TWITTER])
-      .then(result => {
-        const accounts = result.map(cassandraRowToTwitterAccount);
-        resolve({ accounts: accounts });
-      })
-      .catch(reject)
-      ;
-  });
-}
-
-function cassandraRowToTrustedTwitterAccount(row) {
-  return {
-    RowKey: `${row.connector},${row.sourceid},${row.sourcetype}`,
-    acctUrl: row.sourceid
-  };
-}
-
-function trustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const sourcesByConnector = 'SELECT connector, sourceid, sourcetype  FROM fortis.trustedsources WHERE pipelinekey = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, [PIPELINE_KEY_TWITTER])
-      .then(rows => {
-        const accounts = rows.map(cassandraRowToTrustedTwitterAccount);
-        resolve({ accounts: accounts });
-      })
-      .catch(reject)
-      ;
-  });
-}
-
-function cassandraRowToFacebookPage(row) {
-  return {
-    RowKey: `${row.connector},${row.sourceid},${row.sourcetype}`,
-    pageUrl: row.sourceid
-  };
-}
-
-function facebookPages(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const sourcesByConnector = 'SELECT connector, sourceid, sourcetype FROM fortis.trustedsources WHERE connector = ? ALLOW FILTERING';
-    cassandraConnector.executeQuery(sourcesByConnector, [CONNECTOR_FACEBOOK])
-      .then(rows => {
-        const pages = rows.map(cassandraRowToFacebookPage);
-        resolve({ pages: pages });
-      })
-      .catch(reject)
-      ;
-  });
-}
-
-function facebookPageToId(page) {
-  const match = page && page.pageUrl && page.pageUrl.match(/facebook.com\/([^/]+)/);
-  return match && match.length >= 1 && match[1];
-}
-
-function facebookAnalytics(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    facebookPages({ siteId: args.siteId })
-      .then(response => {
-        const pageIds = response.pages.map(facebookPageToId).filter(pageId => !!pageId);
-        Promise.all(pageIds.map(pageId => ({ Name: pageId, LastUpdated: facebookAnalyticsClient.fetchPageLastUpdatedAt(pageId), Count: -1 })))
-          .then(analytics => resolve({ analytics }))
-          .catch(reject);
-      });
-  });
-}
-
 function cassandraRowToTermFilter(row) {
   return {
     id: row.id,
@@ -228,10 +121,6 @@ module.exports = {
   sites: trackEvent(withRunTime(sites), 'sites'),
   streams: trackEvent(withRunTime(streams), 'streams', loggingClient.streamsExtraProps(), loggingClient.streamsExtraMetrics()),
   siteTerms: trackEvent(withRunTime(terms), 'terms', loggingClient.termsExtraProps(), loggingClient.keywordsExtraMetrics()),
-  trustedSources: trackEvent(withRunTime(trustedSources), 'trustedsources', loggingClient.trustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()),
-  twitterAccounts: trackEvent(withRunTime(twitterAccounts), 'twitterAccounts'),
-  trustedTwitterAccounts: trackEvent(withRunTime(trustedTwitterAccounts), 'trustedTwitterAccounts'),
-  facebookPages: trackEvent(withRunTime(facebookPages), 'facebookPages'),
-  facebookAnalytics: trackEvent(facebookAnalytics, 'facebookAnalytics'),
+  trustedSources: trackEvent(withRunTime(trustedSources), 'trustedSources', loggingClient.trustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()),
   termBlacklist: trackEvent(withRunTime(termBlacklist), 'termBlacklist')
 };

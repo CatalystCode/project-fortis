@@ -8,12 +8,6 @@ module.exports = {
   removeSite: mutations.removeSite,
   editSite: mutations.editSite,
   modifyStreams: mutations.modifyStreams,
-  modifyFacebookPages: mutations.modifyFacebookPages,
-  removeFacebookPages: mutations.removeFacebookPages,
-  modifyTrustedTwitterAccounts: mutations.modifyTrustedTwitterAccounts,
-  removeTrustedTwitterAccounts: mutations.removeTrustedTwitterAccounts,
-  modifyTwitterAccounts: mutations.modifyTwitterAccounts,
-  removeTwitterAccounts: mutations.removeTwitterAccounts,
   modifyBlacklist: mutations.modifyBlacklist,
   removeBlacklist: mutations.removeBlacklist,
   removeKeywords: mutations.removeKeywords,
@@ -25,9 +19,5 @@ module.exports = {
   sites: queries.sites,
   trustedSources: queries.trustedSources,
   streams: queries.streams,
-  twitterAccounts: queries.twitterAccounts,
-  trustedTwitterAccounts: queries.trustedTwitterAccounts,
-  facebookPages: queries.facebookPages,
-  facebookAnalytics: queries.facebookAnalytics,
   termBlacklist: queries.termBlacklist
 };
