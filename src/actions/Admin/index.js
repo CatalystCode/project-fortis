@@ -216,9 +216,6 @@ const methods = {
           const trustedSourcesBeforeRemove = this.flux.stores.DataStore.dataStore.trustedSources;
           const trustedSourcesRemoved = graphqlResponse.removeTrustedSources.sources
           const trustedSourcesAfterRemove = getListAfterRemove(trustedSourcesBeforeRemove, trustedSourcesRemoved, 'rowKey');
-          
-          console.log('response');
-          console.log(trustedSourcesAfterRemove);
           self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {action});
           self.dispatch(constants.DASHBOARD.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterRemove})
         } else {
