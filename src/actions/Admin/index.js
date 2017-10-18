@@ -142,7 +142,7 @@ const methods = {
           const action = "saved";
           self.dispatch(constants.ADMIN.LOAD_TOPICS, {response, action});
         } else {
-          let error = 'Error, could not load keywords for admin page';
+          const error = 'Error, could not load keywords for admin page';
           self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
         }
       }))
@@ -157,7 +157,7 @@ const methods = {
         const topicsAfterSave = this.flux.stores.AdminStore.dataStore.watchlist;
         self.dispatch(constants.ADMIN.LOAD_TOPICS, { action, response: topicsAfterSave});
       } else {
-        let error = 'Error, could not load keywords for admin page';
+        const error = 'Error, could not load keywords for admin page';
         self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
       }
     }));
@@ -175,7 +175,7 @@ const methods = {
           const topicsAfterRemove = getListAfterRemove(topicsBeforeRemove, topicsToRemove, 'topicid');
           self.dispatch(constants.ADMIN.LOAD_TOPICS, { action, response: topicsAfterRemove });
         } else {
-          let error = 'Error, could not remove keywords from admin page';
+          const error = 'Error, could not remove keywords from admin page';
           self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
         }
       }));
@@ -199,7 +199,7 @@ const methods = {
           self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {action});
           self.dispatch(constants.DASHBOARD.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterSave});
         } else {
-          let error = 'Error, could not load trusted sources for admin page';
+          const error = 'Error, could not load trusted sources for admin page';
           self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
         }
       }))
@@ -219,7 +219,7 @@ const methods = {
           self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {action});
           self.dispatch(constants.DASHBOARD.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterRemove})
         } else {
-          let error = 'Error, could not load trusted sources for admin page';
+          const error = 'Error, could not load trusted sources for admin page';
           self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
         }
       }))
