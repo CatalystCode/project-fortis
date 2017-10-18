@@ -2,8 +2,7 @@
 
 const Promise = require('promise');
 const azure = require('azure-sb'); 
-const { trackEvent, trackDependency } = require('../appinsights/AppInsightsClient');
-const loggingClient = require('../appinsights/LoggingClient');
+const { trackDependency } = require('../appinsights/AppInsightsClient');
 const SERVICE_BUS_CONNECTION_STRING = process.env.FORTIS_SB_CONN_STR;
 
 const SERVICE_BUS_CONFIG_QUEUE = process.env.FORTIS_SB_CONFIG_QUEUE || 'configuration';
@@ -61,7 +60,7 @@ function sendQueueMessage(queue, serviceBusMessage) {
 }
 
 module.exports = {
-  restartPipeline: trackEvent(restartPipeline, 'restartPipeline', loggingClient.restartPipelineExtraProps()),
+  restartPipeline: trackDependency(restartPipeline, 'ServiceBus', 'send'),
   restartStreaming: trackDependency(restartStreaming, 'ServiceBus', 'send'),
   notifyWatchlistUpdate: trackDependency(notifyWatchlistUpdate, 'ServiceBus', 'send'),
   notifyBlacklistUpdate: trackDependency(notifyBlacklistUpdate, 'ServiceBus', 'send'),
