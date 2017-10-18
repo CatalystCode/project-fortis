@@ -16,7 +16,8 @@ const STATE_ACTIONS = {
   TRANSLATING: "translating"
 };
 
-const FluxMixin = Fluxxor.FluxMixin(React), StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
+const FluxMixin = Fluxxor.FluxMixin(React);
+const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore", "DataStore");
 const RowRenderer = createReactClass({
   getRowStyle: function() {
     return {
@@ -56,7 +57,8 @@ export const DataGrid = createReactClass({
     }
   },
   getStateFromFlux() {
-    return this.getFlux().store("AdminStore").getState();
+    var flux = this.getFlux();
+    return Object.assign({}, flux.store("DataStore").getState(), flux.store("AdminStore").getState());
   },
   componentDidMount() {
     document.body.addEventListener('paste', this.handlePaste);
@@ -71,8 +73,8 @@ export const DataGrid = createReactClass({
     let filters = this.state.filters;
     const rowsToRemove = nextProps.rowsToRemove;
     const rowsToMerge = nextProps.rowsToMerge;
-    let state = this.getFlux().store("AdminStore").getState();
-    let rows = this.state.rows.length === 0 ? nextProps.rows : this.state.rows;
+    let state = this.state;
+    let rows = this.state.rows.length === 0 || nextProps.rows ? nextProps.rows : this.state.rows;
     
     //if the action state === SAVED and the modified rows set has been cleared then mark the state as saved
     if(state.action === STATE_ACTIONS.SAVED && localAction === STATE_ACTIONS.SAVING){
@@ -141,7 +143,9 @@ export const DataGrid = createReactClass({
     
     //remove any selected rows that were marked as modified
     let modifiedRows = new Set(Array.from(this.state.modifiedRows).filter(rowKey => this.state.selectedRowKeys.indexOf(rowKey) === -1));
-    const selectedRowKeys = [];
+    
+    const selectedRowKeys = [];   
+    
     this.setState({filters: {}, localAction: STATE_ACTIONS.SAVING, modifiedRows: modifiedRows, selectedRowKeys});
     this.props.handleRemove(selectedRows);
   },
@@ -319,14 +323,15 @@ export const DataGrid = createReactClass({
             }
         });
 
-        if(!invalidData){
+        if (!invalidData) {
             const mutatedRows = this.state.rows.filter(row=>modifiedRows.has(row[this.props.rowKey]));
             //only save the grid rows that were modified to minimize unneccesary service mutations.
             modifiedRows.clear();
-            this.setState({localAction: STATE_ACTIONS.SAVING, filters: {}, modifiedRows: modifiedRows});
+            const selectedRowKeys = [];
+            this.setState({localAction: STATE_ACTIONS.SAVING, filters: {}, modifiedRows, selectedRowKeys});
             this.props.handleSave(mutatedRows, this.state.columns);
-        }else{
-            return false;
+        } else {
+          return false;
         }
     },
     onRowsSelected(rows) {
@@ -410,6 +415,10 @@ export const DataGrid = createReactClass({
       else return false;
     },
 
+    showUploadChangesButton() {
+      return this.state.localAction && this.state.rows.length > 0 && this.state.selectedRowKeys.length > 0;
+    },
+
     render() {
         let rowText = this.state.selectedRowKeys.length === 1 ? 'row' : 'rows';
         let toolBarProps = {};
@@ -435,7 +444,7 @@ export const DataGrid = createReactClass({
         return (
           <div>
             {
-                this.state.localAction && this.state.rows.length > 0 ? 
+                this.showUploadChangesButton() ? 
                        <button style={styles.actionButton} 
                                 onClick={this.handleSave} 
                                 type="button" 
