@@ -10,7 +10,8 @@ const MESSAGES_ENDPOINT = 'messages';
 export const SERVICES = {
   restartPipeline(callback) {
     const query = `${AdminMutations.restartPipeline}`;
-    fetchGqlData(MESSAGES_ENDPOINT, { query }, callback);
+    const variables = {};
+    fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
   },
 
     getDashboardSiteDefinition(translationLanguage, category, callback) {

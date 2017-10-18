@@ -57,7 +57,7 @@ export const DataGrid = createReactClass({
     }
   },
   getStateFromFlux() {
-    var flux = this.getFlux();
+    const flux = this.getFlux();
     return Object.assign({}, flux.store("DataStore").getState(), flux.store("AdminStore").getState());
   },
   componentDidMount() {
@@ -327,8 +327,7 @@ export const DataGrid = createReactClass({
             const mutatedRows = this.state.rows.filter(row=>modifiedRows.has(row[this.props.rowKey]));
             //only save the grid rows that were modified to minimize unneccesary service mutations.
             modifiedRows.clear();
-            const selectedRowKeys = [];
-            this.setState({localAction: STATE_ACTIONS.SAVING, filters: {}, modifiedRows, selectedRowKeys});
+            this.setState({localAction: STATE_ACTIONS.SAVING, filters: {}, modifiedRows, selectedRowKeys: []});
             this.props.handleSave(mutatedRows, this.state.columns);
         } else {
           return false;

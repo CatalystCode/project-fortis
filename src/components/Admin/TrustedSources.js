@@ -11,6 +11,7 @@ class TrustedSources extends React.Component {
   constructor(props) {
     super(props);
 
+    this.getEnabledStreamsForDropdown = this.getEnabledStreamsForDropdown.bind(this);
     this.getTrustedSourcesColumns = this.getTrustedSourcesColumns.bind(this);
     this.getTranslatableFields = this.getTranslatableFields.bind(this);
     this.handleSave = this.handleSave.bind(this);
@@ -22,12 +23,12 @@ class TrustedSources extends React.Component {
   }
 
   handleSave(rows) {
-    rows.map(row => row.rowKey = this.getRowKey(row));
+    rows.forEach(row => row.rowKey = this.getRowKey(row));
     this.props.flux.actions.ADMIN.save_trusted_sources(rows);
   }
 
   getRowKey(row) {
-    return row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank;
+    return `${row.pipelinekey},${row.externalsourceid},${row.sourcetype},${row.rank}`;
   }
 
   handleRemove(rows) {    
@@ -42,18 +43,13 @@ class TrustedSources extends React.Component {
   }
 
   trustedSourcesToRemoveExist(sources) {
-    const shouldRemove = sources.length > 0;
-    return shouldRemove;
+    return sources.length > 0;
   }
 
   getTrustedSourcesColumns() {
-    const pipelineKeys = [
-      { id: 'Twitter', value: 'Twitter', text: 'Twitter', title: 'Twitter' },
-      { id: 'Facebook', value: 'Facebook', text: 'Facebook', title: 'Facebook' }
-    ];
-
+    const enabledStreams = this.getEnabledStreamsForDropdown();
     const columnValues = [
-      {key: "pipelinekey", name: "Pipeline Key", editor: <DropDownEditor options={pipelineKeys}/>, formatter: <DropDownFormatter options={pipelineKeys} value='Facebook'/>},
+      {key: "pipelinekey", name: "Pipeline Key", editor: <DropDownEditor options={enabledStreams}/>, formatter: <DropDownFormatter options={enabledStreams} value='Facebook'/>},
       {editable: true, filterable: true, sortable: true, key: "externalsourceid", name: "External Source Id"},
       {editable: true, filterable: true, sortable: true, key: "reportingcategory", name: "Category"},
       {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
@@ -62,6 +58,19 @@ class TrustedSources extends React.Component {
     ];
 
     return getColumns(columnValues);
+  }
+
+  getEnabledStreamsForDropdown = () => {
+    let dropdownOptions = [];
+    this.props.enabledStreams.forEach((value, key) => {
+      dropdownOptions.push({
+        id: key,
+        value: key,
+        text: key,
+        title: key
+      });
+    });
+    return dropdownOptions;
   }
 
   getTranslatableFields() {

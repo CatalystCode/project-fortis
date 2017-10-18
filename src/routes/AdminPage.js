@@ -31,11 +31,12 @@ export const AdminPage = createReactClass({
       watchlist,
       streams,
       translatableFields,
-      enabledStreams
     } = this.getStateFromFlux().adminStoreState;
 
+
     const {
-      trustedSources
+      trustedSources,
+      enabledStreams
     } = this.getStateFromFlux().dataStoreState;
 
     return Object.assign({}, { 
