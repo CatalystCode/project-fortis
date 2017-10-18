@@ -170,8 +170,8 @@ class Admin extends React.Component {
             Are you sure you want to restart the pipeline?
           </Modal.Body>
           <Modal.Footer>
-            <Button bsStyle="primary" onClick={this.restartPipelineAndCloseModal}>Yes, I'm sure</Button>
-            <Button onClick={this.closeModal}>No, don't restart</Button>
+            <Button bsStyle="primary" onClick={this.restartPipelineAndCloseModal}>Yes, I&#8217;m sure</Button>
+            <Button onClick={this.closeModal}>No, don&#8217;t restart</Button>
           </Modal.Footer>
         </Modal>
       </div>

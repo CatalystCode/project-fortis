@@ -46,7 +46,7 @@ function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
         enabledStreams, category, (err, response, body) => ResponseHandler(err, response, body, callback));
 }
 
-function fetchAllTrustedSources(resultsUnion, callback) { //MOVE TO ADMIN
+function fetchAllTrustedSources(resultsUnion, callback) {
   AdminServices.fetchTrustedSources((trustedSourcesErr, response, body) => {
     ResponseHandler(trustedSourcesErr, response, body, (err, data) => {
       if (err) {
