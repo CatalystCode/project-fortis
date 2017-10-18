@@ -30,8 +30,6 @@ export const AdminStore = Fluxxor.createStore({
             locationGridColumns: [],
             locations: new Map(),
             watchlist: [],
-            trustedSources: [],
-            trustedSourcesColumns: [],
             action: false,
             error: null
         };
@@ -175,23 +173,9 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleLoadTrustedSources(response) {
-      this.dataStore.trustedSources = response.response || [];
-      this.dataStore.action = response.action || false;
-      this.handleLoadTrustedSourcesColumns();
+      this.dataStore.action = response.action;
       this.emit("change");
-    },
-
-    handleLoadTrustedSourcesColumns() {
-      const columnValues = [
-        {editable: true, key: "pipelinekey", name: "Pipeline Key"},
-        {editable: true, key: "externalsourceid", name: "External Source Id"},
-        {editable: true, key: "sourcetype", name: "Source Type"},
-        {editable: true, key: "rank", name: "Rank"},
-      ];
-      const saveAsColumnName = 'trustedSourcesColumns';
-      this.loadColumns(columnValues, saveAsColumnName);
-      this.emit("change");
-    },
+    }, 
 
     handlePublishedCustomEvents(response){
         this.dataStore.action = response.action || false;
