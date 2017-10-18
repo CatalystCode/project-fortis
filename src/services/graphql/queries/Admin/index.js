@@ -59,8 +59,8 @@ export const getTopics = `query SiteTerms($translationLanguage: String, $categor
   }
 }`;
 
-export const getTrustedSources = `query TrustedSources($pipelinekeys: [String]!, $sourcename: String) {
-  trustedSources(pipelinekeys: $pipelinekeys, sourcename: $sourcename) {
+export const getTrustedSources = `query TrustedSources {
+  trustedSources {
     ...TrustedSourcesView
   }
 }`;

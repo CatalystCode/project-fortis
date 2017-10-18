@@ -132,50 +132,6 @@ const methods = {
       }));
     },
 
-    save_twitter_accounts(siteName, twitterAccts) {
-        const self = this;
-        const mutationNameTwitterAcctModify = "modifyTwitterAccounts";
-
-        AdminServices.saveTwitterAccounts(siteName, twitterAccts, mutationNameTwitterAcctModify, (error, response, body) => {
-            if(!error && response.statusCode === 200 && body.data && body.data.streams) {
-                const action = 'saved';
-                const streams = body.data.streams;
-                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {streams, action});
-            }else{
-                console.error(`[${error}] occured while processing message request`);
-            }
-       });
-    },
-
-    remove_twitter_accounts(siteName, twitterAccts) {
-        const self = this;
-        const mutationNameTwitterAcctModifyRemove = "removeTwitterAccounts";
-        AdminServices.saveTwitterAccounts(siteName, twitterAccts, mutationNameTwitterAcctModifyRemove, (error, response, body) => {
-            if(!error && response.statusCode === 200 && body.data && body.data.streams) {
-                const action = 'saved';
-                const streams = body.data.streams;
-                self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {streams, action});
-            }else{
-                console.error(`[${error}] occured while processing message request`);
-            }
-       });
-    },
-
-    load_twitter_accounts() {
-      const self = this;
-      AdminServices.fetchTwitterAccounts((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-        if (graphqlResponse && !error) {
-          const response = graphqlResponse ? graphqlResponse : [];
-          const action = false;
-          self.dispatch(constants.ADMIN.LOAD_TWITTER_ACCOUNTS, {response, action});
-        } else{
-          const error = 'Error, could not load twitter accounts for admin page';
-          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-        }
-      }));
-    },
-
-
   load_topics(translationLanguage) {
     const self = this;
     const dataStore = this.flux.stores.AdminStore.dataStore;
@@ -226,84 +182,52 @@ const methods = {
     }
   },
 
-    load_trusted_sources(pipelineKeys, sourceName) {
-      const self = this;
-      const dataStore = this.flux.stores.AdminStore.dataStore;
-      if (!dataStore.loading) {
-        AdminServices.fetchTrustedSources(pipelineKeys, sourceName, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-          if (graphqlResponse && !error) {
-            const response = graphqlResponse.trustedSources.sources
-            const action = "saved";
-            self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response, action});
-          } else {
-            let error = 'Error, could not load trusted sources for admin page';
-            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-          }
-        }))
-      }
-    },
+  notifyDataGridTrustedSourcesLoaded() {
+    const self = this;
+    const action = "saved";
+    self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {action});
+  },
 
-    save_trusted_sources(sources) {
-      const self = this;
-      const dataStore = this.flux.stores.AdminStore.dataStore;
-      if (!dataStore.loading) {
-        AdminServices.saveTrustedSources(sources, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-          if (graphqlResponse && !error) {
-            const trustedSourcesAfterSave = this.flux.stores.AdminStore.dataStore.trustedSources;
-            const action = 'saved';
-            self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterSave, action});
-          } else {
-            let error = 'Error, could not load trusted sources for admin page';
-            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-          }
-        }))
-      }
-    },
+  save_trusted_sources(sources) {
+    const self = this;
+    const dataStore = this.flux.stores.DataStore.dataStore;
+    if (!dataStore.loading) {
+      AdminServices.saveTrustedSources(sources, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const trustedSourcesAfterSave = this.flux.stores.DataStore.dataStore.trustedSources;
+          const action = 'saved';
+          self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {action});
+          self.dispatch(constants.DASHBOARD.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterSave});
+        } else {
+          let error = 'Error, could not load trusted sources for admin page';
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }))
+    }
+  },
 
-    remove_trusted_sources(sources) {
-      const self = this;
-      const dataStore = this.flux.stores.AdminStore.dataStore;
-      if (!dataStore.loading) {
-        AdminServices.removeTrustedSources(sources, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-          if (graphqlResponse && !error) {
-            const action = 'saved';
-            const trustedSourcesBeforeRemove = this.flux.stores.AdminStore.dataStore.trustedSources;
-            const trustedSourcesRemoved = graphqlResponse.removeTrustedSources.sources
-            const trustedSourcesAfterRemove = getListAfterRemove(trustedSourcesBeforeRemove, trustedSourcesRemoved, 'rowKey');
-            self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterRemove, action});
-          } else {
-            let error = 'Error, could not load trusted sources for admin page';
-            self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
-          }
-        }))
-      }
-    },
-
-    remove_keywords(siteId, deletedRows) {
-        const self = this;
-
-        AdminServices.removeKeywords(siteId, deletedRows, (error, response, body) => {
-            if(!error && response.statusCode === 200 && body.data.removeKeywords) {
-                const response = body.data.removeKeywords.edges;
-                const action = 'saved';
-                self.dispatch(constants.ADMIN.LOAD_KEYWORDS, {response, action});
-            }else{
-                console.error(`[${error}] occured while processing message request`);
-            }
-        });
-    },
-    save_keywords(siteId, modifiedKeywords){
-        const self = this;
-        AdminServices.saveKeywords(siteId, modifiedKeywords, (error, response, body) => {
-            if(!error && response.statusCode === 200) {
-                const action = 'saved';
-                const response = body.data.addKeywords.edges;
-                self.dispatch(constants.ADMIN.LOAD_KEYWORDS, {response, action});
-            }else{
-                console.error(`[${error}] occured while processing message request`);
-            }
-        });
-    },
+  remove_trusted_sources(sources) {
+    const self = this;
+    const dataStore = this.flux.stores.DataStore.dataStore;
+    if (!dataStore.loading) {
+      AdminServices.removeTrustedSources(sources, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
+        if (graphqlResponse && !error) {
+          const action = 'saved';
+          const trustedSourcesBeforeRemove = this.flux.stores.DataStore.dataStore.trustedSources;
+          const trustedSourcesRemoved = graphqlResponse.removeTrustedSources.sources
+          const trustedSourcesAfterRemove = getListAfterRemove(trustedSourcesBeforeRemove, trustedSourcesRemoved, 'rowKey');
+          
+          console.log('response');
+          console.log(trustedSourcesAfterRemove);
+          self.dispatch(constants.ADMIN.LOAD_TRUSTED_SOURCES, {action});
+          self.dispatch(constants.DASHBOARD.LOAD_TRUSTED_SOURCES, {response: trustedSourcesAfterRemove})
+        } else {
+          let error = 'Error, could not load trusted sources for admin page';
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error });
+        }
+      }))
+    }
+  },
 
     publish_events(events){
         AdminServices.publishCustomEvents(events, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
