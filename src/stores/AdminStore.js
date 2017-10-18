@@ -23,19 +23,13 @@ export const AdminStore = Fluxxor.createStore({
             settings: {},
             siteList: [],
             loading: false,
-            twitterAccounts: [],
-            twitterAccountColumns: [],
-            trustedTwitterAccounts: [],
             topicGridColumns: [],
-            facebookPages: [],
             osmPlaceGroups: new Map(),
             blacklist: [],
             blacklistColumns: [],
             locationGridColumns: [],
             locations: new Map(),
             watchlist: [],
-            trustedSources: [],
-            trustedSourcesColumns: [],
             action: false,
             error: null
         };
@@ -46,9 +40,6 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_TRUSTED_SOURCES, this.handleLoadTrustedSources,
-            constants.ADMIN.LOAD_FB_PAGES, this.handleLoadFacebookPages,
-            constants.ADMIN.LOAD_TWITTER_ACCOUNTS, this.handleLoadTwitterAccounts,
-            constants.ADMIN.LOAD_TRUSTED_TWITTER_ACCTS, this.handleLoadTrustedTwitterAccts,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
             constants.ADMIN.CREATE_SITE, this.handleCreateSite,
             constants.ADMIN.LOAD_BLACKLIST, this.handleLoadBlacklist,
@@ -123,38 +114,6 @@ export const AdminStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleLoadTwitterAccounts(response) {
-      this.loadTwitterAccountsColumns();
-      this.dataStore.twitterAccounts = response.response.twitterAccounts.accounts;
-      this.dataStore.action = response.action || false;
-      this.emit("change");
-    },
-
-    loadTwitterAccountsColumns() {
-      const columnValues = [
-        {key: "consumerKey", name: "Consumer Key"},
-        {key: "consumerSecret", name: "Consumer Secret"},
-        {key: "accessToken", name: "Access Token"},
-        {key: "accessTokenSecret", name: "Access Token Secret"},
-        {key: "userIds", name: "User Ids"}
-      ];
-      const saveAsColumnName = 'twitterAccountColumns';
-
-      this.loadColumns(columnValues, saveAsColumnName);
-    },
-
-    handleLoadTrustedTwitterAccts(response){
-        this.dataStore.trustedTwitterAccounts = response.accounts.accounts || [];
-        this.dataStore.action = response.action || false;
-        this.emit("change");
-    },
-
-    handleLoadFacebookPages(response){
-        this.dataStore.facebookPages = response.pages.pages || [];
-        this.dataStore.action = response.action || false;
-        this.emit("change");
-    },
-
     handleLoadBlacklist(response) {
       this.handleLoadBlackListColumns();
       let action = false;
@@ -214,23 +173,9 @@ export const AdminStore = Fluxxor.createStore({
     },
 
     handleLoadTrustedSources(response) {
-      this.dataStore.trustedSources = response.response || [];
-      this.dataStore.action = response.action || false;
-      this.handleLoadTrustedSourcesColumns();
+      this.dataStore.action = response.action;
       this.emit("change");
-    },
-
-    handleLoadTrustedSourcesColumns() {
-      const columnValues = [
-        {editable: true, key: "pipelinekey", name: "Pipeline Key"},
-        {editable: true, key: "externalsourceid", name: "External Source Id"},
-        {editable: true, key: "sourcetype", name: "Source Type"},
-        {editable: true, key: "rank", name: "Rank"},
-      ];
-      const saveAsColumnName = 'trustedSourcesColumns';
-      this.loadColumns(columnValues, saveAsColumnName);
-      this.emit("change");
-    },
+    }, 
 
     handlePublishedCustomEvents(response){
         this.dataStore.action = response.action || false;

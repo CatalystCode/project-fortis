@@ -28,13 +28,13 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, ca
     const dataSources = toDataSources((streams && streams.streams) || []);
 
     DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel, category, 
-        (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
-            if (!err) {
-                callback(null, Object.assign({}, { terms, dataSources }, { configuration }, topics ));
-            } else {
-                callback(err, null);
-            }
-        }));
+      (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
+          if (!err) {
+              callback(null, Object.assign({}, { terms, dataSources }, { configuration }, topics ));
+          } else {
+              callback(err, null);
+          }
+      }));
 }
 
 function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
@@ -47,21 +47,18 @@ function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
 }
 
 function fetchAllTrustedSources(resultsUnion, callback) {
-    const { dataSources } = resultsUnion;
-    const pipelineKeys = dataSources.get('all').sourceValues;
-
-    AdminServices.fetchTrustedSources(pipelineKeys, '', (trustedSourcesErr, response, body) => {
-        ResponseHandler(trustedSourcesErr, response, body, (err, data) => {
-            if (err) {
-                console.error(`Non-fatal error while fetching trusted sources: ${err}`)
-                callback(null, resultsUnion);
-            } else {
-                const trustedSources = data.trustedSources && data.trustedSources.sources;
-                resultsUnion.trustedSources = trustedSources;
-                callback(null, resultsUnion);
-            }
-        });
+  AdminServices.fetchTrustedSources((trustedSourcesErr, response, body) => {
+    ResponseHandler(trustedSourcesErr, response, body, (err, data) => {
+      if (err) {
+        console.error(`Non-fatal error while fetching trusted sources: ${err}`)
+        callback(null, resultsUnion);
+      } else {
+        const trustedSources = data.trustedSources && data.trustedSources.sources;
+        resultsUnion.trustedSources = trustedSources;
+        callback(null, resultsUnion);
+      }
     });
+  });
 }
 
 function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback) {

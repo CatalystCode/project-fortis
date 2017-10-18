@@ -1,15 +1,17 @@
-import { DataGrid } from './DataGrid';
 import React from 'react';
+import { DataGrid } from './DataGrid';
 import { getColumns } from './shared';
+const { Editors, Formatters } = require('react-data-grid-addons');
+const { DropDownEditor } = Editors;
+const { DropDownFormatter } = Formatters;
 
 const TRANSLATED_NAME = "translatedname";
-
-const PIPELINE_KEYS = ['Twitter', 'Facebook'];
 
 class TrustedSources extends React.Component {
   constructor(props) {
     super(props);
 
+    this.getEnabledStreamsForDropdown = this.getEnabledStreamsForDropdown.bind(this);
     this.getTrustedSourcesColumns = this.getTrustedSourcesColumns.bind(this);
     this.getTranslatableFields = this.getTranslatableFields.bind(this);
     this.handleSave = this.handleSave.bind(this);
@@ -17,24 +19,38 @@ class TrustedSources extends React.Component {
   }
 
   componentDidMount() {
-    this.props.flux.actions.ADMIN.load_trusted_sources(PIPELINE_KEYS);
+    this.props.flux.actions.ADMIN.notifyDataGridTrustedSourcesLoaded();
   }
 
   handleSave(rows) {
-    rows.map(row => this.appendRowKey(row));
+    rows.forEach(row => row.rowKey = this.getRowKey(row));
     this.props.flux.actions.ADMIN.save_trusted_sources(rows);
   }
 
-  appendRowKey(row) {
-    return row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank;
+  getRowKey(row) {
+    return `${row.pipelinekey},${row.externalsourceid},${row.sourcetype},${row.rank}`;
   }
 
-  handleRemove(rows) {
-    this.props.flux.actions.ADMIN.remove_trusted_sources(rows);
+  handleRemove(rows) {    
+    const sourcesWithAllFieldsSet = this.filterSourcesWithUnsetFields(rows);
+    if (this.trustedSourcesToRemoveExist(sourcesWithAllFieldsSet)) {
+      this.props.flux.actions.ADMIN.remove_trusted_sources(sourcesWithAllFieldsSet);
+    }
+  }
+
+  filterSourcesWithUnsetFields(sources) {
+    return sources.filter(source => source.pipelinekey.length > 0 || source.externalsourceid.length > 0 || source.sourcetype.length > 0 || source.rank.length > 0)
+  }
+
+  trustedSourcesToRemoveExist(sources) {
+    return sources.length > 0;
   }
 
   getTrustedSourcesColumns() {
+    const enabledStreams = this.getEnabledStreamsForDropdown();
     const columnValues = [
+      {key: "pipelinekey", name: "Pipeline Key", editor: <DropDownEditor options={enabledStreams}/>, formatter: <DropDownFormatter options={enabledStreams} value='Facebook'/>},
+      {editable: true, filterable: true, sortable: true, key: "externalsourceid", name: "External Source Id"},
       {editable: true, filterable: true, sortable: true, key: "reportingcategory", name: "Category"},
       {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
       {editable: true, filterable: true, sortable: true, key: "sourcetype", name: "Source Type"},
@@ -42,6 +58,19 @@ class TrustedSources extends React.Component {
     ];
 
     return getColumns(columnValues);
+  }
+
+  getEnabledStreamsForDropdown = () => {
+    let dropdownOptions = [];
+    this.props.enabledStreams.forEach((value, key) => {
+      dropdownOptions.push({
+        id: key,
+        value: key,
+        text: key,
+        title: key
+      });
+    });
+    return dropdownOptions;
   }
 
   getTranslatableFields() {
@@ -58,16 +87,18 @@ class TrustedSources extends React.Component {
   }
 
   render() {
+    const trustedSourcesColumns = this.getTrustedSourcesColumns();
     return (
-      this.getTrustedSourcesColumns().length > 0 ? 
+      trustedSourcesColumns.length > 0 ? 
         <DataGrid 
           rowHeight={40}
           minHeight={500}
           rowKey='rowKey'
+          guidAutofillColumn='rowKey'
           handleSave={this.handleSave}
           handleRemove={this.handleRemove}
           translatableFields={null}
-          columns={this.getTrustedSourcesColumns()}
+          columns={trustedSourcesColumns}
           rows={this.props.trustedSources} />
         : <div />
     );

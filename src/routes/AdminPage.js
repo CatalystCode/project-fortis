@@ -14,7 +14,11 @@ export const AdminPage = createReactClass({
   },
 
   getStateFromFlux() {
-    return this.getFlux().store("AdminStore").getState();
+    const flux = this.getFlux();
+    return {
+      dataStoreState: flux.store("DataStore").getState(),
+      adminStoreState: flux.store("AdminStore").getState(),
+    };
   },
 
   componentWillReceiveProps() {
@@ -25,11 +29,15 @@ export const AdminPage = createReactClass({
     const { 
       settings,
       watchlist,
-      trustedSources,
       streams,
       translatableFields,
+    } = this.getStateFromFlux().adminStoreState;
+
+
+    const {
+      trustedSources,
       enabledStreams
-    } = this.getStateFromFlux();
+    } = this.getStateFromFlux().dataStoreState;
 
     return Object.assign({}, { 
       settings,
@@ -44,7 +52,7 @@ export const AdminPage = createReactClass({
   render() {
     return (
       <div>
-        { this.state.settings.properties ? 
+        { this.state.adminStoreState.settings.properties ? 
            <div>
               <Admin flux={this.props.flux} {...this.propertyLiterals()} />
             </div>

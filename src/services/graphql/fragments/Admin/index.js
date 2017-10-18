@@ -53,16 +53,6 @@ export const topics = `fragment TopicsView on TermCollection {
   }
 }`;
 
-export const twitterAccounts = `fragment TwitterAccountsView on TwitterAccountCollection {
-  accounts {
-    userIds
-    consumerKey
-    consumerSecret
-    accessToken
-    accessTokenSecret
-  }
-}`;
-
 export const blacklist = `fragment BlacklistView on BlacklistCollection {
   filters {
     id
