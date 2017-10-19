@@ -9,12 +9,6 @@ const { withRunTime, limitForInClause } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
-const STREAM_PIPELINE_TWITTER = 'twitter';
-const STREAM_CONNECTOR_TWITTER = 'Twitter';
-
-const TRUSTED_SOURCES_CONNECTOR_TWITTER = 'Twitter';
-const TRUSTED_SOURCES_CONNECTOR_FACEBOOK = 'FacebookPage';
-const TRUSTED_SOURCES_RANK_DEFAULT = 10;
 
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
@@ -175,6 +169,74 @@ function createSite(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.input || !args.input.sources || !args.input.sources.length) {
+      loggingClient.logNoTrustedSourcesToAdd();
+      return reject('No trustedsources to add specified.');
+    }
+
+    let mutations = [];
+    args.input.sources.forEach(source => {
+      mutations.push({
+        query: `INSERT INTO fortis.trustedsources (
+          pipelinekey,
+          externalsourceid,
+          sourcetype,
+          rank,
+          displayname,
+          insertiontime,
+          reportingcategory
+        ) VALUES (?,?,?,?,?,dateof(now()),?)`,
+        params: [
+          source.pipelinekey, 
+          source.externalsourceid, 
+          source.sourcetype, 
+          source.rank,
+          source.displayname,
+          source.reportingcategory
+        ]
+      });
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(_ => { // eslint-disable-line no-unused-vars
+      resolve({
+        sources: args.input.sources
+      });
+    })
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
+  });
+}
+
+function removeTrustedSources(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.input || !args.input.sources || !args.input.sources.length) {
+      loggingClient.logNoTrustedSourcesToRemove();
+      return reject('No trusted sources to remove specified.');
+    } 
+
+    const mutations = args.input.sources.map(source => ({
+      query: 'DELETE FROM fortis.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND sourcetype = ? AND rank = ?',
+      params: [source.pipelinekey, source.externalsourceid, source.sourcetype, source.rank]
+    }));
+
+    cassandraConnector.executeBatchMutations(mutations)
+    .then(_ => { // eslint-disable-line no-unused-vars
+      resolve({
+        sources: args.input.sources
+      });
+    })
+    .catch(error => {
+      trackException(error);
+      reject(error);
+    });
+  });
+}
+
 function removeKeywords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.input || !args.input.edges || !args.input.edges.length) {
@@ -316,171 +378,6 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-function facebookPagePrimaryKeyValuesToRowKey(values) {
-  return [TRUSTED_SOURCES_CONNECTOR_FACEBOOK, values[1], values[2]];
-}
-
-function facebookPageRowKeyToPrimaryKey(page) {
-  const params = page.RowKey.split(',');
-  if (params.length != 3) throw('Expecting three element comma-delimited RowKey representing (connector, sourceid, sourcetype).');
-  return facebookPagePrimaryKeyValuesToRowKey(params);
-}
-
-function normalizedFacebookPage(primaryKeyValues) {
-  return {
-    RowKey: facebookPagePrimaryKeyValuesToRowKey(primaryKeyValues),
-    pageUrl: primaryKeyValues[1]
-  };
-}
-
-function modifyFacebookPages(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const pages = args && args.input && args.input.pages;
-    if (!pages || !pages.length) return reject('No pages specified');
-    
-    const invalidPages = pages.filter(page => !page.pageUrl);
-    if (invalidPages.length > 0) return reject(`pageUrl required for ${JSON.stringify(invalidPages)}`);
-
-    const mutations = [];
-    const expectedRecords = [];
-    pages.forEach(page => {
-      const isUpdate = page.RowKey && page.pageUrl != facebookPageRowKeyToPrimaryKey(page)[1];
-      if (isUpdate) {
-        mutations.push({
-          query: 'DELETE FROM fortis.trustedsources WHERE connector = ? AND sourceid = ? AND sourcetype = ?',
-          params: facebookPageRowKeyToPrimaryKey(page)
-        });
-      }
-      
-      const params = facebookPagePrimaryKeyValuesToRowKey([TRUSTED_SOURCES_CONNECTOR_FACEBOOK, page.pageUrl, 'FacebookPost']);
-      params.push(TRUSTED_SOURCES_RANK_DEFAULT);
-      mutations.push({
-        query: 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertiontime, rank) VALUES (?, ?, ?, dateof(now()), ?)',
-        params: params
-      });
-      expectedRecords.push(normalizedFacebookPage(params));
-    });
-
-    cassandraConnector.executeBatchMutations(mutations)
-    .then(() => resolve({ pages: expectedRecords }))
-    .catch(reject);
-  });
-}
-
-function removeFacebookPages(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const pages = args && args.input && args.input.pages;
-    if (!pages || !pages.length) return reject('No pages specified');
-    
-    const invalidPages = pages.filter(page => !page.RowKey);
-    if (invalidPages.length > 0) return reject(`RowKey required for ${JSON.stringify(invalidPages)}`);
-
-    const mutations = pages.map(page => ({
-      query: 'DELETE FROM fortis.trustedsources WHERE connector = ? AND sourceid = ? AND sourcetype = ?',
-      params: facebookPageRowKeyToPrimaryKey(page)
-    }));
-
-    cassandraConnector.executeBatchMutations(mutations)
-    .then(() => resolve({ pages: pages }))
-    .catch(reject);
-  });
-}
-
-function trustedTwitterAccountRowKeyToPrimaryKey(account) {
-  const params = account.RowKey.split(',');
-  if (params.length != 3) throw('Expecting three element comma-delimited RowKey representing (connector, sourceid, sourcetype).');
-  return trustedTwitterAccountPrimaryKeyValuesToRowKey(params);
-}
-
-function trustedTwitterAccountPrimaryKeyValuesToRowKey(values) {
-  return [ TRUSTED_SOURCES_CONNECTOR_TWITTER, values[1], values[2] ];
-}
-
-function normalizedTrustedTwitterAccount(account) {
-  const keyValues = trustedTwitterAccountRowKeyToPrimaryKey(account);
-  return {
-    RowKey: trustedTwitterAccountPrimaryKeyValuesToRowKey(keyValues),
-    acctUrl: keyValues[1]
-  };
-}
-
-function modifyTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const accounts = args && args.input && args.input.accounts;
-    if (!accounts || !accounts.length) return reject('No accounts specified');
-    
-    const statement = 'INSERT INTO fortis.trustedsources (connector, sourceid, sourcetype, insertiontime, rank) VALUES (?, ?, ?, dateof(now()), ?)';
-    const queries = accounts.map(account => {
-      const params = trustedTwitterAccountRowKeyToPrimaryKey(account);
-      params.push(TRUSTED_SOURCES_RANK_DEFAULT);
-
-      return {query: statement, params: params};
-    });
-
-    cassandraConnector.executeBatchMutations(queries)
-    .then(() => resolve({ accounts: accounts.map(normalizedTrustedTwitterAccount) }))
-    .catch(reject);
-  });
-}
-
-function removeTrustedTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const accounts = args && args.input && args.input.accounts;
-    if (!accounts || !accounts.length) return reject('No accounts specified');
-    
-    const deleteByPrimaryKey = 'DELETE FROM fortis.trustedsources WHERE connector = ? AND sourceid = ? AND sourcetype = ?';
-    const queries = accounts.map(trustedTwitterAccountRowKeyToPrimaryKey).map(params => ({query: deleteByPrimaryKey, params}));
-
-    cassandraConnector.executeBatchMutations(queries)
-    .then(() => resolve({ accounts: accounts.map(normalizedTrustedTwitterAccount) }))
-    .catch(reject);
-  });
-}
-
-function modifyTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const accounts = args && args.input && args.input.accounts;
-    if (!accounts || !accounts.length) return reject('No accounts specified');
-
-    const updateStatement = 'UPDATE fortis.streams set connector = ?, params = ? WHERE pipeline= ? AND streamid = ?';
-    const insertStatement = 'INSERT INTO fortis.streams (pipeline, streamid, connector, params) VALUES (?, ?, ?, ?)';
-    const queries = [];
-    const expectedRecords = [];
-    accounts.forEach( account => {
-      // TODO: Arrive at a consensus as to what a canonical account should be in order to create a proper copy of the incoming record.
-      const updatedAccount = account;
-      if (account.RowKey) {
-        queries.push({ query: updateStatement, params: [STREAM_CONNECTOR_TWITTER, account, STREAM_PIPELINE_TWITTER, account.RowKey] });
-      } else {
-        updatedAccount.RowKey = uuid();
-        queries.push({ query: insertStatement, params: [STREAM_PIPELINE_TWITTER, updatedAccount.RowKey, STREAM_CONNECTOR_TWITTER, account] });
-      }
-      expectedRecords.push(updatedAccount);
-    });
-
-    cassandraConnector.executeBatchMutations(queries)
-    .then(() => resolve({ accounts: expectedRecords }))
-    .catch(reject);
-  });
-}
-
-function removeTwitterAccounts(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const accounts = args && args.input && args.input.accounts;
-    if (!accounts || !accounts.length) return reject('No accounts specified');
-
-    const invalidAccounts = accounts.filter(account=>!account.RowKey);
-    if (invalidAccounts.length > 0) return reject(`RowKey required for ${JSON.stringify(invalidAccounts)}`);
-
-    const statement = 'DELETE FROM fortis.streams WHERE streamid = ?';
-    const queries = accounts.map(account => ({query: statement, params: [account.RowKey]}));
-
-    cassandraConnector.executeBatchMutations(queries)
-    .then(() => resolve({ accounts }))
-    .catch(reject);
-  });
-}
-
 function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const termFilters = args && args.input && args.input.filters;
@@ -551,12 +448,8 @@ module.exports = {
   removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
   addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords', loggingClient.addKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
   editSite: trackEvent(withRunTime(editSite), 'editSite'),
-  modifyFacebookPages: trackEvent(withRunTime(modifyFacebookPages), 'modifyFacebookPages'),
-  removeFacebookPages: trackEvent(withRunTime(removeFacebookPages), 'removeFacebookPages'),
-  modifyTrustedTwitterAccounts: trackEvent(withRunTime(modifyTrustedTwitterAccounts), 'modifyTrustedTwitterAccounts'),
-  removeTrustedTwitterAccounts: trackEvent(withRunTime(removeTrustedTwitterAccounts), 'removeTrustedTwitterAccounts'),
-  modifyTwitterAccounts: trackEvent(withRunTime(modifyTwitterAccounts), 'modifyTwitterAccounts'),
-  removeTwitterAccounts: trackEvent(withRunTime(removeTwitterAccounts), 'removeTwitterAccounts'),
   modifyBlacklist: trackEvent(withRunTime(modifyBlacklist), 'modifyBlacklist'),
-  removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist')
+  removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist'),
+  addTrustedSources: trackEvent(withRunTime(addTrustedSources), 'addTrustedSources', loggingClient.addTrustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()),
+  removeTrustedSources: trackEvent(withRunTime(removeTrustedSources), 'removeTrustedSources', loggingClient.removeTrustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics())
 };

@@ -29,11 +29,56 @@ function logExecuteQueryError() {
   });
 }
 
+function restartPipelineExtraProps() {
+  return () => ({
+    success: 'true'
+  });
+}
+
 function termsExtraProps() {
   return () => ({
     operation: 'query',
     table: 'watchlist',
     success: 'true'
+  });
+}
+
+function trustedSourcesExtraProps() {
+  return () => ({
+    operation: 'query',
+    table: 'trustedsources',
+    success: 'true'
+  });
+}
+
+function trustedSourcesExtraMetrics() {
+  return (graphqlResult) => {
+    const totalRows = graphqlResult.sources.length;
+    return {
+      totalRows
+    };
+  };
+}
+
+function logNoTrustedSourcesToAdd() {
+  trackSyncEvent('cassandra', { 
+    client: constants.CLIENTS.cassandra,
+    operation: 'modify',
+    table: 'trustedsources',
+    success: false
+  }, {
+    numToMutate: 0
+  });
+}
+
+function logNoTrustedSourcesToRemove() {
+  trackSyncEvent('cassandra', { 
+    client: constants.CLIENTS.cassandra,
+    operation: 'remove',
+    table: 'trustedsources',
+    success: false
+  }, {
+    numToMutate: 0
   });
 }
 
@@ -60,6 +105,22 @@ function streamsExtraMetrics() {
       totalRows
     };
   };
+}
+
+function addTrustedSourcesExtraProps() {
+  return () => ({
+    operation: 'modify',
+    table: 'trustedsources',
+    success: 'true'
+  });
+}
+
+function removeTrustedSourcesExtraProps() {
+  return () => ({
+    operation: 'remove',
+    table: 'trustedsources',
+    success: 'true'
+  });
 }
 
 function addKeywordsExtraProps() {
@@ -149,10 +210,17 @@ module.exports = {
   logCassandraClientUndefined,
   logNoMutationsDefined,
   logExecuteQueryError,
+  restartPipelineExtraProps,
   termsExtraProps,
+  trustedSourcesExtraProps,
+  trustedSourcesExtraMetrics,
+  logNoTrustedSourcesToAdd,
+  logNoTrustedSourcesToRemove,
   streamsExtraProps,
   modifyStreamsExtraProps,
   streamsExtraMetrics,
+  addTrustedSourcesExtraProps,
+  removeTrustedSourcesExtraProps,
   addKeywordsExtraProps,
   removeKeywordsExtraProps,
   keywordsExtraMetrics,
