@@ -26,21 +26,15 @@ libraryDependencies ++= Seq(
 // Bundled dependencies
 libraryDependencies ++= Seq(
   "log4j" % "log4j" % "1.2.17",
-  "com.github.catalystcode" %% "streaming-rss-html" % "1.0.2" excludeAll(),
   "org.jsoup" % "jsoup" % "1.10.3" excludeAll(),
   "com.rometools" % "rome" % "1.8.0" excludeAll(),
   "com.microsoft.azure" % "applicationinsights-core" % "1.0.6",
   "com.microsoft.azure" % "applicationinsights-logging-log4j1_2" % "1.0.6",
-  "com.github.catalystcode" %% "streaming-instagram" % "0.0.5",
-  "com.github.catalystcode" %% "streaming-facebook" % "0.0.3",
-  "com.github.catalystcode" %% "streaming-bing" % "0.0.1",
   "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.2",
-  "com.github.catalystcode" %% "streaming-reddit" % "0.0.2",
   "com.github.catalystcode" % "speechtotext-websockets-java" % "0.0.7",
   "org.twitter4j" % "twitter4j-stream" % "4.0.4",
   "org.apache.commons" % "commons-collections4" % "4.1",
   "org.apache.lucene" % "lucene-analyzers-common" % "7.0.0",
-  "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.1.2" exclude("com.microsoft.azure", "azure-eventhubs"),
   "com.microsoft.azure" % "azure-servicebus" % "1.0.0-PREVIEW-3",
   "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
   "com.github.benfradet" %% "spark-kafka-0-10-writer" % "0.3.0",
@@ -55,11 +49,22 @@ libraryDependencies ++= Seq(
   "eus.ixa" % "ixa-pipe-nerc" % "1.6.1"
 )
 
+// Libraries with dependency on old test framework
+libraryDependencies ++= Seq(
+  "com.microsoft.azure" %% "spark-streaming-eventhubs" % "2.1.2" exclude("com.microsoft.azure", "azure-eventhubs"),
+  "com.github.catalystcode" %% "streaming-rss-html" % "1.0.2" excludeAll(),
+  "com.github.catalystcode" %% "streaming-instagram" % "0.0.5",
+  "com.github.catalystcode" %% "streaming-facebook" % "0.0.3",
+  "com.github.catalystcode" %% "streaming-bing" % "0.0.1",
+  "com.github.catalystcode" %% "streaming-reddit" % "0.0.2"
+).map(_ exclude("org.scalatest", "scalatest_2.11"))
+
 // Test dependencies
 libraryDependencies ++= Seq(
   "org.mockito" % "mockito-core" % "2.8.47",
   "org.mockito" % "mockito-inline" % "2.8.47",
-  "org.scalatest" %% "scalatest" % "2.2.1"
+  "org.scalactic" %% "scalactic" % "3.0.4",
+  "org.scalatest" %% "scalatest" % "3.0.4"
 ).map(_ % "test")
 
 // Configure fat JAR
