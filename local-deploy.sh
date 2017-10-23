@@ -2,7 +2,7 @@
 echo
 echo "Checking your current system for Fortis compatability:"
 echo
-echo "Validating java version and jdk..........................................-"
+echo "Validating java version and jdk...........................-"
 
 if type -p java; then
     echo found java executable in PATH
@@ -17,10 +17,11 @@ fi
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
     echo version: "$version"
-    if [[ "$version" > "18" ]]; then
-        echo PASS: version is more than 1.8
+    versionDigits=$(echo ${version} | awk '{print substr($0,0,3)}')
+    if [[ "$versionDigits" > "1.7" ]]; then
+        echo PASS: JAVA version is 1.8 or greater
     else         
-        echo WARN: version is less than 1.8
+        echo WARN: JAVA version is less than 1.8
     fi
 fi
 
