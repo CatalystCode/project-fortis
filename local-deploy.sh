@@ -17,7 +17,7 @@ fi
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
     echo version: "$version"
-    if [[ "$version" > "1.8" ]]; then
+    if [[ "$version" > "18" ]]; then
         echo PASS: version is more than 1.8
     else         
         echo WARN: version is less than 1.8
@@ -64,7 +64,7 @@ if [[ "$_mvn" ]]; then
     version=$("$_mvn" -version 1>&1 | awk -F '"' '/Apache/ {print $0}')
     echo version "$version"
     versionNumb=$(echo "$version" | awk '{if(/Maven /) print $3}')
-    if [[ "$version" > "3.0" ]]; then
+    if [[ "$version" > "30" ]]; then
         echo PASS: Apache Maven version is more than 3.0
     else         
         echo WARN: Apache Maven version is less than 3.0. Please Update.
@@ -86,7 +86,7 @@ fi
 if [[ "$_nodejs" ]]; then
     version=$("$_nodejs" -v 2>&1 | tr -d 'v')
     echo version: "$version"
-    if [[ "$version" > "4.0" ]]; then
+    if [[ "$version" > "40" ]]; then
         echo PASS: nodejs version is more than 4.0
     else         
         echo WARN: nodejs version is less than 4.0
@@ -102,7 +102,7 @@ fi
 if [[ "$_npm" ]]; then
     version=$("$_npm" -v )
     echo version: "$version"
-    if [[ "$version" > "3.0" ]]; then
+    if [[ "$version" > "30" ]]; then
         echo PASS: npm version is more than 3.0
     else         
         echo WARN: npm version is less than 3.0
@@ -124,7 +124,7 @@ fi
 if [[ "$_scala" ]]; then
     version=$("$_scala" -version 2>&1 | awk -F ' ' '{print $5}')
     echo version: "$version"
-    if [[ "$version" > "2.7" ]]; then
+    if [[ "$version" > "27" ]]; then
         echo PASS: scala version is more than 2.7
     else         
         echo WARN: scala version is less than 2.0 ####FAILING need to fix
