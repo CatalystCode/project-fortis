@@ -46,7 +46,7 @@ if type -p javac; then
     _javac=javac
 elif [[ -n "$JAVAC_HOME" ]] && [[ -x "$JAVAC_HOME/bin/javac" ]];  then
     echo PASS: found javac executable in JAVAC_HOME     
-    _javac="$JAVAC_HOME/bin/javac"
+    #_javac="$JAVAC_HOME/bin/javac"
 else
     echo FAIL: "javac was not found on your machine"
 fi
