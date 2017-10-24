@@ -1,28 +1,35 @@
 #!/usr/bin/env bash
-echo
+
+# Version Control Center - The following variable are updated to specify the dependency versions Fortis is currentl running on.
+#       For Example: minJava is the minimum Java version required at time of publish. Currently it is 1.7.0 which this script removes decimals
+#       for arithmetic analysis when validating your machine's Jdk version. - Updated 10.24.2017
+minJava=170
+minMaven=300
+minNode=400
+minNpm=300
+minScala=270
+minCassandra=300
+minSpark=2
+#----------------------------------------------------------------------------------
 echo "Checking your current system for Fortis compatability:"
 echo
-echo "Validating java version and jdk...........................-"
+echo "Validating JAVA version and jdk...........................-"
 
 if type -p java; then
-    echo found java executable in PATH
+    echo found JAVA executable in PATH
     _java=java
 elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
-    echo PASS: found java executable in JAVA_HOME     
+    echo PASS: found JAVA executable in JAVA_HOME     
     _java="$JAVA_HOME/bin/java"
 else
-    echo "java was not found on your machine"
+    echo "JAVA was not found on your machine"
 fi
 
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
     vCompare_java=$(echo "${version}" | sed -e 's/[._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
-    echo vCompare: "$vCompare_java"
-    #versionDigits=$(echo ${version} | awk '{print substr($0,0,3)}')
-    #versionDigits=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')
-    #if [["$versionDigits" > "17"]]; then
-    if (( $(echo "$vCompare_java 170" | awk '{print ($1 > $2)}') )); then
+    if (( $(echo "$vCompare_java" "$minJava" | awk '{print ($1 > $2)}') )); then
         echo PASS: JAVA version is 1.8 or greater
     else         
         echo WARN: JAVA version is less than 1.8
@@ -43,10 +50,8 @@ fi
 echo "Validating jdk...........................................-"
 if type -p javac; then
     echo PASS: found javac executable in PATH
-    #_javac=javac
 elif [[ -n "$JAVAC_HOME" ]] && [[ -x "$JAVAC_HOME/bin/javac" ]];  then
     echo PASS: found javac executable in JAVAC_HOME     
-    #_javac="$JAVAC_HOME/bin/javac"
 else
     echo FAIL: "javac was not found on your machine"
 fi
@@ -60,7 +65,6 @@ if type -p mvn; then
     _mvn=mvn
 elif [[ -n "$MAVEN_HOME" ]] && [[ -x "$MAVEN_HOME/bin/mvn" ]];  then
     echo found mvn executable in MAVEN_HOME     
-    #_javac="$MAVEN_HOME/bin/mvn"
 else
     echo "FAIL: maven was not found on your system"
 fi
@@ -69,9 +73,7 @@ if [[ "$_mvn" ]]; then
     version=$("$_mvn" -version 1>&1 | awk -F '"' '/Apache/ {print $0}')
     vCompare_mvn=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
-    echo vCompare: "$vCompare_mvn"
-    #versionNumb=$(echo "$version" | awk '{if(/Maven /) print $3}')
-    if (( $(echo "$vCompare_mvn 300" | awk '{print ($1 > $2)}') )); then
+    if (( $(echo "$vCompare_mvn" "$minMaven" | awk '{print ($1 > $2)}') )); then
         echo PASS: Apache Maven version is more than 3.0
     else         
         echo WARN: Apache Maven version is less than 3.0. Please Update.
@@ -94,8 +96,7 @@ if [[ "$_nodejs" ]]; then
     version=$("$_nodejs" -v 2>&1 | tr -d 'v')
     vCompare_node=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
-    echo vCompare: "$vCompare_node"
-    if (( $(echo "$vCompare_node 400" | awk '{print ($1 > $2)}') )); then
+    if (( $(echo "$vCompare_node" "$minNode" | awk '{print ($1 > $2)}') )); then
         echo PASS: nodejs version is more than 4.0
     else         
         echo WARN: nodejs version is less than 4.0
@@ -112,8 +113,7 @@ if [[ "$_npm" ]]; then
     version=$("$_npm" -v )
     echo version: "$version"
     vCompare_npm=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
-    echo vCompare: "$vCompare_npm"
-    if (( $(echo "$vCompare_npm 300" | awk '{print ($1 > $2)}') )); then
+    if (( $(echo "$vCompare_npm" "$minNpm" | awk '{print ($1 > $2)}') )); then
         echo PASS: npm version is more than 3.0
     else         
         echo WARN: npm version is less than 3.0
@@ -136,8 +136,7 @@ if [[ "$_scala" ]]; then
     version=$("$_scala" -version 2>&1 | awk -F ' ' '{print $5}')
     echo version: "$version"
     vCompare_scala=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
-    echo vCompare: "$vCompare_scala"
-    if (( $(echo "$vCompare_scala 270" | awk '{print ($1 > $2)}') )); then
+    if (( $(echo "$vCompare_scala" "$minScala" | awk '{print ($1 > $2)}') )); then
         echo PASS: scala version is more than 2.7
     else         
         echo WARN: scala version is less than 2.7 ####FAILING need to fix
@@ -152,7 +151,6 @@ echo "Validating sbt..........................................-"
 
 if type -p sbt; then
     echo PASS: found sbt directory in PATH
-    #_sbt=sbt
     echo Checking fortis project sbt version.... "$(sbt sbtVersion)"
 else
     echo "FAIL: sbt was not found on your machine."
@@ -175,8 +173,7 @@ if [[ "$_cassandra" ]]; then
     version=$("$_cassandra" -v )
     echo version: "$version"
     vCompare_cassandra=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
-    echo vCompare: "$vCompare_cassandra"
-    if (( $(echo "$vCompare_cassandra 270" | awk '{print ($1 > $2)}') )); then
+    if (( $(echo "$vCompare_cassandra" "$minCassandra" | awk '{print ($1 > $2)}') )); then
         echo PASS: cassandra version is more than 3.0
     else         
         echo WARN: cassandra version is less than 3.0
@@ -198,7 +195,7 @@ fi
 if [[ "$_sparkshell" ]]; then
     version=$("${SPARK_MAJOR_VERSION}")
     echo version: "$version"
-    if [[ "$version" == "2" ]]; then
+    if [[ "$version" == "$minSpark" ]]; then
         echo PASS: spark-shell version is more than 2.0
     else         
         echo WARN: spark-shell version is less than 2.0
@@ -212,7 +209,6 @@ echo "Validating kubectl..........................................-"
 
 if kubectl cluster-info; then
     echo PASS: found kubectl exe in local shared path
-    #_kubectl=kubectl
 else
     echo "WARN: kubectl path was not found on your machine. Please validate you have installed kubectl correctly"
 fi
@@ -223,7 +219,6 @@ echo "Validating helm..........................................-"
 
 if type -p helm; then
     echo PASS: found helm exe in local shared path
-    #_khelm=helm
 else
     echo "WARN: helm path was not found on your machine. Please validate you have installed helm correctly"
 fi
