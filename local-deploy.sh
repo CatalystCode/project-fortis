@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 echo
 echo "Checking your current system for Fortis compatability:"
 echo
@@ -43,7 +43,7 @@ fi
 echo "Validating jdk...........................................-"
 if type -p javac; then
     echo PASS: found javac executable in PATH
-    _javac=javac
+    #_javac=javac
 elif [[ -n "$JAVAC_HOME" ]] && [[ -x "$JAVAC_HOME/bin/javac" ]];  then
     echo PASS: found javac executable in JAVAC_HOME     
     #_javac="$JAVAC_HOME/bin/javac"
