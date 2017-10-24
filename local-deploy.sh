@@ -16,9 +16,13 @@ fi
 
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    vCompare_java=$(echo ${version} | sed -e 's/[._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
-    versionDigits=$(echo ${version} | awk '{print substr($0,0,3)}')
-    if [[ "$versionDigits" > "1.7" ]]; then
+    echo vCompare: "$vCompare_java"
+    #versionDigits=$(echo ${version} | awk '{print substr($0,0,3)}')
+    #versionDigits=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')
+    #if [["$versionDigits" > "17"]]; then
+    if (( $(echo "$vCompare_java 170" | awk '{print ($1 > $2)}') )); then
         echo PASS: JAVA version is 1.8 or greater
     else         
         echo WARN: JAVA version is less than 1.8
@@ -63,9 +67,11 @@ fi
 
 if [[ "$_mvn" ]]; then
     version=$("$_mvn" -version 1>&1 | awk -F '"' '/Apache/ {print $0}')
-    echo version "$version"
-    versionNumb=$(echo "$version" | awk '{if(/Maven /) print $3}')
-    if [[ "$version" > "30" ]]; then
+    vCompare_mvn=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    echo version: "$version"
+    echo vCompare: "$vCompare_mvn"
+    #versionNumb=$(echo "$version" | awk '{if(/Maven /) print $3}')
+    if (( $(echo "$vCompare_mvn 300" | awk '{print ($1 > $2)}') )); then
         echo PASS: Apache Maven version is more than 3.0
     else         
         echo WARN: Apache Maven version is less than 3.0. Please Update.
@@ -86,8 +92,10 @@ fi
 
 if [[ "$_nodejs" ]]; then
     version=$("$_nodejs" -v 2>&1 | tr -d 'v')
+    vCompare_node=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
-    if [[ "$version" > "40" ]]; then
+    echo vCompare: "$vCompare_node"
+    if (( $(echo "$vCompare_node 400" | awk '{print ($1 > $2)}') )); then
         echo PASS: nodejs version is more than 4.0
     else         
         echo WARN: nodejs version is less than 4.0
@@ -103,7 +111,9 @@ fi
 if [[ "$_npm" ]]; then
     version=$("$_npm" -v )
     echo version: "$version"
-    if [[ "$version" > "30" ]]; then
+    vCompare_npm=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    echo vCompare: "$vCompare_npm"
+    if (( $(echo "$vCompare_npm 300" | awk '{print ($1 > $2)}') )); then
         echo PASS: npm version is more than 3.0
     else         
         echo WARN: npm version is less than 3.0
@@ -125,10 +135,12 @@ fi
 if [[ "$_scala" ]]; then
     version=$("$_scala" -version 2>&1 | awk -F ' ' '{print $5}')
     echo version: "$version"
-    if [[ "$version" > "27" ]]; then
+    vCompare_scala=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    echo vCompare: "$vCompare_scala"
+    if (( $(echo "$vCompare_scala 270" | awk '{print ($1 > $2)}') )); then
         echo PASS: scala version is more than 2.7
     else         
-        echo WARN: scala version is less than 2.0 ####FAILING need to fix
+        echo WARN: scala version is less than 2.7 ####FAILING need to fix
     fi
 fi
 
@@ -162,7 +174,9 @@ fi
 if [[ "$_cassandra" ]]; then
     version=$("$_cassandra" -v )
     echo version: "$version"
-    if [[ "$version" > "3.0" ]]; then
+    vCompare_cassandra=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    echo vCompare: "$vCompare_cassandra"
+    if (( $(echo "$vCompare_cassandra 270" | awk '{print ($1 > $2)}') )); then
         echo PASS: cassandra version is more than 3.0
     else         
         echo WARN: cassandra version is less than 3.0
