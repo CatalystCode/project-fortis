@@ -60,14 +60,14 @@ if type -p mvn; then
     _mvn=mvn
 elif [[ -n "$MAVEN_HOME" ]] && [[ -x "$MAVEN_HOME/bin/mvn" ]];  then
     echo found mvn executable in MAVEN_HOME     
-    _javac="$MAVEN_HOME/bin/mvn"
+    #_javac="$MAVEN_HOME/bin/mvn"
 else
     echo "FAIL: maven was not found on your system"
 fi
 
 if [[ "$_mvn" ]]; then
     version=$("$_mvn" -version 1>&1 | awk -F '"' '/Apache/ {print $0}')
-    vCompare_mvn=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    vCompare_mvn=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
     echo vCompare: "$vCompare_mvn"
     #versionNumb=$(echo "$version" | awk '{if(/Maven /) print $3}')
@@ -92,7 +92,7 @@ fi
 
 if [[ "$_nodejs" ]]; then
     version=$("$_nodejs" -v 2>&1 | tr -d 'v')
-    vCompare_node=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    vCompare_node=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
     echo vCompare: "$vCompare_node"
     if (( $(echo "$vCompare_node 400" | awk '{print ($1 > $2)}') )); then
@@ -111,7 +111,7 @@ fi
 if [[ "$_npm" ]]; then
     version=$("$_npm" -v )
     echo version: "$version"
-    vCompare_npm=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    vCompare_npm=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo vCompare: "$vCompare_npm"
     if (( $(echo "$vCompare_npm 300" | awk '{print ($1 > $2)}') )); then
         echo PASS: npm version is more than 3.0
@@ -135,7 +135,7 @@ fi
 if [[ "$_scala" ]]; then
     version=$("$_scala" -version 2>&1 | awk -F ' ' '{print $5}')
     echo version: "$version"
-    vCompare_scala=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    vCompare_scala=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo vCompare: "$vCompare_scala"
     if (( $(echo "$vCompare_scala 270" | awk '{print ($1 > $2)}') )); then
         echo PASS: scala version is more than 2.7
@@ -152,8 +152,8 @@ echo "Validating sbt..........................................-"
 
 if type -p sbt; then
     echo PASS: found sbt directory in PATH
-    _sbt=sbt
-    echo Checking fortis project sbt version.... $(sbt sbtVersion)
+    #_sbt=sbt
+    echo Checking fortis project sbt version.... "$(sbt sbtVersion)"
 else
     echo "FAIL: sbt was not found on your machine."
 fi
@@ -174,7 +174,7 @@ fi
 if [[ "$_cassandra" ]]; then
     version=$("$_cassandra" -v )
     echo version: "$version"
-    vCompare_cassandra=$(echo $version 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
+    vCompare_cassandra=$(echo "${version}" 2>&1 | sed -e 's/[A-Za-z ._-]//g'| awk '{print substr($0,0,3)}')
     echo vCompare: "$vCompare_cassandra"
     if (( $(echo "$vCompare_cassandra 270" | awk '{print ($1 > $2)}') )); then
         echo PASS: cassandra version is more than 3.0
@@ -196,9 +196,9 @@ else
 fi
 
 if [[ "$_sparkshell" ]]; then
-    version=$(echo "$SPARK_MAJOR_VERSION")
+    version=$("${SPARK_MAJOR_VERSION}")
     echo version: "$version"
-    if [[ "$version" = "2" ]]; then
+    if [[ "$version" == "2" ]]; then
         echo PASS: spark-shell version is more than 2.0
     else         
         echo WARN: spark-shell version is less than 2.0
@@ -212,7 +212,7 @@ echo "Validating kubectl..........................................-"
 
 if kubectl cluster-info; then
     echo PASS: found kubectl exe in local shared path
-    _kubectl=kubectl
+    #_kubectl=kubectl
 else
     echo "WARN: kubectl path was not found on your machine. Please validate you have installed kubectl correctly"
 fi
@@ -223,7 +223,7 @@ echo "Validating helm..........................................-"
 
 if type -p helm; then
     echo PASS: found helm exe in local shared path
-    _khelm=helm
+    #_khelm=helm
 else
     echo "WARN: helm path was not found on your machine. Please validate you have installed helm correctly"
 fi
