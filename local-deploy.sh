@@ -16,7 +16,7 @@ fi
 
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
-    vCompare_java=$(echo ${version} | sed -e 's/[._-]//g'| awk '{print substr($0,0,3)}')
+    vCompare_java=$(echo "${version}" | sed -e 's/[._-]//g'| awk '{print substr($0,0,3)}')
     echo version: "$version"
     echo vCompare: "$vCompare_java"
     #versionDigits=$(echo ${version} | awk '{print substr($0,0,3)}')
