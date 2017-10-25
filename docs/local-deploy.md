@@ -4,7 +4,7 @@
 
 A repository for Project Fortis's data processing pipeline, built on Apache Spark.
 
-## What's this? ##
+## What's this? 
 
 This project contains a Spark Streaming job that ingests data into the Fortis system. Specifically, we:
 
@@ -15,13 +15,13 @@ This project contains a Spark Streaming job that ingests data into the Fortis sy
 
 At the end of the ingestion pipeline, we publish the events and various aggregations to Cassandra.
 
-> Run the local-health-check.sh script  in the main project directory to verify your machine's device is correctly setup for Fortis.
+> Run the local-health-check.sh script  in the main project directory to verify your machine is correctly setup.
 
 
-## Local Development setup ##
+## Local Development setup 
 
 ```sh
-# set up variables from deployment environment
+# set up variables for deployment environment
 export HA_PROGRESS_DIR="..."
 export APPINSIGHTS_INSTRUMENTATIONKEY="..."
 export FORTIS_FEATURE_SERVICE_HOST="..."
@@ -42,17 +42,17 @@ spark-submit --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-
 
 ### Java Installation
 
-Run the following command in the terminal. This will install the appropriate JDK version for Fortis.
+This will install the appropriate JDK version for Fortis.
 ` sudo apt install openjdk-8-jdk`
 
 ### Maven Installation
 
-Run the following command in the terminal. This will install the appropriate mvn version for Fortis.
+This will install the appropriate mvn version for Fortis.
 `sudo apt-get install maven`
 
 ### Node Installation
 
-Run the following commands in the terminal. This will install the appropriate nodejs & npm for Fortis.
+This will install the appropriate nodejs & npm for Fortis.
 
 ```sh
 sudo apt-get install nodejs
@@ -64,12 +64,12 @@ sudo n stable
 
 ### Scala Installation
 
-Run the following command in the terminal. This will install the appropriate scala version for Fortis.
+This will install the appropriate scala version for Fortis.
 `sudo apt-get install scala`
 
 ### SBT Installation
 
-Run the following commands in the terminal. This will install simple build tool.
+This will install simple build tool.
 
 ```sh
 echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
@@ -80,7 +80,7 @@ sudo apt-get install sbt
 
 ### Cassandra Installation
 
-Run the following commands in the terminal. This will install the appropriate cassandra version for Fortis.
+This will install the appropriate cassandra version for Fortis.
 
 ```sh
 echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
@@ -91,7 +91,7 @@ sudo apt-get install cassandra
 
 ### Kubectl Configuration
 
-Run the following commands in the terminal. This will install the kubectl for use in cloud production environments for Fortis.
+This will install the kubectl for use in cloud production environments for Fortis.
 
 ```sh
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -101,7 +101,7 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 
 ### Helm Configuration
 
-Run the following commands in the terminal. This will install helm for use in cloud production environments for Fortis.
+This will install helm for use in cloud production environments for Fortis.
 
 ```sh
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh

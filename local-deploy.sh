@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Version Control Center - The following variable are updated to specify the dependency versions Fortis is currentl running on.
+# Version Control Center - The following variables are updated to specify the dependency versions Fortis is currentl running on.
 #       For Example: minJava is the minimum Java version required at time of publish. Currently it is 1.7.0 which this script removes decimals
-#       for arithmetic analysis when validating your machine's Jdk version. - Updated 10.24.2017
+#       for arithmetic analysis when validating your machine's Jdk version. - Updated 10.25.2017
 minJava=170
 minMaven=300
 minNode=400
@@ -139,12 +139,11 @@ if [[ "$_scala" ]]; then
     if (( $(echo "$vCompare_scala" "$minScala" | awk '{print ($1 > $2)}') )); then
         echo PASS: scala version is more than 2.7
     else         
-        echo WARN: scala version is less than 2.7 ####FAILING need to fix
+        echo WARN: scala version is less than 2.7 
     fi
 fi
 
 #----------------------------------------------------------------------------------
-
 
 echo
 echo "Validating sbt..........................................-"
@@ -189,7 +188,7 @@ if type -p spark-shell; then
     echo PASS: found spark-shell executable in PATH
     _sparkshell=spark-shell
 else
-    echo "WARN: spark path was not found on your machine. Please validate you have added path to spark directory using SPARK_HOME"
+    echo "WARN: spark path was not found on your machine. Please validate that you have added spark directory to path using SPARK_HOME"
 fi
 
 if [[ "$_sparkshell" ]]; then
