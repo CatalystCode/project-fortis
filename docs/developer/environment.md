@@ -6,7 +6,7 @@ The following external components are required in order to run and debug Fortis:
 
 | Component | Description |
 | --- | --- |
-| Cassandra instance | Stores configuration data as well as the processed event information which powers the Fortis UI. |
+| Cassandra instance | Stores configuration data as well as the processed event information which powers the Fortis UI. See [Cassandra Setup](cassandra-setup.md) for detailed setup instructions.  |
 | Azure Service Bus | Two queues are required: The `Command` queue is used to trigger Spark pipeline restarts, while the `Configuration` queue is used to trigger live rollouts of updated configuration data to running Spark jobs. |
 | Azure App Insights *(optional)* | An Application Insights instance used to log telemetry/statistics, debug traces and exceptions in Azure.  If omitted, debug traces as well as exceptions will still be written to `stdout`, but telemetry will not be reported. |
 
