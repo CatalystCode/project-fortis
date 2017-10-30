@@ -36,8 +36,8 @@ fi
 
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
-    vCompare_java=$(to_major_version ${version})
-    echo "version: "$version""
+    vCompare_java=$(to_major_version "${version}")
+    echo version: "$version"
     if (( $(echo "$vCompare_java" "$minJava" | awk '{print ($1 > $2)}') )); then
         echo "PASS: JAVA version is 1.8 or greater"
     else         
@@ -47,7 +47,7 @@ fi
 
 if [[ "$_java" ]]; then
     versionJ=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $1}')
-    echo "Your machine is running: "$versionJ""
+    echo Your machine is running: "$versionJ"
     if [[ "$versionJ" == "java version " ]]; then
         echo "WARN: java version is running the incorrect jdk package, we recommend installing openJDK"
     elif [[ "$versionJ" == "openjdk version " ]]; then
@@ -81,7 +81,7 @@ fi
 if [[ "$_mvn" ]]; then
     version=$("$_mvn" -version 1>&1 | awk -F '"' '/Apache/ {print $0}')
     vCompare_mvn=$(to_major_version "${version}")
-    echo "version: "$version""
+    echo version: "$version"
     if (( $(echo "$vCompare_mvn" "$minMaven" | awk '{print ($1 > $2)}') )); then
         echo "PASS: Apache Maven version is more than 3.0"
     else         
@@ -104,7 +104,7 @@ fi
 if [[ "$_nodejs" ]]; then
     version=$("$_nodejs" -v 2>&1 | tr -d 'v')
     vCompare_node=$(to_major_version "${version}")
-    echo "version: "$version""
+    echo version: "$version"
     if (( $(echo "$vCompare_node" "$minNode" | awk '{print ($1 > $2)}') )); then
         echo "PASS: nodejs version is more than 4.0"
     else         
@@ -120,7 +120,7 @@ fi
 
 if [[ "$_npm" ]]; then
     version=$("$_npm" -v )
-    echo "version: "$version""
+    echo version: "$version"
     vCompare_npm=$(to_major_version "${version}")
     if (( $(echo "$vCompare_npm" "$minNpm" | awk '{print ($1 > $2)}') )); then
         echo "PASS: npm version is more than 3.0"
@@ -143,7 +143,7 @@ fi
 
 if [[ "$_scala" ]]; then
     version=$("$_scala" -version 2>&1 | cut -d' ' -f5)
-    echo "version: "$version""
+    echo version: "$version"
     vCompare_scala=$(to_major_version "${version}")
     if (("$vCompare_scala" > "$minScala")); then
         echo "PASS: scala version is more than 2.7"
@@ -159,7 +159,7 @@ echo "Validating sbt..........................................-"
 
 if command_exists sbt; then
     echo "PASS: found sbt directory in PATH"
-    echo "Checking fortis project sbt version.... "$(sbt sbtVersion)""
+    echo Checking fortis project sbt version.... "$(sbt sbtVersion)"
 else
     echo "FAIL: sbt was not found on your machine."
 fi
@@ -179,7 +179,7 @@ fi
 
 if [[ "$_cassandra" ]]; then
     version=$("$_cassandra" -v )
-    echo "version: "$version""
+    echo version: "$version"
     vCompare_cassandra=$(to_major_version "${version}")
     if (( "$vCompare_cassandra" > "$minCassandra" )); then
         echo "PASS: cassandra version is more than 3.0"
@@ -202,7 +202,7 @@ fi
 
 if [[ "$_sparkshell" ]]; then
     version=$("${SPARK_MAJOR_VERSION}")
-    echo "version: "$version""
+    echo version: "$version"
     if [[ "$version" == "$minSpark" ]]; then
         echo "PASS: spark-shell version is more than 2.0"
     else         
