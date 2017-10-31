@@ -6,6 +6,7 @@ import { getHumanDate, UCWords } from '../../utils/Utils.js';
 import { methods } from '../../actions/Facts';
 import DialogBox from '../dialogs/DialogBox';
 import DataSelector from '../Insights/DataSelector';
+import TypeaheadSearch from '../Insights/TypeaheadSearch';
 import ListView from './ListView';
 
 // Material UI style overrides
@@ -47,11 +48,7 @@ export const FactsList = createReactClass({
   },
 
   componentDidMount() {
-    const { fromDate, toDate, maintopic } = this.props;
-
-    if (fromDate && toDate && maintopic) {
-      this.loadFacts();
-    }
+    this.loadFacts();
   },
 
   componentWillReceiveProps(nextProps) {
@@ -69,14 +66,30 @@ export const FactsList = createReactClass({
 
     return (
       <div id="facts">
-        <DataSelector
-          hideDataSourceFilter
-          hideHeatmapToggle
-          {...this.props}
-        />
+        <div className="inputs-container">
+          <DataSelector
+            hideDataSourceFilter
+            hideHeatmapToggle
+            {...this.props}
+          />
+          <TypeaheadSearch
+            dashboardRefreshFunc={this.handleMainTopicChanged}
+            excludeLocations
+            excludeSources
+            allSiteTopics={this.props.fullTermList}
+            {...this.props}
+          />
+        </div>
         {mainContent}
       </div>
     );
+  },
+
+  handleMainTopicChanged(maintopic, _, __, ___, ____) {
+    if (maintopic !== this.props.maintopic) {
+      const { timespanType, datetimeSelection, fromDate, toDate, bbox, zoomLevel, dataSource, termFilters, externalsourceid, place } = this.props;
+      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, place);
+    }
   },
 
   renderFacts(facts) {
@@ -167,6 +180,9 @@ export const FactsList = createReactClass({
   loadFacts() {
     const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
     const { maintopic, fromDate, toDate } = this.props;
+    if (!maintopic || !fromDate || !toDate) {
+      return;
+    }
 
     methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, (err, data) => {
       if (err) return console.error(`Error fetching facts: ${err}`);
