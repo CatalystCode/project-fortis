@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if ! (command -v jq >/dev/null); then sudo apt install jq; fi
+if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
 
 readonly gh_fortis_spark_repo_name="project-fortis-spark"
 readonly fortis_central_directory="$1"
