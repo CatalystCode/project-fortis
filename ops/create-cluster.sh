@@ -61,7 +61,7 @@ echo "Finished. Installing cassandra cqlsh cli."
 
 echo "Finished. Now setting up site entry"
 if ! (command -v python >/dev/null); then sudo apt-get install -y python; fi
-./create_site.py "http://${graphql_service_host}" "${site_name}" "${site_type}"
+./create_site.py "${graphql_service_host}" "${site_name}" "${site_type}"
 
 kubectl create -f ./spark-namespace.yaml
 echo "Finished. Deploying environment settings to cluster."
