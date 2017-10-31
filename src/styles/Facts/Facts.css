@@ -7,6 +7,9 @@
     padding: 20px;
 }
 
+#facts .dateRow,
+#facts .noResults,
+#facts .loadingPage,
 #facts .ReactListView > * {
     background: #F3F3EC;
     margin: 0 auto;

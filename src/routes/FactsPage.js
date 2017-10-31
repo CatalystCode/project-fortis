@@ -17,7 +17,7 @@ export const FactsPage = createReactClass({
   render() {
     return (
       <div className="report">
-        <FactsList {...this.getStateFromFlux()} />
+        <FactsList {...this.getStateFromFlux()} flux={this.props.flux} />
       </div>
     );
   }

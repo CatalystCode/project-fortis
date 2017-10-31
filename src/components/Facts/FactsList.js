@@ -5,6 +5,7 @@ import { PIPELINE_ALL } from '../../actions/constants';
 import { getHumanDate, UCWords } from '../../utils/Utils.js';
 import { methods } from '../../actions/Facts';
 import DialogBox from '../dialogs/DialogBox';
+import DataSelector from '../Insights/DataSelector';
 import ListView from './ListView';
 
 // Material UI style overrides
@@ -41,28 +42,46 @@ export const FactsList = createReactClass({
 
   getInitialState() {
     return {
-      loaded: false,
       facts: [],
     };
   },
 
   componentDidMount() {
-    this.loadFacts();
+    const { fromDate, toDate, maintopic } = this.props;
+
+    if (fromDate && toDate && maintopic) {
+      this.loadFacts();
+    }
+  },
+
+  componentWillReceiveProps(nextProps) {
+    const { fromDate, toDate, maintopic } = this.props;
+
+    if (nextProps.fromDate !== fromDate || nextProps.toDate !== toDate || nextProps.maintopic !== maintopic) {
+      this.loadFacts();
+    }
   },
 
   render() {
-    const { loaded, facts } = this.state;
+    const { facts } = this.state;
 
-    if (!loaded) {
-      return this.renderLoading();
-    }
-
-    if (!facts || !facts.length) {
-      return this.renderNoFacts();
-    }
+    const mainContent = facts && facts.length ? this.renderFacts(facts) : this.renderNoFacts();
 
     return (
       <div id="facts">
+        <DataSelector
+          hideDataSourceFilter
+          hideHeatmapToggle
+          {...this.props}
+        />
+        {mainContent}
+      </div>
+    );
+  },
+
+  renderFacts(facts) {
+    return (
+      <div>
         <ListView ref="factsListView"
           minCardWidth={this._cardWidth}
           maxCardHeight={this._cardHeight}
@@ -87,10 +106,8 @@ export const FactsList = createReactClass({
 
   renderNoFacts() {
     return (
-      <div id="facts" >
-        <div className="noResults">
-          <h3>No facts found.</h3>
-        </div>
+      <div className="noResults">
+        <h3>No facts found.</h3>
       </div>
     );
   },
@@ -153,11 +170,9 @@ export const FactsList = createReactClass({
 
     methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, (err, data) => {
       if (err) return console.error(`Error fetching facts: ${err}`);
-      if (!data || !data.facts || !data.facts.features || !data.facts.features.length) return console.error(`No facts for ${pipelinekeys}`);
 
       this.setState({
-        facts: this.sortByEventTime(data.facts.features),
-        loaded: true,
+        facts: this.sortByEventTime((data && data.facts && data.facts.features) || []),
       });
     });
   },
