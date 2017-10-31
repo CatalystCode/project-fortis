@@ -29,8 +29,8 @@ function _insertTopics(siteType) {
     .then(response => {
       return response.map(topic => ({
         query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertiontime,category) 
-                VALUES (?, ?, ?, ?, toTimestamp(now()));`,
-        params: [uuid(), topic.topic, topic.lang_code, topic.translations, topic.category]
+                VALUES (?, ?, ?, ?, toTimestamp(now()), ?);`,
+        params: [uuid(), topic.topic, topic.lang_code, topic.translations, topic.category || '']
       }));
     })
     .then(response => {
