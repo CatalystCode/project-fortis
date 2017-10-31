@@ -17,28 +17,18 @@ At the end of the ingestion pipeline, we publish the events and various aggregat
 
 > Run the local-health-check.sh script  in the main project directory to verify your machine is correctly setup.
 
-
 ## Local Development setup 
 
-```sh
-# set up variables for deployment environment
-export HA_PROGRESS_DIR="..."
-export APPINSIGHTS_INSTRUMENTATIONKEY="..."
-export FORTIS_FEATURE_SERVICE_HOST="..."
-export FORTIS_MODELS_DIRECTORY="..."
-export FORTIS_CENTRAL_ASSETS_HOST="..."
-export FORTIS_SERVICEBUS_NAMESPACE="..."
-export FORTIS_SERVICEBUS_CONFIG_QUEUE="..."
-export FORTIS_SERVICEBUS_POLICY_NAME="..."
-export FORTIS_SERVICEBUS_POLICY_KEY="..."
+See [Environment documentation](environment.md) for more details.
 
-# compile scala, run tests, build fat jar
-export JAVA_OPTS="-Xmx2048M"
-sbt assembly
-
-# run on spark
-spark-submit --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar
-```
+| Dependency | Min Version |
+|:----------:|:-----------:|
+|    java    | openjdk 1.8 |
+|     mvn    |     3.0     |
+|    node    |     4.0     |
+|     sbt    |     1.0     |
+|    scala   |     2.7     |
+|    spark   |     2.1     |
 
 ### Java Installation
 

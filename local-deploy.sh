@@ -170,10 +170,10 @@ echo
 echo "Validating cassandra..........................................-"
 
 if command_exists -p cassandra; then
-    echo "PASS: found sbt directory in PATH"
+    echo "PASS: found cassandra directory in PATH"
     _cassandra=cassandra
 else
-    echo "FAIL: cassandra was not found on your machine."
+    echo "WARN: cassandra was not found on your machine. Be sure you plan to connect to a cassandra cluster externally"
 fi
 
 
