@@ -114,7 +114,7 @@ export const FactsList = createReactClass({
           </p>
           <h3 className="title truncate-2">
             <a onClick={() => this.openItemDetails(item)}>
-              {item.title}
+              {this.renderCardTitle(item)}
             </a>
           </h3>
           <div className="tags">
@@ -123,6 +123,14 @@ export const FactsList = createReactClass({
         </div>
       </div>
     );
+  },
+
+  renderCardTitle(item) {
+    if (item.messageid.indexOf('Facebook') > -1 && item.messageid.indexOf('comment') > -1) {
+      return item.summary;
+    }
+
+    return item.title;
   },
 
   openItemDetails(item) {
