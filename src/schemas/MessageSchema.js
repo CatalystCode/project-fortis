@@ -10,7 +10,7 @@ module.exports = graphql.buildSchema(`
             filteredEdges: [String]!, langCode: String!, 
             limit: Int, offset: Int, fromDate: String!, 
             toDate: String!, sourceFilter: [String], fulltextTerm: String): FeatureCollection
-    byPipeline(pipelinekeys: [String]!, pageState: String, limit: Int): FeatureCollection
+    byPipeline(pipelinekeys: [String]!, mainTerm: String!, fromDate: String!, toDate: String!, pageState: String, limit: Int): FeatureCollection
     event(messageId: String!): Feature
     translate(sentence: String!, fromLanguage: String!, toLanguage: String!): TranslationResult
     translateWords(words: [String]!, fromLanguage: String!, toLanguage: String!): TranslatedWords
