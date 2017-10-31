@@ -2,8 +2,10 @@ import { SERVICES } from '../../services/Facts';
 import { ResponseHandler } from '../shared';
 
 const methods = {
-  loadFacts(pipelinekeys, callback) {
-    SERVICES.loadFacts(pipelinekeys, (error, response, body) => ResponseHandler(error, response, body, callback));
+  loadFacts(pipelinekeys, mainTerm, fromDate, toDate, callback) {
+    SERVICES.loadFacts(
+      pipelinekeys, mainTerm, fromDate, toDate,
+      (error, response, body) => ResponseHandler(error, response, body, callback));
   },
 };
 

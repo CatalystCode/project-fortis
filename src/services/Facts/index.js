@@ -3,7 +3,7 @@ import * as FactsQueries from '../graphql/queries/Facts';
 import { fetchGqlData } from '../shared';
 
 export const SERVICES = {
-  loadFacts(pipelinekeys, callback) {
+  loadFacts(pipelinekeys, mainTerm, fromDate, toDate, callback) {
     const gqlEndpoint = 'messages';
 
     const selectionFragments = `
@@ -16,6 +16,9 @@ export const SERVICES = {
     `;
 
     const variables = {
+      mainTerm,
+      fromDate,
+      toDate,
       pipelinekeys
     };
 

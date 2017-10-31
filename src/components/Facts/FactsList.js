@@ -137,8 +137,9 @@ export const FactsList = createReactClass({
 
   loadFacts() {
     const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
+    const { maintopic, fromDate, toDate } = this.props;
 
-    methods.FACTS.loadFacts(pipelinekeys, (err, data) => {
+    methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, (err, data) => {
       if (err) return console.error(`Error fetching facts: ${err}`);
       if (!data || !data.facts || !data.facts.features || !data.facts.features.length) return console.error(`No facts for ${pipelinekeys}`);
 
