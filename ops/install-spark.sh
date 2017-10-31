@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if ! (command -v jq >/dev/null); then sudo apt install jq; fi
+if ! (command -v jq >/dev/null); then sudo apt-get install -y jq; fi
 
 readonly k8spark_worker_count="$1"
 readonly ConfigMapName="$2"
