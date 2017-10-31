@@ -113,7 +113,7 @@ export const FactsList = createReactClass({
             {getHumanDate(item.eventtime, 'x', 'MM/DD/YYYY')}
           </p>
           <h3 className="title truncate-2">
-            <a onClick={() => this.refs.dialogBox.open(item.messageid)}>
+            <a onClick={() => this.openItemDetails(item)}>
               {item.title}
             </a>
           </h3>
@@ -123,6 +123,10 @@ export const FactsList = createReactClass({
         </div>
       </div>
     );
+  },
+
+  openItemDetails(item) {
+    this.refs.dialogBox.open(item.messageid);
   },
 
   sortByEventTime(events) {
