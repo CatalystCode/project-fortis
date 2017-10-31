@@ -44,6 +44,7 @@ export const FactsList = createReactClass({
   getInitialState() {
     return {
       facts: [],
+      loading: false,
     };
   },
 
@@ -60,9 +61,16 @@ export const FactsList = createReactClass({
   },
 
   render() {
-    const { facts } = this.state;
+    const { loading, facts } = this.state;
 
-    const mainContent = facts && facts.length ? this.renderFacts(facts) : this.renderNoFacts();
+    let mainContent;
+    if (loading) {
+      mainContent = this.renderLoading();
+    } else if (facts && facts.length) {
+      mainContent = this.renderFacts(facts);
+    } else {
+      mainContent = this.renderNoFacts();
+    }
 
     return (
       <div id="facts">
@@ -178,18 +186,25 @@ export const FactsList = createReactClass({
   },
 
   loadFacts() {
-    const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
+    const { loading } = this.state;
+    if (loading) {
+      return;
+    }
+
     const { maintopic, fromDate, toDate } = this.props;
     if (!maintopic || !fromDate || !toDate) {
       return;
     }
 
+    const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
     methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, (err, data) => {
       if (err) return console.error(`Error fetching facts: ${err}`);
 
       this.setState({
         facts: this.sortByEventTime((data && data.facts && data.facts.features) || []),
+        loading: false,
       });
     });
+    this.setState({ loading: true });
   },
 });
