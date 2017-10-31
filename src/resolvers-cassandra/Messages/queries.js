@@ -4,7 +4,7 @@ const Promise = require('promise');
 const moment = require('moment');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { parseFromToDate, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
+const { getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
@@ -129,8 +129,6 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
-    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-
     const tagsQuery = `
     SELECT eventid
     FROM fortis.eventtopics
@@ -146,8 +144,8 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
       limitForInClause(toConjunctionTopics(args.mainTerm, args.filteredEdges).filter(topic => !!topic)),
       toPipelineKey(args.sourceFilter),
       'all',
-      toDate,
-      fromDate,
+      args.toDate,
+      args.fromDate,
       parseLimit(args.limit)
     ];
 
