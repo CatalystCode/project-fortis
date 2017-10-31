@@ -315,13 +315,13 @@ AS SELECT eventid, pipelinekey, eventtime,conjunctiontopic3,conjunctiontopic2,ti
    WHERE eventid IS NOT NULL
      AND pipelinekey IS NOT NULL
      AND eventtime IS NOT NULL
-     AND conjunctiontopic3 IS NOT NULL
-     AND conjunctiontopic2 IS NOT NULL
-     AND tilez IS NOT NULL
+     AND conjunctiontopic1 IS NOT NULL
+     AND conjunctiontopic2 = ''
+     AND conjunctiontopic3 = ''
+     AND tilez = 15
      AND tileid IS NOT NULL
      AND placeid IS NOT NULL
-     AND conjunctiontopic1 IS NOT NULL
-PRIMARY KEY ((pipelinekey), eventtime, eventid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, tileid, placeid)
+PRIMARY KEY ((pipelinekey, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez), eventtime, eventid, tileid, placeid)
 WITH CLUSTERING ORDER BY (eventtime DESC);
 
 /**************************************
