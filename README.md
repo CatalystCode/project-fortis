@@ -22,6 +22,7 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
 
 ## Documentation
 - [Deploy to Azure Steps]()
+- [Deploy to Local Machine Steps](docs/local-deploy.md)
 - [Upgrading the Fortis Spark Pipeline](docs/upgrading.md)
 - [Upgrading the Fortis Interface](docs/interface-upgrade.md)
 
