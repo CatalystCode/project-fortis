@@ -20,27 +20,43 @@ export const AppPage = createReactClass({
   },
 
   render() {
+    if (this.state.bbox.length) {
+      return this.renderApp();
+    }
+
+    return this.renderLoading();
+  },
+
+  renderLoading() {
     return (
-      this.state.bbox.length ? 
+      <div className="loadingPage">
+        <h1>Loading {this.props.params.siteKey} watcher...</h1>
+      </div>
+    );
+  },
+
+  renderApp() {
+    return (
       <MuiThemeProvider>
-      <div id="app">
-        <Header id="header" flux={this.props.flux}
+        <div id="app">
+          <Header
+            id="header"
+            flux={this.props.flux}
             {...this.props.params}
             title={this.state.title}
             logo={this.state.logo}
             category={this.props.params.siteKey}
             language={this.state.language}
             supportedLanguages={this.state.supportedLanguages}
-            settings={this.state.settings} />
-        <div id="main">
-          <div id="content">
-            {this.props.children}
+            settings={this.state.settings}
+          />
+          <div id="main">
+            <div id="content">
+              {this.props.children}
+            </div>
           </div>
         </div>
-      </div>
-     </MuiThemeProvider> : 
-    <div className="loadingPage">
-      <h1>loading {this.props.params.siteKey} watcher...</h1>
-    </div>
-  )}
+      </MuiThemeProvider>
+    );
+  },
 });
