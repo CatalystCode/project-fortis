@@ -113,6 +113,7 @@ const methods = {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
             } else {
                 console.error(`[${error}] occured while fetching edges or site defintion`);
+                self.dispatch(constants.DASHBOARD.INITIALIZE, { error });
             }
         });
     },

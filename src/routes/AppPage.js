@@ -24,7 +24,19 @@ export const AppPage = createReactClass({
       return this.renderApp();
     }
 
+    if (this.state.error) {
+      return this.renderError();
+    }
+
     return this.renderLoading();
+  },
+
+  renderError() {
+    return (
+      <div className="loadingPage">
+        <h1>An error occurred while loading the page: {this.state.error}</h1>
+      </div>
+    );
   },
 
   renderLoading() {
