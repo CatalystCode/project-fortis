@@ -12,7 +12,7 @@
             "value": 6
         },
         "agentVMSize": {
-            "value": "Standard_DS2"
+            "value": "Standard_L4s"
         },
         "dnsNamePrefix": {
             "value": "fortis"
