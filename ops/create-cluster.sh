@@ -12,13 +12,14 @@ readonly sb_conn_str="$9"
 readonly storage_account_key="${10}"
 readonly checkpointfileshare="${11}"
 readonly site_type="${12}"
+readonly agent_vm_size="${13}"
 
 chmod -R 752 .
 
 git clone https://github.com/erikschlegel/charts.git -b spark-localssd
 
 echo "Installing Cassandra chart"
-./install-cassandra.sh "${k8cassandra_node_count}"
+./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
 echo "Finished. Now installing feature service DB"
 ## shellcheck disable=SC1091
 #. ./install-feature-service-db.sh "${k8location}" "${k8resource_group}"

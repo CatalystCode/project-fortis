@@ -26,6 +26,7 @@ Arguments
   --site_name|-sn                    [Required] : Fortis Site Name
   --eh_conn_str|-ec                  [Required] : Event Hub Connection String
   --sb_conn_str|-sb                  [Required] : Service Bus Connection String
+  --agent_vm_size|-avms              [Required] : Size of the VMs used for the Kubernetes cluster
 EOF
 }
 
@@ -124,6 +125,10 @@ do
       location="$1"
       shift
       ;;
+    --agent_vm_size|-avms)
+      agent_vm_size="$1"
+      shift
+      ;;
     *)
       echo "ERROR: Unknown argument '${key}' to script '$0'" 1>&2
       exit -1
@@ -219,6 +224,7 @@ throw_if_empty --prefix "${prefix}"
 throw_if_empty --site_name "${site_name}"
 throw_if_empty --eh_conn_str "${eh_conn_str}"
 throw_if_empty --sb_conn_str "${sb_conn_str}"
+throw_if_empty --agent_vm_size "${agent_vm_size}"
 
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
@@ -275,4 +281,5 @@ chmod 752 create-cluster.sh
     "${sb_conn_str}" \
     "${storage_account_key}" \
     "${checkpointfileshare}" \
-    "${site_type}"
+    "${site_type}" \
+    "${agent_vm_size}" \
