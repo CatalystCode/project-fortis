@@ -59,10 +59,6 @@ echo "Finished. Now deploying"
 echo "Finished. Installing cassandra cqlsh cli."
 ./storage-ddls/install-cassandra-ddls.sh "${cassandra_extlb_host}"
 
-echo "Finished. Now setting up site entry"
-if ! (command -v python >/dev/null); then sudo apt-get install -y python; fi
-./create_site.py "${graphql_service_host}" "${site_name}" "${site_type}"
-
 kubectl create -f ./spark-namespace.yaml
 echo "Finished. Deploying environment settings to cluster."
 ./setup-environment.sh \
@@ -79,6 +75,10 @@ echo "Finished. Deploying environment settings to cluster."
     "${sb_conn_str}" \
     "${storage_account_name}" \
     "${storage_account_key}"
+
+echo "Finished. Now setting up site entry"
+if ! (command -v python >/dev/null); then sudo apt-get install -y python; fi
+./create_site.py "${graphql_service_host}" "${site_name}" "${site_type}"
 
 echo "Finished. Installing spark cluster."
 ./install-spark.sh "${k8spark_worker_count}" "${spark_config_map_name}" "${fortis_central_directory}" "${storage_account_name}" "${storage_account_key}" "${checkpointfileshare}"
