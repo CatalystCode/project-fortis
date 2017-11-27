@@ -52,6 +52,7 @@ export const DataStore = Fluxxor.createStore({
             termFilters: new Set(),
             heatmapTileIds: [],
             fullTermList: new Map(),
+            error: null,
             bbox: [],
             zoomLevel: constants.HEATMAP_DEFAULT_ZOOM,
             maintopic: false,
@@ -91,6 +92,12 @@ export const DataStore = Fluxxor.createStore({
     },
 
     intializeSettings(graphqlResponse) {
+        if (graphqlResponse.error) {
+            this.dataStore.error = graphqlResponse.error;
+            this.emit("change");
+            return;
+        }
+
         const { terms, configuration, topics, dataSources, category, trustedSources } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
