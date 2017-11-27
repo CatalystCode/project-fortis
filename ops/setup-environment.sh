@@ -79,4 +79,4 @@ deis config:push
 cd ../../ || exit 2
 
 #Set the deployed service host url tag so we can output that on the deployment console to the user
-sudo az resource tag --tags FORTIS_INTERFACE_HOST="${fortis_interface_host}" FORTIS_ADMIN_INTERFACE_HOST="${fortis_admin_interface}" FORTIS_SERVICE_HOST="${graphql_service_host}" -g "${k8resource_group}" -n "${storage_account_name}" --resource-type "Microsoft.Storage/storageAccounts"
+az resource tag --tags FORTIS_INTERFACE_HOST="${fortis_interface_host}" FORTIS_ADMIN_INTERFACE_HOST="${fortis_admin_interface}" FORTIS_SERVICE_HOST="${graphql_service_host}" -g "${k8resource_group}" -n "${storage_account_name}" --resource-type "Microsoft.Storage/storageAccounts"

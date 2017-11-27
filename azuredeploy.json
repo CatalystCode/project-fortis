@@ -500,6 +500,10 @@
             "type": "string",
             "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).tags.FORTIS_ADMIN_INTERFACE_HOST]"
         },
+        "fortisSiteURL": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).tags.FORTIS_INTERFACE_HOST]"
+        },
         "agentFQDN": {
             "type": "string",
             "value": "[reference(concat('Microsoft.ContainerService/containerServices/', variables('kubernetesName'))).agentPoolProfiles[0].fqdn]"

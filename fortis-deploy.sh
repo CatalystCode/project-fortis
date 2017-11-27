@@ -254,7 +254,7 @@ echo "Installed Helm. Adding storage share for spark checkpointing."
 echo "creating azure file share"
 readonly checkpointfileshare="checkpoint"
 
-sudo az storage share create --name ${checkpointfileshare} --account-key="${storage_account_key}" --account-name="${storage_account_name}"
+az storage share create --name ${checkpointfileshare} --account-key="${storage_account_key}" --account-name="${storage_account_name}"
 
 sleep 10
 
