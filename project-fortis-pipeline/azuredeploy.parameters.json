@@ -1,0 +1,42 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "siteName": {
+            "value": "enter-your-fortis-site-name"
+        },
+        "acsMasterCount": {
+            "value": 1
+        },
+        "acsAgentCount": {
+            "value": 6
+        },
+        "agentVMSize": {
+            "value": "Standard_L4s"
+        },
+        "dnsNamePrefix": {
+            "value": "fortis"
+        },
+        "adminUsername": {
+            "value": "fortisadmin"
+        },
+        "sparkWorkers": {
+            "value": 6
+        },
+        "cassandraNodes": {
+            "value": 5
+        },
+        "siteType": {
+            "value": "humanitarian"
+        },
+        "sshPublicKey": {
+            "value": "GEN-UNIQUE"
+        },
+        "servicePrincipalAppId": {
+            "value": "GEN-UNIQUE"
+        },
+        "servicePrincipalAppKey": {
+            "value": "GEN-UNIQUE"
+        }
+    }
+}
