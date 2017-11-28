@@ -1,5 +1,5 @@
 {
-  "name": "fortisclient",
+  "name": "projectfortisinterfaces",
   "description": "This repository holds all client / front-end related code for the Fortis Project: https://aka.ms/fortis-story",
   "version": "0.0.1",
   "license": "MIT",
@@ -31,7 +31,7 @@
     }
   ],
   "engines": {
-    "node": "6.9.1"
+    "node": "6.12.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",

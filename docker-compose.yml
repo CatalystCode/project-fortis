@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+
+  project_fortis_interfaces:
+    build:
+      context: .
+      dockerfile: docker/project-fortis-interfaces/Dockerfile
+    ports:
+      - 8888:80
