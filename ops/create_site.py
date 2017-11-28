@@ -14,7 +14,7 @@ def _main(graphql_service_host, site_name, site_type):
       createSite(
         input: {
           siteType: "%s",
-          targetBbox: [],
+          targetBbox: [0, 0, 0, 0],
           defaultZoomLevel: 8,
           logo: "",
           title: "",
