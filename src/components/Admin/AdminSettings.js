@@ -71,7 +71,7 @@ export const AdminSettings = createReactClass({
     } else {
       siteSettingsMutable.properties[fieldName] = event.target.value;
     }
-    
+
     this.setState({
       isFormValid: this.isFormValid(),
       siteSettings: siteSettingsMutable,
@@ -94,15 +94,15 @@ export const AdminSettings = createReactClass({
   },
 
   handleSaveSettings() {
-    const { 
-      defaultLocation, 
-      defaultZoomLevel 
+    const {
+      defaultLocation,
+      defaultZoomLevel
     } = this.props.siteSettings.properties;
 
     const {
-      name, 
-      title, 
-      logo, 
+      name,
+      title,
+      logo,
       targetBbox,
       defaultLanguage,
       supportedLanguages,
@@ -117,13 +117,13 @@ export const AdminSettings = createReactClass({
     const languageJSON = `["${languageArray.join('","')}"]`;
     const bboxJSON = `[${targetBbox.value}]`
     const site = {
-      name: name.value, 
+      name: name.value,
       targetBbox: JSON.parse(bboxJSON),
-      logo: logo.value, 
+      logo: logo.value,
       defaultLocation: defaultLocation,
       defaultLanguage: defaultLanguage.value,
-      defaultZoomLevel: defaultZoomLevel, 
-      supportedLanguages: JSON.parse(languageJSON), 
+      defaultZoomLevel: defaultZoomLevel,
+      supportedLanguages: JSON.parse(languageJSON),
       title: title.value,
       featureservicenamespace: featureservicenamespace.value,
       translationSvcToken: translationSvcToken.value,
@@ -141,7 +141,7 @@ export const AdminSettings = createReactClass({
 
   render() {
       return (
-        this.state.siteSettings.properties ? 
+        this.state.siteSettings.properties ?
           <div className="row">
               <form ref="settingsForm">
                   <div className="col-lg-6">
@@ -205,12 +205,12 @@ export const AdminSettings = createReactClass({
                       <div className="form-group">
                           <p style={styles.settings.buttonRow}>
                           {
-                              this.state.isFormValid ? 
+                              this.state.isFormValid ?
                                   <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
                                     <i className="fa fa-cloud-upload" aria-hidden="true"></i> {this.state.saving ? "Saved Changes" : "Save Settings"}
                                   </button>
                               : undefined
-                          }  
+                          }
                           </p>
                       </div>
                   </div>
