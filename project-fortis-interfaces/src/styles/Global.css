@@ -1,0 +1,109 @@
+/* Shared page styles */
+
+body{
+    height: 100%;
+    overflow-y: auto;
+    background-color: #30303d;
+}
+
+::-webkit-scrollbar {
+    position: absolute;
+    -webkit-appearance: none;
+    width: 10px;
+}
+ 
+::-webkit-scrollbar-track {
+    background: #f3f3f3;
+    border-radius: 3px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    background: #999;
+    min-height: 36px;
+}
+
+html, body, #leafletMap {
+      height:100%;
+      background-color: #30303d!important
+}
+
+#app {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+#main {
+    display: flex;
+    flex: 1;
+}
+
+#content {
+    width: 100%;
+}
+
+/* Sentiment component */
+#sentimentGraph, .sentimentGraph {
+  vertical-align: middle;
+  display: inline-flex; 
+  width: 235px;
+  height: 35px;
+}
+
+.positiveSentiment{
+  background-color: rgb(98, 227, 30);
+}
+
+.neutralPositiveSentiment{
+  background-color: rgb(234, 224, 34);
+}
+
+.negativeSentiment{
+  background-color: #a43834;
+}
+
+.neutralNegativeSentiment{
+  background-color: #FF9800;
+}
+
+.neutralSentiment{
+  background-color: #FDD835;
+}
+
+.positiveSentimentIcon{
+  color: rgb(98, 227, 30);
+}
+
+.neutralPositiveSentimentIcon{
+  color: rgb(234, 224, 34);
+}
+
+.negativeSentimentIcon{
+  color: #a43834;
+}
+
+.neutralNegativeSentimentIcon{
+  color: #FF9800
+}
+
+.loadingPage {
+  color: #fff;
+}
+
+.neutralSentimentIcon{
+  color: #FDD835;
+}
+
+.sentimentGraphBar{
+    color: #fff;
+    width: 75%;
+    display: flex;
+    font-size: 20px;
+    font-weight: 700;
+    align-items: center;
+    padding-left: 6px;
+}
+
+.sentimentIcon{
+  font-size: 35px;
+}
