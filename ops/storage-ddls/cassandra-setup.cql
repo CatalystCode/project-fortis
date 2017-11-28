@@ -309,6 +309,21 @@ AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, t
 PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, tileid), perioddate, mentioncount, externalsourceid)
 WITH CLUSTERING ORDER BY (perioddate DESC, mentioncount DESC);
 
+CREATE MATERIALIZED VIEW eventsbypipeline
+AS SELECT eventid, pipelinekey, eventtime,conjunctiontopic3,conjunctiontopic2,tilez,tileid,placeid,conjunctiontopic1
+   FROM eventplaces
+   WHERE eventid IS NOT NULL
+     AND pipelinekey IS NOT NULL
+     AND eventtime IS NOT NULL
+     AND conjunctiontopic1 IS NOT NULL
+     AND conjunctiontopic2 = ''
+     AND conjunctiontopic3 = ''
+     AND tilez = 15
+     AND tileid IS NOT NULL
+     AND placeid IS NOT NULL
+PRIMARY KEY ((pipelinekey, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez), eventtime, eventid, tileid, placeid)
+WITH CLUSTERING ORDER BY (eventtime DESC);
+
 /**************************************
  * Indices
  *************************************/
