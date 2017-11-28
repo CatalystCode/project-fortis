@@ -71,7 +71,7 @@ export const AdminSettings = createReactClass({
     } else {
       siteSettingsMutable.properties[fieldName] = event.target.value;
     }
-    
+
     this.setState({
       isFormValid: this.isFormValid(),
       siteSettings: siteSettingsMutable,
@@ -94,16 +94,16 @@ export const AdminSettings = createReactClass({
   },
 
   handleSaveSettings() {
-    const { 
-      targetBbox, 
-      defaultLocation, 
-      defaultZoomLevel 
+    const {
+      defaultLocation,
+      defaultZoomLevel
     } = this.props.siteSettings.properties;
 
     const {
-      name, 
-      title, 
-      logo, 
+      name,
+      title,
+      logo,
+      targetBbox,
       defaultLanguage,
       supportedLanguages,
       featureservicenamespace,
@@ -115,14 +115,15 @@ export const AdminSettings = createReactClass({
 
     const languageArray = supportedLanguages.value.split(",");
     const languageJSON = `["${languageArray.join('","')}"]`;
+    const bboxJSON = `[${targetBbox.value}]`
     const site = {
-      name: name.value, 
-      targetBbox: targetBbox, 
-      logo: logo.value, 
+      name: name.value,
+      targetBbox: JSON.parse(bboxJSON),
+      logo: logo.value,
       defaultLocation: defaultLocation,
       defaultLanguage: defaultLanguage.value,
-      defaultZoomLevel: defaultZoomLevel, 
-      supportedLanguages: JSON.parse(languageJSON), 
+      defaultZoomLevel: defaultZoomLevel,
+      supportedLanguages: JSON.parse(languageJSON),
       title: title.value,
       featureservicenamespace: featureservicenamespace.value,
       translationSvcToken: translationSvcToken.value,
@@ -140,7 +141,7 @@ export const AdminSettings = createReactClass({
 
   render() {
       return (
-        this.state.siteSettings.properties ? 
+        this.state.siteSettings.properties ?
           <div className="row">
               <form ref="settingsForm">
                   <div className="col-lg-6">
@@ -155,17 +156,22 @@ export const AdminSettings = createReactClass({
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
+                          <label htmlFor="targetBbox">Bounding Box (<span style={styles.settings.labelInfo}>comma seperated i.e. 1,2,3,4</span>)<span>*</span></label>
+                          <input onChange={this.handleInputChange} required aria-required="true" data-rule="required" name="targetBbox" data-msg="Please enter a bounding box" ref="targetBbox" value={this.state.siteSettings.targetBbox} type="text" style={styles.settings.input} className="form-control settings" aria-label="targetBbox" />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
                           <label>Header Logo Banner<span>*</span></label>
                           <input onChange={this.handleInputChange} required data-rule="required" data-msg="Please enter a header image for your site" name="logo" ref="logo" value={this.state.siteSettings.properties.logo} type="text" style={styles.settings.input} className="form-control settings" aria-label="logo" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label>Supported Languages(<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
+                          <label>Supported Languages (<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="supportedLanguages" ref="supportedLanguages" value={this.state.siteSettings.properties.supportedLanguages} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label>Default Languages(<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
+                          <label>Default Languages (<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="defaultLanguage" ref="defaultLanguage" value={this.state.siteSettings.properties.defaultLanguage} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                           <div className="validation"></div>
                       </div>
@@ -199,12 +205,12 @@ export const AdminSettings = createReactClass({
                       <div className="form-group">
                           <p style={styles.settings.buttonRow}>
                           {
-                              this.state.isFormValid ? 
+                              this.state.isFormValid ?
                                   <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
                                     <i className="fa fa-cloud-upload" aria-hidden="true"></i> {this.state.saving ? "Saved Changes" : "Save Settings"}
                                   </button>
                               : undefined
-                          }  
+                          }
                           </p>
                       </div>
                   </div>
