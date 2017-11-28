@@ -95,7 +95,6 @@ export const AdminSettings = createReactClass({
 
   handleSaveSettings() {
     const { 
-      targetBbox, 
       defaultLocation, 
       defaultZoomLevel 
     } = this.props.siteSettings.properties;
@@ -104,6 +103,7 @@ export const AdminSettings = createReactClass({
       name, 
       title, 
       logo, 
+      targetBbox,
       defaultLanguage,
       supportedLanguages,
       featureservicenamespace,
@@ -115,9 +115,10 @@ export const AdminSettings = createReactClass({
 
     const languageArray = supportedLanguages.value.split(",");
     const languageJSON = `["${languageArray.join('","')}"]`;
+    const bboxJSON = `[${targetBbox.value}]`
     const site = {
       name: name.value, 
-      targetBbox: targetBbox, 
+      targetBbox: JSON.parse(bboxJSON),
       logo: logo.value, 
       defaultLocation: defaultLocation,
       defaultLanguage: defaultLanguage.value,
@@ -152,6 +153,11 @@ export const AdminSettings = createReactClass({
                       <div className="form-group">
                           <label>Site Title<span>*</span></label>
                           <input onChange={this.handleInputChange} required data-rule="required" data-msg="Please enter a site title" name="title" ref="title" value={this.state.siteSettings.properties.title} type="text" style={styles.settings.input} className="form-control settings" aria-label="siteTitle" />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
+                          <label htmlFor="targetBbox">Bounding Box (<span style={styles.settings.labelInfo}>comma seperated i.e. 1,2,3,4</span>)<span>*</span></label>
+                          <input onChange={this.handleInputChange} required aria-required="true" data-rule="required" name="targetBbox" data-msg="Please enter a bounding box" ref="targetBbox" value={this.state.siteSettings.targetBbox} type="text" style={styles.settings.input} className="form-control settings" aria-label="targetBbox" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
