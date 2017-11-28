@@ -19,6 +19,8 @@ locally: a Cassandra database and the GraphQL server. You can spin up both of
 these pieces using Docker via the following command:
 
 ```sh
+git clone https://github.com/CatalystCode/project-fortis-services
+cd project-fortis-services
 docker-compose up
 ```
 
