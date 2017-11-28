@@ -4,7 +4,7 @@ const Promise = require('promise');
 const moment = require('moment');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { parseFromToDate, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
+const { getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
@@ -14,12 +14,12 @@ function eventToFeature(row) {
 
   return {
     type: FeatureType,
-    coordinates: row.computedfeatures.places.map(place => [place.centroidlon, place.centroidlat]),
+    coordinates: row.computedfeatures && row.computedfeatures.places.map(place => [place.centroidlon, place.centroidlat]),
     properties: {
       edges: row.topics,
       messageid: row.eventid,
       sourceeventid: row.sourceeventid,
-      places: row.computedfeatures.places.map(place => place.placeid),
+      places: row.computedfeatures && row.computedfeatures.places.map(place => place.placeid),
       entities: row.computedfeatures && row.computedfeatures.entities ? row.computedfeatures.entities.map(entity => entity.name) : [],
       eventtime: row.eventtime.getTime(),
       sentiment: row.computedfeatures && row.computedfeatures.sentiment ? row.computedfeatures.sentiment.neg_avg : -1,
@@ -129,8 +129,6 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
-    const { fromDate, toDate } = parseFromToDate(args.fromDate, args.toDate);
-
     const tagsQuery = `
     SELECT eventid
     FROM fortis.eventtopics
@@ -146,8 +144,8 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
       limitForInClause(toConjunctionTopics(args.mainTerm, args.filteredEdges).filter(topic => !!topic)),
       toPipelineKey(args.sourceFilter),
       'all',
-      toDate,
-      fromDate,
+      args.toDate,
+      args.fromDate,
       parseLimit(args.limit)
     ];
 
@@ -155,6 +153,38 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
       .then(rows => {
         return queryEventsTable(rows, args);
       })
+      .then(resolve)
+      .catch(reject);
+  });
+}
+
+function byPipeline(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    if (!args || !args.pipelinekeys || !args.pipelinekeys.length) return reject('No pipelines by which to filter specified');
+    if (!args || !args.mainTerm) return reject('No term to query specified');
+    if (!args || !args.toDate || !args.fromDate) return reject('No date range to query specified');
+
+    const pipelineQuery = `
+    SELECT eventid
+    FROM fortis.eventsbypipeline
+    WHERE pipelinekey IN ?
+    AND conjunctiontopic1 = ?
+    AND conjunctiontopic2 = ''
+    AND conjunctiontopic3 = ''
+    AND tilez = 15
+    AND eventtime <= ?
+    AND eventtime >= ?
+    `.trim();
+
+    const pipelineParams = [
+      limitForInClause(args.pipelinekeys),
+      args.mainTerm,
+      args.toDate,
+      args.fromDate
+    ];
+
+    cassandraConnector.executeQueryWithPageState(pipelineQuery, pipelineParams, args.pageState, parseLimit(args.limit))
+      .then(response => queryEventsTable(response, args))
       .then(resolve)
       .catch(reject);
   });
@@ -234,6 +264,7 @@ function translateWords(args, res) { // eslint-disable-line no-unused-vars
 module.exports = {
   byBbox: trackEvent(withRunTime(byBbox), 'messagesForBbox'),
   byEdges: trackEvent(withRunTime(byEdges), 'messagesForEdges'),
+  byPipeline: trackEvent(withRunTime(byPipeline), 'messagesForPipeline'),
   event: trackEvent(event, 'messageForEvent'),
   translate: trackEvent(translate, 'translate'),
   translateWords: trackEvent(translateWords, 'translateWords')
