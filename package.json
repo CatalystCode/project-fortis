@@ -1,6 +1,7 @@
 {
-  "name": "fortis-services",
+  "name": "project-fortis-services",
   "description": "",
+  "license": "MIT",
   "version": "1.0.0",
   "author": "erik schlegel <erik.schlegel@gmail.com>",
   "contributors": [],
