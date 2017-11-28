@@ -54,8 +54,13 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The Fo
   * Health
 
 ## Post Deployment Instructions
-* Grab a large cup of coffee as the deployment can take north of an hour to complete. 
-* Once the deployment has finished, click on the `Manage your resources`(highlighted below). 
-![image](https://user-images.githubusercontent.com/7635865/27893300-7a5d32c2-61ca-11e7-9413-50a3b125f9f1.png)
-* Select the Deployment tab in the Azure Portal, then the `fortis-containers###` deployment and copy the Fortis Admin Interface URL in the output section of the deployment summary. 
-![image](https://user-images.githubusercontent.com/7635865/27909039-66951d0a-6214-11e7-998b-be5603c4949b.png)
+* Grab a large cup of coffee as the deployment can take north of an hour to complete.
+
+* Once the deployment has finished, click on the `Manage your resources` (highlighted below). 
+![Screenshot of ARM template after successful deployment with highlight of management link to access the newly created resource group](https://user-images.githubusercontent.com/1086421/33331326-4437a7fe-d42f-11e7-8b4a-19b968b4705b.png)
+
+* Select the `Tags` tab in the Azure Portal (highlighted below), point your browser to the site at the `FORTIS_ADMIN_INTERFACE_URL` (also highlighted below). 
+![Screenshot of Azure portal with highlight of the Fortis admin site URL accessed via Azure Portal tags](https://user-images.githubusercontent.com/1086421/33331249-1b1ce1f4-d42f-11e7-8341-0100660e9e74.png)
+
+* In the Fortis admin portal, you can now finalize the setup of your Fortis deployment; once you've completed all the admin configuration, your deployment is ready to be used.
+![Screenshot showing the Fortis admin interface](https://user-images.githubusercontent.com/1086421/33331562-e9e589be-d42f-11e7-870c-6b758ec2141a.png)
