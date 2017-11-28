@@ -1,0 +1,84 @@
+{
+  "name": "projectfortisservices",
+  "description": "This repository holds all the services-tier related code for the Fortis Project: https://aka.ms/fortis-story",
+  "license": "MIT",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CatalystCode/project-fortis-services.git"
+  },
+  "maintainers": [
+    {
+      "name": "Erik Schlegel",
+      "email": "erisch@microsoft.com"
+    },
+    {
+      "name": "Stephanie Marker",
+      "email": "stmarker@microsoft.com"
+    },
+    {
+      "name": "JC Jimenez",
+      "email": "jcjimene@microsoft.com"
+    },
+    {
+      "name": "Kevin Hartman",
+      "email": "keha@microsoft.com"
+    },
+    {
+      "name": "Clemens Wolff",
+      "email": "clewolff@microsoft.com"
+    }
+  ],
+  "engines": {
+    "node": "9.2.0"
+  },
+  "dependencies": {
+    "applicationinsights": "^0.16.0",
+    "async": "^2.1.2",
+    "azure-event-hubs": "0.0.8",
+    "azure-sb": "^0.10.4",
+    "azure-storage": "^1.3.2",
+    "body-parser": "^1.15.0",
+    "cassandra-driver": "^3.2.2",
+    "express": "^4.0.0",
+    "express-graphql": "^0.5.4",
+    "geopoint": "^1.0.1",
+    "geotile": "^0.1.10",
+    "graphql": "^0.7.2",
+    "json2csv": "^3.11.1",
+    "jsonpath": "^0.2.7",
+    "lodash": "^4.17.4",
+    "moment": "^2.17.1",
+    "nconf": "^0.8.4",
+    "node-cache": "^4.1.1",
+    "pg": "^6.1.2",
+    "postgres-client": "^1.0.1",
+    "promise": "^7.1.1",
+    "request": "^2.79.0",
+    "turf-bbox-polygon": "^3.0.12",
+    "turf-inside": "^3.0.12",
+    "uuid": "^3.1.0",
+    "xml2js": "^0.4.17"
+  },
+  "devDependencies": {
+    "chai": "^4.0.2",
+    "eslint": "^2",
+    "eslint-plugin-require-path-exists": "^1.1.7",
+    "is-my-json-valid": "^2.13.1",
+    "istanbul": "~0.4.3",
+    "js-yaml": "^3.2.6",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.6",
+    "supertest": "^1.2.0",
+    "tape": "^4"
+  },
+  "scripts": {
+    "test": "tape 'tests/**/*.js'",
+    "cover": "istanbul cover tape -- 'tests/**/*.js'",
+    "lint": "eslint ."
+  },
+  "generator-swaggerize": {
+    "version": "3.1.0"
+  },
+  "main": "./server"
+}
