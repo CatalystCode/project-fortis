@@ -9,11 +9,10 @@ export default class TypeaheadSearch extends React.Component {
   constructor(props) {
     super(props);
 
-    this.DATASETS = {
-      LOCATION: { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' },
-      TERM: { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' },
-      SOURCE: { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchSourcesSuggestions, description: 'Search for trusted sources' }
-    };
+    this.DATASETS = {};
+    this.DATASETS.TERM = { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' };
+    if (!props.excludeLocations) this.DATASETS.LOCATION = { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' };
+    if (!props.excludeSources) this.DATASETS.SOURCE = { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchSourcesSuggestions, description: 'Search for trusted sources' };
 
     this.state = {
       suggestions: [],

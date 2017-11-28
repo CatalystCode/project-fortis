@@ -132,16 +132,16 @@ export default class DataSelector extends React.Component {
                             : undefined
                         }
                     </div>
-                    <div>
+                    {this.props.hideHeatmapToggle ? null : <div>
                         <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={()=>this.props.toggleHeatmapSize()}>
                             <span className="fa fa-expand" aria-hidden="true">
                             </span>
                             <span>{this.props.heatmapToggleText}</span>
                         </button>
-                    </div>
-                    <div>
+                    </div>}
+                    {this.props.hideDataSourceFilter ? null : <div>
                         <DataSourceFilter {...this.props} />
-                    </div>
+                    </div>}
                 </div>
             </div>
         );

@@ -1,138 +1,108 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Fluxxor from 'fluxxor';
-import ListView from './ListView';
-import { Link } from 'react-router';
-import { SERVICES as DashboardServices } from '../../services/Dashboard';
-import { getHumanDate, containsEqualValues, UCWords, momentLastMonths } from '../../utils/Utils.js';
-import { fragmentToArray, changeFactsUrl } from '../../utils/Fact.js';
-import SuperSelectField from 'material-ui-superselectfield/lib/superSelectField'
 import Chip from 'material-ui/Chip';
+import { PIPELINE_ALL } from '../../actions/constants';
+import { getHumanDate, UCWords } from '../../utils/Utils.js';
+import { methods } from '../../actions/Facts';
+import DialogBox from '../dialogs/DialogBox';
+import DataSelector from '../Insights/DataSelector';
+import TypeaheadSearch from '../Insights/TypeaheadSearch';
+import ListView from './ListView';
 
 // Material UI style overrides
 const styles = {
   radioButton: {
-    width: "auto",
-    float: "left",
-    marginRight: "20px",
+    width: 'auto',
+    float: 'left',
+    marginRight: '20px',
   },
   checkbox: {
-    marginTop: "6px",
-    marginRight: "20px",
+    marginTop: '6px',
+    marginRight: '20px',
   },
   iconStyle: {
-    marginRight: "4px",
+    marginRight: '4px',
   },
   button: {
-    marginLeft: "5px",
-    height: "20px",
+    marginLeft: '5px',
+    height: '20px',
     lineHeight: '1',
-    textAlign: "center",
+    textAlign: 'center',
   },
   chip: {
-    display: "inline-block",
-    margin: "2px",
+    display: 'inline-block',
+    margin: '2px',
   }
 };
 
-const FluxMixin = Fluxxor.FluxMixin(React);
-const StoreWatchMixin = Fluxxor.StoreWatchMixin("FactsStore");
-
 export const FactsList = createReactClass({
-  mixins: [FluxMixin, StoreWatchMixin],
-
-  displayName: 'FactsList',
-  sources: ["tadaweb"],
-
-  // Card sizes
   _cardWidth: 320,
   _cardHeight: 200,
   _gutter: 20,
+  _subtractedElements: ['.navbar', '#filters'],
 
-  // Select tags
-  _select: "selectFilter",
-  _isSelectOpen: false,
-
-  resetState(state, selectedTags = []) {
-    state.loaded = false;
-    state.facts = [];
-    state.skip = 0;
-    state.selectedTags = selectedTags;
-    return state;
-  },
-
-  getStateFromFlux() {
-    const state = this.getFlux().store("FactsStore").getState();
-    const tags = fragmentToArray(this.props.tags);
-    if (!containsEqualValues(state.selectedTags, tags)) {
-      return this.resetState(state, tags);
-    }
-    return state;
-  },
-
-  componentWillReceiveProps(nextProps) {
-    let state = this.getStateFromFlux();
-    const curr = fragmentToArray(this.props.tags);
-    const next = fragmentToArray(nextProps.tags);
-    if (!containsEqualValues(curr, next)) {
-      state = this.resetState(state, next);
-    }
-    this.setState(state);
+  getInitialState() {
+    return {
+      facts: [],
+      loading: false,
+    };
   },
 
   componentDidMount() {
-    // get list of unique tags
-    if (this.state.tags.length === 0) {
-      this.loadTags();
-    }
-    // get first page of all facts
-    if (this.state.facts.length === 0) {
-      this.loadFacts();
-    }
+    this.loadFacts();
   },
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!this.state.loaded) {
+  componentWillReceiveProps(nextProps) {
+    const { fromDate, toDate, maintopic } = this.props;
+
+    if (nextProps.fromDate !== fromDate || nextProps.toDate !== toDate || nextProps.maintopic !== maintopic) {
       this.loadFacts();
     }
   },
 
   render() {
-    // Loading state
-    if (!this.state.loaded) {
-      return (<div className="loadingPage"><p>Loading facts&hellip;</p></div>);
+    const { loading, facts } = this.state;
+
+    let mainContent;
+    if (loading) {
+      mainContent = this.renderLoading();
+    } else if (facts && facts.length) {
+      mainContent = this.renderFacts(facts);
+    } else {
+      mainContent = this.renderNoFacts();
     }
 
-    // No results
-    if (this.state.facts.length === 0) {
-      return (
-        <div id="facts" >
-          <div className="noResults">
-            <h3>No facts found.</h3>
-            <Link to={`/site/${this.props.siteKey}/facts/`}>Reset filters</Link>
-          </div>
-        </div>);
-    }
-
-    const facts = this.state.facts;
-    const select = this.renderSelect();
-    const chips = this.renderChips();
-
-    // List view
     return (
       <div id="facts">
-        <div id="filters">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-md-9 hidden-sm">
-                <div id="tags">{chips}</div>
-              </div>
-              <div className="col-md-3 col-sm-12">
-                <div id="select">{select}</div>
-              </div>
-            </div>
-          </div>
+        <div className="inputs-container">
+          <DataSelector
+            hideDataSourceFilter
+            hideHeatmapToggle
+            {...this.props}
+          />
+          <TypeaheadSearch
+            dashboardRefreshFunc={this.handleMainTopicChanged}
+            excludeLocations
+            excludeSources
+            allSiteTopics={this.props.fullTermList}
+            {...this.props}
+          />
         </div>
+        {mainContent}
+      </div>
+    );
+  },
+
+  handleMainTopicChanged(maintopic, _, __, ___, ____) {
+    if (maintopic !== this.props.maintopic) {
+      const { timespanType, datetimeSelection, fromDate, toDate, bbox, zoomLevel, dataSource, termFilters, externalsourceid, place } = this.props;
+      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, place);
+    }
+  },
+
+  renderFacts(facts) {
+    return (
+      <div>
         <ListView ref="factsListView"
           minCardWidth={this._cardWidth}
           maxCardHeight={this._cardHeight}
@@ -140,145 +110,101 @@ export const FactsList = createReactClass({
           items={facts}
           renderCardItem={this.renderCardItem}
           loadItems={this.loadFacts}
-          subtractedElements={['.navbar', '#filters']}
-          />
+          subtractedElements={this._subtractedElements}
+        />
+        <DialogBox ref="dialogBox" {...this.props} />
       </div>
     );
   },
 
-  translate(sentence, fromLanguage, toLanguage, factId) {
-    const self = this;
-    DashboardServices.translateSentence(sentence, fromLanguage, toLanguage, (translatedSentence, error) => {
-      if (translatedSentence) {
-        self.state.facts.forEach(fact => {
-          if (fact.id === factId) {
-            fact.language = toLanguage;
-            fact.title = translatedSentence
-          }
-        });
-        self.setState({
-          elements: self.state
-        });
-      }
-      else {
-        console.error(`[${error}] occured while translating sentence`);
-      }
-    }
+  renderLoading() {
+    return (
+      <div className="loadingPage">
+        <p>Loading facts&hellip;</p>
+      </div>
+    );
+  },
+
+  renderNoFacts() {
+    return (
+      <div className="noResults">
+        <h3>No facts found.</h3>
+      </div>
+    );
+  },
+
+  renderTag(tag) {
+    return (
+      <Chip key={tag} style={styles.chip}>
+        {UCWords(tag)}
+      </Chip>
     );
   },
 
   renderCardItem(data, style) {
     const item = data.properties;
-    const dateString = getHumanDate(item.createdtime, "MM/DD/YYYY");
-    const title = item.sentence;
+
     return (
       <div className="cell" style={style}>
         <div className="card">
-          <p className="date">{dateString}
-            {this.state.language !== item.language ? <button className="btn btn-primary btn-sm" style={styles.button}
-              onClick={() => this.translate(title, item.language, this.state.language, item.messageid)}>Translate</button> : ''}
+          <p className="date">
+            {getHumanDate(item.eventtime, 'x', 'MM/DD/YYYY')}
           </p>
-          <h3 className="title truncate-2"><Link to={`/site/${this.props.siteKey}/facts/detail/${item.messageid}`}>{title}</Link></h3>
+          <h3 className="title truncate-2">
+            <a onClick={() => this.openItemDetails(item)}>
+              {this.renderCardTitle(item)}
+            </a>
+          </h3>
           <div className="tags">
-            {item.edges.sort().map((tag) => {
-              const name = UCWords(tag);
-              return <Chip key={tag} style={styles.chip} onTouchTap={(event) => this.handleSelectTag(tag)}>{name}</Chip>;
-            }, this)}
+            {item.edges.sort().map(this.renderTag)}
           </div>
         </div>
       </div>
     );
   },
 
-  handleSelectTag(tag) {
-    changeFactsUrl(this.props.siteKey, [tag]);
-  },
-
-  renderSelect() {
-    if (this.state.tags.length === 0) {
-      return;
+  renderCardTitle(item) {
+    if (item.messageid.indexOf('Facebook') > -1 && item.messageid.indexOf('comment') > -1) {
+      return item.summary;
     }
 
-    const dataSource = this.state.tags
-    .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) || (a.name.toLowerCase() === b.name.toLowerCase()) - 1)
-    .map((x, index) => {
-      const tag = x.name.toLowerCase();
-      return (
-        <div key={tag} value={tag} label={tag}>{UCWords(x.name)}</div>
-      );
+    return item.title;
+  },
+
+  openItemDetails(item) {
+    this.refs.dialogBox.open(item.messageid);
+  },
+
+  sortByEventTime(events) {
+    return events.sort((a, b) => {
+      const timeA = parseInt(a.properties.eventtime, 10);
+      const timeB = parseInt(b.properties.eventtime, 10);
+      if (timeA > timeB) return 1;
+      if (timeA < timeB) return -1;
+      return 0;
     });
-
-    return (
-      <SuperSelectField
-        ref={this._select}
-        name={this._select}
-        hintText="Filter"
-        multiple
-        onSelect={(selectedValues) => this.setState({ 'selectedTags': selectedValues })}
-        value={this.state.selectedTags}
-        selectionsRenderer={this.handleSelectRenderer}
-        menuProps={{ maxHeight: 460 }}
-        style={{ width: "100%" }}
-        >
-        {dataSource}
-      </SuperSelectField>
-    );
-  },
-
-  // Using custom renderer to trigger page update only once the multiple select menu has closed
-  handleSelectRenderer(values, hintText) {
-    if (this.refs[this._select] && this.refs[this._select].state.isOpen === false) {
-      changeFactsUrl(this.props.siteKey, this.state.selectedTags);
-    }
-    return hintText;
-  },
-
-  renderChips() {
-    const selectedTags = this.getSelectedTagNames();
-    return (
-      <div className="chips">
-        {selectedTags.map((name) => {
-          const tag = name.toLowerCase();
-          return (
-            <Chip key={tag} style={{ margin: 2 }} onRequestDelete={(event) => this.handleRequestDelete(tag)}>{UCWords(name)}</Chip>
-          );
-        }, this)}
-      </div>
-    );
-  },
-
-  handleRequestDelete(name) {
-    // create mutable clone of selected tags for splicing the deleted tag
-    const selectedTags = this.state.selectedTags.slice();
-    const index = selectedTags.indexOf(name);
-    if (index > -1) {
-      selectedTags.splice(index, 1);
-      changeFactsUrl(this.props.siteKey, selectedTags);
-    } else {
-      console.error(`Unable to delete tag: ${name}`);
-    }
-  },
-
-  loadTags() {
-    const range = momentLastMonths(3);
-    const fromDate = range.fromDate;
-    const toDate = range.toDate;
-    this.getFlux().actions.FACTS.load_tags(this.props.siteKey, this.sources, fromDate, toDate);
   },
 
   loadFacts() {
-    // NB: filter edges param uses lowercase names
-    const selectedTags = this.state.selectedTags.slice().map(s => s.toLowerCase());
-    this.getFlux().actions.FACTS.load_facts(this.props.siteKey, this.state.pageSize, this.state.skip, selectedTags, this.sources);
-  },
+    const { loading } = this.state;
+    if (loading) {
+      return;
+    }
 
-  // returns the selected (case sensitive) tag names from term collection
-  getSelectedTagNames() {
-    const selectedTags = this.state.selectedTags.slice().map(s => s.toLowerCase());
-    const filteredTags = this.state.tags.filter(x => selectedTags.indexOf(x.name.toLowerCase()) > -1);
-    return filteredTags.reduce((prev, curr) => {
-      prev.push(curr['name']);
-      return prev;
-    }, []);
+    const { maintopic, fromDate, toDate } = this.props;
+    if (!maintopic || !fromDate || !toDate) {
+      return;
+    }
+
+    const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
+    methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, (err, data) => {
+      if (err) return console.error(`Error fetching facts: ${err}`);
+
+      this.setState({
+        facts: this.sortByEventTime((data && data.facts && data.facts.features) || []),
+        loading: false,
+      });
+    });
+    this.setState({ loading: true });
   },
 });

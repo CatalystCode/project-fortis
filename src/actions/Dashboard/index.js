@@ -101,7 +101,7 @@ const methods = {
 
         seqAsync(
             //Load the site settings
-            callback => AdminServices.getDashboardSiteDefinition(null, category, (error, response, body) => ResponseHandler(error, response, body, callback)),
+            callback => AdminServices.getDashboardSiteDefinition(null, null, (error, response, body) => ResponseHandler(error, response, body, callback)),
             //Load the top 5 most popular terms
             (settings, callback) => fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category),
             //Merged Results(Settings + Full Term List + Popular Terms)

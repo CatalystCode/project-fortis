@@ -7,9 +7,26 @@
     padding: 20px;
 }
 
+#facts .inputs-container,
+#facts .noResults,
+#facts .loadingPage,
 #facts .ReactListView > * {
     background: #F3F3EC;
     margin: 0 auto;
+}
+
+#facts .inputs-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+#facts .inputs-container > .input-group,
+#facts .inputs-container > .dateRow {
+    align-self: center;
+}
+
+#facts .inputs-container > .input-group {
+    width: 300px;
 }
 
 #facts .cell {
