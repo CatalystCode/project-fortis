@@ -17,7 +17,8 @@ readonly sb_conn_str="${11}"
 readonly storage_account_name="${12}"
 readonly storage_account_key="${13}"
 
-readonly fortis_admin_interface="${fortis_interface_host}/#/site/${site_name}/admin"
+readonly fortis_admin_interface_url="${fortis_interface_host}/#/site/${site_name}/admin"
+readonly fortis_interface_url="${fortis_interface_host}/#/site/${site_name}"
 readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
 readonly eh_path="published-messages"
@@ -79,4 +80,6 @@ deis config:push
 cd ../../ || exit 2
 
 #Set the deployed service host url tag so we can output that on the deployment console to the user
-az resource tag --tags FORTIS_INTERFACE_HOST="${fortis_interface_host}" FORTIS_ADMIN_INTERFACE_HOST="${fortis_admin_interface}" FORTIS_SERVICE_HOST="${graphql_service_host}" -g "${k8resource_group}" -n "${storage_account_name}" --resource-type "Microsoft.Storage/storageAccounts"
+az group update --name "${k8resource_group}" --set tags.FORTIS_INTERFACE_URL="${fortis_interface_url}"
+az group update --name "${k8resource_group}" --set tags.FORTIS_ADMIN_INTERFACE_URL="${fortis_admin_interface_url}"
+az group update --name "${k8resource_group}" --set tags.FORTIS_SERVICE_HOST="${graphql_service_host}"

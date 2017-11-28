@@ -498,11 +498,11 @@
         },
         "fortisAdminSiteURL": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).tags.FORTIS_ADMIN_INTERFACE_HOST]"
+            "value": "[resourceGroup().tags.FORTIS_ADMIN_INTERFACE_URL]"
         },
         "fortisSiteURL": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).tags.FORTIS_INTERFACE_HOST]"
+            "value": "[resourceGroup().tags.FORTIS_INTERFACE_URL]"
         },
         "agentFQDN": {
             "type": "string",
