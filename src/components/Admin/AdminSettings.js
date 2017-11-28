@@ -166,12 +166,12 @@ export const AdminSettings = createReactClass({
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label>Supported Languages(<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
+                          <label>Supported Languages (<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="supportedLanguages" ref="supportedLanguages" value={this.state.siteSettings.properties.supportedLanguages} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label>Default Languages(<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
+                          <label>Default Languages (<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="defaultLanguage" ref="defaultLanguage" value={this.state.siteSettings.properties.defaultLanguage} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                           <div className="validation"></div>
                       </div>
