@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+  cassandra:
+    build:
+      context: .
+      dockerfile: docker/cassandra/Dockerfile
+    ports:
+      - 7000:7000
+      - 7001:7001
+      - 7199:7199
+      - 9042:9042
+      - 9160:9160
+
+  project_fortis_services:
+    build:
+      context: .
+      dockerfile: docker/project-fortis-services/Dockerfile
+    ports:
+      - 8080:80
+    links:
+      - cassandra:cassandra
+    environment:
+      - CASSANDRA_CONTACT_POINTS=cassandra
