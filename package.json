@@ -1,19 +1,36 @@
 {
-  "name": "fortis-services",
-  "description": "",
-  "version": "1.0.0",
-  "author": "erik schlegel <erik.schlegel@gmail.com>",
-  "contributors": [],
+  "name": "projectfortisservices",
+  "description": "This repository holds all the services-tier related code for the Fortis Project: https://aka.ms/fortis-story",
+  "license": "MIT",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/erikschlegel/services.git"
+    "url": "https://github.com/CatalystCode/project-fortis-services.git"
   },
-  "bugs": "http://github.com/erikschlegel/services/issues",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
+  "maintainers": [
+    {
+      "name": "Erik Schlegel",
+      "email": "erisch@microsoft.com"
+    },
+    {
+      "name": "Stephanie Marker",
+      "email": "stmarker@microsoft.com"
+    },
+    {
+      "name": "JC Jimenez",
+      "email": "jcjimene@microsoft.com"
+    },
+    {
+      "name": "Kevin Hartman",
+      "email": "keha@microsoft.com"
+    },
+    {
+      "name": "Clemens Wolff",
+      "email": "clewolff@microsoft.com"
+    }
+  ],
   "engines": {
-    "node": "6.0.0"
+    "node": "9.2.0"
   },
   "dependencies": {
     "applicationinsights": "^0.16.0",
