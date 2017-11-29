@@ -43,7 +43,7 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
 
-cd deis-apps/fortis-services || exit 2
+pushd /opt/fortis-services
 
 {
 echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
@@ -67,7 +67,9 @@ echo ENABLE_V2=1
 
 deis config:push
 
-cd ../fortis-interface || exit 2
+popd
+
+pushd /opt/fortis-interface
 
 {
 echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
@@ -77,7 +79,7 @@ echo DEFAULT_SITE_NAME="${site_name}"
 
 deis config:push
 
-cd ../../ || exit 2
+popd
 
 #Set the deployed service host url tag so we can output that on the deployment console to the user
 az group update --name "${k8resource_group}" --set tags.FORTIS_INTERFACE_URL="${fortis_interface_url}"

@@ -13,8 +13,7 @@ readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 export REACT_APP_SERVICE_HOST="${graphql_service_host}"
 export REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}"
 
-cd fortis_interface/project-fortis-interfaces || exit -2
-git pull origin master
+pushd /opt/fortis-interface
 rm -rf webdeploy
 
 deis config:set BUILDPACK_URL=${CUSTOM_REACT_CREATE_APP_BP}
@@ -27,4 +26,4 @@ git commit -m "Adding deployment assets"
 git push deis master
 deis autoscale:set web --min=2 --max=5 --cpu-percent=75
 
-cd ../.. || exit -2
+popd

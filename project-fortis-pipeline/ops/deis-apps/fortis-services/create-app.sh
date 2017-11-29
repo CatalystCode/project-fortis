@@ -2,9 +2,15 @@
 
 export DEIS_PROFILE="/root/.deis/client.json"
 
-git clone --depth=1 "https://github.com/CatalystCode/project-fortis-mono.git" fortis_services
+git clone --depth=1 "https://github.com/CatalystCode/project-fortis-mono.git" /tmp/fortis_services
 
-cd fortis_services/project-fortis-services || exit -2
+mv /tmp/fortis_services/project-fortis-services /opt/fortis-services
+rm -rf /tmp/fortis_services
+
+pushd /opt/fortis-services
+git init
+git add -A
+git commit -m "Initial commit"
 
 deis create fortis-services
 deis git:remote --force --remote deis --app fortis-services
@@ -12,4 +18,4 @@ deis git:remote --force --remote deis --app fortis-services
 deis limits:set web=512M
 deis autoscale:set web --min=2 --max=5 --cpu-percent=75
 
-cd ../.. || exit -2
+popd
