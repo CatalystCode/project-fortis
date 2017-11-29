@@ -31,8 +31,7 @@ matrix:
 
     - language: scala
       jdk: oraclejdk8
-      scala:
-        - 2.11.7
+      scala: 2.11.7
       dist: trusty
       sudo: required
       script:
