@@ -15,24 +15,22 @@ Learn more about Fortis in our [article](https://aka.ms/fortis-story) and in our
 
 ![Overview of the Fortis project workflow](https://user-images.githubusercontent.com/7635865/31245700-cd8193be-a9d0-11e7-9558-e78dd15951a2.png)
 
-### Data-sources and site types
+### Monitoring
 
-Fortis can monitor the following data sources:
-
-* Twitter
-* Facebook
-* Public Web (via Bing)
-* RSS
-* Reddit
-* Instagram
-* Radio Broadcasts
-* ACLED
-
-Fortis also comes with pre-configured terms to monitor sites of these types:
-
-* Humanitarian
-* Climate Change
-* Health
+Fortis is a flexible project and can be configured for many situations, e.g.:
+* Ingesting from multiple data sources, including:
+  - Twitter
+  - Facebook
+  - Public Web (via Bing)
+  - RSS
+  - Reddit
+  - Instagram
+  - Radio Broadcasts
+  - ACLED
+* Fortis also comes with pre-configured terms to monitor sites of these types:
+  - Humanitarian
+  - Climate Change
+  - Health
 
 ### Architecture
 
