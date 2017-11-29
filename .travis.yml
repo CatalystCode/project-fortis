@@ -9,6 +9,8 @@ matrix:
           project-fortis-interfaces/node_modules
       script:
         project-fortis-interfaces/travis/ci.sh
+      env:
+        NAME=project-fortis-interfaces
 
     - language: bash
       addons:
@@ -19,6 +21,8 @@ matrix:
           - shellcheck
       script:
         - project-fortis-pipeline/travis/ci.sh
+      env:
+        NAME=project-fortis-pipeline
 
     - language: node_js
       node_js:
@@ -28,6 +32,8 @@ matrix:
           project-fortis-services/node_modules
       script:
         project-fortis-services/travis/ci.sh
+      env:
+        NAME=project-fortis-services
 
     - language: scala
       jdk: oraclejdk8
@@ -38,3 +44,5 @@ matrix:
         - project-fortis-spark/travis/ci.sh
       after_success:
         - project-fortis-spark/travis/publish.sh
+      env:
+        NAME=project-fortis-spark
