@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # shellcheck disable=SC2086
 pushd "$(dirname $0)/.."
 
