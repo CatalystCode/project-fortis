@@ -30,8 +30,7 @@ matrix:
         project-fortis-services/travis/ci.sh
 
     - language: scala
-      jdk:
-        - oraclejdk8
+      jdk: oraclejdk8
       scala:
         - 2.11.7
       dist: trusty
