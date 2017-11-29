@@ -34,7 +34,7 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 
 ### Architecture
 
-![Overview of the Fortis pipeline architecture](https://user-images.githubusercontent.com/7635865/29438127-927a70e8-8369-11e7-9158-85d78ceb16c9.png)
+![Overview of the Fortis pipeline architecture](https://user-images.githubusercontent.com/1086421/33353437-d1ed7fc8-d47b-11e7-9f05-818723f8c09c.png)
 
 ## Deployment
 
