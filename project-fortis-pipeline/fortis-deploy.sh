@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo "***********************************************************************"
+echo "Now running $0 $@"
+echo "***********************************************************************"
+
 print_usage() {
   cat << EOF
 Command
@@ -224,10 +228,6 @@ throw_if_empty --site_name "${site_name}"
 throw_if_empty --eh_conn_str "${eh_conn_str}"
 throw_if_empty --sb_conn_str "${sb_conn_str}"
 throw_if_empty --agent_vm_size "${agent_vm_size}"
-
-echo "***********************************************************************"
-echo "Now running $0 $@"
-echo "***********************************************************************"
 
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
