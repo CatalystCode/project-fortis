@@ -258,9 +258,9 @@ az storage share create --name ${checkpointfileshare} --account-key="${storage_a
 sleep 10
 
 install_git
-git clone --depth=1 "${gh_clone_path}"
+git clone --depth=1 "${gh_clone_path}" project_fortis
 
-cd -- *deploy*/project-fortis-pipeline/ops/ || exit -2
+cd project_fortis/project-fortis-pipeline/ops/ || exit -2
 
 readonly k8location="${location}"
 readonly k8cassandra_node_count="${cassandra_node_count}"
