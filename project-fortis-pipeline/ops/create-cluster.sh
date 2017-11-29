@@ -16,7 +16,7 @@ readonly agent_vm_size="${13}"
 
 chmod -R 752 .
 
-git clone https://github.com/erikschlegel/charts.git -b spark-localssd
+git clone --depth=1 https://github.com/erikschlegel/charts.git -b spark-localssd
 
 echo "Installing Cassandra chart"
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
