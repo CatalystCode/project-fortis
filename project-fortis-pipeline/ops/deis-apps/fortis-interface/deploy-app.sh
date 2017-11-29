@@ -13,7 +13,7 @@ readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 export REACT_APP_SERVICE_HOST="${graphql_service_host}"
 export REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}"
 
-pushd /opt/fortis-interface
+pushd project-fortis-interfaces
 rm -rf webdeploy
 
 deis config:set BUILDPACK_URL=${CUSTOM_REACT_CREATE_APP_BP}

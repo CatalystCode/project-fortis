@@ -43,7 +43,7 @@ kubectl create configmap "${spark_config_map_name}" --namespace spark \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
 --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
 
-pushd /opt/fortis-services
+pushd deis-apps/fortis-services
 
 {
 echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"
@@ -69,7 +69,7 @@ deis config:push
 
 popd
 
-pushd /opt/fortis-interface
+pushd deis-apps/fortis-interface
 
 {
 echo APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}"

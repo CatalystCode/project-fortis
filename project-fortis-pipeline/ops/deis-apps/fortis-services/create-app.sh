@@ -4,10 +4,10 @@ export DEIS_PROFILE="/root/.deis/client.json"
 
 git clone --depth=1 "https://github.com/CatalystCode/project-fortis-mono.git" /tmp/fortis_services
 
-mv /tmp/fortis_services/project-fortis-services /opt/fortis-services
+mv /tmp/fortis_services/project-fortis-services .
 rm -rf /tmp/fortis_services
 
-pushd /opt/fortis-services
+pushd project-fortis-services
 git init
 git add -A
 git commit -m "Initial commit"
