@@ -1,5 +1,3 @@
-[![Travis CI status](https://api.travis-ci.org/CatalystCode/project-fortis-spark.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis-spark)
-
 # project-fortis-spark
 
 A repository for Project Fortis's data processing pipeline, built on Apache Spark.

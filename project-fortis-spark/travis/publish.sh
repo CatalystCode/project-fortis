@@ -52,7 +52,11 @@ publish_fat_jar() {
   --blob "${blobname}"
 }
 
+pushd "$(dirname $0)/.."
+
 check_preconditions
 install_azure_cli
 create_fat_jar
 publish_fat_jar
+
+popd

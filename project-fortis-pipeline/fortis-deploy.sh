@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 print_usage() {
-  cat <<EOF
-https://github.com/CatalystCode/fortisdeploy/fortis-deploy.sh
+  cat << EOF
 Command
   $0
 Arguments
-  --app_id|-ai                       [Required] : Service principal app id  used to dynamically manage resource in your subscription
+  --app_id|-ai                       [Required] : Service principal app id used to dynamically manage resource in your subscription
   --app_key|-ak                      [Required] : Service principal app key used to dynamically manage resource in your subscription
   --subscription_id|-si              [Required] : Subscription Id
   --tenant_id|-ti                    [Required] : Tenant Id
@@ -259,9 +258,9 @@ az storage share create --name ${checkpointfileshare} --account-key="${storage_a
 sleep 10
 
 install_git
-git clone "${gh_clone_path}"
+git clone --depth=1 "${gh_clone_path}"
 
-cd -- *deploy*/ops/ || exit -2
+cd -- *deploy*/project-fortis-pipeline/ops/ || exit -2
 
 readonly k8location="${location}"
 readonly k8cassandra_node_count="${cassandra_node_count}"

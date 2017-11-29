@@ -17,7 +17,7 @@
         "acsAgentCount": {
             "type": "int",
             "metadata": {
-                "description": "The number of agents for the cluster.  This value can be from 1 to 100 (note, for Kubernetes clusters you will also get 1 or 2 public agents in addition to these seleted masters)"
+                "description": "The number of agents for the cluster. This value can be from 1 to 100 (note, for Kubernetes clusters you will also get 1 or 2 public agents in addition to these seleted masters)"
             }
         },
         "agentVMSize": {
@@ -46,7 +46,7 @@
         "dnsNamePrefix": {
             "type": "string",
             "metadata": {
-                "description": "Sets the Domain name prefix for the cluster.  The concatenation of the domain name and the regionalized DNS zone make up the fully qualified domain name associated with the public IP address."
+                "description": "Sets the Domain name prefix for the cluster. The concatenation of the domain name and the regionalized DNS zone make up the fully qualified domain name associated with the public IP address."
             }
         },
         "adminUsername": {
@@ -81,7 +81,7 @@
         "sshPublicKey": {
             "type": "securestring",
             "metadata": {
-                "description": "Configure all linux machines with the SSH RSA public key string.  Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
             }
         },
         "servicePrincipalAppId": {
@@ -130,9 +130,9 @@
         "virtualNetworkName": "FortisVNet",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
-        "postDeploymentGithubRepoPath": "https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master",
-        "postDeploymentExtensionScript": "fortis-deploy.sh",
-        "githubClonePath": "https://github.com/CatalystCode/fortisdeploy.git",
+        "postDeploymentGithubRepoPath": "https://raw.githubusercontent.com/CatalystCode/project-fortis-mono/master",
+        "postDeploymentExtensionScript": "project-fortis-pipeline/fortis-deploy.sh",
+        "githubClonePath": "https://github.com/CatalystCode/project-fortis-mono.git",
         "sbNamespace": "[concat(uniquestring(resourceGroup().id), 'sbns')]",
         "sbQueueNameConfiguration": "configuration",
         "sbQueueNameCommand": "command",
@@ -484,7 +484,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "[concat(variables('postDeploymentGithubRepoPath'),'/', variables('postDeploymentExtensionScript'))]"
+                        "[concat(variables('postDeploymentGithubRepoPath'), '/', variables('postDeploymentExtensionScript'))]"
                     ],
                     "commandToExecute": "[concat('./', variables('postDeploymentExtensionScript'), ' -lo \"', resourceGroup().location, '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -kn \"', variables('kubernetesName'), '\" -pf \"', parameters('dnsNamePrefix'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -gc \"', variables('githubClonePath'), '\" -avms \"', parameters('agentVMSize'), '\"')]"
                 }

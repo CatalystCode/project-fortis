@@ -1,0 +1,42 @@
+matrix:
+  include:
+
+    - language: node_js
+      node_js:
+        - "6"
+      cache:
+        directories:
+          project-fortis-interfaces/node_modules
+      script:
+        project-fortis-interfaces/travis/ci.sh
+
+    - language: bash
+      addons:
+      apt:
+        sources:
+          - debian-sid
+        packages:
+          - shellcheck
+      script:
+        - project-fortis-pipeline/travis/ci.sh
+
+    - language: node_js
+      node_js:
+        - "9"
+      cache:
+        directories:
+          project-fortis-services/node_modules
+      script:
+        project-fortis-services/travis/ci.sh
+
+    - language: scala
+      jdk:
+        - oraclejdk8
+      scala:
+        - 2.11.7
+      dist: trusty
+      sudo: required
+      script:
+        - project-fortis-spark/travis/ci.sh
+      after_success:
+        - project-fortis-spark/travis/publish.sh

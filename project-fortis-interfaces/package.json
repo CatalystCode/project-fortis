@@ -6,7 +6,7 @@
   "main": "./dist/js/index.min.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CatalystCode/project-fortis-interfaces.git"
+    "url": "https://github.com/CatalystCode/project-fortis-mono.git"
   },
   "maintainers": [
     {

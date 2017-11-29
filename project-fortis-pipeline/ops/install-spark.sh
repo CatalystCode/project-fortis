@@ -8,8 +8,7 @@ readonly fortis_central_directory="$3"
 readonly storage_acct_name="$4"
 readonly storage_acct_key="$5"
 readonly checkpointfileshare="$6"
-readonly gh_fortis_spark_repo_name="project-fortis-spark"
-readonly latest_version=$(curl "https://api.github.com/repos/catalystcode/${gh_fortis_spark_repo_name}/releases/latest" | jq -r '.tag_name')
+readonly latest_version=$(curl "https://api.github.com/repos/CatalystCode/project-fortis-mono/releases/latest" | jq -r '.tag_name')
 readonly fortis_jar="fortis-${latest_version}.jar"
 readonly SparkCommand="spark-submit --conf \"spark.executor.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --conf \"spark.driver.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --deploy-mode cluster --driver-memory 2g --executor-memory 18g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/${fortis_jar}\""
 

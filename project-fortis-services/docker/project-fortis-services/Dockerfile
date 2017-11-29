@@ -29,7 +29,10 @@ ENV APPINSIGHTS_INSTRUMENTATIONKEY="..."
 # then update the value of this environment variable to http://localhost:3035
 ENV FORTIS_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure.com"
 
-ENV CASSANDRA_CONTACT_POINTS="..."
+# a one-node local cassandra is set up via docker-compose, if you wish to use a
+# larger cluster (e.g. hosted in Azure), just override this variable with the
+# hostname of your cluster
+ENV CASSANDRA_CONTACT_POINTS="localhost"
 ENV CASSANDRA_KEYSPACE="fortis"
 ENV CASSANDRA_USERNAME="cassandra"
 ENV CASSANDRA_PASSWORD="cassandra"

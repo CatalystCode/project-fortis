@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+pushd "$(dirname $0)/.."
 
 sbt ++${TRAVIS_SCALA_VERSION} test
+
+popd

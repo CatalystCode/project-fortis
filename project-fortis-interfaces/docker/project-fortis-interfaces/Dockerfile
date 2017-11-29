@@ -5,9 +5,9 @@ WORKDIR /app
 
 RUN npm install
 
-# please set up the project-fortis-services repository locally by following the
-# instructions at https://github.com/CatalystCode/project-fortis-services
-# basically, you just need to clone the project and run `docker-compose up`
+# a local deployment of the project-fortis-services is set up via docker-compose
+# if you wish to use a pre-existing service deployment, just override this
+# variable with the transport prefix, hostname, and port of your deployment
 ENV REACT_APP_SERVICE_HOST="http://localhost:8080"
 
 # setting up the feature service is a lengthy process so we provide a shared
