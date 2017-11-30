@@ -242,8 +242,8 @@ az storage share create \
 sleep 10
 
 if ! (command -v git >/dev/null); then sudo apt-get -qq install -y git; fi
-git clone --depth=1 "${gh_clone_path}" /tmp/project_fortis
-cp -r /tmp/project_fortis/project-fortis-pipeline .
+git clone --depth=1 "${gh_clone_path}" /tmp/fortis-project
+cp -r /tmp/fortis-project/project-fortis-pipeline .
 
 cd project-fortis-pipeline/ops/ || exit -2
 
