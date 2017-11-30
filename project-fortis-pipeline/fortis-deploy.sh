@@ -239,8 +239,6 @@ az storage share create \
     --account-key "${storage_account_key}" \
     --account-name "${storage_account_name}"
 
-sleep 10
-
 if ! (command -v git >/dev/null); then sudo apt-get -qq install -y git; fi
 git clone --depth=1 "${gh_clone_path}" /tmp/fortis-project
 cp -r /tmp/fortis-project/project-fortis-pipeline .
