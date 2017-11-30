@@ -98,7 +98,7 @@
         }
     },
     "variables": {
-        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'prstrg')]",
+        "storageAccountName": "[concat('fortis', uniquestring(resourceGroup().id))]",
         "premStorageSku": "Premium_LRS",
         "vmStorageAccountType": "Standard_LRS",
         "vmName": "FortisDeployVM",
