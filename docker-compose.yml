@@ -7,22 +7,22 @@ services:
       context: project-fortis-interfaces
       dockerfile: docker/project-fortis-interfaces/Dockerfile
     ports:
-      - 8888:80
+      - ${PROJECT_FORTIS_INTERFACES_PORT}:80
     depends_on:
       - project_fortis_services
     environment:
-      - REACT_APP_SERVICE_HOST=http://localhost:8080
+      - REACT_APP_SERVICE_HOST=${PROJECT_FORTIS_SERVICES_HOST}
 
   project_fortis_services:
     build:
       context: project-fortis-services
       dockerfile: docker/project-fortis-services/Dockerfile
     ports:
-      - 8080:80
+      - ${PROJECT_FORTIS_SERVICES_PORT}:80
     links:
       - cassandra:cassandra
     environment:
-      - CASSANDRA_CONTACT_POINTS=cassandra
+      - CASSANDRA_CONTACT_POINTS=${CASSANDRA_HOST}
 
   cassandra:
     image: cassandra:3.11.0
