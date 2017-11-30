@@ -51,9 +51,11 @@ kubectl create configmap "${spark_config_map_name}" \
     --from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" \
     --from-literal=FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" \
     --from-literal=APPLICATION_INSIGHTS_IKEY="${app_insights_id}" \
+    --from-literal=APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" \
     --from-literal=SPARK_DAEMON_MEMORY="${spark_daemon_memory}" \
     --from-literal=DEFAULT_LANGUAGE="${default_language}" \
     --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
+    --from-literal=FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" \
     --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
     --from-literal=FORTIS_SB_CONN_STR="${sb_conn_str}" \
     --from-literal=FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" \

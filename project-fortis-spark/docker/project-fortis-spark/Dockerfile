@@ -49,14 +49,37 @@ WORKDIR /root
 # Spark worker web UI on 8081.
 EXPOSE 4040 8080 8081
 
-# Application-specific code
-ARG SPARK_MAINCLASS="com.microsoft.partnercatalyst.fortis.spark.ProjectFortis"
-ADD . /app
-RUN cd /app && \
-    echo 'version := "0.0.0"' > version.sbt && \
-    sbt assembly && \
-    echo > /root/spark-submit.sh "spark-submit --driver-memory 4g --class ${SPARK_MAINCLASS} $(find target -name '*-assembly-0.0.0.jar' -exec readlink -f {} \; -quit)" && \
-    chmod +x /root/spark-submit.sh && \
-    cd -
+# Only application-specific code follows below this point
 
-CMD /root/spark-submit.sh
+RUN apt-get -qq install -y --no-install-recommends wget ca-certificates && \
+    wget -q http://www-eu.apache.org/dist/cassandra/3.11.0/apache-cassandra-3.11.0-bin.tar.gz && \
+    tar xfz apache-cassandra-3.11.0-bin.tar.gz && \
+    rm apache-cassandra-3.11.0-bin.tar.gz && \
+    mv apache-cassandra-3.11.0 /opt/cassandra
+
+ADD . /app
+ADD docker/project-fortis-spark/run-spark.sh /app/run-spark.sh
+RUN cd /app && echo 'version := "0.0.0"' > version.sbt && sbt assembly && cd -
+
+ENV FORTIS_MODELS_DIRECTORY="https://fortiscentral.blob.core.windows.net/sentiment/"
+ENV FORTIS_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure.com"
+ENV FORTIS_CENTRAL_ASSETS_HOST="https://fortiscentral.blob.core.windows.net"
+ENV APPINSIGHTS_INSTRUMENTATIONKEY="..."
+ENV APPLICATION_INSIGHTS_IKEY="..."
+ENV FORTIS_SB_CONN_STR="..."
+ENV FORTIS_SB_CONFIG_QUEUE="..."
+ENV FORTIS_SB_COMMAND_QUEUE="..."
+ENV HA_PROGRESS_DIR=""
+ENV FORTIS_STREAMING_DURATION_IN_SECONDS="30"
+ENV FORTIS_SSC_INIT_RETRY_AFTER_MILLIS="60000"
+ENV FORTIS_SSC_SHUTDOWN_DELAY_MILLIS="60000"
+ENV FORTIS_EVENT_MAX_KEYWORDS="5"
+ENV FORTIS_EVENT_MAX_LOCATIONS="4"
+ENV FORTIS_CASSANDRA_HOST="cassandra"
+ENV FORTIS_CASSANDRA_USERNAME="cassandra"
+ENV FORTIS_CASSANDRA_PASSWORD="cassandra"
+
+ENV SPARK_MAINCLASS="com.microsoft.partnercatalyst.fortis.spark.ProjectFortis"
+ENV SPARK_DRIVER_MEMORY="4g"
+
+CMD /app/run-spark.sh
