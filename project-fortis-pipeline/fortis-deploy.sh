@@ -36,15 +36,10 @@ EOF
 throw_if_empty() {
   local name="$1"
   local value="$2"
-  if [ -z "${value}" ]; then
-    echo "Parameter '${name}' cannot be empty." 1>&2
-    print_usage
-    exit -1
-  fi
+  if [ -z "${value}" ]; then echo "Parameter '${name}' cannot be empty." 1>&2; print_usage; exit -1; fi
 }
 
-while [[ $# -gt 0 ]]
-do
+while [[ $# -gt 0 ]]; do
   key="$1"
   shift
   case ${key} in
@@ -163,7 +158,7 @@ install_helm() {
   sleep 30
 }
 
-setup_k8_cluster(){
+setup_k8_cluster() {
   echo "Setting up access to locally copy the kubernetes cluster"
   # Create keys to copy over kube config
   temp_user_name="$(uuidgen | sed 's/-//g')"
@@ -189,10 +184,7 @@ setup_k8_cluster(){
   rm "${temp_key_path}"
   rm "${temp_key_path}.pub"
 
-  if [ ! -s "${kube_config_dest_file}" ]; then
-    >&2 echo "Failed to copy kubeconfig for kubernetes cluster."
-    exit -1
-  fi
+  if [ ! -s "${kube_config_dest_file}" ]; then echo "Failed to copy kubeconfig for kubernetes cluster." >&2 && exit -1; fi
 
   sudo chmod +r "${kube_config_dest_file}"
 }
@@ -231,25 +223,19 @@ throw_if_empty --agent_vm_size "${agent_vm_size}"
 
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
-if ! (command -v az >/dev/null); then
-  install_azure_cli
-fi
+if ! (command -v az >/dev/null); then install_azure_cli; fi
 
 azure_login
 setup_k8_cluster
 
 # Install and setup Kubernetes cli for admin user
 echo "Installing Kubectl"
-if ! (command -v kubectl >/dev/null); then
-  install_kubectl
-fi
+if ! (command -v kubectl >/dev/null); then install_kubectl; fi
 
 echo "Installed Kubectl. Now installing Helm"
 
 # Install and setup Helm for cluster chart setup
-if ! (command -v helm >/dev/null); then
-  install_helm
-fi
+if ! (command -v helm >/dev/null); then install_helm; fi
 
 echo "Installed Helm. Adding storage share for spark checkpointing."
 
