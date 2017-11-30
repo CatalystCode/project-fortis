@@ -53,10 +53,10 @@ with the services:
   - http://localhost:8888/#/site/INSERT_YOUR_SITE_NAME_HERE/admin
   - http://localhost:8888/#/site/INSERT_YOUR_SITE_NAME_HERE
 * Backend
-  - http://localhost:8080/api/edges/graphiql
-  - http://localhost:8080/api/messages/graphiql
-  - http://localhost:8080/api/settings/graphiql
-  - http://localhost:8080/api/tiles/graphiql
+  - http://localhost:8889/api/edges/graphiql
+  - http://localhost:8889/api/messages/graphiql
+  - http://localhost:8889/api/settings/graphiql
+  - http://localhost:8889/api/tiles/graphiql
 
 ### Production deployment
 
