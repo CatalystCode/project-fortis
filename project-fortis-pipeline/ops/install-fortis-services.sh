@@ -44,8 +44,6 @@ spec:
           value: ${app_insights_id}
         - name: FORTIS_FEATURE_SERVICE_HOST
           value: ${feature_service_host}
-        - name: CASSANDRA_CONTACT_POINTS
-          value: ${cassandra_ip}
         - name: FORTIS_CENTRAL_ASSETS_HOST
           value: ${fortis_central_directory}
         - name: PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING
