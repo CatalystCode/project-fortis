@@ -58,7 +58,7 @@ RUN apt-get -qq install -y --no-install-recommends wget ca-certificates && \
     mv apache-cassandra-3.11.0 /opt/cassandra
 
 ADD . /app
-ADD docker/project-fortis-spark/run-spark.sh /app/run-spark.sh
+ADD docker/run-spark.sh /app/run-spark.sh
 RUN cd /app && echo 'version := "0.0.0"' > version.sbt && sbt assembly && cd -
 
 ENV FORTIS_MODELS_DIRECTORY="https://fortiscentral.blob.core.windows.net/sentiment/"

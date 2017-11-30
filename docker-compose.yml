@@ -6,7 +6,7 @@ services:
     image: cwolff/project_fortis_interfaces
     build:
       context: project-fortis-interfaces
-      dockerfile: docker/project-fortis-interfaces/Dockerfile
+      dockerfile: docker/Dockerfile
     ports:
       - ${PROJECT_FORTIS_INTERFACES_PORT}:80
     depends_on:
@@ -18,7 +18,7 @@ services:
     image: cwolff/project_fortis_services
     build:
       context: project-fortis-services
-      dockerfile: docker/project-fortis-services/Dockerfile
+      dockerfile: docker/Dockerfile
     ports:
       - ${PROJECT_FORTIS_SERVICES_PORT}:80
     links:
@@ -30,7 +30,7 @@ services:
     image: cwolff/project_fortis_spark
     build:
       context: project-fortis-spark
-      dockerfile: docker/project-fortis-spark/Dockerfile
+      dockerfile: docker/Dockerfile
     ports:
       - ${PROJECT_FORTIS_SPARK_CONTEXT_UI_PORT}:4040
       - ${PROJECT_FORTIS_SPARK_MASTER_UI_PORT}:8080

@@ -1,7 +1,7 @@
 FROM node:9.2.0
 
 ADD . /app
-ADD docker/project-fortis-services/run-server.sh /app/run-server.sh
+ADD docker/run-server.sh /app/run-server.sh
 
 WORKDIR /app
 
