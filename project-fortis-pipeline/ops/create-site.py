@@ -30,7 +30,7 @@ def _main(graphql_service_host, site_name, site_type):
     headers = {'Content-Type': 'application/json'}
     body = dumps({'query': mutation}).encode('utf-8')
 
-    request = urlopen(Request(url, body, headers))
+    request = urlopen(Request(url, body, headers), timeout=(5 * 60))
     response = request.read().decode('utf-8')
     print(response)
 
