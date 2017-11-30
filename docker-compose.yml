@@ -3,6 +3,7 @@ version: '3'
 services:
 
   project_fortis_interfaces:
+    image: cwolff/project_fortis_interfaces
     build:
       context: project-fortis-interfaces
       dockerfile: docker/project-fortis-interfaces/Dockerfile
@@ -14,6 +15,7 @@ services:
       - REACT_APP_SERVICE_HOST=${PROJECT_FORTIS_SERVICES_HOST}
 
   project_fortis_services:
+    image: cwolff/project_fortis_services
     build:
       context: project-fortis-services
       dockerfile: docker/project-fortis-services/Dockerfile
