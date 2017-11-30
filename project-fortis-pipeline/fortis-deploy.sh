@@ -21,7 +21,6 @@ Arguments
   --spark_worker_count|-sw           [Required] : Spark Worker Node Count
   --cassandra_node_count|-cn         [Required] : Port used for Front50, defaulted to 8080
   --app_insights_id|-aii             [Required] : Application Insights Instramentation Key
-  --kubernetes_name|-kn              [Required] : Kubernetes ACS Cluster Name
   --gh_clone_path|-gc                [Required] : Github path to clone
   --location|-lo                     [Required] : Container cluster location
   --site_type|-sty                   [Required] : Fortis Site Type
@@ -109,10 +108,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --app_insights_id|-aii)
       app_insights_id="$1"
-      shift
-      ;;
-    --kubernetes_name|-kn)
-      kubernetes_name="$1"  # shellcheck disable=SC2034
       shift
       ;;
     --gh_clone_path|-gc)
