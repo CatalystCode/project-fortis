@@ -1,8 +1,7 @@
 # project-fortis-pipeline
 
-## Documentation
-
-- [Deploy to Azure Steps](../readme.md#deployment)
-- [Deploy to Local Machine Steps](docs/local-deploy.md)
-- [Upgrading the Fortis Spark Pipeline](docs/upgrading.md)
-- [Upgrading the Fortis Interface](docs/interface-upgrade.md)
+This repository contains scripts that are used as part of the deployment of
+Fortis to Azure. The ARM template (azuredeploy.json) first sets up some
+resources in Azure (e.g. Kubernetes cluster, storage accounts, ServiceBus,
+etc.) and then the scripts in this repository finish the setup by, for
+example, deploying Cassandra and Spark to the Kubernetes cluster via Helm.
