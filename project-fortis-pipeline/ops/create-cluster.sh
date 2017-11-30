@@ -27,6 +27,7 @@ chmod -R 752 .
 
 echo "Installing Cassandra helm chart."
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
+sleep 10s  # wait for tiler pod to get ready TODO: implement in a more robust way
 while :; do
    cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
    if [ -n "${cassandra_ip}" ]; then break; else sleep 5s; fi
@@ -47,7 +48,7 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${storage_account_name}" \
   "${storage_account_key}"
 while :; do
-   fortis_service_ip="$(kubectl get svc project-fortis-service-lb -o jsonpath='{..ip}')"
+   fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
    if [ -n "${fortis_service_ip}" ]; then break; else sleep 5s; fi
 done
 readonly graphql_service_host="http://${fortis_service_ip}"

@@ -25,12 +25,16 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   name: project-fortis-services
+  labels:
+    io.kompose.service: project-fortis-service
 spec:
   replicas: 1
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
+      labels:
+        io.kompose.service: project-fortis-services
     spec:
       containers:
       - env:
@@ -74,7 +78,11 @@ kind: Service
 metadata:
   creationTimestamp: null
   name: project-fortis-services
+  labels:
+    io.kompose.service: project-fortis-services
 spec:
+  selector:
+    io.kompose.service: project-fortis-services
   ports:
   - name: "80"
     port: 80
