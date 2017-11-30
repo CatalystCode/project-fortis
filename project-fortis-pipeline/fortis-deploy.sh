@@ -198,10 +198,6 @@ install_kubectl() {
   kubectl cluster-info
 }
 
-install_git() {
-  sudo apt-get -qq install -y git
-}
-
 throw_if_empty --app_id "${app_id}"
 throw_if_empty --app_key "${app_key}"
 throw_if_empty --subscription_id "${subscription_id}"
@@ -250,7 +246,7 @@ az storage share create \
 
 sleep 10
 
-install_git
+if ! (command -v git >/dev/null); then sudo apt-get -qq install -y git; fi
 git clone --depth=1 "${gh_clone_path}" /tmp/project_fortis
 cp -r /tmp/project_fortis/project-fortis-pipeline .
 
