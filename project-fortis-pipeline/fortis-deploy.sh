@@ -139,11 +139,11 @@ do
 done
 
 install_azure_cli() {
-  sudo apt-get update && sudo apt-get install -y libssl-dev libffi-dev python-dev
+  sudo apt-get -qq update && sudo apt-get -qq install -y libssl-dev libffi-dev python-dev
   echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/azure-cli/ wheezy main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
   sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
-  sudo apt-get install -y apt-transport-https
-  sudo apt-get -y update && sudo apt-get install -y azure-cli
+  sudo apt-get -qq install -y apt-transport-https
+  sudo apt-get -qq update && sudo apt-get -qq install -y azure-cli
 }
 
 azure_login() {
@@ -207,7 +207,7 @@ install_kubectl() {
 }
 
 install_git() {
-  sudo apt-get install -y git
+  sudo apt-get -qq install -y git
 }
 
 throw_if_empty --app_id "${app_id}"
@@ -263,8 +263,7 @@ sleep 10
 
 install_git
 git clone --depth=1 "${gh_clone_path}" /tmp/project_fortis
-mv /tmp/project_fortis/project-fortis-pipeline .
-rm -rf /tmp/project_fortis
+cp -r /tmp/project_fortis/project-fortis-pipeline .
 
 cd project-fortis-pipeline/ops/ || exit -2
 

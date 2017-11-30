@@ -5,6 +5,8 @@ readonly agent_vm_size="$2"
 readonly cluster_name="FORTIS_CASSANDRA"
 readonly storageClass="fast"
 
+git clone --depth=1 https://github.com/erikschlegel/charts.git -b spark-localssd
+
 cd charts || exit -2
 
 helm install \
