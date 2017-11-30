@@ -275,4 +275,4 @@ chmod 752 create-cluster.sh
     "${storage_account_key}" \
     "${checkpointfileshare}" \
     "${site_type}" \
-    "${agent_vm_size}" \
+    "${agent_vm_size}"
