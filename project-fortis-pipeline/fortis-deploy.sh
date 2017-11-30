@@ -256,17 +256,12 @@ cp -r /tmp/project_fortis/project-fortis-pipeline .
 
 cd project-fortis-pipeline/ops/ || exit -2
 
-readonly k8location="${location}"
-readonly k8cassandra_node_count="${cassandra_node_count}"
-readonly k8spark_worker_count="${spark_worker_count}"
-readonly k8resource_group="${resource_group}"
-
 chmod 752 create-cluster.sh
 ./create-cluster.sh \
-    "${k8location}" \
-    "${k8cassandra_node_count}" \
-    "${k8spark_worker_count}" \
-    "${k8resource_group}" \
+    "${location}" \
+    "${cassandra_node_count}" \
+    "${spark_worker_count}" \
+    "${resource_group}" \
     "${storage_account_name}" \
     "${app_insights_id}" \
     "${site_name}" \
