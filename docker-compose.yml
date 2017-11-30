@@ -26,6 +26,20 @@ services:
     environment:
       - CASSANDRA_CONTACT_POINTS=${CASSANDRA_HOST}
 
+  project_fortis_spark:
+    image: cwolff/project_fortis_spark
+    build:
+      context: project-fortis-spark
+      dockerfile: docker/project-fortis-spark/Dockerfile
+    ports:
+      - ${PROJECT_FORTIS_SPARK_CONTEXT_UI_PORT}:4040
+      - ${PROJECT_FORTIS_SPARK_MASTER_UI_PORT}:8080
+      - ${PROJECT_FORTIS_SPARK_WORKER_UI_PORT}:8081
+    links:
+      - cassandra:cassandra
+    environment:
+      - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
+
   cassandra:
     image: cassandra:3.11.0
     ports:
