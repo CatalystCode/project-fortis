@@ -25,9 +25,11 @@ readonly sb_queue_command="command"
 
 chmod -R 752 .
 
-echo "Installing Cassandra helm chart."
+echo "Waiting for Tiller pod to get ready"
+while ! (kubectl get po --namespace kube-system | grep -q tiller); do echo "Waiting for Tiller pod"; sleep 10s; done
+
+echo "Finished. Now installing Cassandra helm chart."
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
-sleep 10s  # wait for tiler pod to get ready TODO: implement in a more robust way
 while :; do
    cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
    if [ -n "${cassandra_ip}" ]; then break; else sleep 5s; fi
