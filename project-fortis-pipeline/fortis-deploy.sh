@@ -149,8 +149,6 @@ install_helm() {
   
   export HELM_HOME="/home/${user_name}/"
   helm init
-
-  sleep 30
 }
 
 setup_k8_cluster() {
