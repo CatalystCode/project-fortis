@@ -212,38 +212,34 @@ throw_if_empty --agent_vm_size "${agent_vm_size}"
 
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
+echo "Logging into Azure"
 if ! (command -v az >/dev/null); then install_azure_cli; fi
-
 azure_login
+
+echo "Finished. Setting up Kubernetes cluster"
 setup_k8_cluster
 
-# Install and setup Kubernetes cli for admin user
-echo "Installing Kubectl"
+echo "Finished. Installing Kubectl"
 if ! (command -v kubectl >/dev/null); then install_kubectl; fi
 
-echo "Installed Kubectl. Now installing Helm"
-
-# Install and setup Helm for cluster chart setup
+echo "Finished. Now installing Helm"
 if ! (command -v helm >/dev/null); then install_helm; fi
 
-echo "Installed Helm. Adding storage share for spark checkpointing."
-
-#Create the K8 azure file storage container
-echo "creating azure file share"
+echo "Finished. Adding storage share for spark checkpointing"
 readonly checkpointfileshare="checkpoint"
-
 az storage share create \
     --name "${checkpointfileshare}" \
     --account-key "${storage_account_key}" \
     --account-name "${storage_account_name}"
 
+echo "Finished. Installing deployment scripts"
 if ! (command -v git >/dev/null); then sudo apt-get -qq install -y git; fi
 git clone --depth=1 "${gh_clone_path}" /tmp/fortis-project
 cp -r /tmp/fortis-project/project-fortis-pipeline .
-
 cd project-fortis-pipeline/ops/ || exit -2
-
 chmod 752 create-cluster.sh
+
+echo "Finished. Setting up cluster"
 ./create-cluster.sh \
     "${location}" \
     "${cassandra_node_count}" \
