@@ -2,13 +2,14 @@
 
 readonly k8cassandra_node_count="$1"
 readonly agent_vm_size="$2"
+
+# setup
+if [ ! -d charts ]; then git clone --depth=1 https://github.com/erikschlegel/charts.git -b spark-localssd; fi
+cd charts || exit -2
 readonly cluster_name="FORTIS_CASSANDRA"
 readonly storageClass="fast"
 
-git clone --depth=1 https://github.com/erikschlegel/charts.git -b spark-localssd
-
-cd charts || exit -2
-
+# install cassandra
 helm install \
   --set replicaCount="${k8cassandra_node_count}" \
   --set VmInstanceType="${agent_vm_size}" \
@@ -17,4 +18,5 @@ helm install \
   --name cassandra-cluster ./incubator/cassandra \
   --namespace cassandra
 
+# cleanup
 cd ..

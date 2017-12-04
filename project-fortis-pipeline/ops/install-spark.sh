@@ -21,6 +21,8 @@ readonly k8spark_worker_count="${18}"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
+if [ ! -d charts ]; then git clone --depth=1 https://github.com/erikschlegel/charts.git -b spark-localssd; fi
+cd charts || exit -2
 readonly spark_daemon_memory="1g"
 readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
@@ -63,7 +65,6 @@ kubectl create configmap "${spark_config_map_name}" \
     --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
     --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
     --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
-cd charts || exit -2
 helm install \
     --set Worker.Replicas="${k8spark_worker_count}" \
     --set Master.ImageTag="2.2" \
@@ -83,4 +84,6 @@ helm install \
     --namespace spark \
     --name spark-cluster \
     ./stable/spark
+
+# cleanup
 cd ..
