@@ -18,6 +18,7 @@ readonly sb_queue_config="${15}"
 readonly sb_queue_command="${16}"
 readonly checkpointfileshare="${17}"
 readonly k8spark_worker_count="${18}"
+readonly agent_vm_size="${19}"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
@@ -72,6 +73,7 @@ helm install \
     --set Worker.ConfigMapName="${spark_config_map_name}" \
     --set Master.ConfigMapName="${spark_config_map_name}" \
     --set Master.SparkSubmitCommand="${spark_command}" \
+    --set Worker.VmInstanceType="${agent_vm_size}" \
     --set Worker.Resources.Requests.Cpu="1" \
     --set Worker.Resources.Requests.Memory="10Gi" \
     --set Worker.Resources.Limits.Cpu="2.8" \

@@ -87,7 +87,8 @@ echo "Finished. Now installing Spark helm chart."
     "${sb_queue_config}" \
     "${sb_queue_command}" \
     "${checkpointfileshare}" \
-    "${k8spark_worker_count}"
+    "${k8spark_worker_count}" \
+    "${agent_vm_size}"
 
 echo "Finished. Finally, creating tags containing URLs for resources so that the user can find them later."
 ./create-tags.sh \
