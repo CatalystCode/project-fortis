@@ -87,11 +87,5 @@ helm install \
     --name spark-cluster \
     ./stable/spark
 
-# remove Spark public IPs
-while ! (kubectl get svc --namespace spark | grep -i spark-master); do echo "Waiting for Spark master"; sleep 10s; done
-kubectl delete svc spark-master --namespace spark
-while ! (kubectl get svc --namespace spark | grep -i zeppelin); do echo "Waiting for Spark zeppelin"; sleep 10s; done
-kubectl delete svc zeppelin --namespace spark
-
 # cleanup
 cd ..
