@@ -108,3 +108,5 @@ loads, you can now finalize the setup of your Fortis deployment using the portal
 
 Once you've completed all the admin configuration, your deployment is ready to
 be used.
+
+For more detailed information on the admin page, refer to this [guide](https://github.com/CatalystCode/project-fortis-mono/blob/master/project-fortis-pipeline/docs/user/admin.md).
