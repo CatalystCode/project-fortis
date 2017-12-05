@@ -184,22 +184,22 @@ export const AdminSettings = createReactClass({
                       </div>
                       <div className="form-group">
                           <label>Translation Services Token</label>
-                          <input onChange={this.handleInputChange} required name="translationSvcToken" ref="translationSvcToken" value={this.state.siteSettings.properties.translationSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <input onChange={this.handleInputChange} required name="translationSvcToken" ref="translationSvcToken" value={this.state.siteSettings.properties.translationSvcToken} type="text" style={styles.settings.input} className="form-control settings secret" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
                           <label>Cognitive Speech Services Token</label>
-                          <input onChange={this.handleInputChange} required name="cogSpeechSvcToken" ref="cogSpeechSvcToken" value={this.state.siteSettings.properties.cogSpeechSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <input onChange={this.handleInputChange} required name="cogSpeechSvcToken" ref="cogSpeechSvcToken" value={this.state.siteSettings.properties.cogSpeechSvcToken} type="text" style={styles.settings.input} className="form-control settings secret" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
                           <label>Cognitive Vision Services Token</label>
-                          <input onChange={this.handleInputChange} required name="cogVisionSvcToken" ref="cogVisionSvcToken" value={this.state.siteSettings.properties.cogVisionSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <input onChange={this.handleInputChange} required name="cogVisionSvcToken" ref="cogVisionSvcToken" value={this.state.siteSettings.properties.cogVisionSvcToken} type="text" style={styles.settings.input} className="form-control settings secret" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
                           <label>Cognitive Text Services Token</label>
-                          <input onChange={this.handleInputChange} required name="cogTextSvcToken" ref="cogTextSvcToken" value={this.state.siteSettings.properties.cogTextSvcToken} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
+                          <input onChange={this.handleInputChange} required name="cogTextSvcToken" ref="cogTextSvcToken" value={this.state.siteSettings.properties.cogTextSvcToken} type="text" style={styles.settings.input} className="form-control settings secret" aria-label="..." />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
