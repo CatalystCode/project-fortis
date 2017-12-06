@@ -13,6 +13,8 @@ services:
       - project_fortis_services
     environment:
       - REACT_APP_SERVICE_HOST=${PROJECT_FORTIS_SERVICES_HOST}
+    env_file:
+      - .env-secrets
 
   project_fortis_services:
     image: cwolff/project_fortis_services
@@ -25,6 +27,8 @@ services:
       - cassandra:cassandra
     environment:
       - CASSANDRA_CONTACT_POINTS=${CASSANDRA_HOST}
+    env_file:
+      - .env-secrets
 
   project_fortis_spark:
     image: cwolff/project_fortis_spark
@@ -39,6 +43,8 @@ services:
       - cassandra:cassandra
     environment:
       - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
+    env_file:
+      - .env-secrets
 
   cassandra:
     image: cassandra:3.11.0

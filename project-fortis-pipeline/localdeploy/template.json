@@ -1,0 +1,236 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namespaces_fortiseventhubs_name": {
+            "type": "string"
+        },
+        "namespaces_fortisservicebus_name": {
+            "type": "string"
+        },
+        "storageAccounts_fortisblobstorage_name": {
+            "type": "string"
+        },
+        "accounts_fortistranslator_name": {
+            "type": "string"
+        },
+        "accounts_fortisspeechtotext_name": {
+            "type": "string"
+        },
+        "components_fortisapplicationinsights_name": {
+            "type": "string"
+        },
+        "accounts_fortistextanalytics_name": {
+            "type": "string"
+        },
+        "accounts_fortiscomputervision_name": {
+            "type": "string"
+        },
+        "authorizationRules_eventhubs_name": {
+            "type": "string"
+        },
+        "authorizationRules_servicebus_name": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "sku": {
+                "name": "S0"
+            },
+            "kind": "Bing.Speech",
+            "name": "[parameters('accounts_fortisspeechtotext_name')]",
+            "apiVersion": "2016-02-01-preview",
+            "location": "global",
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "sku": {
+                "name": "S1"
+            },
+            "kind": "TextTranslation",
+            "name": "[parameters('accounts_fortistranslator_name')]",
+            "apiVersion": "2016-02-01-preview",
+            "location": "global",
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "sku": {
+                "name": "S1"
+            },
+            "kind": "ComputerVision",
+            "name": "[parameters('accounts_fortiscomputervision_name')]",
+            "apiVersion": "2016-02-01-preview",
+            "location": "eastus",
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "sku": {
+                "name": "S0"
+            },
+            "kind": "TextAnalytics",
+            "name": "[parameters('accounts_fortistextanalytics_name')]",
+            "apiVersion": "2016-02-01-preview",
+            "location": "eastus",
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 1
+            },
+            "name": "[parameters('namespaces_fortiseventhubs_name')]",
+            "apiVersion": "2017-04-01",
+            "location": "East US",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "isAutoInflateEnabled": false,
+                "maximumThroughputUnits": 0,
+                "provisioningState": "Succeeded",
+                "metricId": "[concat('04f7ec88-8e28-41ed-8537-5e17766001f5:', parameters('namespaces_fortiseventhubs_name'))]",
+                "createdAt": "2017-12-06T16:48:12.72Z",
+                "updatedAt": "2017-12-06T16:48:32.893Z",
+                "serviceBusEndpoint": "[concat('https://', parameters('namespaces_fortiseventhubs_name'),'.servicebus.windows.net:443/')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "kind": "other",
+            "name": "[parameters('components_fortisapplicationinsights_name')]",
+            "apiVersion": "2014-04-01",
+            "location": "eastus",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "ApplicationId": "[parameters('components_fortisapplicationinsights_name')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard"
+            },
+            "name": "[parameters('namespaces_fortisservicebus_name')]",
+            "apiVersion": "2017-04-01",
+            "location": "East US",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "metricId": "[concat('04f7ec88-8e28-41ed-8537-5e17766001f5:', parameters('namespaces_fortisservicebus_name'))]",
+                "createdAt": "2017-12-06T16:48:29.86Z",
+                "updatedAt": "2017-12-06T16:48:52.947Z",
+                "serviceBusEndpoint": "[concat('https://', parameters('namespaces_fortisservicebus_name'),'.servicebus.windows.net:443/')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "location": "eastus",
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            },
+            "name": "[parameters('storageAccounts_fortisblobstorage_name')]",
+            "apiVersion": "2016-01-01",
+            "kind": "Storage",
+            "properties": {},
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "name": "[concat(parameters('namespaces_fortiseventhubs_name'), '/', parameters('authorizationRules_eventhubs_name'))]",
+            "apiVersion": "2017-04-01",
+            "location": "East US",
+            "scale": null,
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaces_fortiseventhubs_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "name": "[concat(parameters('namespaces_fortisservicebus_name'), '/', parameters('authorizationRules_servicebus_name'))]",
+            "apiVersion": "2017-04-01",
+            "location": "East US",
+            "scale": null,
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_fortisservicebus_name'))]"
+            ]
+        }
+    ],
+    "outputs": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('components_fortisapplicationinsights_name')), '2014-04-01').InstrumentationKey]"
+        },
+        "APPLICATION_INSIGHTS_IKEY": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('components_fortisapplicationinsights_name')), '2014-04-01').InstrumentationKey]"
+        },
+        "FORTIS_SB_CONN_STR": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules', parameters('namespaces_fortisservicebus_name'), parameters('authorizationRules_servicebus_name')), '2017-04-01').primaryConnectionString]"
+        },
+        "PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/AuthorizationRules', parameters('namespaces_fortiseventhubs_name'), parameters('authorizationRules_eventhubs_name')), '2017-04-01').primaryConnectionString]"
+        },
+        "USER_FILES_BLOB_ACCOUNT_NAME": {
+            "type": "string",
+            "value": "[parameters('storageAccounts_fortisblobstorage_name')]"
+        },
+        "USER_FILES_BLOB_ACCOUNT_KEY": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_fortisblobstorage_name')), '2016-01-01').keys[0].value]"
+        },
+        "translationsvctoken": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortistranslator_name')), '2016-02-01-preview').key1]"
+        },
+        "cogspeechsvctoken": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortisspeechtotext_name')), '2016-02-01-preview').key1]"
+        },
+        "cogvisionsvctoken": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortiscomputervision_name')), '2016-02-01-preview').key1]"
+        },
+        "cogtextsvctoken": {
+            "type": "string",
+            "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortistextanalytics_name')), '2016-02-01-preview').key1]"
+        }
+    }
+}

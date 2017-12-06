@@ -40,7 +40,23 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 
 ### Local deployment
 
-You can start the full Fortis pipeline with one command:
+First, you need to set up some services in Azure:
+
+```sh
+./project-fortis-pipeline/localdeploy/fortis-deploy.sh \
+  -i YOUR_SUBSCRIPTION_ID_HERE \
+  -g SOME_RESOURCE_GROUP_NAME \
+  -l SOME_RESOURCE_GROUP_LOCATION \
+  -n SOME_DEPLOYMENT_NAME \
+> .env-secrets
+```
+
+This script will deploy to Azure a number of services used by Fortis, such as
+ServiceBus, EventHubs, Cognitive Services, and so forth. The secrets to access
+these services are stored in a `.env-secrets` file which the rest of the
+developmnet setup will leverage.
+
+Now you can start the full Fortis pipeline with one command:
 
 ```sh
 docker-compose up

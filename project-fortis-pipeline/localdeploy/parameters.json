@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "namespaces_fortiseventhubs_name": {
+            "value": "fortiseventhubs"
+        },
+        "namespaces_fortisservicebus_name": {
+            "value": "fortisservicebus"
+        },
+        "storageAccounts_fortisblobstorage_name": {
+            "value": "fortisblobstorage"
+        },
+        "accounts_fortistranslator_name": {
+            "value": "fortistranslator"
+        },
+        "accounts_fortisspeechtotext_name": {
+            "value": "fortisspeechtotext"
+        },
+        "components_fortisapplicationinsights_name": {
+            "value": "fortisapplicationinsights"
+        },
+        "accounts_fortistextanalytics_name": {
+            "value": "fortistextanalytics"
+        },
+        "accounts_fortiscomputervision_name": {
+            "value": "fortiscomputervision"
+        },
+        "authorizationRules_eventhubs_name": {
+            "value": "RootManageSharedAccessKey"
+        },
+        "authorizationRules_servicebus_name": {
+            "value": "RootManageSharedAccessKey"
+        }
+    }
+}
