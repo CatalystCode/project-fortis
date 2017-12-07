@@ -25,6 +25,8 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
 spec:
   ports:
   - name: {{ template "fullname" . }}
