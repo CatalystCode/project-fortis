@@ -1,5 +1,8 @@
 DROP KEYSPACE IF EXISTS fortis;
-CREATE KEYSPACE fortis WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+CREATE KEYSPACE fortis WITH replication = {
+    'class': 'SimpleStrategy',
+    'replication_factor': 3
+};
 
 USE fortis;
 
