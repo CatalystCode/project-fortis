@@ -168,6 +168,24 @@
             ]
         },
         {
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "name": "[concat(parameters('namespaces_fortisservicebus_name'), '/command')]",
+            "apiVersion": "2017-04-01",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_fortisservicebus_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "name": "[concat(parameters('namespaces_fortisservicebus_name'), '/configuration')]",
+            "apiVersion": "2017-04-01",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_fortisservicebus_name'))]"
+            ]
+        },
+        {
             "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
             "name": "[concat(parameters('namespaces_fortisservicebus_name'), '/RootManageSharedAccessKey')]",
             "apiVersion": "2017-04-01",
