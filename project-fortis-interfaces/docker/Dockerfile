@@ -10,7 +10,7 @@ WORKDIR /app
 # that is running docker-compose, not the host inside of the docker container
 # this is because the react app is accessed from the users's browser which runs
 # on the docker-compose machine, not inside of the docker container
-ENV REACT_APP_SERVICE_HOST="http://localhost:8080"
+ENV REACT_APP_SERVICE_HOST="http://localhost:8889"
 
 # setting up the feature service is a lengthy process so we provide a shared
 # instance for convenience; if you wish to run this service locally, please
