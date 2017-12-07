@@ -3,7 +3,7 @@ version: '3'
 services:
 
   project_fortis_interfaces:
-    image: cwolff/project_fortis_interfaces
+    image: cwolff/project_fortis_interfaces:${BUILD_TAG}
     build:
       context: project-fortis-interfaces
       dockerfile: docker/Dockerfile
@@ -17,7 +17,7 @@ services:
       - .env-secrets
 
   project_fortis_services:
-    image: cwolff/project_fortis_services
+    image: cwolff/project_fortis_services:${BUILD_TAG}
     build:
       context: project-fortis-services
       dockerfile: docker/Dockerfile
@@ -27,11 +27,12 @@ services:
       - cassandra:cassandra
     environment:
       - CASSANDRA_CONTACT_POINTS=${CASSANDRA_HOST}
+      - FORTIS_CASSANDRA_SEED_DATA_URL=${CASSANDRA_SEED_DATA_URL}
     env_file:
       - .env-secrets
 
   project_fortis_spark:
-    image: cwolff/project_fortis_spark
+    image: cwolff/project_fortis_spark:${BUILD_TAG}
     build:
       context: project-fortis-spark
       dockerfile: docker/Dockerfile
