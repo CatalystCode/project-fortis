@@ -14,11 +14,14 @@ RUN apt-get install -y --no-install-recommends wget ca-certificates \
 
 ENV ENABLE_V2=1
 
-ENV PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="..."
+# these settings need to be in sync with project-fortis-spark
 ENV PUBLISH_EVENTS_EVENTHUB_PATH="published-messages"
 ENV PUBLISH_EVENTS_EVENTHUB_PARTITION="\$Default"
 ENV FORTIS_SB_CONFIG_QUEUE="configuration"
 ENV FORTIS_SB_COMMAND_QUEUE="command"
+
+# access keys for azure resources
+ENV PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="..."
 ENV FORTIS_SB_CONN_STR="..."
 ENV USER_FILES_BLOB_ACCOUNT_NAME="..."
 ENV USER_FILES_BLOB_ACCOUNT_KEY="..."
@@ -39,7 +42,17 @@ ENV CASSANDRA_KEYSPACE="fortis"
 ENV CASSANDRA_USERNAME="cassandra"
 ENV CASSANDRA_PASSWORD="cassandra"
 
+# the cql file at this url is used to set up the initial schema for the
+# cassandra database; you don't want to change this value unless you're
+# developing a schema migration
 ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master/ops/storage-ddls/cassandra-setup.cql"
+
+# the tar.gz file at this url is used to populate the cassandra database with
+# initial test data; you never ever want to set this value in a production
+# deployment since it would pollute the deployment with test data -- this is
+# for developer convenience only
+# the archive at the url is expected to contain an import.cql file which may
+# reference other files in the archive, e.g. for cql `copy from` commands
 ENV FORTIS_CASSANDRA_SEED_DATA_URL=""
 
 EXPOSE 80
