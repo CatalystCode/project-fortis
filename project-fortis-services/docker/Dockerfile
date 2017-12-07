@@ -1,7 +1,7 @@
 FROM node:9.2.0
 
 ADD . /app
-ADD docker/run-server.sh /app/run-server.sh
+ADD docker/run-node.sh /app/run-node.sh
 
 WORKDIR /app
 
@@ -43,4 +43,4 @@ ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/
 ENV FORTIS_CASSANDRA_SEED_DATA_URL=""
 
 EXPOSE 80
-CMD "/app/run-server.sh"
+CMD "/app/run-node.sh"
