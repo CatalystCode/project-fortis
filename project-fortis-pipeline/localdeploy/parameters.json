@@ -25,12 +25,6 @@
         },
         "accounts_fortiscomputervision_name": {
             "value": "fortiscomputervision"
-        },
-        "authorizationRules_eventhubs_name": {
-            "value": "RootManageSharedAccessKey"
-        },
-        "authorizationRules_servicebus_name": {
-            "value": "RootManageSharedAccessKey"
         }
     }
 }

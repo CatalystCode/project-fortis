@@ -25,12 +25,6 @@
         },
         "accounts_fortiscomputervision_name": {
             "type": "string"
-        },
-        "authorizationRules_eventhubs_name": {
-            "type": "string"
-        },
-        "authorizationRules_servicebus_name": {
-            "type": "string"
         }
     },
     "variables": {},
@@ -158,7 +152,7 @@
         },
         {
             "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
-            "name": "[concat(parameters('namespaces_fortiseventhubs_name'), '/', parameters('authorizationRules_eventhubs_name'))]",
+            "name": "[concat(parameters('namespaces_fortiseventhubs_name'), '/RootManageSharedAccessKey')]",
             "apiVersion": "2017-04-01",
             "location": "East US",
             "scale": null,
@@ -175,7 +169,7 @@
         },
         {
             "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
-            "name": "[concat(parameters('namespaces_fortisservicebus_name'), '/', parameters('authorizationRules_servicebus_name'))]",
+            "name": "[concat(parameters('namespaces_fortisservicebus_name'), '/RootManageSharedAccessKey')]",
             "apiVersion": "2017-04-01",
             "location": "East US",
             "scale": null,
@@ -202,11 +196,11 @@
         },
         "FORTIS_SB_CONN_STR": {
             "type": "string",
-            "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules', parameters('namespaces_fortisservicebus_name'), parameters('authorizationRules_servicebus_name')), '2017-04-01').primaryConnectionString]"
+            "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules', parameters('namespaces_fortisservicebus_name'), 'RootManageSharedAccessKey'), '2017-04-01').primaryConnectionString]"
         },
         "PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING": {
             "type": "string",
-            "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/AuthorizationRules', parameters('namespaces_fortiseventhubs_name'), parameters('authorizationRules_eventhubs_name')), '2017-04-01').primaryConnectionString]"
+            "value": "[listKeys(resourceId('Microsoft.EventHub/namespaces/AuthorizationRules', parameters('namespaces_fortiseventhubs_name'), 'RootManageSharedAccessKey'), '2017-04-01').primaryConnectionString]"
         },
         "USER_FILES_BLOB_ACCOUNT_NAME": {
             "type": "string",
