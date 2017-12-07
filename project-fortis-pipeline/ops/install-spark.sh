@@ -22,7 +22,6 @@ readonly agent_vm_size="${19}"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
-if [ ! -d charts ]; then git clone --depth=1 https://github.com/erikschlegel/charts.git -b spark-localssd; fi
 cd charts || exit -2
 readonly spark_daemon_memory="1g"
 readonly default_language="en"
@@ -85,7 +84,7 @@ helm install \
     --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="20g" \
     --namespace spark \
     --name spark-cluster \
-    ./stable/spark
+    ./spark
 
 # cleanup
 cd ..

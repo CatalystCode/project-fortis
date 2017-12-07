@@ -1,0 +1,92 @@
+apiVersion: "apps/v1beta1"
+kind: StatefulSet
+metadata:
+  name: {{ template "worker-fullname" . }}
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+spec:
+  serviceName: {{ template "worker-fullname" . }}
+  replicas: {{default 1 .Values.Worker.Replicas}}
+  selector:
+    matchLabels:
+      component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+  template:
+    metadata:
+      labels:
+        app: {{ template "worker-fullname" . }}
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+        component: "{{.Release.Name}}-{{.Values.Worker.Component}}"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "beta.kubernetes.io/instance-type"
+                  operator: In
+                  values: ["{{.Values.Worker.VmInstanceType}}"]
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: [{{ template "worker-fullname" . }}]
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - name: {{ template "worker-fullname" . }}
+          image: "{{.Values.Worker.Image}}:{{.Values.Worker.ImageTag}}"
+          imagePullPolicy: "{{.Values.Worker.ImagePullPolicy}}"
+          command: ["/start-worker"]
+          {{- if .Values.Worker.ConfigMapName }}
+          envFrom:
+          - configMapRef:
+              name: "{{.Values.Worker.ConfigMapName}}"
+          {{ end }}
+      #    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://{{ template "master-fullname" . }}:{{.Values.Master.ServicePort}}", "--webui-port", "{{.Values.Worker.ContainerPort}}", "--work-dir", "{{.Values.Worker.WorkingDirectory}}"]
+          ports:
+            - containerPort: {{.Values.Worker.ContainerPort}}
+          resources:
+            requests:
+              cpu: "{{.Values.Worker.Resources.Requests.Cpu}}"
+              memory: "{{.Values.Worker.Resources.Requests.Memory}}"
+            limits:
+              cpu: "{{.Values.Worker.Resources.Limits.Cpu}}"
+              memory: "{{.Values.Worker.Resources.Limits.Memory}}"
+         {{- if .Values.Persistence.CheckpointShare }}
+          volumeMounts:
+            - name: worker-data
+              mountPath: {{ .Values.Worker.WorkingDirectory | quote }}
+            - name: checkpointfile
+              mountPath: {{ .Values.Persistence.CheckpointDirectory | quote }}
+         {{ else }}
+          volumeMounts:
+            - name: worker-data
+              mountPath: {{ .Values.Worker.WorkingDirectory | quote }}
+         {{- end }}
+          env:
+{{- if .Values.Worker.Environment }}
+{{ toYaml .Values.Worker.Environment | indent 12 }}
+{{- end }}
+            {{- if .Values.Worker.WorkingDirectory }}
+            - name: SPARK_WORKER_DIR
+              value: {{ .Values.Worker.WorkingDirectory | quote }}
+            {{- end -}}
+  # These are converted to volume claims by the controller
+  # and mounted at the paths mentioned above.
+      volumes:
+      - name: worker-data
+        hostPath:
+            path: "/mnt/workdir"
+      {{- if .Values.Persistence.CheckpointShare }}
+      - name: checkpointfile
+        azureFile:
+          secretName: checkpointing-pvc-secret
+          shareName: {{ .Values.Persistence.CheckpointShare | quote }}
+          readOnly: false
+      {{- end }}

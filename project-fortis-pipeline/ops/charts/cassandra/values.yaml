@@ -1,0 +1,39 @@
+# Default values for cassandra.
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+
+Name: cassandra
+Component: "cassandra"
+replicaCount: 6
+Image: "erikschlegel/cassandra"
+VmInstanceType: "Standard_L4s"
+ImageTag: "v12"
+ImagePullPolicy: "Always"
+
+# Cassandra configuration options
+# For chart deployment, the value for sending to the Seed Provider is 
+# constructed using a template in the statefulset.yaml template
+cassandra:
+  MaxHeapSize: "4000M"
+  HeapNewSize: "100M"
+  ClusterName: "cassandra"
+  DC: "dc-eastus2-cassandra"
+  Rack: "rack-eastus2-cassandra"
+  AutoBootstrap: "false"
+
+# Persistence information
+persistence:
+  enabled: true
+  storageClass: fast
+  accessMode: ReadWriteOnce
+  size: 512Gi
+
+# Instance resources
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "4Gi"
+  limits:
+    cpu: "2000m"
+    memory: "8Gi"    
