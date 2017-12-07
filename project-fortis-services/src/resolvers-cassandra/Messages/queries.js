@@ -94,6 +94,8 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     let tableName = 'eventplaces';
     let tagsParams = [
       ...fromTopicListToConjunctionTopics(args.conjunctivetopics),
+      args.fromDate,
+      args.toDate,
       tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       args.zoomLevel,
       args.pipelinekeys
@@ -110,8 +112,8 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     WHERE conjunctiontopic1 = ?
     AND conjunctiontopic2 = ?
     AND conjunctiontopic3 = ?
-    AND eventtime >= '${args.fromDate}' 
-    AND eventtime <= '${args.toDate}'
+    AND eventtime >= ?
+    AND eventtime <= ?
     AND tileid IN ?
     AND tilez = ?
     AND pipelinekey IN ?
