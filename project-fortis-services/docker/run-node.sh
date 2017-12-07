@@ -27,7 +27,7 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
   echo "Got Fortis sample data at $FORTIS_CASSANDRA_SEED_DATA_URL, ingesting..."
   mkdir -p /tmp/cassandra-seed-data
   cd /tmp/cassandra-seed-data
-  wget -qO- "$FORTIS_CASSANDRA_SEED_DATA_URL" | tar xf
+  wget -qO- "$FORTIS_CASSANDRA_SEED_DATA_URL" | tar xzf -
   cassandra_exec < import.cql
   cd -
   echo "...done, Fortis sample data is now ingested"
