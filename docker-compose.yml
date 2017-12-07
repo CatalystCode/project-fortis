@@ -42,6 +42,8 @@ services:
       - ${PROJECT_FORTIS_SPARK_WORKER_UI_PORT}:8081
     links:
       - cassandra:cassandra
+    depends_on:
+      - project_fortis_services
     environment:
       - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
     env_file:
