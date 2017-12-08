@@ -74,9 +74,7 @@ with the services:
   - http://localhost:8889/api/settings/graphiql
   - http://localhost:8889/api/tiles/graphiql
 * Spark
-  - http://localhost:7777
-  - http://localhost:7778
-  - http://localhost:7779
+  - http://localhost:7777/jobs/
 
 ### Production deployment
 
