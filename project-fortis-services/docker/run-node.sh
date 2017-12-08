@@ -18,7 +18,9 @@ echo "...done, Cassandra is now available"
 # set up cassandra schema
 if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ]; then
   echo "Got Fortis schema definition at $FORTIS_CASSANDRA_SCHEMA_URL, ingesting..."
-  wget -qO- "$FORTIS_CASSANDRA_SCHEMA_URL" | cassandra_exec
+  wget -qO- "$FORTIS_CASSANDRA_SCHEMA_URL" \
+  | sed "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" \
+  | cassandra_exec
   echo "...done, Fortis schema definition is now ingested"
 fi
 

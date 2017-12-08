@@ -41,6 +41,7 @@ ENV CASSANDRA_CONTACT_POINTS="localhost"
 ENV CASSANDRA_KEYSPACE="fortis"
 ENV CASSANDRA_USERNAME="cassandra"
 ENV CASSANDRA_PASSWORD="cassandra"
+ENV FORTIS_CASSANDRA_REPLICATION_FACTOR="3"
 
 # the cql file at this url is used to set up the initial schema for the
 # cassandra database; you don't want to change this value unless you're
