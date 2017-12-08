@@ -57,7 +57,6 @@ export const SERVICES = {
     getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
                     dataSource, externalsourceid, conjunctivetopics, bbox, 
                     enabledStreams, callback) {
-        console.log(`processing tile request [${maintopic}, ${fromDate}, ${toDate}, ${tileid}}]`)
         const topsourcespipelinekey = ActionMethods.DataSources(dataSource, enabledStreams);
         const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
         ? [dataSource] : topsourcespipelinekey;
