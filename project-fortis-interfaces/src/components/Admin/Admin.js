@@ -140,9 +140,9 @@ class Admin extends React.Component {
             </div>
           </div>
         </div>
-        <Modal show={this.state.showModal} onHide={this.closeModal} aria-labelledby="contained-modal-title-sm">
+        <Modal show={this.state.showModal} onHide={this.closeModal}>
           <Modal.Header closeButton>
-            <Modal.Title id="contained-modal-title-sm">Are you sure you want to restart the pipeline?</Modal.Title>
+            <Modal.Title>Are you sure you want to restart the pipeline?</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             Restarting the pipeline will prevent the intake of events for <b>several minutes</b> until the restart is complete.
