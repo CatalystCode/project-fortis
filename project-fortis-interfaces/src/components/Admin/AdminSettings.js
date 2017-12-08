@@ -157,7 +157,7 @@ export const AdminSettings = createReactClass({
                       </div>
                       <div className="form-group">
                           <label htmlFor="targetBbox">Bounding Box (<span style={styles.settings.labelInfo}>comma seperated i.e. 1,2,3,4</span>)<span>*</span></label>
-                          <input onChange={this.handleInputChange} required aria-required="true" data-rule="required" name="targetBbox" data-msg="Please enter a bounding box" ref="targetBbox" value={this.state.siteSettings.properties.targetBbox} type="text" style={styles.settings.input} className="form-control settings" aria-label="targetBbox" />
+                          <input onChange={this.handleInputChange} required aria-required="true" data-rule="required" name="targetBbox" data-msg="Please enter a bounding box. The format is four comma separated numbers: north,west,south,east" ref="targetBbox" value={this.state.siteSettings.properties.targetBbox} type="text" style={styles.settings.input} className="form-control settings" aria-label="targetBbox" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
@@ -178,7 +178,7 @@ export const AdminSettings = createReactClass({
                     </div>
                     <div className="col-lg-6">
                       <div className="form-group">
-                          <label>Feature Service</label>
+                          <label>Feature Service Namespace</label>
                           <input onChange={this.handleInputChange} required name="featureservicenamespace" ref="featureservicenamespace" value={this.state.siteSettings.properties.featureservicenamespace} type="text" style={styles.settings.input} className="form-control settings" aria-label="..." />
                           <div className="validation"></div>
                       </div>
