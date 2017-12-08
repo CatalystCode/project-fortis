@@ -1,16 +1,10 @@
 FROM node:9.2.0
 
-ADD . /app
-ADD docker/run-node.sh /app/run-node.sh
-
-WORKDIR /app
-
 RUN apt-get install -y --no-install-recommends wget ca-certificates \
  && wget -q http://www-eu.apache.org/dist/cassandra/3.11.0/apache-cassandra-3.11.0-bin.tar.gz \
  && tar xfz apache-cassandra-3.11.0-bin.tar.gz \
  && rm apache-cassandra-3.11.0-bin.tar.gz \
- && mv apache-cassandra-3.11.0 /opt/cassandra \
- && npm install
+ && mv apache-cassandra-3.11.0 /opt/cassandra
 
 ENV ENABLE_V2=1
 
@@ -55,6 +49,11 @@ ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/
 # the archive at the url is expected to contain an import.cql file which may
 # reference other files in the archive, e.g. for cql `copy from` commands
 ENV FORTIS_CASSANDRA_SEED_DATA_URL=""
+
+ADD . /app
+ADD docker/run-node.sh /app/run-node.sh
+WORKDIR /app
+RUN npm install
 
 EXPOSE 80
 CMD "/app/run-node.sh"

@@ -66,10 +66,6 @@ RUN apt-get -qq install -y --no-install-recommends wget ca-certificates && \
     rm apache-cassandra-3.11.0-bin.tar.gz && \
     mv apache-cassandra-3.11.0 /opt/cassandra
 
-ADD . /app
-ADD docker/run-spark.sh /app/run-spark.sh
-RUN cd /app && echo 'version := "0.0.0"' > version.sbt && sbt assembly && cd -
-
 # access keys for azure resources
 ENV APPINSIGHTS_INSTRUMENTATIONKEY="..."
 ENV APPLICATION_INSIGHTS_IKEY="..."
@@ -112,5 +108,9 @@ ENV HA_PROGRESS_DIR=""
 ENV FORTIS_STREAMING_DURATION_IN_SECONDS="30"
 ENV FORTIS_SSC_INIT_RETRY_AFTER_MILLIS="60000"
 ENV FORTIS_SSC_SHUTDOWN_DELAY_MILLIS="60000"
+
+ADD . /app
+ADD docker/run-spark.sh /app/run-spark.sh
+RUN cd /app && echo 'version := "0.0.0"' > version.sbt && sbt assembly && cd -
 
 CMD /app/run-spark.sh
