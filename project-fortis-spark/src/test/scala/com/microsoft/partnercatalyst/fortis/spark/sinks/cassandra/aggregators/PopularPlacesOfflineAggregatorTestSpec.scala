@@ -52,7 +52,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
   it should "produce an all/all aggregates for single event" in {
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(0.5),
@@ -112,7 +112,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         perioddate = period.startTime(),
         externalsourceid = "all",
         periodtype = "day",
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         mentioncount = 1,
         avgsentimentnumerator = 500,
         placeid = "wof-101731037",
@@ -129,7 +129,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(
       Event(
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         computedfeatures = Features(
           mentions = 1,
           sentiment = Sentiment(0.7),
@@ -154,7 +154,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         title = ""
       ),
       Event(
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         computedfeatures = Features(
           mentions = 1,
           sentiment = Sentiment(0.5),
@@ -215,7 +215,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         perioddate = period.startTime(),
         externalsourceid = "all",
         periodtype = "day",
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         mentioncount = 2,
         avgsentimentnumerator = 1200,
         placeid = "wof-907128885",
@@ -232,7 +232,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(
       Event(
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         computedfeatures = Features(
           mentions = 1,
           sentiment = Sentiment(0.7),
@@ -318,7 +318,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         perioddate = period.startTime(),
         externalsourceid = "all",
         periodtype = "day",
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         mentioncount = 1,
         avgsentimentnumerator = 700,
         placeid = "wof-907128885",

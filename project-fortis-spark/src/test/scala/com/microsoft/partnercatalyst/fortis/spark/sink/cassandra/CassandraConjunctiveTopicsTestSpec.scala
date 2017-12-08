@@ -12,7 +12,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
   it should "flat map keywords" in {
     val period = Period("day-2017-08-11")
     val keywords = CassandraConjunctiveTopics.flatMapKeywords(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
@@ -47,7 +47,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
   it should "produce an non-empty sequence" in {
     val period = Period("day-2017-08-11")
     val topics = CassandraConjunctiveTopics(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
@@ -78,7 +78,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       mentioncount = 1,
       perioddate =  period.startTime(),
       periodtype = "day",
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       tileid = "8_120_142",
       tilez = 8,
       topic = "europe"
@@ -88,7 +88,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
   it should "produce a non-empty sequence on single keyword" in {
     val period = Period("day-2017-08-11")
     val topics = CassandraConjunctiveTopics(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
@@ -119,7 +119,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       mentioncount = 1,
       perioddate =  period.startTime(),
       periodtype = "day",
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       tileid = "8_120_142",
       tilez = 8,
       topic = "europe"
@@ -128,7 +128,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
 
   it should "produce an empty sequence on empty places" in {
     val topics = CassandraConjunctiveTopics(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
@@ -157,7 +157,7 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
 
   it should "produce an empty sequence on empty keywords" in {
     val topics = CassandraConjunctiveTopics(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(1.0),

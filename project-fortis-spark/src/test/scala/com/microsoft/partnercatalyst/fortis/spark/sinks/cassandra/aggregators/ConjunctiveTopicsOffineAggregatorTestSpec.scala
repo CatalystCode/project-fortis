@@ -52,7 +52,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
   it should "produce an all/all aggregates for single event" in {
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(Event(
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       computedfeatures = Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
@@ -107,7 +107,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(
         Event(
-          pipelinekey = "twitter",
+          pipelinekey = "Twitter",
           computedfeatures = Features(
             mentions = 1,
             sentiment = Sentiment(1.0),
@@ -132,7 +132,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
           title = ""
         ),
       Event(
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         computedfeatures = Features(
           mentions = 1,
           sentiment = Sentiment(1.0),
@@ -177,7 +177,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       mentioncount = 2,
       perioddate =  period.startTime(),
       periodtype = "day",
-      pipelinekey = "twitter",
+      pipelinekey = "Twitter",
       tileid = "8_120_142",
       tilez = 8,
       topic = "europe"
@@ -227,7 +227,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
         title = ""
       ),
       Event(
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         computedfeatures = Features(
           mentions = 1,
           sentiment = Sentiment(1.0),
@@ -273,7 +273,7 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
         mentioncount = 1,
         perioddate =  period.startTime(),
         periodtype = "day",
-        pipelinekey = "twitter",
+        pipelinekey = "Twitter",
         tileid = "8_120_142",
         tilez = 8,
         topic = "europe"
