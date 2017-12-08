@@ -27,8 +27,8 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     AND pipelinekey IN ?
     AND externalsourceid = ?
     AND tilez = ?
-    AND perioddate <= '${args.toDate}'
-    AND perioddate >= '${args.fromDate}'
+    AND perioddate <= ?
+    AND perioddate >= ?
     AND tileid IN ?
     LIMIT ?
     `.trim();
@@ -39,6 +39,8 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       args.pipelinekeys,
       args.externalsourceid,
       args.zoomLevel,
+      args.toDate,
+      args.fromDate,
       tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       MaxFetchedRows
     ];
@@ -108,8 +110,8 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
     AND pipelinekey IN ?
     AND externalsourceid = ?
     AND tilez = ?
-    AND perioddate <= '${args.toDate}'
-    AND perioddate >= '${args.fromDate}'
+    AND perioddate <= ?
+    AND perioddate >= ?
     AND tileid IN ?
     `.trim();
 
@@ -120,6 +122,8 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       args.pipelinekeys,
       args.externalsourceid,
       args.zoomLevel,
+      args.toDate,
+      args.fromDate,
       tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id)
     ];
 
@@ -183,8 +187,8 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
           AND pipelinekey IN ?
           AND externalsourceid = ?
           AND tilez = ?
-          AND perioddate <= '${args.toDate}'
-          AND perioddate >= '${args.fromDate}'
+          AND perioddate <= ?
+          AND perioddate >= ?
           AND tileid IN ?
           AND conjunctiontopic1 IN ?
           AND conjunctiontopic2 = ''
@@ -198,6 +202,8 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
           args.pipelinekeys,
           args.externalsourceid,
           args.zoomLevel,
+          args.toDate,
+          args.fromDate,
           tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
           terms.edges.map(item => item.name),
           MaxFetchedRows
@@ -232,8 +238,8 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
     AND conjunctiontopic3 = ?
     AND pipelinekey IN ?
     AND tilez = ?
-    AND perioddate <= '${args.toDate}'
-    AND perioddate >= '${args.fromDate}'
+    AND perioddate <= ?
+    AND perioddate >= ?
     AND tileid IN ?
     LIMIT ?
     `.trim();
@@ -243,6 +249,8 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
       ...toConjunctionTopics(args.maintopic, args.conjunctivetopics),
       args.pipelinekeys,
       args.zoomLevel,
+      args.toDate,
+      args.fromDate,
       tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       MaxFetchedRows
     ];
@@ -280,8 +288,8 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
     AND tilez = ?
     AND pipelinekey IN ?
     AND externalsourceid = ?
-    AND perioddate <= '${args.toDate}'
-    AND perioddate >= '${args.fromDate}'
+    AND perioddate <= ?
+    AND perioddate >= ?
     AND tileid IN ?
     LIMIT ?
     `.trim();
@@ -292,6 +300,8 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       args.pipelinekeys,
       args.externalsourceid,
+      args.toDate,
+      args.fromDate,
       tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
       CassandraLimit
     ];

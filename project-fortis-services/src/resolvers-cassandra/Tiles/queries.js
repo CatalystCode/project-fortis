@@ -56,8 +56,8 @@ function queryHeatmapTilesByParentTile(args) {
     AND tilez = ?
     AND pipelinekey IN ?
     AND externalsourceid = ?
-    AND perioddate <= '${args.toDate}'
-    AND perioddate >= '${args.fromDate}'
+    AND perioddate <= ?
+    AND perioddate >= ?
     AND tileid = ?
     `.trim();
 
@@ -67,6 +67,8 @@ function queryHeatmapTilesByParentTile(args) {
       args.zoomLevel,
       args.pipelinekeys,
       args.externalsourceid,
+      args.toDate,
+      args.fromDate,
       args.tileid
     ];
 
