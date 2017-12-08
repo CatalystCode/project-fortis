@@ -116,7 +116,7 @@ object StreamsChangeListener {
           Path(settings.progressDir).deleteRecursively()
         }
       } catch {
-        case e => e.printStackTrace(System.err)
+        case e: Throwable => e.printStackTrace(System.err)
       }
     }
   }
