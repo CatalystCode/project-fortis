@@ -91,12 +91,17 @@ function byBbox(args, res) { // eslint-disable-line no-unused-vars
     if (!args.bbox || args.bbox.length !== 4) return reject('Invalid bbox specified');
     if (!args.conjunctivetopics.length) return reject('Empty conjunctive topic list specified');
 
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id);
+    if (!tiles || !tiles.length) {
+      return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
+    }
+
     let tableName = 'eventplaces';
     let tagsParams = [
       ...fromTopicListToConjunctionTopics(args.conjunctivetopics),
       args.fromDate,
       args.toDate,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
+      tiles,
       args.zoomLevel,
       args.pipelinekeys
     ];

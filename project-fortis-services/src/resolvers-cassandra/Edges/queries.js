@@ -17,6 +17,11 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
     const responseSize = args.limit || 5;
     const layerfilters = ['country'];
 
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id);
+    if (!tiles || !tiles.length) {
+      return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
+    }
+
     const query = `
     SELECT mentioncount, placeid, mentioncount, avgsentimentnumerator
     FROM fortis.popularplaces
@@ -41,7 +46,7 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       args.toDate,
       args.fromDate,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
+      tiles,
       MaxFetchedRows
     ];
 
@@ -100,6 +105,11 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
 
     const MaxConjunctiveTopicsAllowed = 2;
 
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id);
+    if (!tiles || !tiles.length) {
+      return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
+    }
+
     const query = `
     SELECT conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, perioddate, mentioncount, avgsentimentnumerator, tileid
     FROM fortis.computedtiles
@@ -124,7 +134,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       args.toDate,
       args.fromDate,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id)
+      tiles
     ];
 
     return cassandraConnector.executeQuery(query, params)
@@ -179,6 +189,11 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
         if(!terms.edges.length){
           return resolve({edges: []});
         }
+
+        const tiles = tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id);
+        if (!tiles || !tiles.length) {
+          return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
+        }
         
         const query = `
           SELECT mentioncount, conjunctiontopic1, avgsentimentnumerator
@@ -204,7 +219,7 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
           args.zoomLevel,
           args.toDate,
           args.fromDate,
-          tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
+          tiles,
           terms.edges.map(item => item.name),
           MaxFetchedRows
         ];
@@ -229,6 +244,11 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
     const fetchSize = 400;
     const responseSize = args.limit || 5;
 
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id);
+    if (!tiles || !tiles.length) {
+      return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
+    }
+
     const query = `
     SELECT mentioncount, pipelinekey, externalsourceid, avgsentimentnumerator
     FROM fortis.popularsources
@@ -251,7 +271,7 @@ function topSources(args, res) { // eslint-disable-line no-unused-vars
       args.zoomLevel,
       args.toDate,
       args.fromDate,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
+      tiles,
       MaxFetchedRows
     ];
 
@@ -280,6 +300,11 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
     const CassandraLimit = 1000;
     const MaxSize = 50;
 
+    const tiles = tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id);
+    if (!tiles || !tiles.length) {
+      return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
+    }
+
     const query = `
     SELECT mentioncount, conjunctivetopic, topic
     FROM fortis.conjunctivetopics
@@ -302,7 +327,7 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
       args.externalsourceid,
       args.toDate,
       args.fromDate,
-      tilesForBbox(args.bbox, args.zoomLevel).map(tile => tile.id),
+      tiles,
       CassandraLimit
     ];
 
