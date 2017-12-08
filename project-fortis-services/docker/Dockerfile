@@ -45,7 +45,7 @@ ENV CASSANDRA_PASSWORD="cassandra"
 # the cql file at this url is used to set up the initial schema for the
 # cassandra database; you don't want to change this value unless you're
 # developing a schema migration
-ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/fortisdeploy/master/ops/storage-ddls/cassandra-setup.cql"
+ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/project-fortis-pipeline/master/ops/storage-ddls/cassandra-setup.cql"
 
 # the tar.gz file at this url is used to populate the cassandra database with
 # initial test data; you never ever want to set this value in a production
