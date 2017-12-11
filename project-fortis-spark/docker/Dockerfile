@@ -109,6 +109,9 @@ ENV FORTIS_STREAMING_DURATION_IN_SECONDS="30"
 ENV FORTIS_SSC_INIT_RETRY_AFTER_MILLIS="60000"
 ENV FORTIS_SSC_SHUTDOWN_DELAY_MILLIS="60000"
 
+# ensure that all tests get run
+ENV FORTIS_INTEGRATION_TESTS="true"
+
 ADD . /app
 ADD docker/run-spark.sh /app/run-spark.sh
 RUN cd /app && echo 'version := "0.0.0"' > version.sbt && sbt assembly && cd -
