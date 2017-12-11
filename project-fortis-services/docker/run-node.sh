@@ -16,6 +16,10 @@ has_seed_data() {
   echo 'SELECT eventid FROM fortis.events LIMIT 100;' | cassandra_exec | grep -q '(100 rows)'
 }
 
+get_sitename() {
+  echo 'COPY fortis.sitesettings(sitename) TO STDOUT;' | cassandra_exec | tr -d '\r'
+}
+
 # wait for cassandra to start
 while ! cassandra_exec; do
   echo "Cassandra not yet available, waiting..."
@@ -30,6 +34,13 @@ if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ] && ! has_cassandra_schema; then
   | sed "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" \
   | cassandra_exec
   echo "...done, Fortis schema definition is now ingested"
+fi
+
+# set up cognitive services secrets if preconfigured
+if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvisionsvctoken" ] && [ -n "$cogtextsvctoken" ]; then
+  echo "Got Fortis cognitive services secrets, ingesting..."
+  echo "UPDATE fortis.sitesettings SET translationsvctoken = '$translationsvctoken', cogspeechsvctoken = '$cogspeechsvctoken', cogvisionsvctoken = '$cogvisionsvctoken', cogtextsvctoken = '$cogtextsvctoken' WHERE sitename = '$(get_sitename)';" | cassandra_exec
+  echo "...done, Fortis cognitive services secrets are now ingested"
 fi
 
 # set up cassandra seed data
