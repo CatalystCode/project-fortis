@@ -16,7 +16,7 @@ class PlaceRecognizer(
   def extractPlacesAndOccurrance(text: String): Seq[(String, Int)] = {
     // See: https://github.com/opener-project/kaf/wiki/KAF-structure-overview
     entityRecognizer.extractTerms(TextNormalizer(text, language.getOrElse("")))
-      .filter(t=>Set("N", "R").contains(t.getPos))
+      .filter(term => Set("N", "R").contains(term.getPos))
       .groupBy(_.getStr)
       .map(place => (place._1, place._2.size)).toSeq
   }
