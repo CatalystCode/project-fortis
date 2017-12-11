@@ -59,7 +59,7 @@ developmnet setup will leverage.
 Now you can start the full Fortis pipeline with one command:
 
 ```sh
-docker-compose up
+docker-compose up --build
 ```
 
 After all the Docker services started, head over to the following URLs to play
