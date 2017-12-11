@@ -114,6 +114,9 @@ ENV FORTIS_INTEGRATION_TESTS="true"
 
 ADD . /app
 ADD docker/run-spark.sh /app/run-spark.sh
-RUN cd /app && echo 'version := "0.0.0"' > version.sbt && sbt assembly && cd -
+RUN cd /app && \
+    echo 'version := "0.0.0"' > version.sbt && \
+    JAVA_OPTS="-Xmx2048M" sbt assembly && \
+    cd -
 
 CMD /app/run-spark.sh

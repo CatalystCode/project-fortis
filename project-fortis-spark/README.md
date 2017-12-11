@@ -12,26 +12,3 @@ This project contains a Spark Streaming job that ingests data into the Fortis sy
 4. Perform trend detection and aggregate the metrics that back Project Fortis.
 
 At the end of the ingestion pipeline, we publish the events and various aggregations to Cassandra.
-
-
-## Development setup ##
-
-```sh
-# set up variables from deployment environment
-export HA_PROGRESS_DIR="..."
-export APPINSIGHTS_INSTRUMENTATIONKEY="..."
-export FORTIS_FEATURE_SERVICE_HOST="..."
-export FORTIS_MODELS_DIRECTORY="..."
-export FORTIS_CENTRAL_ASSETS_HOST="..."
-export FORTIS_SERVICEBUS_NAMESPACE="..."
-export FORTIS_SERVICEBUS_CONFIG_QUEUE="..."
-export FORTIS_SERVICEBUS_POLICY_NAME="..."
-export FORTIS_SERVICEBUS_POLICY_KEY="..."
-
-# compile scala, run tests, build fat jar
-export JAVA_OPTS="-Xmx2048M"
-sbt assembly
-
-# run on spark
-spark-submit --driver-memory 4g target/scala-2.11/project-fortis-spark-assembly-0.0.1.jar
-```
