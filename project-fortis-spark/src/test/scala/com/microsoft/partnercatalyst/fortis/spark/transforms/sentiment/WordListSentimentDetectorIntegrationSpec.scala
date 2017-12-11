@@ -8,7 +8,7 @@ class WordListSentimentDetectorIntegrationSpec extends IntegrationTestSpec {
   "The word list sentiment detector" should "download models from blob" in {
     val localModels = checkIfShouldRunWithLocalModels()
     val modelsProvider = new ZipModelsProvider(
-      language => s"https://fortiscentral.blob.core.windows.net/opener/opener-$language.zip",
+      language => s"https://fortiscentral.blob.core.windows.net/sentiment/sentiment-$language.zip",
       localModels)
 
     val testCases = List(
