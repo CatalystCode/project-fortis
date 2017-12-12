@@ -86,6 +86,10 @@ function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, ca
     }
 }
 
+function fetchDashboardSiteDefinition(callback) {
+    AdminServices.getDashboardSiteDefinition(null, null, (error, response, body) => ResponseHandler(error, response, body, callback));
+}
+
 function isMostPopularTopicSelected(maintopic, popularTopics){
     return popularTopics.length && popularTopics[0].name === maintopic;
 }
@@ -101,7 +105,7 @@ const methods = {
 
         seqAsync(
             //Load the site settings
-            callback => AdminServices.getDashboardSiteDefinition(null, null, (error, response, body) => ResponseHandler(error, response, body, callback)),
+            callback => fetchDashboardSiteDefinition(callback),
             //Load the top 5 most popular terms
             (settings, callback) => fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category),
             //Merged Results(Settings + Full Term List + Popular Terms)
