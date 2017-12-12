@@ -102,15 +102,17 @@ const methods = {
         const { fromDate, toDate } = dates;
         const self = this;
 
+        const reportProgress = () => self.dispatch(constants.DASHBOARD.INITIALIZE_PROGRESS);
+
         seqAsync(
             //Load the site settings
-            callback => fetchDashboardSiteDefinition(callback),
+            callback => { fetchDashboardSiteDefinition(callback); reportProgress(); },
             //Load the top 5 most popular terms
-            (settings, callback) => fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category),
+            (settings, callback) => { fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category); reportProgress(); },
             //Merged Results(Settings + Full Term List + Popular Terms)
-            (resultUnion, callback) => fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback),
+            (resultUnion, callback) => { fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback); reportProgress(); },
             //Merged Results(Settings + Full Term List + Popular Terms)
-            (resultUnion2, callback) => fetchAllTrustedSources(resultUnion2, callback),
+            (resultUnion2, callback) => { fetchAllTrustedSources(resultUnion2, callback); reportProgress(); },
         )((error, results) => {
             if (!error) {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);

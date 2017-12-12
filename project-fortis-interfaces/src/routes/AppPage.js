@@ -42,7 +42,9 @@ export const AppPage = createReactClass({
   renderLoading() {
     return (
       <div className="loadingPage">
-        <h1>Loading {this.props.params.siteKey} watcher...</h1>
+        <h1>
+          Loading {this.props.params.siteKey} watcher... ({this.state.initialLoadStepsCompleted} out of {this.state.initialLoadStepsTotal} steps done)
+        </h1>
       </div>
     );
   },

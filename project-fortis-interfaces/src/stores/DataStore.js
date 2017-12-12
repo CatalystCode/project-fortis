@@ -53,6 +53,8 @@ export const DataStore = Fluxxor.createStore({
             heatmapTileIds: [],
             fullTermList: new Map(),
             error: null,
+            initialLoadStepsCompleted: 0,
+            initialLoadStepsTotal: 4,
             bbox: [],
             zoomLevel: constants.HEATMAP_DEFAULT_ZOOM,
             maintopic: false,
@@ -61,6 +63,7 @@ export const DataStore = Fluxxor.createStore({
 
         this.bindActions(
             constants.DASHBOARD.INITIALIZE, this.intializeSettings,
+            constants.DASHBOARD.INITIALIZE_PROGRESS, this.intializeSettingsProgress,
             constants.DASHBOARD.RELOAD_CHARTS, this.handleReloadChartData,
             constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange,
             constants.DASHBOARD.LOAD_TRUSTED_SOURCES, this.handleTrustedSourceChange
@@ -121,6 +124,11 @@ export const DataStore = Fluxxor.createStore({
         this.syncChartDataToStore(graphqlResponse);
 
         this.dataStore.termFilters.clear();
+        this.emit("change");
+    },
+
+    intializeSettingsProgress() {
+        this.dataStore.initialLoadStepsCompleted++;
         this.emit("change");
     },
 
