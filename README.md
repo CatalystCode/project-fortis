@@ -40,7 +40,14 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 
 ### Local deployment
 
-First, you need to set up some services in Azure:
+First, you need to get the code:
+
+```sh
+git clone https://github.com/CatalystCode/project-fortis-mono.git
+cd project-fortis-mono
+```
+
+Then, you need to set up some services in Azure:
 
 ```sh
 ./project-fortis-pipeline/localdeploy/fortis-deploy.sh \
