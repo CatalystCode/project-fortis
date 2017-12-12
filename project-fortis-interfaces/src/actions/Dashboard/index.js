@@ -96,12 +96,11 @@ function isMostPopularTopicSelected(maintopic, popularTopics){
 
 const methods = {
     initializeDashboard(category) {
-        let self = this;
-        let dataStore = this.flux.stores.DataStore.dataStore;
-        const { timespanType, datetimeSelection } = dataStore;
+        const { timespanType, datetimeSelection } = this.flux.stores.DataStore.dataStore;
         const formatter = constants.TIMESPAN_TYPES[timespanType];
         const dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
         const { fromDate, toDate } = dates;
+        const self = this;
 
         seqAsync(
             //Load the site settings
@@ -121,6 +120,7 @@ const methods = {
             }
         });
     },
+
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, 
         zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
         let self = this;
