@@ -61,7 +61,7 @@ Then, you need to set up some services in Azure:
 This script will deploy to Azure a number of services used by Fortis, such as
 ServiceBus, EventHubs, Cognitive Services, and so forth. The secrets to access
 these services are stored in a `.env-secrets` file which the rest of the
-developmnet setup will leverage.
+development setup will leverage.
 
 Now you can start the full Fortis pipeline with one command:
 
