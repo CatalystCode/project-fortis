@@ -2,10 +2,7 @@ import constants from '../../actions/constants';
 import * as ActionMethods from '../../actions/shared';
 import * as DashboardFragments from '../graphql/fragments/Dashboard';
 import * as DashboardQueries from '../graphql/queries/Dashboard';
-import { fetchGqlData } from '../shared';
-import request from 'request';
-
-const MESSAGES_ENDPOINT = 'messages';
+import { fetchGqlData, MESSAGES_ENDPOINT, TILES_ENDPOINT, EDGES_ENDPOINT } from '../shared';
 
 export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
@@ -17,7 +14,6 @@ export const SERVICES = {
         ? [dataSource] : topsourcespipelinekey;
 
         const limit = 10;
-        const gqlEndpoint = 'edges';
 
         const selectionFragments = `${DashboardFragments.topSourcesFragment}
                                       ${DashboardFragments.conjunctiveTermsFragment}
@@ -33,7 +29,7 @@ export const SERVICES = {
             toDate, zoomLevel, periodType, timePeriodType, externalsourceid, maintopic,
             timeseriesmaintopics, conjunctivetopics, csv, category
         };
-        fetchGqlData(gqlEndpoint, { variables, query }, callback);
+        fetchGqlData(EDGES_ENDPOINT, { variables, query }, callback);
     },
     
     getCommonTerms(periodType, fromDate, toDate, bbox, zoomLevel, category, callback) {
@@ -42,7 +38,6 @@ export const SERVICES = {
         const csv = false;
         const externalsourceid = constants.DEFAULT_EXTERNAL_SOURCE;
         const selectionFragments = `${DashboardFragments.termsFragment}`;
-        const gqlEndpoint = 'edges';
         const query = `${selectionFragments}
                        ${DashboardQueries.getPopularTermsQuery}`;
 
@@ -51,7 +46,7 @@ export const SERVICES = {
             toDate, zoomLevel, periodType, externalsourceid, category, 
             csv
         };
-        fetchGqlData(gqlEndpoint, { variables, query }, callback);
+        fetchGqlData(EDGES_ENDPOINT, { variables, query }, callback);
     },
 
     getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
@@ -63,12 +58,11 @@ export const SERVICES = {
 
         const query = `${DashboardFragments.heatmapFragment}
                        ${DashboardQueries.getHeatmapQuery}`;
-        const gqlEndpoint = 'tiles';
         const variables = { fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
             pipelinekeys, externalsourceid, conjunctivetopics, bbox
         };
 
-        fetchGqlData(gqlEndpoint, { variables, query }, callback);
+        fetchGqlData(TILES_ENDPOINT, { variables, query }, callback);
     },
 
     FetchMessageDetail(messageId, callback) {
@@ -76,8 +70,7 @@ export const SERVICES = {
                         ${DashboardQueries.getEventDetailsQuery}`;
 
         const variables = { messageId };
-        const gqlEndpoint = 'Messages';
-        fetchGqlData(gqlEndpoint, { variables, query }, callback);
+        fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
     },
 
     FetchMessages(site, originalSource, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm, sourceProperties, callback) {
@@ -105,28 +98,17 @@ export const SERVICES = {
                             }
                         }`;
         const variables = { site, originalSource, filteredEdges, langCode, limit, offset, fromDate, toDate, sourceFilter, fulltextTerm };
-
-        let host = process.env.REACT_APP_SERVICE_HOST;
-        var POST = {
-            url: `${host}/api/Messages`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
     },
 
     FetchMessageSentences(externalsourceid, bbox, zoomLevel, fromDate, toDate, limit, pageState, conjunctivetopics, pipelinekeys, fulltextTerm, callback) {
         if (bbox && Array.isArray(bbox) && bbox.length === 4) {
-            const gqlEndpoint = 'Messages';
             const query = ` ${DashboardFragments.getMessagesByBbox}
                             ${DashboardQueries.getMessagesByBbox}`;
 
             const variables = { bbox, conjunctivetopics, zoomLevel, limit, pageState, fromDate, toDate, externalsourceid, pipelinekeys, fulltextTerm };
 
-            fetchGqlData(gqlEndpoint, { variables, query }, callback);
+            fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
         } else {
             callback(new Error(`Invalid bbox format for value [${bbox}]`));
         }
@@ -139,19 +121,10 @@ export const SERVICES = {
     },
 
     translateSentence(sentence, fromLanguage, toLanguage, callback) {
-        let query = `${DashboardFragments.translationEventFragment}
-                     ${DashboardQueries.translateEvent}
+        const query = `${DashboardFragments.translationEventFragment}
+                       ${DashboardQueries.translateEvent}
         }`
-        let variables = { sentence, fromLanguage, toLanguage };
-        let host = process.env.REACT_APP_SERVICE_HOST;
-        var POST = {
-            url: `${host}/api/Messages`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        const variables = { sentence, fromLanguage, toLanguage };
+        fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
     }
 }

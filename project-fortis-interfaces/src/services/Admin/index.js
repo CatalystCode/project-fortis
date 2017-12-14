@@ -1,34 +1,20 @@
 import * as AdminFragments from '../graphql/fragments/Admin';
 import * as AdminQueries from '../graphql/queries/Admin';
 import * as AdminMutations from '../graphql/mutations/Admin';
-import { fetchGqlData } from '../shared';
-import request from 'request';
-
-const SETTINGS_ENDPOINT = 'settings';
-const MESSAGES_ENDPOINT = 'messages';
+import { fetchGqlData, SETTINGS_ENDPOINT, EDGES_ENDPOINT, MESSAGES_ENDPOINT } from '../shared';
 
 export const SERVICES = {
-  restartPipeline(callback) {
-    const query = `${AdminMutations.restartPipeline}`;
-    const variables = {};
-    fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
-  },
+    restartPipeline(callback) {
+      const query = `${AdminMutations.restartPipeline}`;
+      const variables = {};
+      fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
+    },
 
     getDashboardSiteDefinition(translationLanguage, category, callback) {
         const query = ` ${AdminFragments.siteSettingsFragment}
                       ${AdminQueries.getPipelineDefinition}`;
-
         const variables = { translationLanguage, category };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     fetchSite(callback) {
@@ -39,18 +25,8 @@ export const SERVICES = {
 
     getWatchlist(translationLanguage, category, callback) {
         const query = ` ${AdminQueries.getPipelineWatchlist}`;
-
         const variables = { translationLanguage, category };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     fetchTopics(translationLanguage, callback) {
@@ -123,18 +99,8 @@ export const SERVICES = {
         const query = ` mutation PublishEvents($input: NewMessages!) {
                             events: publishEvents(input: $input)
                         }`;
-
         const variables = { input: { messages } };
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/messages`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
     },
 
     saveKeywords(site, edges, callback) {
@@ -144,39 +110,18 @@ export const SERVICES = {
                                 ...FortisDashboardTermEdges
                             }
                         }`;
-
         const variables = { input: { site, edges } };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/edges`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(EDGES_ENDPOINT, { variables, query }, callback);
     },
+
     editSite(site, callback) {
         const query = `mutation EditSite($input: EditableSiteSettings!) {
           editSite(input: $input) {
             name
           }
         }`;
-
         const variables = { input: site };
-
-        const host = process.env.REACT_APP_SERVICE_HOST
-        const POST = {
-            url: `${host}/api/settings`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     removeKeywords(site, edges, callback) {
@@ -186,18 +131,7 @@ export const SERVICES = {
                                 ...FortisDashboardTermEdges
                             }
                         }`;
-
         const variables = { input: { site, edges } };
-
-        let host = process.env.REACT_APP_SERVICE_HOST
-        var POST = {
-            url: `${host}/api/edges`,
-            method: "POST",
-            json: true,
-            withCredentials: false,
-            body: { query, variables }
-        };
-
-        request(POST, callback);
+        fetchGqlData(EDGES_ENDPOINT, { variables, query }, callback);
     }
 };

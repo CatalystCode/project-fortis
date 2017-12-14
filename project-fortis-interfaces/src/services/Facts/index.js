@@ -1,11 +1,9 @@
 import * as FactsFragments from '../graphql/fragments/Facts';
 import * as FactsQueries from '../graphql/queries/Facts';
-import { fetchGqlData } from '../shared';
+import { fetchGqlData, MESSAGES_ENDPOINT } from '../shared';
 
 export const SERVICES = {
   loadFacts(pipelinekeys, mainTerm, fromDate, toDate, callback) {
-    const gqlEndpoint = 'messages';
-
     const selectionFragments = `
       ${FactsFragments.factsFragment}
     `;
@@ -22,6 +20,6 @@ export const SERVICES = {
       pipelinekeys
     };
 
-    fetchGqlData(gqlEndpoint, { variables, query }, callback);
+    fetchGqlData(MESSAGES_ENDPOINT, { variables, query }, callback);
   },
 }

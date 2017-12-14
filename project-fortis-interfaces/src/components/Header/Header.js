@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 
 import LanguagePicker from './LanguagePicker';
 
+import { publicUrl } from '../../config';
+
 class Header extends React.Component {
   render() {
     return (
@@ -31,7 +33,7 @@ class Header extends React.Component {
           <span className="icon-bar"></span>
         </button>
         <a className="navbar-brand text-danger">
-          { logo && <img src={logo.startsWith("http:") ? logo : `${process.env.PUBLIC_URL}/images/${logo}`} style={{display: 'inline'}} height="48" alt="" /> }
+          { logo && <img src={logo.startsWith("http:") ? logo : `${publicUrl}/images/${logo}`} style={{display: 'inline'}} height="48" alt="" /> }
           <span className="brandLabel">{title}</span>
         </a>
       </div>
