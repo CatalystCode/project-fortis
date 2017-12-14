@@ -7,12 +7,13 @@ const { trackEvent, trackException } = require('../appinsights/AppInsightsClient
 const deprecated = require('./deprecated');
 const loggingClient = require('../appinsights/LoggingClient');
 
-const TOKEN_URL_BASE = process.env.TRANSLATION_SERVICE_TOKEN_HOST || 'https://api.cognitive.microsoft.com';
-const TRANSLATOR_URL_BASE = process.env.TRANSLATION_SERVICE_TRANSLATOR_HOST || 'https://api.microsofttranslator.com';
-const TOKEN_REFETCH_SECONDS = (10 - 2) * 60; // 10 minutes validity minus 2 minutes to always avoid expiry
+const {
+  translationServiceTokenHost, translationServiceTranslatorHost
+} = require('../../../config').translator;
 
-const translator_uri = `${TRANSLATOR_URL_BASE}/V2/Http.svc/Translate`;
-const translator_array_uri = `${TRANSLATOR_URL_BASE}/V2/Http.svc/TranslateArray`;
+const translatorUri = `${translationServiceTranslatorHost}/V2/Http.svc/Translate`;
+const translatorArrayUri = `${translationServiceTranslatorHost}/V2/Http.svc/TranslateArray`;
+const tokenRefetchSeconds = (10 - 2) * 60; // 10 minutes validity minus 2 minutes to always avoid expiry
 
 function getAccessTokenForTranslation(token) {
   if (!token && deprecated.client_id && deprecated.client_secret) {
@@ -20,7 +21,7 @@ function getAccessTokenForTranslation(token) {
   }
 
   const POST = {
-    url: `${TOKEN_URL_BASE}/sts/v1.0/issueToken`,
+    url: `${translationServiceTokenHost}/sts/v1.0/issueToken`,
     data: '',
     headers: {
       'Ocp-Apim-Subscription-Key': token
@@ -43,7 +44,7 @@ function getAccessTokenForTranslation(token) {
       } else {
         resolve({
           'token': body,
-          'expires': new Date(now.getTime() + TOKEN_REFETCH_SECONDS * 1000)
+          'expires': new Date(now.getTime() + tokenRefetchSeconds * 1000)
         });
       }
     });
@@ -60,7 +61,7 @@ function TranslateSentenceArrayWithToken(access_token, wordsToTranslate, fromLan
   const requestXML = `<TranslateArrayRequest><AppId/><From>${fromLanguage}</From>${text}<To>${toLanguage}</To></TranslateArrayRequest>`;
 
   const POST = {
-    url: translator_array_uri,
+    url: translatorArrayUri,
     headers: headers,
     body: requestXML
   };
@@ -89,7 +90,7 @@ function TranslateWithToken(access_token, sentence, fromLanguage, toLanguage) {
   var headers = { Authorization: 'Bearer ' + access_token };
 
   var options = {
-    url: translator_uri,
+    url: translatorUri,
     headers: headers,
     qs: payload
   };

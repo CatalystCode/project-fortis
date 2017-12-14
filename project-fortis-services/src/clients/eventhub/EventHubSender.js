@@ -4,9 +4,10 @@ const EventHubClient = require('azure-event-hubs').Client;
 const Promise = require('promise');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
-const eventHubConnectionString = process.env.PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING;
-const eventHubPath = process.env.PUBLISH_EVENTS_EVENTHUB_PATH;
-const eventHubPartition = process.env.PUBLISH_EVENTS_EVENTHUB_PARTITION;
+const {
+  publishEventsEventhubConnectionString, publishEventsEventhubPath,
+  publishEventsEventhubPartition
+} = require('../../../config').eventHub;
 
 function sendMessages(messages) {
   return new Promise((resolve, reject) => {
@@ -21,7 +22,8 @@ function sendMessages(messages) {
       return reject(`Unable to create payloads for EventHub: ${err}`);
     }
 
-    const eventHubClient = EventHubClient.fromConnectionString(eventHubConnectionString, eventHubPath);
+    const eventHubClient = EventHubClient.fromConnectionString(
+      publishEventsEventhubConnectionString, publishEventsEventhubPath);
 
     if (!eventHubClient) return reject('No event hub connection string provided.');
 
@@ -29,7 +31,7 @@ function sendMessages(messages) {
     .then(() => eventHubClient.createSender())
     .then(eventHubSender => {
       eventHubSender.on('errorReceived', err => reject(`Error talking to EventHub: ${err}`));
-      Promise.all(payloads.map(payload => eventHubSender.send(payload, eventHubPartition)))
+      Promise.all(payloads.map(payload => eventHubSender.send(payload, publishEventsEventhubPartition)))
       .then(() => resolve([]))
       .catch((err) => reject(`Error sending EventHub message: ${err}`));
     });

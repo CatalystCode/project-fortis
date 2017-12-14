@@ -7,8 +7,9 @@ const azure = require('azure-storage');
 const { minutesFromNow } = azure.date;
 const { READ } = azure.BlobUtilities.SharedAccessPermissions;
 
-const USER_FILES_BLOB_ACCOUNT_NAME = process.env.USER_FILES_BLOB_ACCOUNT_NAME;
-const USER_FILES_BLOB_ACCOUNT_KEY = process.env.USER_FILES_BLOB_ACCOUNT_KEY;
+const {
+  userFilesBlobAccountKey, userFilesBlobAccountName
+} = require('../../../config').storage;
 
 /**
  * @param {string} uri
@@ -41,7 +42,7 @@ function fetchJson(uri) {
  * @returns {Promise.<{url: string, expires: Date}>}
  */
 function createFile(container, fileName, content, expiryMinutes) {
-  const client = azure.createBlobService(USER_FILES_BLOB_ACCOUNT_NAME, USER_FILES_BLOB_ACCOUNT_KEY);
+  const client = azure.createBlobService(userFilesBlobAccountName, userFilesBlobAccountKey);
 
   return new Promise((resolve, reject) => {
     client.createContainerIfNotExists(container, (error) => {

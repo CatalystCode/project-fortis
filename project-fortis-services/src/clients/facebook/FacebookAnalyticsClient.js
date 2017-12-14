@@ -4,13 +4,13 @@ const Promise = require('promise');
 const request = require('request');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
-const accessToken = process.env.FACEBOOK_AUTH_TOKEN;
-const apiUrlBase = process.env.FACEBOOK_API_HOST || 'https://graph.facebook.com';
-const facebookApiVersion = 'v2.9';
+const {
+  facebookAuthToken, facebookApiHost, facebookApiVersion
+} = require('../../../config').facebook;
 
 function buildFeedUri(pageId) {
-  return `${apiUrlBase}/${facebookApiVersion}/${pageId}/feed`
-    + `?access_token=${accessToken}`
+  return `${facebookApiHost}/${facebookApiVersion}/${pageId}/feed`
+    + `?access_token=${facebookAuthToken}`
     + '&format=json';
 }
 

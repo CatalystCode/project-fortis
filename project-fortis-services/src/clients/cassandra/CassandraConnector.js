@@ -2,34 +2,36 @@
 
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
+const distance = cassandra.types.distance;
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
 const { trackDependency, trackException } = require('../appinsights/AppInsightsClient');
 const loggingClient = require('../appinsights/LoggingClient');
 
-const FETCH_SIZE = process.env.FETCH_SIZE || 1000;
-const MAX_OPERATIONS_PER_BATCH = process.env.MAX_OPERATIONS_PER_BATCH || 10;
-const MAX_CONCURRENT_BATCHES = process.env.MAX_CONCURRENT_BATCHES || 50;
-const distance = cassandra.types.distance;
-const CORE_CONNECTIONS_PER_HOST_LOCAL = process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 3;
-const CORE_CONNECTIONS_PER_HOST_REMOTE = process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1;
+const {
+  fetchSize, maxOperationsPerBatch, maxConcurrentBatches,
+  coreConnectionsPerHostLocal, coreConnectionsPerHostRemote,
+  cassandraKeyspace, cassandraContactPoints,
+  cassandraPassword, cassandraUsername
+} = require('../../../config').cassandra;
+
 const options = {
-  contactPoints: [process.env.CASSANDRA_CONTACT_POINTS],
-  keyspace: process.env.CASSANDRA_KEYSPACE,
+  contactPoints: [cassandraContactPoints],
+  keyspace: cassandraKeyspace,
   pooling: {
     coreConnectionsPerHost: {
-      [distance.local]: CORE_CONNECTIONS_PER_HOST_LOCAL,
-      [distance.remote]: CORE_CONNECTIONS_PER_HOST_REMOTE
+      [distance.local]: coreConnectionsPerHostLocal,
+      [distance.remote]: coreConnectionsPerHostRemote
     } 
   },
   queryOptions: {
     autoPage: true,
     prepare: true,
-    fetchSize: FETCH_SIZE
+    fetchSize: fetchSize
   }
 };
-if (process.env.CASSANDRA_USERNAME && process.env.CASSANDRA_PASSWORD) {
-  options.authProvider = new cassandra.auth.PlainTextAuthProvider(process.env.CASSANDRA_USERNAME, process.env.CASSANDRA_PASSWORD);
+if (cassandraUsername && cassandraPassword) {
+  options.authProvider = new cassandra.auth.PlainTextAuthProvider(cassandraUsername, cassandraPassword);
 }
 const client = new cassandra.Client(options);
 
@@ -49,9 +51,9 @@ function executeBatchMutations(mutations) {
       return reject('No mutations defined');
     }
   
-    let chunkedMutations = chunk(mutations, MAX_OPERATIONS_PER_BATCH);
+    let chunkedMutations = chunk(mutations, maxOperationsPerBatch);
 
-    asyncEachLimit(chunkedMutations, MAX_CONCURRENT_BATCHES, (chunk, asyncCallback) => {
+    asyncEachLimit(chunkedMutations, maxConcurrentBatches, (chunk, asyncCallback) => {
       try {
         client.batch(chunk, { prepare: true }, (err) => {
           if (err) {

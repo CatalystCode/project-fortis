@@ -1,4 +1,6 @@
-const appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
+const {
+  appinsightsInstrumentationkey
+} = require('../../../config').appinsights;
 
 let client;
 let consoleLog = console.log;
@@ -10,11 +12,11 @@ const TRACE_LEVEL_WARNING = 2;
 const TRACE_LEVEL_ERROR = 3;
 
 function setup() {
-  if (appInsightsKey) {
+  if (appinsightsInstrumentationkey) {
     const appInsights = require('applicationinsights');
-    appInsights.setup(appInsightsKey);
+    appInsights.setup(appinsightsInstrumentationkey);
     appInsights.start();
-    client = appInsights.getClient(appInsightsKey);
+    client = appInsights.getClient(appinsightsInstrumentationkey);
     console.log = trackTrace(TRACE_LEVEL_INFO, consoleLog);
     console.warn = trackTrace(TRACE_LEVEL_WARNING, consoleWarn);
     console.error = trackTrace(TRACE_LEVEL_ERROR, consoleError);

@@ -1,6 +1,8 @@
 'use strict';
 
-const port = process.env.PORT || 8000;
+const {
+  port, enableV2
+} = require('./config').server;
 
 require('./src/clients/appinsights/AppInsightsClient').setup();
 const http = require('http');
@@ -13,7 +15,7 @@ const MessageSchema = require('./src/schemas/MessageSchema');
 const SettingsSchema = require('./src/schemas/SettingsSchema');
 const TileSchema = require('./src/schemas/TilesSchema');
 
-const resolversDirectory = process.env.ENABLE_V2 ? './src/resolvers-cassandra' : './src/resolvers';
+const resolversDirectory = enableV2 ? './src/resolvers-cassandra' : './src/resolvers';
 const EdgesResolver = require(`${resolversDirectory}/Edges`);
 const MessageResolver = require(`${resolversDirectory}/Messages`);
 const SettingsResolver = require(`${resolversDirectory}/Settings`);
@@ -68,7 +70,7 @@ function startServer() {
   server.listen(port, function () {});
 }
 
-const serverStartBlocker = process.env.ENABLE_V2
+const serverStartBlocker = enableV2
   ? require('./src/clients/cassandra/CassandraConnector').initialize()
   : require('promise').resolve();
 

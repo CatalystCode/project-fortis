@@ -8,7 +8,10 @@ const streamingController = require('../../clients/streaming/StreamingController
 const { withRunTime, limitForInClause } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
-const apiUrlBase = process.env.FORTIS_CENTRAL_ASSETS_HOST || 'https://fortiscentral.blob.core.windows.net';
+
+const {
+  fortisCentralAssetsHost
+} = require('../../../config').storage;
 
 function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
@@ -23,7 +26,7 @@ function _insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     if (!siteType || !siteType.length) return reject('insertTopics: siteType is not defined');
 
-    const uri = `${apiUrlBase}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+    const uri = `${fortisCentralAssetsHost}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
     let mutations = [];
     blobStorageClient.fetchJson(uri)
     .then(response => {

@@ -3,29 +3,29 @@
 const Promise = require('promise');
 const azure = require('azure-sb'); 
 const { trackDependency } = require('../appinsights/AppInsightsClient');
-const SERVICE_BUS_CONNECTION_STRING = process.env.FORTIS_SB_CONN_STR;
 
-const SERVICE_BUS_CONFIG_QUEUE = process.env.FORTIS_SB_CONFIG_QUEUE || 'configuration';
-const SERVICE_BUS_COMMAND_QUEUE = process.env.FORTIS_SB_COMMAND_QUEUE || 'command'; 
+const {
+  fortisSbConnStr, fortisSbCommandQueue, fortisSbConfigQueue
+} = require('../../../config').serviceBus;
 
 function restartPipeline() {
-  return notifyUpdate(SERVICE_BUS_COMMAND_QUEUE, { 'dirty': 'streams' });
+  return notifyUpdate(fortisSbCommandQueue, { 'dirty': 'streams' });
 }
 
 function restartStreaming() {
-  return notifyUpdate(SERVICE_BUS_COMMAND_QUEUE, { 'dirty': 'streams' });
+  return notifyUpdate(fortisSbCommandQueue, { 'dirty': 'streams' });
 }
 
 function notifyWatchlistUpdate() {
-  return notifyUpdate(SERVICE_BUS_CONFIG_QUEUE, { 'dirty': 'watchlist' });
+  return notifyUpdate(fortisSbConfigQueue, { 'dirty': 'watchlist' });
 }
 
 function notifyBlacklistUpdate() {
-  return notifyUpdate(SERVICE_BUS_CONFIG_QUEUE, { 'dirty': 'blacklist' });
+  return notifyUpdate(fortisSbConfigQueue, { 'dirty': 'blacklist' });
 }
 
 function notifySiteSettingsUpdate() {
-  return notifyUpdate(SERVICE_BUS_CONFIG_QUEUE, { 'dirty': 'sitesettings' });
+  return notifyUpdate(fortisSbConfigQueue, { 'dirty': 'sitesettings' });
 }
 
 function notifyUpdate(queue, properties) {
@@ -44,7 +44,7 @@ function sendQueueMessage(queue, serviceBusMessage) {
   return new Promise((resolve, reject) => {
     let client;
     try {
-      client = azure.createServiceBusService(SERVICE_BUS_CONNECTION_STRING);
+      client = azure.createServiceBusService(fortisSbConnStr);
     } catch (exception) {
       return reject(exception);
     }

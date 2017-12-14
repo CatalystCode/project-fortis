@@ -4,28 +4,30 @@ const Promise = require('promise');
 const request = require('request');
 const trackDependency = require('../appinsights/AppInsightsClient').trackDependency;
 
-const apiUrlBase = process.env.FORTIS_FEATURE_SERVICE_HOST;
+const {
+  fortisFeatureServiceHost
+} = require('../../../config').featureService;
 
 function formatIdsUri(ids, extraFields) {
-  let uri = `${apiUrlBase}/features/id/${ids.map(encodeURIComponent).join(',')}`;
+  let uri = `${fortisFeatureServiceHost}/features/id/${ids.map(encodeURIComponent).join(',')}`;
   if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
 function formatBboxUri(north, west, south, east, extraFields) {
-  let uri = `${apiUrlBase}/features/bbox/${north}/${west}/${south}/${east}`;
+  let uri = `${fortisFeatureServiceHost}/features/bbox/${north}/${west}/${south}/${east}`;
   if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
 function formatPointUri(latitude, longitude, extraFields) {
-  let uri = `${apiUrlBase}/features/point/${latitude}/${longitude}`;
+  let uri = `${fortisFeatureServiceHost}/features/point/${latitude}/${longitude}`;
   if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
 
 function formatNameUri(names, extraFields) {
-  let uri = `${apiUrlBase}/features/name/${names.map(encodeURIComponent).join(',')}`;
+  let uri = `${fortisFeatureServiceHost}/features/name/${names.map(encodeURIComponent).join(',')}`;
   if (extraFields) uri += `?include=${extraFields}`;
   return uri;
 }
