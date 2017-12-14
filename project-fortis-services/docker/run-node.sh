@@ -36,13 +36,6 @@ if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ] && ! has_cassandra_schema; then
   echo "...done, Fortis schema definition is now ingested"
 fi
 
-# set up cognitive services secrets if preconfigured
-if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvisionsvctoken" ] && [ -n "$cogtextsvctoken" ]; then
-  echo "Got Fortis cognitive services secrets, ingesting..."
-  echo "UPDATE fortis.sitesettings SET translationsvctoken = '$translationsvctoken', cogspeechsvctoken = '$cogspeechsvctoken', cogvisionsvctoken = '$cogvisionsvctoken', cogtextsvctoken = '$cogtextsvctoken' WHERE sitename = '$(get_sitename)';" | cassandra_exec
-  echo "...done, Fortis cognitive services secrets are now ingested"
-fi
-
 # set up cassandra seed data
 if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
   echo "Got Fortis sample data at $FORTIS_CASSANDRA_SEED_DATA_URL, ingesting..."
@@ -52,6 +45,13 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
   cassandra_exec < import.cql
   cd -
   echo "...done, Fortis sample data is now ingested"
+fi
+
+# set up cognitive services secrets if preconfigured
+if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvisionsvctoken" ] && [ -n "$cogtextsvctoken" ]; then
+  echo "Got Fortis cognitive services secrets, ingesting..."
+  echo "UPDATE fortis.sitesettings SET translationsvctoken = '$translationsvctoken', cogspeechsvctoken = '$cogspeechsvctoken', cogvisionsvctoken = '$cogvisionsvctoken', cogtextsvctoken = '$cogtextsvctoken' WHERE sitename = '$(get_sitename)';" | cassandra_exec
+  echo "...done, Fortis cognitive services secrets are now ingested"
 fi
 
 # start node server
