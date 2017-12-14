@@ -15,6 +15,10 @@ ENV REACT_APP_SERVICE_HOST="http://localhost:8889"
 # then update the value of this environment variable to http://localhost:3035
 ENV REACT_APP_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure.com"
 
+# active directory configuration
+ENV REACT_APP_AD_CLIENT_ID=""
+ENV REACT_APP_AD_AUTHORITY=""
+
 ADD . /app
 WORKDIR /app
 

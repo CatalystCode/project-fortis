@@ -72,6 +72,7 @@ class Header extends React.Component {
     return (
       <ul className="nav navbar-nav navbar-right">
         { this.props.settings && <li>{ this.renderLanguagePicker() }</li> }
+        { this.props.renderLogout && <li>{ this.props.renderLogout() }</li> }
       </ul>
     );
   }

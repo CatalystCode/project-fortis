@@ -53,6 +53,7 @@ export const DataStore = Fluxxor.createStore({
             heatmapTileIds: [],
             fullTermList: new Map(),
             error: null,
+            user: null,
             initialLoadStepsCompleted: 0,
             initialLoadStepsTotal: 4,
             bbox: [],
@@ -63,6 +64,7 @@ export const DataStore = Fluxxor.createStore({
 
         this.bindActions(
             constants.DASHBOARD.INITIALIZE, this.intializeSettings,
+            constants.DASHBOARD.AUTH_USER, this.handleAuth,
             constants.DASHBOARD.INITIALIZE_PROGRESS, this.intializeSettingsProgress,
             constants.DASHBOARD.RELOAD_CHARTS, this.handleReloadChartData,
             constants.DASHBOARD.CHANGE_LANGUAGE, this.handleLanguageChange,
@@ -79,6 +81,11 @@ export const DataStore = Fluxxor.createStore({
         
         this.dataStore.language = language;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
+        this.emit("change");
+    },
+
+    handleAuth(user) {
+        this.dataStore.user = user;
         this.emit("change");
     },
 

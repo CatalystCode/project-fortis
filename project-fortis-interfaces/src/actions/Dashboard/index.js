@@ -147,6 +147,11 @@ const methods = {
             }
         })
     },
+
+    handleAuth(user) {
+        this.dispatch(constants.DASHBOARD.AUTH_USER, user);
+    },
+
     changeLanguage(language, category) {
         const self = this;
 
