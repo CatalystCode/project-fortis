@@ -68,11 +68,19 @@ class Header extends React.Component {
     );
   }
 
+  renderLogoutLink() {
+    return (
+      <a onClick={this.props.logoutCallback}>
+        Logout {this.props.userName}
+      </a>
+    )
+  }
+
   renderRightNav() {
     return (
       <ul className="nav navbar-nav navbar-right">
         { this.props.settings && <li>{ this.renderLanguagePicker() }</li> }
-        { this.props.renderLogout && <li>{ this.props.renderLogout() }</li> }
+        { this.props.logoutCallback && <li>{ this.renderLogoutLink() }</li> }
       </ul>
     );
   }

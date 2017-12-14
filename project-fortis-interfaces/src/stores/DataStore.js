@@ -53,7 +53,7 @@ export const DataStore = Fluxxor.createStore({
             heatmapTileIds: [],
             fullTermList: new Map(),
             error: null,
-            user: null,
+            authInfo: null,
             initialLoadStepsCompleted: 0,
             initialLoadStepsTotal: 4,
             bbox: [],
@@ -84,8 +84,8 @@ export const DataStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleAuth(user) {
-        this.dataStore.user = user;
+    handleAuth(authInfo) {
+        this.dataStore.authInfo = authInfo;
         this.emit("change");
     },
 

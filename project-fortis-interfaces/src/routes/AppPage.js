@@ -2,32 +2,36 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
-import { UserAgentApplication, Logger } from '@cicorias/msal';
+import { UserAgentApplication, Logger } from 'msal';
 
 import '../styles/Global.css';
 import Header from '../components/Header';
-import { reactAppAdAuthority, reactAppAdClientId, reactAppAdGraphScopes } from '../config';
+import { reactAppAdClientId, reactAppAdGraphScopes } from '../config';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
+
+const TokenStoreKey = 'Fortis.AD.Token';
 
 export const AppPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   adApplication: new UserAgentApplication(
     reactAppAdClientId,
-    reactAppAdAuthority,
+    null,
     (errorMessage, token, error, tokenType) => {
-      if (token) this.adHandleToken(token)
-      else this.adHandleError(error);
+      if (token) {
+        this.adHandleToken(token);
+      } else {
+        this.adHandleError(error);
+      }
     },
     {
       cacheLocation: 'localStorage',
       logger: new Logger((level, message, containsPII) => {
         const logger = level === 0 ? console.error : level === 1 ? console.warn : console.log;
         logger(`AD: ${message}`);
-      }),
-      useV1: true
+      })
     }
   ),
 
@@ -37,7 +41,8 @@ export const AppPage = createReactClass({
 
   adHandleToken(token) {
     const user = this.adApplication.getUser();
-    this.getFlux().actions.DASHBOARD.handleAuth(user);
+    localStorage.setItem(TokenStoreKey, token);
+    this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
   },
 
   adLogin() {
@@ -58,16 +63,18 @@ export const AppPage = createReactClass({
 
   adLogout() {
     this.adApplication.logout();
+    localStorage.removeItem(TokenStoreKey);
     this.getFlux().actions.DASHBOARD.handleAuth(null);
   },
 
   componentDidMount() {
-    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
-
     const user = this.adApplication.getUser();
-    if (user) {
-      this.getFlux().actions.DASHBOARD.handleAuth(user);
+    const token = localStorage.getItem(TokenStoreKey);
+    if (user && token) {
+      this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
     }
+
+    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
   },
 
   getStateFromFlux() {
@@ -75,7 +82,7 @@ export const AppPage = createReactClass({
   },
 
   render() {
-    if (!this.state.user) {
+    if (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token) {
       return this.renderLogin();
     }
 
@@ -99,8 +106,9 @@ export const AppPage = createReactClass({
   },
 
   renderLogout() {
+    const userName = this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name;
     return (
-      <a onClick={this.adLogout}>Log out {this.state.user.name}</a>
+      <a onClick={this.adLogout}>Log out {userName}</a>
     );
   },
 
@@ -136,7 +144,8 @@ export const AppPage = createReactClass({
             language={this.state.language}
             supportedLanguages={this.state.supportedLanguages}
             settings={this.state.settings}
-            renderLogout={this.renderLogout}
+            logoutCallback={this.adLogout}
+            userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}
           />
           <div id="main">
             <div id="content">

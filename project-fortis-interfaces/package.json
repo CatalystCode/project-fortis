@@ -49,7 +49,6 @@
     "react-dom": "^15.4.2"
   },
   "dependencies": {
-    "@cicorias/msal": "^0.1.8",
     "async": "^2.5.0",
     "autosuggest-highlight": "^3.1.0",
     "bootstrap": "^3.3.7",
@@ -68,6 +67,7 @@
     "material-ui": "^0.16.6",
     "material-ui-superselectfield": "^0.1.4",
     "moment": "^2.19.0",
+    "msal": "^0.1.3",
     "numeral": "^1.5.3",
     "prop-types": "^15.6.0",
     "react": "^15.6.2",

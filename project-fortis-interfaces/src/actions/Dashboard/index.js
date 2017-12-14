@@ -148,8 +148,8 @@ const methods = {
         })
     },
 
-    handleAuth(user) {
-        this.dispatch(constants.DASHBOARD.AUTH_USER, user);
+    handleAuth(authInfo) {
+        this.dispatch(constants.DASHBOARD.AUTH_USER, authInfo);
     },
 
     changeLanguage(language, category) {

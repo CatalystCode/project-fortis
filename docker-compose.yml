@@ -14,7 +14,6 @@ services:
     environment:
       - REACT_APP_SERVICE_HOST=${PROJECT_FORTIS_SERVICES_HOST}
       - REACT_APP_AD_CLIENT_ID=${AD_CLIENT_ID}
-      - REACT_APP_AD_AUTHORITY=${AD_AUTHORITY}
     env_file:
       - .env-secrets
 
