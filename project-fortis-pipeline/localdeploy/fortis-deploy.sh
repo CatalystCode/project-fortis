@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+if ! (command -v az >/dev/null); then echo "Unmet system dependency: az" >&2; exit 1; fi
+if ! (command -v python >/dev/null); then echo "Unmet system dependency: python" >&2; exit 1; fi
+
 usage() { echo "Usage: $0 -i <subscriptionId> -g <resourceGroupName> -n <deploymentName> -l <resourceGroupLocation>" >&2; exit 1; }
 
 declare subscriptionId=""
