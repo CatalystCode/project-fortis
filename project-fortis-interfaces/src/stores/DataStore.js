@@ -2,6 +2,7 @@ import Fluxxor from 'fluxxor';
 import constants from '../actions/constants';
 import { momentGetFromToRange } from '../utils/Utils.js';
 import moment from 'moment';
+import { auth } from '../services/shared';
 
 function makeMap(items, keyFunc, valueFunc) {
     let map = new Map();
@@ -85,6 +86,10 @@ export const DataStore = Fluxxor.createStore({
     },
 
     handleAuth(authInfo) {
+        if (authInfo) {
+            auth.user = authInfo.user;
+            auth.token = authInfo.token;
+        }
         this.dataStore.authInfo = authInfo;
         this.emit("change");
     },
