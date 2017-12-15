@@ -86,10 +86,7 @@ export const DataStore = Fluxxor.createStore({
     },
 
     handleAuth(authInfo) {
-        if (authInfo) {
-            auth.user = authInfo.user;
-            auth.token = authInfo.token;
-        }
+        if (authInfo) auth.token = authInfo.token;
         this.dataStore.authInfo = authInfo;
         this.emit("change");
     },

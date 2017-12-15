@@ -1,25 +1,15 @@
 import request from 'request';
 import { reactAppServiceHost } from '../config';
 
-const auth = {
-    user: null,
-    token: null
-};
+const auth = { token: null }; // token will get set as soon as it's available
 
 function fetchGqlData(endpoint, { query, variables }, callback) {
-    // todo: pass the credentials to the backend
-    const { user, token } = auth;
-    console.log('--------------------------');
-    console.log('Got user:');
-    console.log(user);
-    console.log('Got token:')
-    console.log(token);
-    console.log('--------------------------');
     request({
         url: `${reactAppServiceHost}/api/${endpoint}`,
         method: 'POST',
         json: true,
         withCredentials: false,
+        headers: { 'Authorization': `Bearer ${auth.token}` },
         body: { query, variables }
     }, callback);
 }
