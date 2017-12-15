@@ -6,8 +6,6 @@ RUN apt-get install -y --no-install-recommends wget ca-certificates \
  && rm apache-cassandra-3.11.0-bin.tar.gz \
  && mv apache-cassandra-3.11.0 /opt/cassandra
 
-ENV ENABLE_V2=1
-
 # these settings need to be in sync with project-fortis-spark
 ENV PUBLISH_EVENTS_EVENTHUB_PATH="published-messages"
 ENV PUBLISH_EVENTS_EVENTHUB_PARTITION="\$Default"

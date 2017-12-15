@@ -41,7 +41,6 @@ module.exports = {
         appinsightsInstrumentationkey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     },
     server: {
-        enableV2: process.env.ENABLE_V2,
         port: process.env.PORT || 8000
     }
 };

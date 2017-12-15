@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  port, enableV2
+  port
 } = require('./config').server;
 
 require('./src/clients/appinsights/AppInsightsClient').setup();
@@ -15,11 +15,10 @@ const MessageSchema = require('./src/schemas/MessageSchema');
 const SettingsSchema = require('./src/schemas/SettingsSchema');
 const TileSchema = require('./src/schemas/TilesSchema');
 
-const resolversDirectory = enableV2 ? './src/resolvers-cassandra' : './src/resolvers';
-const EdgesResolver = require(`${resolversDirectory}/Edges`);
-const MessageResolver = require(`${resolversDirectory}/Messages`);
-const SettingsResolver = require(`${resolversDirectory}/Settings`);
-const TileResolver = require(`${resolversDirectory}/Tiles`);
+const EdgesResolver = require('./src/resolvers/Edges');
+const MessageResolver = require('./src/resolvers/Messages');
+const SettingsResolver = require('./src/resolvers/Settings');
+const TileResolver = require('./src/resolvers/Tiles');
 
 const app = express();
 
@@ -70,8 +69,6 @@ function startServer() {
   server.listen(port, function () {});
 }
 
-const serverStartBlocker = enableV2
-  ? require('./src/clients/cassandra/CassandraConnector').initialize()
-  : require('promise').resolve();
+const serverStartBlocker = require('./src/clients/cassandra/CassandraConnector').initialize();
 
 serverStartBlocker.then(startServer).catch(console.error);

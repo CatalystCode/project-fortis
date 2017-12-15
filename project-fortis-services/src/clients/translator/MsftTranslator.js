@@ -4,7 +4,6 @@ const xml2js = require('xml2js');
 const Promise = require('promise');
 const request = require('request');
 const { trackEvent, trackException } = require('../appinsights/AppInsightsClient');
-const deprecated = require('./deprecated');
 const loggingClient = require('../appinsights/LoggingClient');
 
 const {
@@ -16,10 +15,6 @@ const translatorArrayUri = `${translationServiceTranslatorHost}/V2/Http.svc/Tran
 const tokenRefetchSeconds = (10 - 2) * 60; // 10 minutes validity minus 2 minutes to always avoid expiry
 
 function getAccessTokenForTranslation(token) {
-  if (!token && deprecated.client_id && deprecated.client_secret) {
-    return deprecated.getAccessTokenForTranslation();
-  }
-
   const POST = {
     url: `${translationServiceTokenHost}/sts/v1.0/issueToken`,
     data: '',

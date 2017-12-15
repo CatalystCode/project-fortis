@@ -2,7 +2,7 @@
     "rules": {
         "no-console": "off",
         "indent": [
-            "error", 
+            "error",
             2
         ],
         "quotes": [
@@ -20,8 +20,7 @@
     },
     "env": {
         "es6": true,
-        "node": true,
-        "mocha": true
+        "node": true
     },
     "extends": [
         "plugin:require-path-exists/recommended",
