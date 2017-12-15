@@ -1,18 +1,14 @@
 import request from 'request';
 import { reactAppServiceHost } from '../config';
 
-function fetchGqlData(endpoint, gqlQueryBody, callback) {
-    const { query, variables } = gqlQueryBody;
-
-    const POST = {
+function fetchGqlData(endpoint, { query, variables }, callback) {
+    request({
         url: `${reactAppServiceHost}/api/${endpoint}`,
-        method: "POST",
+        method: 'POST',
         json: true,
         withCredentials: false,
         body: { query, variables }
-    };
-
-    request(POST, callback);
+    }, callback);
 }
 
 const MESSAGES_ENDPOINT = 'messages';
