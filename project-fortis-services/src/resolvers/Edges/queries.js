@@ -194,7 +194,7 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
         if (!tiles || !tiles.length) {
           return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
         }
-        
+
         const query = `
           SELECT mentioncount, conjunctiontopic1, avgsentimentnumerator
           FROM fortis.populartopics

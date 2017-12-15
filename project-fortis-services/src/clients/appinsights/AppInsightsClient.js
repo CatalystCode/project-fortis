@@ -44,25 +44,25 @@ function trackDependency(promiseFunc, dependencyName, callName) {
     return new Promise((resolve, reject) => {
       const start = new Date();
       promiseFunc(...args)
-      .then(returnValue => {
-        const duration = new Date() - start;
-        const success = true;
-        if (client) {
-          client.trackDependency(dependencyName, callName, duration, success);
-        }
-        console.log(JSON.stringify({dependency: dependencyName, call: callName, duration, success, args}));
-        resolve(returnValue);
-      })
-      .catch(err => {
-        const duration = new Date() - start;
-        const success = false;
-        if (client) {
-          client.trackDependency(dependencyName, callName, duration, success);
-        }
-        console.error(JSON.stringify({dependency: dependencyName, call: callName, duration, success, err, args}));
-        reject(err);
-      })
-      .catch(reject);
+        .then(returnValue => {
+          const duration = new Date() - start;
+          const success = true;
+          if (client) {
+            client.trackDependency(dependencyName, callName, duration, success);
+          }
+          console.log(JSON.stringify({dependency: dependencyName, call: callName, duration, success, args}));
+          resolve(returnValue);
+        })
+        .catch(err => {
+          const duration = new Date() - start;
+          const success = false;
+          if (client) {
+            client.trackDependency(dependencyName, callName, duration, success);
+          }
+          console.error(JSON.stringify({dependency: dependencyName, call: callName, duration, success, err, args}));
+          reject(err);
+        })
+        .catch(reject);
     });
   }
 
@@ -77,29 +77,29 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
     return new Promise((resolve, reject) => {
       const start = new Date();
       promiseFunc(...args)
-      .then(returnValue => {
-        const properties = extraPropsFunc(returnValue, null);
-        properties.duration = new Date() - start;
-        properties.success = true;
-        const metrics = extraMetricsFunc(returnValue, null);
-        if (client) {
-          client.trackEvent(eventName, properties, metrics);
-        }
-        console.log(JSON.stringify({event: eventName, properties, metrics, args: args && args.length && args[0]}));
-        resolve(returnValue);
-      })
-      .catch(err => {
-        const properties = extraPropsFunc(null, err);
-        properties.duration = new Date() - start;
-        properties.success = false;
-        const metrics = extraMetricsFunc(null, err);
-        if (client) {
-          client.trackEvent(eventName, properties);
-        }
-        console.error(JSON.stringify({event: eventName, properties, metrics, err, args: args && args.length && args[0]}));
-        reject(err);
-      })
-      .catch(reject);
+        .then(returnValue => {
+          const properties = extraPropsFunc(returnValue, null);
+          properties.duration = new Date() - start;
+          properties.success = true;
+          const metrics = extraMetricsFunc(returnValue, null);
+          if (client) {
+            client.trackEvent(eventName, properties, metrics);
+          }
+          console.log(JSON.stringify({event: eventName, properties, metrics, args: args && args.length && args[0]}));
+          resolve(returnValue);
+        })
+        .catch(err => {
+          const properties = extraPropsFunc(null, err);
+          properties.duration = new Date() - start;
+          properties.success = false;
+          const metrics = extraMetricsFunc(null, err);
+          if (client) {
+            client.trackEvent(eventName, properties);
+          }
+          console.error(JSON.stringify({event: eventName, properties, metrics, err, args: args && args.length && args[0]}));
+          reject(err);
+        })
+        .catch(reject);
     });
   }
 

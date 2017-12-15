@@ -22,7 +22,7 @@ const options = {
     coreConnectionsPerHost: {
       [distance.local]: coreConnectionsPerHostLocal,
       [distance.remote]: coreConnectionsPerHostRemote
-    } 
+    }
   },
   queryOptions: {
     autoPage: true,
@@ -50,7 +50,7 @@ function executeBatchMutations(mutations) {
       loggingClient.logNoMutationsDefined();
       return reject('No mutations defined');
     }
-  
+
     let chunkedMutations = chunk(mutations, maxOperationsPerBatch);
 
     asyncEachLimit(chunkedMutations, maxConcurrentBatches, (chunk, asyncCallback) => {
@@ -139,14 +139,14 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
     }
 
     client.execute(query, params, options)
-    .then(result => resolve({
-      pageState: result.pageState, 
-      rows: result.rows
-    }))
-    .catch(error => {
-      trackException(error);
-      reject(error);
-    });
+      .then(result => resolve({
+        pageState: result.pageState,
+        rows: result.rows
+      }))
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
   });
 }
 

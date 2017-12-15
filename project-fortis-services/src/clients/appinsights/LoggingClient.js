@@ -10,7 +10,7 @@ function logCassandraClientUndefined() {
 }
 
 function logNoMutationsDefined() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'mutate',
     success: 'false'
@@ -20,7 +20,7 @@ function logNoMutationsDefined() {
 }
 
 function logExecuteQueryError() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'query',
     success: 'false'
@@ -61,7 +61,7 @@ function trustedSourcesExtraMetrics() {
 }
 
 function logNoTrustedSourcesToAdd() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'modify',
     table: 'trustedsources',
@@ -72,7 +72,7 @@ function logNoTrustedSourcesToAdd() {
 }
 
 function logNoTrustedSourcesToRemove() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'remove',
     table: 'trustedsources',
@@ -149,7 +149,7 @@ function keywordsExtraMetrics() {
 }
 
 function logNoKeywordsToAdd() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'modify',
     table: 'watchlist',
@@ -160,7 +160,7 @@ function logNoKeywordsToAdd() {
 }
 
 function logNoKeywordsToRemove() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'remove',
     table: 'watchlist',
@@ -171,7 +171,7 @@ function logNoKeywordsToRemove() {
 }
 
 function logNoStreamParamsToEdit() {
-  trackSyncEvent('cassandra', { 
+  trackSyncEvent('cassandra', {
     client: constants.CLIENTS.cassandra,
     operation: 'modify',
     table: 'streams',

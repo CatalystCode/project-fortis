@@ -66,7 +66,7 @@ function queryEventsTable(eventIdResponse, args) {
       eventsQuery += ' AND fulltext LIKE ?';
       eventsParams.push(`%${args.fulltextTerm}%`);
     }
- 
+
     if (eventIdResponse.rows.length) {
       cassandraConnector.executeQuery(eventsQuery, eventsParams)
         .then(rows => {

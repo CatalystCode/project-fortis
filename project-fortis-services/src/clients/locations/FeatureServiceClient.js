@@ -57,7 +57,7 @@ function callFeatureService(uri) {
 }
 
 /**
- * @param {{north: number, west: number, south: number, east: number}} fence 
+ * @param {{north: number, west: number, south: number, east: number}} fence
  * @param {string} extraFields
  * @returns {Promise.<Array<{id: string, name: string, layer: string}>>}
  */
@@ -66,7 +66,7 @@ function fetchByBbox(fence, extraFields) {
 }
 
 /**
- * @param {{latitude: number, longitude: number}} point 
+ * @param {{latitude: number, longitude: number}} point
  * @param {string} extraFields
  * @returns {Promise.<Array<{id: string, name: string, layer: string}>>}
  */

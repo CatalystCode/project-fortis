@@ -36,9 +36,9 @@ function aggregateBy(rows, aggregateKey, aggregateValue) {
   rows.forEach(row => {
     const key = aggregateKey(row);
     const mapEntry = accumulationMap.has(key) ? accumulationMap.get(key) : aggregateValue(row);
-    const mutatedRow = Object.assign({}, mapEntry, { 
+    const mutatedRow = Object.assign({}, mapEntry, {
       mentions: (mapEntry.mentions || Long.ZERO).add(row.mentioncount),
-      avgsentimentnumerator: (mapEntry.avgsentimentnumerator || Long.ZERO).add(row.avgsentimentnumerator || Long.ZERO) 
+      avgsentimentnumerator: (mapEntry.avgsentimentnumerator || Long.ZERO).add(row.avgsentimentnumerator || Long.ZERO)
     });
 
     accumulationMap.set(key, mutatedRow);

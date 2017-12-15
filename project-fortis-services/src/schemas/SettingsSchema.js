@@ -49,7 +49,7 @@ module.exports = graphql.buildSchema(`
     translationSvcToken: String,
     cogSpeechSvcToken: String,
     cogVisionSvcToken: String,
-    cogTextSvcToken: String  
+    cogTextSvcToken: String
   }
 
   input Term {
@@ -124,9 +124,9 @@ module.exports = graphql.buildSchema(`
     streams: [Stream]!
   }
 
-  type ParamsEntry {   
-    key: String!,    
-    value: String!  
+  type ParamsEntry {
+    key: String!,
+    value: String!
   }
 
   type Stream {
@@ -214,9 +214,9 @@ module.exports = graphql.buildSchema(`
     featureservicenamespace: String
   }
 
-  input ParamsEntryInput {   
-    key: String!,    
-    value: String!  
+  input ParamsEntryInput {
+    key: String!,
+    value: String!
   }
 
   input StreamInput {

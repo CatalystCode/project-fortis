@@ -1,7 +1,7 @@
 'use strict';
 
 const Promise = require('promise');
-const azure = require('azure-sb'); 
+const azure = require('azure-sb');
 const { trackDependency } = require('../appinsights/AppInsightsClient');
 
 const {
@@ -30,7 +30,7 @@ function notifySiteSettingsUpdate() {
 
 function notifyUpdate(queue, properties) {
   return new Promise((resolve, reject) => {
-    const serviceBusMessage = { 
+    const serviceBusMessage = {
       customProperties: properties
     };
 
