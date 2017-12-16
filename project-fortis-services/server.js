@@ -4,13 +4,14 @@ const {
   port
 } = require('./config').server;
 
-require('./src/clients/appinsights/AppInsightsClient').setup();
 const http = require('http');
 const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHTTP = require('express-graphql');
 
+const initializeAppInsights = require('./src/clients/appinsights/AppInsightsClient').setup;
+const initializeCassandra = require('./src/clients/cassandra/CassandraConnector').initialize;
 const auth = require('./src/auth');
 
 const EdgesSchema = require('./src/schemas/EdgesSchema');
@@ -61,6 +62,5 @@ function startServer() {
   server.listen(port, function () {});
 }
 
-const serverStartBlocker = require('./src/clients/cassandra/CassandraConnector').initialize();
-
-serverStartBlocker.then(startServer).catch(console.error);
+initializeAppInsights();
+initializeCassandra().then(startServer).catch(console.error);
