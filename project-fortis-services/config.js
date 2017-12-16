@@ -40,6 +40,9 @@ module.exports = {
   appinsights: {
     appinsightsInstrumentationkey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
   },
+  activeDirectory: {
+    adClientId: process.env.AD_CLIENT_ID
+  },
   server: {
     port: process.env.PORT || 8000
   }

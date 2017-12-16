@@ -49,6 +49,8 @@
     "lodash": "^4.17.4",
     "moment": "^2.17.1",
     "node-cache": "^4.1.1",
+    "passport": "^0.4.0",
+    "passport-azure-ad": "^3.0.8",
     "promise": "^7.1.1",
     "request": "^2.79.0",
     "uuid": "^3.1.0",

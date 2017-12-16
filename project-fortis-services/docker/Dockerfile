@@ -48,6 +48,17 @@ ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/
 # reference other files in the archive, e.g. for cql `copy from` commands
 ENV FORTIS_CASSANDRA_SEED_DATA_URL=""
 
+# active directory configuration
+# you can set up your own application via https://apps.dev.microsoft.com/
+# click "add platform" -> "web" -> make sure that "allow implicit flow" is
+# checked (it's the default) and add in the "Redirect URLs" textbox both
+# http://localhost:8888 as well as http://localhost:3000 so that your app works
+# via docker-compose but also if run stand-alone via npm start
+# next up ensure that the "User.Read" permission is added in the section
+# "Delegated Permissions" (it's the default); hit "Save" at the bottom of the
+# page and you're done
+ENV AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
+
 ADD . /app
 ADD docker/run-node.sh /app/run-node.sh
 WORKDIR /app

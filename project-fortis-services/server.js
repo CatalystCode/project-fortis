@@ -11,6 +11,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHTTP = require('express-graphql');
 
+const auth = require('./src/auth');
+
 const EdgesSchema = require('./src/schemas/EdgesSchema');
 const MessageSchema = require('./src/schemas/MessageSchema');
 const SettingsSchema = require('./src/schemas/SettingsSchema');
@@ -26,6 +28,8 @@ const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
+auth.initialize(app);
 
 app.use('/api/messages', graphqlHTTP({
   schema: MessageSchema,

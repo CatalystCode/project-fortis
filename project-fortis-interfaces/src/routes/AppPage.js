@@ -6,12 +6,13 @@ import { UserAgentApplication, Logger } from 'msal';
 
 import '../styles/Global.css';
 import Header from '../components/Header';
-import { reactAppAdClientId, reactAppAdGraphScopes } from '../config';
+import { reactAppAdClientId } from '../config';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
 const TokenStoreKey = 'Fortis.AD.Token';
+const AdScopes = ['openid'];
 
 export const AppPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
@@ -48,12 +49,12 @@ export const AppPage = createReactClass({
   adLogin() {
     const self = this;
 
-    self.adApplication.loginPopup(reactAppAdGraphScopes)
+    self.adApplication.loginPopup(AdScopes)
     .then((idToken) => {
-      self.adApplication.acquireTokenSilent(reactAppAdGraphScopes)
+      self.adApplication.acquireTokenSilent(AdScopes)
       .then(self.adHandleToken)
       .catch((error) => {
-        self.adApplication.acquireTokenPopup(reactAppAdGraphScopes)
+        self.adApplication.acquireTokenPopup(AdScopes)
         .then(self.adHandleToken)
         .catch(self.adHandleError);
       });
