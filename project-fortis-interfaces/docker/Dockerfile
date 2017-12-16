@@ -26,13 +26,12 @@ ENV REACT_APP_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure
 # page and you're done
 ENV REACT_APP_AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 
-ADD . /app
 WORKDIR /app
+ADD package.json /app/package.json
+RUN npm install
 
-RUN npm install \
- && npm run build \
- && npm install -g pushstate-server
+ADD . /app
 
 EXPOSE 80
-
-CMD ["pushstate-server", "./build", "80"]
+ENV PORT="80"
+CMD ["npm", "start"]
