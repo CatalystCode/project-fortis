@@ -6,6 +6,7 @@ const {
 
 require('./src/clients/appinsights/AppInsightsClient').setup();
 const http = require('http');
+const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHTTP = require('express-graphql');
@@ -22,20 +23,7 @@ const TileResolver = require('./src/resolvers/Tiles');
 
 const app = express();
 
-app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'OPTIONS,GET,POST,PUT,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-ms-meta-data*,x-ms-meta-target*,x-ms-meta-abc');
-
-  // intercept OPTIONS method
-  if ('OPTIONS' === req.method) {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
-
+app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
