@@ -69,8 +69,9 @@ Now you can start the full Fortis pipeline with one command:
 docker-compose up --build
 ```
 
-After all the Docker services started, head over to the following URLs to play
-with the services:
+This will start all the Docker services and gather logs in the terminal. After
+all the Docker services started, head over to the following URLs to play with
+the services:
 
 * Frontend
   - http://localhost:8888/#/site/Fortis%20Dev/admin
@@ -82,6 +83,12 @@ with the services:
   - http://localhost:8889/api/tiles/graphiql
 * Spark
   - http://localhost:7777/jobs/
+
+After making changes, you can re-build and re-start the affected services using:
+
+```sh
+docker-compose up --build -d
+```
 
 ### Production deployment
 
