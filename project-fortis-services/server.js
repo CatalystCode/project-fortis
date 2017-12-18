@@ -12,7 +12,7 @@ const graphqlHTTP = require('express-graphql');
 
 const initializeAppInsights = require('./src/clients/appinsights/AppInsightsClient').setup;
 const initializeCassandra = require('./src/clients/cassandra/CassandraConnector').initialize;
-const auth = require('./src/auth');
+const initializeAuth = require('./src/auth').initialize;
 
 const EdgesSchema = require('./src/schemas/EdgesSchema');
 const MessageSchema = require('./src/schemas/MessageSchema');
@@ -30,7 +30,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
-auth.initialize(app);
+initializeAuth(app);
 
 app.use('/api/messages', graphqlHTTP({
   schema: MessageSchema,
