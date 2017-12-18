@@ -90,8 +90,7 @@ function transformWatchlist(item, translatedlanguage) {
 
 function getSiteDefintion() {
   return new Promise((resolve, reject) => {
-    const siteByIdQuery = 'SELECT * FROM fortis.sitesettings';
-    cassandraConnector.executeQuery(siteByIdQuery, [])
+    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings', [])
       .then(rows => {
         if (rows.length < 1) return reject('Could not find site with sitename');
         if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
