@@ -14,6 +14,8 @@ readonly storage_account_name="${11}"
 readonly storage_account_key="${12}"
 readonly fortis_admins="${13}"
 readonly fortis_users="${14}"
+readonly site_name="${15}"
+readonly site_type="${16}"
 
 # setup
 mkdir -p "/tmp/fortis-services"
@@ -68,6 +70,10 @@ spec:
           value: ${fortis_admins}
         - name: FORTIS_CASSANDRA_USERS
           value: ${fortis_users}
+        - name: FORTIS_CASSANDRA_SITE_NAME
+          value: ${site_name}
+        - name: FORTIS_CASSANDRA_SITE_TYPE
+          value: ${site_type}
         image: cwolff/project_fortis_services
         name: project-fortis-services
         ports:

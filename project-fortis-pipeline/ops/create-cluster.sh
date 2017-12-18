@@ -52,7 +52,9 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${storage_account_name}" \
   "${storage_account_key}" \
   "${fortis_admins}" \
-  "${fortis_users}"
+  "${fortis_users}" \
+  "${site_name}" \
+  "${site_type}"
 while :; do
    fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
    if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
@@ -67,10 +69,6 @@ echo "Finished. Now setting up fortis react frontend."
     "${storage_account_key}" \
     "${fortis_interface_container}" \
     "${fortis_interface_host}"
-
-echo "Finished. Now setting up site entry."
-if ! (command -v python >/dev/null); then sudo apt-get -qq install -y python; fi
-./create-site.py "${graphql_service_host}" "${site_name}" "${site_type}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \

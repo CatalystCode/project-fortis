@@ -16,6 +16,10 @@ has_seed_data() {
   echo 'SELECT eventid FROM fortis.events LIMIT 100;' | cassandra_exec | grep -q '(100 rows)'
 }
 
+has_site() {
+  echo 'SELECT * FROM fortis.sitesettings;' | cassandra_exec | grep -q '(1 rows)'
+}
+
 get_sitename() {
   echo 'COPY fortis.sitesettings(sitename) TO STDOUT;' | cassandra_exec | tr -d '\r'
 }
@@ -68,6 +72,14 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
   cassandra_exec < import.cql
   cd -
   echo "...done, Fortis sample data is now ingested"
+fi
+
+# set up site entry
+if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ] && ! has_site; then
+  echo "Got Fortis site name and type, ingesting default site settings..."
+  npm run createsite -- "$FORTIS_CASSANDRA_SITE_NAME" "$FORTIS_CASSANDRA_SITE_TYPE"
+  if [ $? -ne 0 ]; then echo "Failed to create site!" >&2; exit 1; fi
+  echo "...done, Fortis default site is now ingested"
 fi
 
 # set up cognitive services secrets if preconfigured

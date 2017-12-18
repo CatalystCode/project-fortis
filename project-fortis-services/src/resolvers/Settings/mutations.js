@@ -3,47 +3,10 @@
 const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const blobStorageClient = require('../../clients/storage/BlobStorageClient');
 const streamingController = require('../../clients/streaming/StreamingController');
 const { withRunTime, limitForInClause, requiresRole } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
-
-const {
-  fortisCentralAssetsHost
-} = require('../../../config').storage;
-
-function _insertTopics(siteType) {
-  return new Promise((resolve, reject) => {
-    if (!siteType || !siteType.length) return reject('insertTopics: siteType is not defined');
-
-    const uri = `${fortisCentralAssetsHost}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
-    let mutations = [];
-    blobStorageClient.fetchJson(uri)
-      .then(response => {
-        return response.map(topic => ({
-          query: `INSERT INTO fortis.watchlist (topicid,topic,lang_code,translations,insertiontime,category)
-                VALUES (?, ?, ?, ?, toTimestamp(now()), ?);`,
-          params: [uuid(), topic.topic, topic.lang_code, topic.translations, topic.category || '']
-        }));
-      })
-      .then(response => {
-        mutations = response;
-        return cassandraConnector.executeBatchMutations(response);
-      })
-      .then(() => {
-        streamingController.notifyWatchlistUpdate();
-      })
-      .then(() => {
-        resolve({
-          numTopicsInserted: mutations.length
-        });
-      })
-      .catch(reject);
-  });
-}
-
-const insertTopics = trackEvent(_insertTopics, 'Settings.Topics.Insert', (response, err) => ({numTopicsInserted: err ? 0 : response.numTopicsInserted}));
 
 function editSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
@@ -104,58 +67,6 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
             cogVisionSvcToken: args.input.cogVisionSvcToken,
             featureservicenamespace: args.input.featureservicenamespace,
             translationSvcToken: args.input.translationSvcToken
-          }
-        });
-      })
-      .catch(reject);
-  });
-}
-
-function createSite(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    const siteType = args && args.input && args.input.siteType;
-    if (!siteType || !siteType.length) return reject(`siteType for sitename ${args.input.name} is not defined`);
-
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?;', [args.input.name])
-      .then(rows => {
-        if (!rows || !rows.length) return insertTopics(siteType);
-        else if (rows.length == 1) return reject(`Site with sitename ${args.input.name} already exists.`);
-        else return reject(`(${rows.length}) number of sites with sitename ${args.input.name} already exist.`);
-      })
-      .then(() => {
-        return cassandraConnector.executeBatchMutations([{
-          query: `INSERT INTO fortis.sitesettings (
-          geofence,
-          defaultzoom,
-          logo,
-          title,
-          sitename,
-          languages,
-          insertiontime
-        ) VALUES (?,?,?,?,?,?,toTimestamp(now()))`,
-          params: [
-            args.input.targetBbox,
-            args.input.defaultZoomLevel,
-            args.input.logo,
-            args.input.title,
-            args.input.name,
-            args.input.supportedLanguages
-          ]
-        }]);
-      })
-      .then(() => {
-        streamingController.restartStreaming();
-      })
-      .then(() => {
-        resolve({
-          name: args.input.name,
-          properties: {
-            targetBbox: args.input.targetBbox,
-            defaultZoomLevel: args.input.defaultZoomLevel,
-            logo: args.input.logo,
-            title: args.input.title,
-            defaultLocation: args.input.defaultLocation,
-            supportedLanguages:args.input.supportedLanguages
           }
         });
       })
@@ -435,7 +346,6 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  createSite: requiresRole(trackEvent(createSite, 'createSite'), 'admin'),
   removeSite: requiresRole(trackEvent(removeSite, 'removeSite'), 'admin'),
   modifyStreams: requiresRole(trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()), 'admin'),
   removeKeywords: requiresRole(trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()), 'admin'),

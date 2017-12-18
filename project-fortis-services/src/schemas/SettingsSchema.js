@@ -14,7 +14,6 @@ module.exports = graphql.buildSchema(`
   }
 
   type Mutation {
-    createSite(input: EditableSiteSettings!): Site
     removeKeywords(input: MutatedTerms): TermCollection
     addKeywords(input: MutatedTerms): TermCollection
     removeSite(input: EditableSiteSettings!): Site

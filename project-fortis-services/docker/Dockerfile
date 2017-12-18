@@ -48,6 +48,12 @@ ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/
 # reference other files in the archive, e.g. for cql `copy from` commands
 ENV FORTIS_CASSANDRA_SEED_DATA_URL=""
 
+# if no seed data is specified, use the following two variables to set up the
+# Fortis site site types include 'climate', 'health' and 'humanitarian' and
+# drive default terms that the pipeline will monitor
+ENV FORTIS_CASSANDRA_SITE_NAME=""
+ENV FORTIS_CASSANDRA_SITE_TYPE=""
+
 # active directory configuration
 # you can set up your own application via https://apps.dev.microsoft.com/
 # click "add platform" -> "web" -> make sure that "allow implicit flow" is
