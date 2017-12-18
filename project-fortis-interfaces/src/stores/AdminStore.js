@@ -41,7 +41,6 @@ export const AdminStore = Fluxxor.createStore({
             constants.ADMIN.LOAD_TOPICS, this.handleLoadTopics,
             constants.ADMIN.LOAD_TRUSTED_SOURCES, this.handleLoadTrustedSources,
             constants.ADMIN.LOAD_FAIL, this.handleLoadPayloadFail,
-            constants.ADMIN.CREATE_SITE, this.handleCreateSite,
             constants.ADMIN.LOAD_BLACKLIST, this.handleLoadBlacklist,
             constants.ADMIN.PUBLISHED_EVENTS, this.handlePublishedCustomEvents
         );
@@ -182,14 +181,6 @@ export const AdminStore = Fluxxor.createStore({
         this.emit("change");
     },
 
-    handleCreateSite(response){
-        const {siteName, action} = response;
-        this.dataStore.siteList.push({name: siteName});
-        this.dataStore.action = action;
-        this.emit("change");
-    },
-
-    
     handleLoadPayloadFail(payload) {
         this.dataStore.error = payload.error;
     }
