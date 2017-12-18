@@ -4,9 +4,10 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { requiresRole, tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
+const { tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { computeWeightedAvg } = require('../../utils/collections');
+const { requiresRole } = require('../../auth');
 
 const DETAIL_ZOOM_LEVEL = 5;
 

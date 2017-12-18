@@ -4,7 +4,7 @@ const streamingController = require('../../clients/streaming/StreamingController
 const eventHubSender = require('../../clients/eventhub/EventHubSender');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const restartPipelineExtraProps = require('../../clients/appinsights/LoggingClient').restartPipelineExtraProps;
-const { requiresRole } = require('../shared');
+const { requiresRole } = require('../../auth');
 
 function restartPipeline(args, res) { // eslint-disable-line no-unused-vars
   return streamingController.restartPipeline();

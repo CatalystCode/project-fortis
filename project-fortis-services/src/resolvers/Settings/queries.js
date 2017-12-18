@@ -2,9 +2,10 @@
 
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { withRunTime, getTermsByCategory, getSiteDefintion, requiresRole } = require('../shared');
+const { withRunTime, getTermsByCategory, getSiteDefintion } = require('../shared');
 const { trackException, trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
+const { requiresRole } = require('../../auth');
 
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {

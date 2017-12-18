@@ -4,10 +4,11 @@ const Promise = require('promise');
 const moment = require('moment');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { requiresRole, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
+const { getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
+const { requiresRole } = require('../../auth');
 
 function eventToFeature(row) {
   const FeatureType = 'MultiPoint';

@@ -4,7 +4,8 @@ const Promise = require('promise');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, BlacklistPlaceList, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics, requiresRole } = require('../shared');
+const { tilesForBbox, BlacklistPlaceList, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { requiresRole } = require('../../auth');
 const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 

@@ -4,9 +4,10 @@ const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const streamingController = require('../../clients/streaming/StreamingController');
-const { withRunTime, limitForInClause, requiresRole } = require('../shared');
+const { withRunTime, limitForInClause } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
+const { requiresRole } = require('../../auth');
 
 function editSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
