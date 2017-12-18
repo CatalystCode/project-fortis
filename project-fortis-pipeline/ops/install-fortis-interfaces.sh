@@ -6,6 +6,7 @@ readonly blob_account_name="$3"
 readonly blob_account_key="$4"
 readonly blob_container_name="$5"
 readonly fortis_interface_host="$6"
+readonly aad_client="$7"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
@@ -23,6 +24,7 @@ mv "$package_json" ./package.json
 # build the frontend
 REACT_APP_SERVICE_HOST="${graphql_service_host}" \
 REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}" \
+REACT_APP_AD_CLIENT_ID="${aad_client}" \
 npm run build
 
 # deploy the frontend to blob storage

@@ -29,6 +29,9 @@
         "cassandraNodes": {
             "value": 5
         },
+        "activeDirectoryClientId": {
+            "value": ""
+        },
         "fortisAdmins": {
             "value": ""
         },

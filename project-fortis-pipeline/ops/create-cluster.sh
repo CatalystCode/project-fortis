@@ -15,6 +15,7 @@ readonly site_type="${12}"
 readonly agent_vm_size="${13}"
 readonly fortis_admins="${14}"
 readonly fortis_users="${15}"
+readonly aad_client="${16}"
 
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
@@ -54,7 +55,8 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${fortis_admins}" \
   "${fortis_users}" \
   "${site_name}" \
-  "${site_type}"
+  "${site_type}" \
+  "${aad_client}"
 while :; do
    fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
    if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
@@ -68,7 +70,8 @@ echo "Finished. Now setting up fortis react frontend."
     "${storage_account_name}" \
     "${storage_account_key}" \
     "${fortis_interface_container}" \
-    "${fortis_interface_host}"
+    "${fortis_interface_host}" \
+    "${aad_client}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \

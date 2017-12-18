@@ -14,6 +14,7 @@ Arguments
   --subscription_id|-si              [Required] : Subscription Id
   --tenant_id|-ti                    [Required] : Tenant Id
   --user_name|-un                    [Required] : Admin user name for the Kubernetes cluster
+  --aad_client|-ad                   [Required] : Active Directory Client Id to use for this deployment
   --fortis_admins|-fa                [Required] : Email addresses of fortis admins, comma separated
   --fortis_users|-fu                 [Required] : Email addresses of fortis users, comma separated
   --resource_group|-rg               [Required] : Resource group containing your Kubernetes cluster
@@ -62,6 +63,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --user_name|-un)
       user_name="$1"
+      shift
+      ;;
+    --aad_client|-ad)
+      aad_client="$1"
       shift
       ;;
     --fortis_admins|-fa)
@@ -206,6 +211,7 @@ throw_if_empty --app_key "${app_key}"
 throw_if_empty --subscription_id "${subscription_id}"
 throw_if_empty --tenant_id "${tenant_id}"
 throw_if_empty --user_name "${user_name}"
+throw_if_empty --aad_client "${aad_client}"
 throw_if_empty --fortis_admins "${fortis_admins}"
 throw_if_empty --fortis_users "${fortis_users}"
 throw_if_empty --resource_group "${resource_group}"
@@ -267,4 +273,5 @@ echo "Finished. Setting up cluster"
     "${site_type}" \
     "${agent_vm_size}" \
     "${fortis_admins}" \
-    "${fortis_users}"
+    "${fortis_users}" \
+    "${aad_client}"
