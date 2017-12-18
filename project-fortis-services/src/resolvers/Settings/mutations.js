@@ -5,7 +5,7 @@ const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const blobStorageClient = require('../../clients/storage/BlobStorageClient');
 const streamingController = require('../../clients/streaming/StreamingController');
-const { withRunTime, limitForInClause } = require('../shared');
+const { withRunTime, limitForInClause, requiresRole } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 
@@ -445,14 +445,14 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
 module.exports = {
   createOrReplaceSite: createOrReplaceSite,
-  createSite: trackEvent(createSite, 'createSite'),
-  removeSite: trackEvent(removeSite, 'removeSite'),
-  modifyStreams: trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()),
-  removeKeywords: trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
-  addKeywords: trackEvent(withRunTime(addKeywords), 'addKeywords', loggingClient.addKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()),
-  editSite: trackEvent(withRunTime(editSite), 'editSite'),
-  modifyBlacklist: trackEvent(withRunTime(modifyBlacklist), 'modifyBlacklist'),
-  removeBlacklist: trackEvent(withRunTime(removeBlacklist), 'removeBlacklist'),
-  addTrustedSources: trackEvent(withRunTime(addTrustedSources), 'addTrustedSources', loggingClient.addTrustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()),
-  removeTrustedSources: trackEvent(withRunTime(removeTrustedSources), 'removeTrustedSources', loggingClient.removeTrustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics())
+  createSite: requiresRole(trackEvent(createSite, 'createSite'), 'admin'),
+  removeSite: requiresRole(trackEvent(removeSite, 'removeSite'), 'admin'),
+  modifyStreams: requiresRole(trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()), 'admin'),
+  removeKeywords: requiresRole(trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()), 'admin'),
+  addKeywords: requiresRole(trackEvent(withRunTime(addKeywords), 'addKeywords', loggingClient.addKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()), 'admin'),
+  editSite: requiresRole(trackEvent(withRunTime(editSite), 'editSite'), 'admin'),
+  modifyBlacklist: requiresRole(trackEvent(withRunTime(modifyBlacklist), 'modifyBlacklist'), 'admin'),
+  removeBlacklist: requiresRole(trackEvent(withRunTime(removeBlacklist), 'removeBlacklist'), 'admin'),
+  addTrustedSources: requiresRole(trackEvent(withRunTime(addTrustedSources), 'addTrustedSources', loggingClient.addTrustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()), 'admin'),
+  removeTrustedSources: requiresRole(trackEvent(withRunTime(removeTrustedSources), 'removeTrustedSources', loggingClient.removeTrustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()), 'admin')
 };

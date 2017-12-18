@@ -2,7 +2,7 @@
 
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { withRunTime, getTermsByCategory, getSiteDefintion } = require('../shared');
+const { withRunTime, getTermsByCategory, getSiteDefintion, requiresRole } = require('../shared');
 const { trackException, trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 
@@ -118,9 +118,9 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  sites: trackEvent(withRunTime(sites), 'sites'),
-  streams: trackEvent(withRunTime(streams), 'streams', loggingClient.streamsExtraProps(), loggingClient.streamsExtraMetrics()),
-  siteTerms: trackEvent(withRunTime(terms), 'terms', loggingClient.termsExtraProps(), loggingClient.keywordsExtraMetrics()),
-  trustedSources: trackEvent(withRunTime(trustedSources), 'trustedSources', loggingClient.trustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()),
-  termBlacklist: trackEvent(withRunTime(termBlacklist), 'termBlacklist')
+  sites: requiresRole(trackEvent(withRunTime(sites), 'sites'), 'user'),
+  streams: requiresRole(trackEvent(withRunTime(streams), 'streams', loggingClient.streamsExtraProps(), loggingClient.streamsExtraMetrics()), 'user'),
+  siteTerms: requiresRole(trackEvent(withRunTime(terms), 'terms', loggingClient.termsExtraProps(), loggingClient.keywordsExtraMetrics()), 'user'),
+  trustedSources: requiresRole(trackEvent(withRunTime(trustedSources), 'trustedSources', loggingClient.trustedSourcesExtraProps(), loggingClient.trustedSourcesExtraMetrics()), 'user'),
+  termBlacklist: requiresRole(trackEvent(withRunTime(termBlacklist), 'termBlacklist'), 'user')
 };

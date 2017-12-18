@@ -12,6 +12,8 @@ readonly fortis_central_directory="${9}"
 readonly sb_conn_str="${10}"
 readonly storage_account_name="${11}"
 readonly storage_account_key="${12}"
+readonly fortis_admins="${13}"
+readonly fortis_users="${14}"
 
 # setup
 mkdir -p "/tmp/fortis-services"
@@ -62,6 +64,10 @@ spec:
           value: ${storage_account_name}
         - name: USER_FILES_BLOB_ACCOUNT_KEY
           value: ${storage_account_key}
+        - name: FORTIS_CASSANDRA_ADMINS
+          value: ${fortis_admins}
+        - name: FORTIS_CASSANDRA_USERS
+          value: ${fortis_users}
         image: cwolff/project_fortis_services
         name: project-fortis-services
         ports:

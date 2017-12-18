@@ -4,7 +4,7 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
+const { requiresRole, tilesForBbox, withRunTime, toConjunctionTopics } = require('../shared');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const { computeWeightedAvg } = require('../../utils/collections');
 
@@ -105,6 +105,6 @@ function fetchTileIdsByPlaceId(args, res) { // eslint-disable-line no-unused-var
 }
 
 module.exports = {
-  heatmapFeaturesByTile: trackEvent(withRunTime(heatmapFeaturesByTile), 'heatmapFeaturesByTile'),
-  fetchTileIdsByPlaceId: trackEvent(withRunTime(fetchTileIdsByPlaceId), 'fetchTileIdsByPlaceId')
+  heatmapFeaturesByTile: requiresRole(trackEvent(withRunTime(heatmapFeaturesByTile), 'heatmapFeaturesByTile'), 'user'),
+  fetchTileIdsByPlaceId: requiresRole(trackEvent(withRunTime(fetchTileIdsByPlaceId), 'fetchTileIdsByPlaceId'), 'user')
 };

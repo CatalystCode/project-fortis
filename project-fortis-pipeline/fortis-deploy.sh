@@ -14,6 +14,8 @@ Arguments
   --subscription_id|-si              [Required] : Subscription Id
   --tenant_id|-ti                    [Required] : Tenant Id
   --user_name|-un                    [Required] : Admin user name for the Kubernetes cluster
+  --fortis_admins|-fa                [Required] : Email addresses of fortis admins, comma separated
+  --fortis_users|-fu                 [Required] : Email addresses of fortis users, comma separated
   --resource_group|-rg               [Required] : Resource group containing your Kubernetes cluster
   --master_fqdn|-mf                  [Required] : Master FQDN of your Kubernetes cluster
   --storage_account_name|-san        [Required] : Storage Account name used for Kubernetes's persistent storage
@@ -60,6 +62,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --user_name|-un)
       user_name="$1"
+      shift
+      ;;
+    --fortis_admins|-fa)
+      fortis_admins="$1"
+      shift
+      ;;
+    --fortis_users|-fu)
+      fortis_users="$1"
       shift
       ;;
     --site_name|-sn)
@@ -196,6 +206,8 @@ throw_if_empty --app_key "${app_key}"
 throw_if_empty --subscription_id "${subscription_id}"
 throw_if_empty --tenant_id "${tenant_id}"
 throw_if_empty --user_name "${user_name}"
+throw_if_empty --fortis_admins "${fortis_admins}"
+throw_if_empty --fortis_users "${fortis_users}"
 throw_if_empty --resource_group "${resource_group}"
 throw_if_empty --master_fqdn "${master_fqdn}"
 throw_if_empty --storage_account_name "${storage_account_name}"
@@ -253,4 +265,6 @@ echo "Finished. Setting up cluster"
     "${storage_account_key}" \
     "${checkpointfileshare}" \
     "${site_type}" \
-    "${agent_vm_size}"
+    "${agent_vm_size}" \
+    "${fortis_admins}" \
+    "${fortis_users}"

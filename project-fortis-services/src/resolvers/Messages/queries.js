@@ -4,7 +4,7 @@ const Promise = require('promise');
 const moment = require('moment');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
+const { requiresRole, getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
@@ -269,10 +269,10 @@ function translateWords(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  byBbox: trackEvent(withRunTime(byBbox), 'messagesForBbox'),
-  byEdges: trackEvent(withRunTime(byEdges), 'messagesForEdges'),
-  byPipeline: trackEvent(withRunTime(byPipeline), 'messagesForPipeline'),
-  event: trackEvent(event, 'messageForEvent'),
-  translate: trackEvent(translate, 'translate'),
-  translateWords: trackEvent(translateWords, 'translateWords')
+  byBbox: requiresRole(trackEvent(withRunTime(byBbox), 'messagesForBbox'), 'user'),
+  byEdges: requiresRole(trackEvent(withRunTime(byEdges), 'messagesForEdges'), 'user'),
+  byPipeline: requiresRole(trackEvent(withRunTime(byPipeline), 'messagesForPipeline'), 'user'),
+  event: requiresRole(trackEvent(event, 'messageForEvent'), 'user'),
+  translate: requiresRole(trackEvent(translate, 'translate'), 'user'),
+  translateWords: requiresRole(trackEvent(translateWords, 'translateWords'), 'user')
 };

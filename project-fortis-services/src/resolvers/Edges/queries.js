@@ -4,7 +4,7 @@ const Promise = require('promise');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, BlacklistPlaceList, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { tilesForBbox, BlacklistPlaceList, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics, requiresRole } = require('../shared');
 const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
@@ -350,10 +350,10 @@ function conjunctiveTopics(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  popularLocations: trackEvent(withRunTime(withCsvExporter(popularLocations, 'edges')), 'popularLocations'),
-  timeSeries: trackEvent(withCsvExporter(timeSeries, 'graphData'), 'timeSeries'),
-  topTerms: trackEvent(withCsvExporter(topTerms, 'edges'), 'topTerms'),
-  geofenceplaces: trackEvent(withRunTime(withCsvExporter(locations, 'places')), 'locations'),
-  conjunctiveTopics: trackEvent(withCsvExporter(conjunctiveTopics, 'edges'), 'conjunctiveTopics'),
-  topSources: trackEvent(withCsvExporter(topSources, 'edges'), 'topSources')
+  popularLocations: requiresRole(trackEvent(withRunTime(withCsvExporter(popularLocations, 'edges')), 'popularLocations'), 'user'),
+  timeSeries: requiresRole(trackEvent(withCsvExporter(timeSeries, 'graphData'), 'timeSeries'), 'user'),
+  topTerms: requiresRole(trackEvent(withCsvExporter(topTerms, 'edges'), 'topTerms'), 'user'),
+  geofenceplaces: requiresRole(trackEvent(withRunTime(withCsvExporter(locations, 'places')), 'locations'), 'user'),
+  conjunctiveTopics: requiresRole(trackEvent(withCsvExporter(conjunctiveTopics, 'edges'), 'conjunctiveTopics'), 'user'),
+  topSources: requiresRole(trackEvent(withCsvExporter(topSources, 'edges'), 'topSources'), 'user')
 };

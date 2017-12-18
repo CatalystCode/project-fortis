@@ -17,9 +17,7 @@ function initialize(app) {
   };
 
   const bearerStrategy = new OIDCBearerStrategy(adOptions, (req, token, done) => {
-    const user = {
-      username: token.preferred_username
-    };
+    const user = { identifier: token.preferred_username };
     done(null, user, token);
   });
 

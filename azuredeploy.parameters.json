@@ -29,6 +29,12 @@
         "cassandraNodes": {
             "value": 5
         },
+        "fortisAdmins": {
+            "value": ""
+        },
+        "fortisUsers": {
+            "value": ""
+        },
         "siteType": {
             "value": "humanitarian"
         },

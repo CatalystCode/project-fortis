@@ -20,6 +20,14 @@ get_sitename() {
   echo 'COPY fortis.sitesettings(sitename) TO STDOUT;' | cassandra_exec | tr -d '\r'
 }
 
+ingest_users_with_role() {
+  echo "$2" \
+  | tr ',' '\n' \
+  | sed "s/^\(.*\)$/INSERT INTO fortis.users(identifier, role) VALUES ('\1', '$1') IF NOT EXISTS;/g" \
+  | tr '\n' ' ' \
+  | cassandra_exec
+}
+
 # wait for cassandra to start
 while ! cassandra_exec; do
   echo "Cassandra not yet available, waiting..."
@@ -34,6 +42,21 @@ if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ] && ! has_cassandra_schema; then
   | sed "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" \
   | cassandra_exec
   echo "...done, Fortis schema definition is now ingested"
+fi
+
+# set up users
+if [ -n "$FORTIS_CASSANDRA_USERS" ]; then
+  echo "Got Fortis users, ingesting..."
+  ingest_users_with_role 'user' "$FORTIS_CASSANDRA_USERS"
+  echo "...done, Fortis users are now ingested"
+fi
+
+# set up admins
+if [ -n "$FORTIS_CASSANDRA_ADMINS" ]; then
+  echo "Got Fortis admins, ingesting..."
+  ingest_users_with_role 'user' "$FORTIS_CASSANDRA_ADMINS"
+  ingest_users_with_role 'admin' "$FORTIS_CASSANDRA_ADMINS"
+  echo "...done, Fortis admins are now ingested"
 fi
 
 # set up cassandra seed data
