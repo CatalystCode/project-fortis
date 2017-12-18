@@ -8,7 +8,7 @@ cassandra_exec() {
     "$FORTIS_CASSANDRA_HOST"
 }
 
-has_schema() {
+has_site() {
   echo 'SELECT * FROM fortis.sitesettings;' | cassandra_exec | grep -q '(1 rows)'
 }
 
@@ -23,12 +23,12 @@ while ! cassandra_exec; do
 done
 echo "...done, Cassandra is now available"
 
-# wait for cassandra schema to be defined
-while ! has_schema; do
-  echo "Cassandra schema is not yet complete, waiting..."
+# wait for cassandra site to be defined
+while ! has_site; do
+  echo "Cassandra site is not yet set up, waiting..."
   sleep 10s
 done
-echo "...done, Cassandra schema is now complete"
+echo "...done, Cassandra site is now set up"
 
 # wait for cognitive services secrets if preconfigured
 if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvisionsvctoken" ] && [ -n "$cogtextsvctoken" ]; then
