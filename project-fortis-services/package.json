@@ -62,7 +62,7 @@
   },
   "scripts": {
     "createsite": "node src/scripts/createsite.js",
-    "lint": "eslint ."
+    "lint": "eslint --max-warnings=0 src *.js"
   },
   "generator-swaggerize": {
     "version": "3.1.0"
