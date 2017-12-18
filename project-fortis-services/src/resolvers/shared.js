@@ -88,7 +88,7 @@ function transformWatchlist(item, translatedlanguage) {
   };
 }
 
-function getSiteDefintion() {
+function getSiteDefinition() {
   return new Promise((resolve, reject) => {
     cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings', [])
       .then(rows => {
@@ -257,7 +257,7 @@ module.exports = {
   setTermsCache,
   BlacklistPlaceList,
   transformWatchlist,
-  getSiteDefintion,
+  getSiteDefinition,
   fromTopicListToConjunctionTopics,
   withCsvExporter,
   withRunTime

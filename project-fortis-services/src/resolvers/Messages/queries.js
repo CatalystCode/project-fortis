@@ -4,7 +4,7 @@ const Promise = require('promise');
 const moment = require('moment');
 const translatorService = require('../../clients/translator/MsftTranslator');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { getSiteDefintion, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
+const { getSiteDefinition, parseLimit, withRunTime, tilesForBbox, toPipelineKey, fromTopicListToConjunctionTopics, toConjunctionTopics, limitForInClause } = require('../shared');
 const { makeSet } = require('../../utils/collections');
 const trackEvent = require('../../clients/appinsights/AppInsightsClient').trackEvent;
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
@@ -228,7 +228,7 @@ function event(args, res) { // eslint-disable-line no-unused-vars
 
 function translate(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    getSiteDefintion()
+    getSiteDefinition()
       .then(sitesettings => {
         return translatorService.translate(sitesettings.site.properties.translationSvcToken,
           args.sentence,
@@ -250,7 +250,7 @@ function translate(args, res) { // eslint-disable-line no-unused-vars
 
 function translateWords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    getSiteDefintion()
+    getSiteDefinition()
       .then(sitesettings => {
         return translatorService.translateSentenceArray(
           sitesettings.site.properties.translationSvcToken,
