@@ -22,7 +22,6 @@ module.exports = graphql.buildSchema(`
     modifyStreams(input: StreamListInput!): StreamCollection
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
-    createOrReplaceSite(input: SiteDefinition!): Site
     modifyTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection
     removeTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection
     modifyTrustedTwitterAccounts(input: TrustedTwitterAccountDefintion!): TrustedTwitterAccountCollection

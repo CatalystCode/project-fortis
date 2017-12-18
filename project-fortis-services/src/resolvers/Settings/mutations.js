@@ -13,15 +13,6 @@ const {
   fortisCentralAssetsHost
 } = require('../../../config').storage;
 
-function createOrReplaceSite(args, res) { // eslint-disable-line no-unused-vars
-  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    return reject(
-      'This API call is no longer supported. ' +
-      'Its functionality has been separated into createSite and removeSite.'
-    );
-  });
-}
-
 function _insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     if (!siteType || !siteType.length) return reject('insertTopics: siteType is not defined');
@@ -444,7 +435,6 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
-  createOrReplaceSite: createOrReplaceSite,
   createSite: requiresRole(trackEvent(createSite, 'createSite'), 'admin'),
   removeSite: requiresRole(trackEvent(removeSite, 'removeSite'), 'admin'),
   modifyStreams: requiresRole(trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()), 'admin'),
