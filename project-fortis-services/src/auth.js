@@ -25,7 +25,7 @@ function initialize(app) {
 
   app.use(passport.initialize());
   app.use(passport.session());
-  passport.use(bearerStrategy)
+  passport.use(bearerStrategy);
   app.use('/', passport.authenticate('oauth-bearer', { session: false }));
 }
 

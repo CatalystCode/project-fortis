@@ -11,9 +11,8 @@ const cassandraConnector = require('../clients/cassandra/CassandraConnector');
 
 const BlacklistPlaces = ['colombia'];
 
-const FORTIS_DATA_STORE_TTL = 1200;
-
-const memoryStore = new NodeCache( { stdTTL: FORTIS_DATA_STORE_TTL} );
+const MINUTES = 60;
+const termsCache = new NodeCache( { stdTTL: 20 * MINUTES } );
 
 function termsFilter(term, categoryFilter) {
   if (categoryFilter) {
@@ -29,11 +28,11 @@ function BlacklistPlaceList(){
 }
 
 function getTermsFromCache() {
-  return memoryStore.get('terms');
+  return termsCache.get('terms');
 }
 
 function setTermsCache(terms) {
-  memoryStore.set('terms', terms);
+  termsCache.set('terms', terms);
 }
 
 function getTermsByCategory(translationLanguage, category, ignoreCache) {
@@ -206,12 +205,9 @@ function parseLimit(limit) {
   return limit > 0 ? limit : DEFAULT_LIMIT;
 }
 
-const DEFAULT_CSV_CONTAINER = 'csv-export';
-const DEFAULT_CSV_EXPIRY_MINUTES = 2 * 60;
-
 function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinutes) {
-  container = container || DEFAULT_CSV_CONTAINER;
-  expiryMinutes = expiryMinutes || DEFAULT_CSV_EXPIRY_MINUTES;
+  container = container || 'csv-export';
+  expiryMinutes = expiryMinutes || (2 * MINUTES);
 
   function formatCsvFilename(provenance) {
     const uniqueIdentifier = uuidv4();
