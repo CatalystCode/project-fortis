@@ -126,16 +126,16 @@ function cli() {
   const siteType = process.argv[3];
 
   createSiteWithDefaults(siteName, siteType)
-  .then(result => {
+    .then(result => {
       console.log(`Site ${siteName} of type ${siteType} created!`);
       console.log(result);
       process.exit(0);
-  })
-  .catch(error => {
-    console.error(`Failed to create site ${siteName}.`);
-    console.error(error);
-    process.exit(1);
-  });
+    })
+    .catch(error => {
+      console.error(`Failed to create site ${siteName}.`);
+      console.error(error);
+      process.exit(1);
+    });
 }
 
 cli();
