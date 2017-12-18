@@ -10,7 +10,7 @@ declare resourceGroupName=""
 declare deploymentName=""
 declare resourceGroupLocation=""
 
-readonly scriptDirectory="$(readlink -f $(dirname $0))"
+readonly scriptDirectory="$(readlink -f "$(dirname "$0")")"
 readonly templateFilePath="$scriptDirectory/template.json"
 readonly parametersFilePath="$scriptDirectory/parameters.json"
 readonly outputParserScriptPath="$scriptDirectory/parse-output.py"
