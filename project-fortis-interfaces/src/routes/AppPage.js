@@ -17,7 +17,7 @@ const AdScopes = ['openid'];
 export const AppPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
-  adApplication: new UserAgentApplication(
+  adApplication: reactAppAdClientId ? new UserAgentApplication(
     reactAppAdClientId,
     null,
     (errorMessage, token, error, tokenType) => {
@@ -34,7 +34,7 @@ export const AppPage = createReactClass({
         logger(`AD: ${message}`);
       })
     }
-  ),
+  ) : null,
 
   adHandleError(error) {
     console.error(`AD: ${error}`);
@@ -69,10 +69,14 @@ export const AppPage = createReactClass({
   },
 
   componentDidMount() {
-    const user = this.adApplication.getUser();
-    const token = localStorage.getItem(TokenStoreKey);
-    if (user && token) {
-      this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
+    if (this.adApplication) {
+      const user = this.adApplication.getUser();
+      const token = localStorage.getItem(TokenStoreKey);
+      if (user && token) {
+        this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
+      }
+    } else {
+      console.warn('!!!!!!!!!!!! No Active Directory Client Id configured; auth is disabled !!!!!!!!!!!!');
     }
 
     this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
@@ -83,7 +87,7 @@ export const AppPage = createReactClass({
   },
 
   render() {
-    if (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token) {
+    if (this.adApplication && (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token)) {
       return this.renderLogin();
     }
 
@@ -145,7 +149,7 @@ export const AppPage = createReactClass({
             language={this.state.language}
             supportedLanguages={this.state.supportedLanguages}
             settings={this.state.settings}
-            logoutCallback={this.adLogout}
+            logoutCallback={this.adApplication ? this.adLogout : null}
             userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}
           />
           <div id="main">

@@ -12,6 +12,8 @@ const MINUTES = 60;
 const rolesCache = new NodeCache( { stdTTL: 5 * MINUTES } );
 
 function initialize(app) {
+  if (!adClientId) return console.warn('!!!!!!!!!!!! No Active Directory Client Id configured; auth is disabled !!!!!!!!!!!!');
+
   const adOptions = {
     identityMetadata: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
     clientID: adClientId,
@@ -74,6 +76,8 @@ function checkIfUserHasRoleCached(user, role) {
 }
 
 function requiresRole(promiseFunc, requiredRole) {
+  if (!adClientId) return promiseFunc;
+
   function roleChecker(...args) {
     return new Promise((resolve, reject) => {
       const user = args && args.length >= 2 && args[1].user && args[1].user.identifier;
