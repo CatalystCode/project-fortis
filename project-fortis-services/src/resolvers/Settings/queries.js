@@ -2,7 +2,7 @@
 
 const Promise = require('promise');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { withRunTime, getTermsByCategory, getSiteDefinition } = require('../shared');
+const { PlaceholderForSecret, withRunTime, getTermsByCategory, getSiteDefinition } = require('../shared');
 const { trackException, trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { requiresRole } = require('../../auth');
@@ -21,10 +21,22 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function hideSecret(obj, key) {
+  if (obj[key]) {
+    obj[key] = PlaceholderForSecret;
+  }
+}
+
 function sites(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     getSiteDefinition()
-      .then(resolve)
+      .then(value => {
+        hideSecret(value.site.properties, 'translationSvcToken');
+        hideSecret(value.site.properties, 'cogSpeechSvcToken');
+        hideSecret(value.site.properties, 'cogVisionSvcToken');
+        hideSecret(value.site.properties, 'cogTextSvcToken');
+        resolve(value);
+      })
       .catch(reject);
   });
 }

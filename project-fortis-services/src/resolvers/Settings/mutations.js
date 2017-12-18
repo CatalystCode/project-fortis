@@ -4,7 +4,7 @@ const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const streamingController = require('../../clients/streaming/StreamingController');
-const { withRunTime, limitForInClause } = require('../shared');
+const { PlaceholderForSecret, getSiteDefinition, withRunTime, limitForInClause } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { requiresRole } = require('../../auth');
@@ -14,11 +14,8 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
     const siteName = args && args.input && args.input.name;
     if (!siteName || !siteName.length) return reject('sitename is not defined');
 
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?;', [siteName])
-      .then(rows => {
-        if (rows.length !== 1) return reject(`Site with sitename ${siteName} does not exist.`);
-      })
-      .then(() => {
+    getSiteDefinition()
+      .then(({ site }) => {
         return cassandraConnector.executeBatchMutations([{
           query: `UPDATE fortis.sitesettings
           SET geofence = ?,
@@ -40,11 +37,11 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
             args.input.title,
             args.input.supportedLanguages,
             args.input.defaultLanguage,
-            args.input.cogSpeechSvcToken,
-            args.input.cogTextSvcToken,
-            args.input.cogVisionSvcToken,
+            args.input.cogSpeechSvcToken === PlaceholderForSecret ? site.properties.cogSpeechSvcToken : args.input.cogSpeechSvcToken,
+            args.input.cogTextSvcToken === PlaceholderForSecret ? site.properties.cogTextSvcToken : args.input.cogTextSvcToken,
+            args.input.cogVisionSvcToken === PlaceholderForSecret ? site.properties.cogVisionSvcToken : args.input.cogVisionSvcToken,
             args.input.featureservicenamespace,
-            args.input.translationSvcToken,
+            args.input.translationSvcToken === PlaceholderForSecret ? site.properties.translationSvcToken : args.input.translationSvcToken,
             args.input.name
           ]
         }]);

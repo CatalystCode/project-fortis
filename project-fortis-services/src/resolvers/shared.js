@@ -11,6 +11,8 @@ const cassandraConnector = require('../clients/cassandra/CassandraConnector');
 
 const BlacklistPlaces = ['colombia'];
 
+const PlaceholderForSecret = 'secretHidden';
+
 const MINUTES = 60;
 const termsCache = new NodeCache( { stdTTL: 20 * MINUTES } );
 
@@ -260,5 +262,6 @@ module.exports = {
   getSiteDefinition,
   fromTopicListToConjunctionTopics,
   withCsvExporter,
+  PlaceholderForSecret,
   withRunTime
 };
