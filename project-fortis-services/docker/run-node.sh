@@ -24,14 +24,6 @@ get_sitename() {
   echo 'COPY fortis.sitesettings(sitename) TO STDOUT;' | cassandra_exec | tr -d '\r'
 }
 
-ingest_users_with_role() {
-  echo "$2" \
-  | tr ',' '\n' \
-  | sed "s/^\(.*\)$/INSERT INTO fortis.users(identifier, role) VALUES ('\1', '$1') IF NOT EXISTS;/g" \
-  | tr '\n' ' ' \
-  | cassandra_exec
-}
-
 # wait for cassandra to start
 while ! cassandra_exec; do
   echo "Cassandra not yet available, waiting..."
@@ -51,15 +43,18 @@ fi
 # set up users
 if [ -n "$FORTIS_CASSANDRA_USERS" ]; then
   echo "Got Fortis users, ingesting..."
-  ingest_users_with_role 'user' "$FORTIS_CASSANDRA_USERS"
+  npm run addusers -- 'user' "$FORTIS_CASSANDRA_USERS"
+  if [ $? -ne 0 ]; then echo "Failed to ingest users!" >&2; exit 1; fi
   echo "...done, Fortis users are now ingested"
 fi
 
 # set up admins
 if [ -n "$FORTIS_CASSANDRA_ADMINS" ]; then
   echo "Got Fortis admins, ingesting..."
-  ingest_users_with_role 'user' "$FORTIS_CASSANDRA_ADMINS"
-  ingest_users_with_role 'admin' "$FORTIS_CASSANDRA_ADMINS"
+  npm run addusers -- 'user' "$FORTIS_CASSANDRA_ADMINS"
+  if [ $? -ne 0 ]; then echo "Failed to ingest admins!" >&2; exit 1; fi
+  npm run addusers -- 'admin' "$FORTIS_CASSANDRA_ADMINS"
+  if [ $? -ne 0 ]; then echo "Failed to ingest admins!" >&2; exit 1; fi
   echo "...done, Fortis admins are now ingested"
 fi
 
