@@ -1,26 +1,45 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.summary
 
 import com.google.common.base.Strings.isNullOrEmpty
+import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 
 trait Summarizer extends Serializable {
   def summarize(text: String): Option[String]
 }
 
 object KeywordSummarizer {
+  def createSummary(keyword: String, keywordIndexInWords: Int, words: List[String], maxLeft: Int, maxLength: Int): String = {
+    var leftSummaryLength = 0
+    val leftSummary = words.take(keywordIndexInWords).reverse.takeWhile(word => {
+      val canFit = leftSummaryLength + word.length < maxLeft
+      leftSummaryLength += word.length
+      canFit
+    }).reverse.mkString("").trim()
+
+    var rightSummaryLength = leftSummary.length
+    val rightSummary = words.drop(keywordIndexInWords).takeWhile(word => {
+      val canFit = rightSummaryLength + word.length < maxLength
+      rightSummaryLength += word.length
+      canFit
+    }).mkString("").trim()
+
+    leftSummary + ' ' + rightSummary
+  }
+
   val MAX_CHARACTER_LIMIT = 200
   val MAX_LEFT_CHARACTERS = 20
+  val MAX_DISPLAYED_KEYWORDS = 3
+  val DELIMITER_BETWEEN_KEYWORD_SUMMARIES = "…"
 }
 
 @SerialVersionUID(100L)
 class KeywordSummarizer(
   keywords: List[String],
   maxLeftCharacters: Int = KeywordSummarizer.MAX_LEFT_CHARACTERS,
-  maxLength: Int = KeywordSummarizer.MAX_CHARACTER_LIMIT
+  maxLength: Int = KeywordSummarizer.MAX_CHARACTER_LIMIT,
+  maxDisplayedKeywords: Int = KeywordSummarizer.MAX_DISPLAYED_KEYWORDS
 ) extends Summarizer {
 
-  /**
-   * @see https://github.com/CatalystCode/project-fortis-azure-functions/blob/5e8ec0d7a71be875a6d668abd372955c81f431c0/postgresMessagePusher/index.js#L81-L104
-   */
   override def summarize(sentence: String): Option[String] = {
     if (keywords.isEmpty || isNullOrEmpty(sentence)) {
       return None
@@ -29,36 +48,17 @@ class KeywordSummarizer(
       return Some(sentence)
     }
 
-    val trimmedSentence = sentence.replaceAll("\\s+", " ")
-
-    val keywordFirstOccurrence = indexOfFirstKeywordFound(trimmedSentence.toLowerCase())
-    if (keywordFirstOccurrence == -1) {
+    val words = Tokenizer(sentence.replaceAll("\\s+", " ")).toList
+    val lowerWords = words.map(_.toLowerCase)
+    val matchedKeywords = keywords.map(keyword => (keyword, lowerWords.indexOf(keyword.toLowerCase))).filter(keywordAndIndex => keywordAndIndex._2 != -1).take(maxDisplayedKeywords).sortBy(keywordAndIndex => keywordAndIndex._2)
+    if (matchedKeywords.isEmpty) {
       return Some(keywords.mkString(" "))
     }
-    if (keywordFirstOccurrence < maxLeftCharacters) {
-      return Option(trimmedSentence.substring(0, if (trimmedSentence.length > maxLength) maxLength else trimmedSentence.length))
-    }
 
-    var leftIndex = 0
-    var i = keywordFirstOccurrence - 1
-    while (i > 0 && (keywordFirstOccurrence - i) < maxLeftCharacters) {
-      if (trimmedSentence.charAt(i) == ' ') {
-        leftIndex = i
-      }
-      i -= 1
-    }
+    val spaceForDelimiters = (matchedKeywords.length - 1) * KeywordSummarizer.DELIMITER_BETWEEN_KEYWORD_SUMMARIES.length
+    val maxLeftPerSummary = maxLeftCharacters / matchedKeywords.length
+    val maxLengthPerSummary = (maxLength - spaceForDelimiters) / matchedKeywords.length
 
-    Option(trimmedSentence.substring(leftIndex + 1, if (leftIndex + maxLength < trimmedSentence.length) leftIndex + maxLength else trimmedSentence.length))
+    Some(matchedKeywords.map(keywordAndIndex => KeywordSummarizer.createSummary(keywordAndIndex._1, keywordAndIndex._2, words, maxLeftPerSummary, maxLengthPerSummary)).mkString(KeywordSummarizer.DELIMITER_BETWEEN_KEYWORD_SUMMARIES))
   }
-
-  private def indexOfFirstKeywordFound(sentence: String): Int = {
-    for (k <- keywords) {
-      val index = sentence.indexOf(k.toLowerCase())
-      if (index != -1) {
-        return index
-      }
-    }
-    return -1
-  }
-
 }

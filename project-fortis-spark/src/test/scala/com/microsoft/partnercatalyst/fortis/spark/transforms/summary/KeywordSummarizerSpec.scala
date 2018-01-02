@@ -32,11 +32,24 @@ class KeywordSummarizerSpec extends FlatSpec {
 
     assert(summarizer.summarize(
       """
+        | TUNIS/ROME (Reuters) - An armed group is stopping migrant boats from setting off across the Mediterranean from a city west of Tripoli that has been a springboard for people smugglers, causing a sudden drop in departures over the past month, sources in the area said.
+        |
+        | The revelation throws new light on the sharp reduction in migrant arrivals from Italy, which took over from the Aegean route as the main focus of European concerns in the crisis.
+        |
+        | Arrivals in Italy from North Africa, the main route for migration to Europe this year, dropped by more than 50 percent in July from a year earlier, and August arrivals so far are down even further. July and August are peak months for migrant boats because of favorable sea conditions.
+      """.stripMargin).contains("arrivals from Italy, which took over from the Aegean route as the main focus of European concerns in the crisis. Arrivals in Italy from North Africa, the main route for migration to Europe this year,"))
+  }
+
+  it should "summarize long text with multiple keyword hits" in {
+    val summarizer = new KeywordSummarizer(List("italy", "city"))
+
+    assert(summarizer.summarize(
+      """
       | TUNIS/ROME (Reuters) - An armed group is stopping migrant boats from setting off across the Mediterranean from a city west of Tripoli that has been a springboard for people smugglers, causing a sudden drop in departures over the past month, sources in the area said.
       |
       | The revelation throws new light on the sharp reduction in migrant arrivals from Italy, which took over from the Aegean route as the main focus of European concerns in the crisis.
       |
       | Arrivals in Italy from North Africa, the main route for migration to Europe this year, dropped by more than 50 percent in July from a year earlier, and August arrivals so far are down even further. July and August are peak months for migrant boats because of favorable sea conditions.
-      """.stripMargin).contains("arrivals from Italy, which took over from the Aegean route as the main focus of European concerns in the crisis. Arrivals in Italy from North Africa, the main route for migration to Europe this year,"))
+      """.stripMargin).contains("from a city west of Tripoli that has been a springboard for people smugglers, causing a sudden drop…from Italy, which took over from the Aegean route as the main focus of European concerns in the"))
   }
 }
