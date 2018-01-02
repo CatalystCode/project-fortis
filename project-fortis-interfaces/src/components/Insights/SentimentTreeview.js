@@ -71,23 +71,6 @@ export default class SentimentTreeview extends React.Component {
             children: []
         };
 
-        let popularItemsRoot = {
-            name: 'Top 5 Terms',
-            folderKey: 'top5Keywords',
-            checked: true,
-            toggled: true,
-            children: []
-        };
-
-        let otherItemsRoot = {
-            name: 'Other Terms',
-            folderKey: 'otherKeywords',
-            checked: true,
-            toggled: true,
-            children: []
-        };
-
-        let itemCount = 0;
         let popularTermsTotal = 0, otherTotal = 0;
 
         conjunctivetopics.forEach(topic => {
@@ -102,26 +85,9 @@ export default class SentimentTreeview extends React.Component {
                 eventCount: mentions
             });
 
-            if (itemCount++ < 5) {
-                newEntry.parent = popularItemsRoot;
-                popularItemsRoot.children.push(newEntry);
-                popularTermsTotal += enabledConjunctiveTerm ? mentions : 0;
-            } else {
-                newEntry.parent = otherItemsRoot;
-                otherItemsRoot.children.push(newEntry);
-                otherTotal += enabledConjunctiveTerm ? mentions : 0;
-            }
+            otherTotal += enabledConjunctiveTerm ? mentions : 0;
+            rootItem.children.push(newEntry);
         });
-
-        if (popularItemsRoot.children < 5) {
-            popularItemsRoot.name = "Terms";
-        }
-
-        rootItem.children.push(popularItemsRoot);
-
-        if (otherItemsRoot.children.length > 0) {
-            rootItem.children.push(otherItemsRoot);
-        }
 
         rootItem.eventCount = popularTermsTotal + otherTotal;
 
