@@ -76,11 +76,13 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
   function eventTracker(...args) {
     return new Promise((resolve, reject) => {
       const start = new Date();
+      const user = (args && args.length >= 2 && args[1].user && args[1].user.identifier) || "";
       promiseFunc(...args)
         .then(returnValue => {
           const properties = extraPropsFunc(returnValue, null);
           properties.duration = new Date() - start;
           properties.success = true;
+          properties.user = user;
           const metrics = extraMetricsFunc(returnValue, null);
           if (client) {
             client.trackEvent(eventName, properties, metrics);
