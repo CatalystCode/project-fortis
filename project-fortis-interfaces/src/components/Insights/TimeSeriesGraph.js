@@ -96,20 +96,21 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     render() {
-        const ActionButtons = [<FlatButton key="reload-button"
-            icon={<ActionTimeline color={fullWhite} />}
-            label="Reload with Range"
-            primary={true}
-            onClick={this.handleDataFetch} />,
-        <FlatButton key="reset-button"
-            icon={<ActionTimeline color={fullWhite} />}
-            label="Reset Selection"
-            primary={true}
-            onClick={this.resetTimeline} />
+        const actionButtons = [
+            <FlatButton key="reload-button"
+                icon={<ActionTimeline color={fullWhite} />}
+                label="Reload with Range"
+                primary={true}
+                onClick={this.handleDataFetch} />,
+            <FlatButton key="reset-button"
+                icon={<ActionTimeline color={fullWhite} />}
+                label="Reset Selection"
+                primary={true}
+                onClick={this.resetTimeline} />,
         ];
 
         return (
-            <GraphCard cardActions={ActionButtons}>
+            <GraphCard cardActions={actionButtons}>
                 <Timeline fill={constants.CHART_STYLE.BG_FILL}
                     data={this.props.timeSeriesGraphData.graphData}
                     dataKey="date"
