@@ -75,12 +75,16 @@ function checkIfUserHasRoleCached(user, role) {
   });
 }
 
+function getUserFromArgs(...args) {
+  return (args && args.length >= 2 && args[1].user && args[1].user.identifier) || '';
+}
+
 function requiresRole(promiseFunc, requiredRole) {
   if (!adClientId) return promiseFunc;
 
   function roleChecker(...args) {
     return new Promise((resolve, reject) => {
-      const user = args && args.length >= 2 && args[1].user && args[1].user.identifier;
+      const user = getUserFromArgs(...args);
       if (!user) return reject('Unknown user');
 
       checkIfUserHasRoleCached(user, requiredRole)
@@ -99,5 +103,6 @@ function requiresRole(promiseFunc, requiredRole) {
 
 module.exports = {
   requiresRole,
+  getUserFromArgs,
   initialize
 };

@@ -2,6 +2,8 @@ const {
   appinsightsInstrumentationkey
 } = require('../../../config').appinsights;
 
+const { getUserFromArgs } = require('../../auth');
+
 let client;
 let consoleLog = console.log;
 let consoleError = console.error;
@@ -76,7 +78,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
   function eventTracker(...args) {
     return new Promise((resolve, reject) => {
       const start = new Date();
-      const user = (args && args.length >= 2 && args[1].user && args[1].user.identifier) || '';
+      const user = getUserFromArgs(...args);
       promiseFunc(...args)
         .then(returnValue => {
           const properties = extraPropsFunc(returnValue, null);
