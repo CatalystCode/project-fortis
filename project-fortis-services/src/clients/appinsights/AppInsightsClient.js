@@ -99,7 +99,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
           properties.user = user;
           const metrics = extraMetricsFunc(null, err);
           if (client) {
-            client.trackEvent(eventName, properties);
+            client.trackEvent(eventName, properties, metrics);
           }
           console.error(JSON.stringify({event: eventName, properties, metrics, err, args: args && args.length && args[0]}));
           reject(err);
