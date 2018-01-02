@@ -24,7 +24,7 @@ class KeywordSummarizerSpec extends FlatSpec {
 
   it should "return keywords separated by space" in {
     val summarizer = new KeywordSummarizer(List("abc", "123"))
-    assert(summarizer.summarize("As simple as do re mi. Baby, you and me girl. As simple as do re mi. Baby, you and me girl. As simple as do re mi. Baby, you and me girl.") == Some("abc 123"))
+    assert(summarizer.summarize("As simple as do re mi. Baby, you and me girl. As simple as do re mi. Baby, you and me girl. As simple as do re mi. Baby, you and me girl.").contains("abc 123"))
   }
 
   it should "summarize long text" in {
