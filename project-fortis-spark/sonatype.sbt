@@ -1,5 +1,5 @@
 pomExtra in Global := {
-  <url>github.com/CatalystCode/project-fortis-mono</url>
+  <url>github.com/CatalystCode/project-fortis</url>
     <licenses>
       <license>
         <name>MIT</name>
@@ -7,9 +7,9 @@ pomExtra in Global := {
       </license>
     </licenses>
     <scm>
-      <connection>scm:git:github.com/CatalystCode/project-fortis-mono</connection>
-      <developerConnection>scm:git:git@github.com:CatalystCode/project-fortis-mono</developerConnection>
-      <url>github.com/CatalystCode/project-fortis-mono</url>
+      <connection>scm:git:github.com/CatalystCode/project-fortis</connection>
+      <developerConnection>scm:git:git@github.com:CatalystCode/project-fortis</developerConnection>
+      <url>github.com/CatalystCode/project-fortis</url>
     </scm>
     <developers>
       <developer>

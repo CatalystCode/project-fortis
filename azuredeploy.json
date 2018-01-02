@@ -185,7 +185,7 @@
         "virtualNetworkName": "FortisVNet",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
-        "githubClonePath": "https://github.com/CatalystCode/project-fortis-mono.git",
+        "githubClonePath": "https://github.com/CatalystCode/project-fortis.git",
         "sbNamespace": "[concat('sbns', parameters('siteName'))]",
         "sbQueueNameConfiguration": "configuration",
         "sbQueueNameCommand": "command",
@@ -537,7 +537,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/CatalystCode/project-fortis-mono/master/project-fortis-pipeline/fortis-deploy.sh"
+                        "https://raw.githubusercontent.com/CatalystCode/project-fortis/master/project-fortis-pipeline/fortis-deploy.sh"
                     ],
                     "commandToExecute": "[concat('./fortis-deploy.sh', ' -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -pf \"', parameters('dnsNamePrefix'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -gc \"', variables('githubClonePath'), '\" -avms \"', parameters('agentVMSize'), '\"')]"
                 }

@@ -2,7 +2,7 @@
 
 Project Fortis comes with an admin page with which you can edit site configurations and also provide details on how events should be monitored and processed. Through the admin site, you will be able to configure site settings, blacklist terms, whitelist terms (watchlist), streams (twitter, facebook, etc.), monitored places, and trusted sources.
 
-Once you deployed a site with `deploy to azure`, you may view the admin site by navigating to the admin url, specified in the `Tags` tab in the Azure portal: `FORTIS_ADMIN_INTERFACE_URL`. Click [here](https://github.com/CatalystCode/project-fortis-mono#setting-up-a-new-azure-deployment) and scroll down to the `Tags` step for more information about `FORTIS_ADMIN_INTERFACE_URL` and how to view the admin site.
+Once you deployed a site with `deploy to azure`, you may view the admin site by navigating to the admin url, specified in the `Tags` tab in the Azure portal: `FORTIS_ADMIN_INTERFACE_URL`. Click [here](https://github.com/CatalystCode/project-fortis#setting-up-a-new-azure-deployment) and scroll down to the `Tags` step for more information about `FORTIS_ADMIN_INTERFACE_URL` and how to view the admin site.
 
 ## Site Settings
 

@@ -1,6 +1,6 @@
-# project-fortis-mono
+# project-fortis
 
-[![Travis CI status](https://api.travis-ci.org/CatalystCode/project-fortis-mono.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis-mono)
+[![Travis CI status](https://api.travis-ci.org/CatalystCode/project-fortis.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis)
 
 ## Background
 
@@ -43,8 +43,8 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 First, you need to get the code:
 
 ```sh
-git clone https://github.com/CatalystCode/project-fortis-mono.git
-cd project-fortis-mono
+git clone https://github.com/CatalystCode/project-fortis.git
+cd project-fortis
 ```
 
 Then, you need to set up some services in Azure:
@@ -110,7 +110,7 @@ docker-compose up --build -d
 
 Hit the deploy to Azure button below:
 
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.svg)](https://deploy.azure.com/?repository=https://github.com/catalystcode/project-fortis-mono/tree/master?ptmpl=azuredeploy.parameters.json)
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.svg)](https://deploy.azure.com/?repository=https://github.com/catalystcode/project-fortis/tree/master?ptmpl=azuredeploy.parameters.json)
 
 Fill in the wizard that comes up:
 
