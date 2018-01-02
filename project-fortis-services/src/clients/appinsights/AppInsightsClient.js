@@ -76,7 +76,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
   function eventTracker(...args) {
     return new Promise((resolve, reject) => {
       const start = new Date();
-      const user = (args && args.length >= 2 && args[1].user && args[1].user.identifier) || "";
+      const user = (args && args.length >= 2 && args[1].user && args[1].user.identifier) || '';
       promiseFunc(...args)
         .then(returnValue => {
           const properties = extraPropsFunc(returnValue, null);
