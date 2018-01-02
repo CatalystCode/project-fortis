@@ -94,6 +94,7 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
           const properties = extraPropsFunc(null, err);
           properties.duration = new Date() - start;
           properties.success = false;
+          properties.user = user;
           const metrics = extraMetricsFunc(null, err);
           if (client) {
             client.trackEvent(eventName, properties);
