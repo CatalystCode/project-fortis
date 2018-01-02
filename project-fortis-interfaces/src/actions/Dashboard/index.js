@@ -117,7 +117,8 @@ const methods = {
             if (!error) {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
             } else {
-                console.error(`[${error}] occured while fetching edges or site defintion`);
+                const { message, code } = error;
+                console.error(`${code}: error [${message}] occured while fetching edges or site defintion`);
                 self.dispatch(constants.DASHBOARD.INITIALIZE, { error });
             }
         });
