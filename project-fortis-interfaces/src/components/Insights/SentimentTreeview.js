@@ -167,21 +167,22 @@ export default class SentimentTreeview extends React.Component {
         const decoratorsOverride = {
             Header: (props, ref) => {
                 const style = props.style;
-                let self = this;
+                const isParentNode = props.node.name === parentTermsName;
                 const termStyle = { paddingLeft: '3px', fontWeight: 800, fontSize: '14px', color: '#337ab7', width: '100%' };
                 const categoryStyle = { paddingLeft: '3px', fontSize: '14px', color: '#fff', display: 'inline-table', fontWeight: 600 };
-                let badgeClass = (props.node.checked || props.node.children) && props.node.eventCount > 0 ? "badge" : "badge badge-disabled";
-                let isNodeTypeCategory = props.node.children && props.node.children.length > 0;
-                let termClassName = !isNodeTypeCategory ? "relevantTerm" : "";
-        
+                const badgeClass = (props.node.checked || props.node.children) && props.node.eventCount > 0 ? "badge" : "badge badge-disabled";
+                const isNodeTypeCategory = props.node.children && props.node.children.length > 0;
+                const termClassName = !isNodeTypeCategory ? "relevantTerm" : "";
+                const checkboxClicked = !isParentNode ? () => this.onToggle(props.node) : () => {};
+                const termClicked = !isParentNode ? () => self.termSelected(props.node) : () => {};
+
                 return (
                     <div className="row" style={!props.node.highlighted || props.node.children ? style.base : style.baseHighlight} >
                         <div className="col-md-10" style={style.title}>
-                            <input type="checkbox" onChange={()=>self.onToggle(props.node)}
-                                checked={props.node.checked} />
-                            <span className={termClassName} onClick={() => self.termSelected(props.node)} style={!isNodeTypeCategory ? termStyle : categoryStyle}>{props.node.name} </span>
+                            {!isParentNode ? <input type="checkbox" onChange={checkboxClicked} checked={props.node.checked} /> : undefined}
+                            <span className={termClassName} onClick={termClicked} style={!isNodeTypeCategory ? termStyle : categoryStyle}>{props.node.name} </span>
                         </div>
-                        <div style={props.node.name === parentTermsName ? style.parentBadge : style.badge} className="col-md-2">
+                        <div style={isParentNode ? style.parentBadge : style.badge} className="col-md-2">
                             {
                                 props.node.eventCount && props.node.eventCount > 0 ?
                                     <span className={badgeClass}>{numeralLibs(props.node.eventCount).format(props.node.eventCount > 1000 ? '+0.0a' : '0a')}</span>
