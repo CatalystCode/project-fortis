@@ -49,7 +49,7 @@ export default class TimeSeriesGraph extends React.Component {
         }
     }
 
-    dateFormat(time) {
+    dateFormat = (time) => {
         let validDatetimeTypes = ["day"];
         let format = validDatetimeTypes.indexOf(this.props.timespanType || "") > -1 ? "h:mm a" : this.props.timespanType === "week" ? "ddd h a" : "MMM-DD - ha";
         return moment(time).format(format);
@@ -60,7 +60,7 @@ export default class TimeSeriesGraph extends React.Component {
         this.refreshChart(this.props, initialLoad);
     }
 
-    dateRangeChanged(range, obj) {
+    dateRangeChanged = (range, obj) => {
         const { startIndex, endIndex } = range;
         this.range = { startIndex, endIndex };
     }
@@ -75,11 +75,11 @@ export default class TimeSeriesGraph extends React.Component {
         return moment(dateString).format(format);
     }
 
-    resetTimeline() {
+    resetTimeline = () => {
         this.props.refreshDashboardFunction();
     }
 
-    handleDataFetch() {
+    handleDataFetch = () => {
         const { dataSource, timespanType, bbox, selectedplace, termFilters, timeSeriesGraphData, zoomLevel, externalsourceid, maintopic } = this.props;
         const { startIndex, endIndex } = this.range;
         const fromDateSlice = timeSeriesGraphData.graphData[startIndex];
@@ -100,12 +100,12 @@ export default class TimeSeriesGraph extends React.Component {
             icon={<ActionTimeline color={fullWhite} />}
             label="Reload with Range"
             primary={true}
-            onClick={() => this.handleDataFetch()} />,
+            onClick={this.handleDataFetch} />,
         <FlatButton key="reset-button"
             icon={<ActionTimeline color={fullWhite} />}
             label="Reset Selection"
             primary={true}
-            onClick={event => this.resetTimeline(event)} />
+            onClick={this.resetTimeline} />
         ];
 
         return (
@@ -113,8 +113,8 @@ export default class TimeSeriesGraph extends React.Component {
                 <Timeline fill={constants.CHART_STYLE.BG_FILL}
                     data={this.props.timeSeriesGraphData.graphData}
                     dataKey="date"
-                    dateRangeChanged={(range, ob) => this.dateRangeChanged(range, ob)}
-                    tickFormatter={time => this.dateFormat(time)}>
+                    dateRangeChanged={this.dateRangeChanged}
+                    tickFormatter={this.dateFormat}>
                     {this.state.lines}
                 </Timeline>
             </GraphCard>
