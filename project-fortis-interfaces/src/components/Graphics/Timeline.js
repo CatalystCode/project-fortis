@@ -6,8 +6,14 @@ const toNumericDisplay = (decimal, fixed = 0) => {
     return numeralLibs(decimal).format(decimal > 1000 ? '+0.0a' : '0a');
 };
 
-class Timeline extends Component {
-    
+function highestCountFirst(item1, item2) {
+    if (!item1 || !item1.value) return -1;
+    if (!item2 || !item2.value) return 1;
+    return item1.value < item2.value;
+}
+
+export default class Timeline extends Component {
+
     render() {
         return (
             <ResponsiveContainer>
@@ -17,7 +23,7 @@ class Timeline extends Component {
                     <XAxis dataKey={this.props.dataKey}
                         tickFormatter={this.props.tickFormatter}/>
                     <YAxis type="number" tickFormatter={toNumericDisplay}/>
-                    <Tooltip />
+                    <Tooltip itemSorter={highestCountFirst} />
                     <Brush height={25}
                         onChange={range=>this.props.dateRangeChanged(range)}
                         dataKey={this.props.dataKey} >
@@ -35,5 +41,3 @@ class Timeline extends Component {
         );
     }
 }
-
-export default Timeline;
