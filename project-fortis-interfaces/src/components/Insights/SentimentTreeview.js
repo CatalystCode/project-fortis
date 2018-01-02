@@ -72,7 +72,7 @@ export default class SentimentTreeview extends React.Component {
             folderKey: conjunctionterm,
             checked: termFilters.has(conjunctionterm),
             eventCount: mentions
-        }));
+        })).filter(({ name }) => name && name.trim() !== "");
 
         return {
             eventCount: termsMentions,
