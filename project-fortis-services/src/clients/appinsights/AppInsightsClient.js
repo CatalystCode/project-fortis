@@ -82,8 +82,8 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
       promiseFunc(...args)
         .then(returnValue => {
           const properties = extraPropsFunc(returnValue, null);
-          properties.duration = new Date() - start;
-          properties.success = true;
+          properties.duration = (new Date() - start).toString();
+          properties.success = 'true';
           properties.user = user;
           const metrics = extraMetricsFunc(returnValue, null);
           if (client) {
@@ -94,8 +94,8 @@ function trackEvent(promiseFunc, eventName, extraPropsFunc, extraMetricsFunc) {
         })
         .catch(err => {
           const properties = extraPropsFunc(null, err);
-          properties.duration = new Date() - start;
-          properties.success = false;
+          properties.duration = (new Date() - start).toString();
+          properties.success = 'false';
           properties.user = user;
           const metrics = extraMetricsFunc(null, err);
           if (client) {
