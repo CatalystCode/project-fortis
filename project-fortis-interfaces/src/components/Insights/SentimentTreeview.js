@@ -64,34 +64,23 @@ export default class SentimentTreeview extends React.Component {
     createRelevantTermsTree(props) {
         const { conjunctivetopics, language, termFilters, allSiteTopics, defaultLanguage } = props;
 
-        let rootItem = {
+        const termsMentions = conjunctivetopics.reduce((total, { mentions, conjunctionterm }) =>
+            termFilters.has(conjunctionterm) ? total + mentions : total, 0);
+
+        const termsChildren = conjunctivetopics.map(({ mentions, conjunctionterm }) => ({
+            name: fetchTermFromMap(allSiteTopics, conjunctionterm, language, defaultLanguage).translatedname,
+            folderKey: conjunctionterm,
+            checked: termFilters.has(conjunctionterm),
+            eventCount: mentions
+        }));
+
+        return {
+            eventCount: termsMentions,
             name: parentTermsName,
             folderKey: 'associatedKeywords',
             toggled: true,
-            children: []
+            children: termsChildren
         };
-
-        let popularTermsTotal = 0, otherTotal = 0;
-
-        conjunctivetopics.forEach(topic => {
-            const { mentions, conjunctionterm } = topic;
-            const edge = fetchTermFromMap(allSiteTopics, conjunctionterm, language, defaultLanguage);
-            const enabledConjunctiveTerm = termFilters.has(conjunctionterm);
-
-            let newEntry = Object.assign({}, {
-                name: edge.translatedname,
-                folderKey: conjunctionterm,
-                checked: enabledConjunctiveTerm,
-                eventCount: mentions
-            });
-
-            otherTotal += enabledConjunctiveTerm ? mentions : 0;
-            rootItem.children.push(newEntry);
-        });
-
-        rootItem.eventCount = popularTermsTotal + otherTotal;
-
-        return rootItem;
     }
 
     onToggle(node, toggled) {
