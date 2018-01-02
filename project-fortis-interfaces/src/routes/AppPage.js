@@ -38,6 +38,7 @@ export const AppPage = createReactClass({
 
   adHandleError(error) {
     console.error(`AD: ${error}`);
+    localStorage.removeItem(TokenStoreKey);
   },
 
   adHandleToken(token) {
