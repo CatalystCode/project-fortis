@@ -21,7 +21,7 @@ function initialize(app) {
     issuer: null,
     passReqToCallback: true,
     allowMultiAudiencesInToken: false,
-    loggingLevel: 'info'
+    loggingLevel: 'warn'
   };
 
   const bearerStrategy = new OIDCBearerStrategy(adOptions, (req, token, done) => {
