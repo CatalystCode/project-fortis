@@ -174,7 +174,7 @@ export default class SentimentTreeview extends React.Component {
                 const isNodeTypeCategory = props.node.children && props.node.children.length > 0;
                 const termClassName = !isNodeTypeCategory ? "relevantTerm" : "";
                 const checkboxClicked = !isParentNode ? () => this.onToggle(props.node) : () => {};
-                const termClicked = !isParentNode ? () => self.termSelected(props.node) : () => {};
+                const termClicked = !isParentNode ? () => this.termSelected(props.node) : () => {};
 
                 return (
                     <div className="row" style={!props.node.highlighted || props.node.children ? style.base : style.baseHighlight} >
