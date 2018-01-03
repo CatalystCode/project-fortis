@@ -72,7 +72,7 @@ export default class DataSelector extends React.Component {
   }
 
     handleDatePickerChange = (dateObject, dateStr) => {
-        let formatter = constants.TIMESPAN_TYPES[this.state.timeType];
+        const formatter = constants.TIMESPAN_TYPES[this.state.timeType];
         this.refreshDashboard(momentToggleFormats(dateStr, formatter.reactWidgetFormat, formatter.format), this.state.timeType);
         this.setState({ timeType: 'customDatePlaceholder' });
     }
