@@ -127,7 +127,11 @@ export default class TimeSeriesGraph extends React.Component {
         return (
             <GraphCard cardActions={this.renderActionButtons()} cardHeader={cardHeader}>
                 <Timeline fill={constants.CHART_STYLE.BG_FILL}
-                    data={this.props.timeSeriesGraphData.graphData}
+                    data={this.props.timeSeriesGraphData.graphData.map(graphData => {
+                        const localizedGraphData = Object.assign({}, graphData);
+                        localizedGraphData.date = this.momentFormat(graphData.date, 'lll');
+                        return localizedGraphData;
+                    })}
                     dataKey="date"
                     dateRangeChanged={this.dateRangeChanged}
                     tickFormatter={this.dateFormat}>
