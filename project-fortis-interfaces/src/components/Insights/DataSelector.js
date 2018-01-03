@@ -56,11 +56,11 @@ export default class DataSelector extends React.Component {
     }
 
     handleChangeDate = (event, index, value) => {
-        var selectionOption = TimeSelectionOptions[index];
+        const selectionOption = TimeSelectionOptions[index];
 
-        if(selectionOption.timeType.startsWith("custom")){
+        if (selectionOption.timeType.startsWith("custom")) {
             this.setState({timeType: value});
-        }else{
+        } else {
             this.refreshDashboard(value, selectionOption.timeType);
         }
     }
