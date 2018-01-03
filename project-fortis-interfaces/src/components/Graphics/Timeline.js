@@ -25,7 +25,7 @@ export default class Timeline extends Component {
                     <YAxis type="number" tickFormatter={toNumericDisplay}/>
                     <Tooltip itemSorter={highestCountFirst} />
                     <Brush height={25}
-                        onChange={range=>this.props.dateRangeChanged(range)}
+                        onChange={this.props.dateRangeChanged}
                         dataKey={this.props.dataKey} >
                         <AreaChart data={this.props.data} fill={this.props.fill}>
                             <CartesianGrid />
