@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { fetchTermFromMap, hasChanged } from './shared';
 import WordCloud from '../Graphics/WordCloud';
+import NoData from '../Graphics/NoData';
 import ReactTooltip from 'react-tooltip'
 import numeralLibs from 'numeral';
 import { getSentimentAttributes } from './shared';
@@ -113,17 +114,19 @@ export default class TopicCloud extends Component {
     }
 
     render() {
+        if (!this.state.dataProvider || !this.state.dataProvider.length) {
+            return <NoData />;
+        }
+
         return (
             <div>
-                {this.state.dataProvider.length ?
-                    <WordCloud
-                        words={this.state.dataProvider}
-                        minSize={DefaultMinSize}
-                        maxSize={DefaultMaxSize}
-                        customRenderer={this.customRenderer}
-                        onClick={this.handleClick}
-                    /> : undefined
-                }
+                <WordCloud
+                    words={this.state.dataProvider}
+                    minSize={DefaultMinSize}
+                    maxSize={DefaultMaxSize}
+                    customRenderer={this.customRenderer}
+                    onClick={this.handleClick}
+                />
                 <div>
                     <ReactTooltip />
                 </div>

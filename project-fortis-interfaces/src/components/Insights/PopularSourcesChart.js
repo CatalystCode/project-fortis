@@ -1,5 +1,6 @@
 import React from 'react';
 import DoughnutChart from '../Graphics/DoughnutChart';
+import NoData from '../Graphics/NoData';
 import { Cell } from 'recharts';
 import constants from '../../actions/constants';
 import { hasChanged, extractHostnameIfExists } from './shared';
@@ -53,6 +54,10 @@ export default class PopularSourcesChart extends React.Component {
     }
 
     render() {
+        if (!this.state.colorsCells || !this.state.colorCells.length) {
+            return <NoData />;
+        }
+
         return (
             <DoughnutChart handleClick={(data, activeIndex) => this.handleClick(data, activeIndex)}
                 fill={constants.CHART_STYLE.BG_FILL}

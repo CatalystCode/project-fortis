@@ -2,6 +2,7 @@ import React from 'react';
 import { Area } from 'recharts';
 import moment from 'moment';
 import GraphCard from '../Graphics/GraphCard';
+import NoData from '../Graphics/NoData';
 import constants from '../../actions/constants';
 import { FromToDateFormat } from '../../utils/Utils';
 import { fetchTermFromMap, hasChanged } from './shared';
@@ -131,6 +132,14 @@ export default class TimeSeriesGraph extends React.Component {
         const cardHeader = {
             title: 'Timeline'
         };
+
+        if (!this.state.lines.length) {
+            return (
+                <GraphCard cardHeader={cardHeader}>
+                    <NoData />
+                </GraphCard>
+            );
+        }
 
         return (
             <GraphCard cardActions={this.renderActionButtons()} cardHeader={cardHeader}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { SERVICES } from '../../services/Dashboard';
 import '../../styles/Insights/ActivityFeed.css';
+import NoData from '../Graphics/NoData';
 import styles from '../../styles/Insights/ActivityFeed';
 import Infinite from 'react-infinite';
 import { Tabs, Tab } from 'material-ui/Tabs';
@@ -242,6 +243,7 @@ export default class ActivityFeed extends React.Component {
                     onChange={this.sourceOnClickHandler}>
                     {this.renderDataSourceTabs(styles.iconStyle)}
                 </Tabs>
+                {renderedElements.length ?
                 <Infinite elementHeight={ActivityConsts.ELEMENT_ITEM_HEIGHT}
                     containerHeight={infiniteScrollHeight - ActivityConsts.NEWS_FEED_SEARCH_CONTAINER_HEIGHT}
                     infiniteLoadBeginEdgeOffset={600}
@@ -271,8 +273,8 @@ export default class ActivityFeed extends React.Component {
                                 handleOpenDialog={this.handleOpenDialog} />;
                         })
                     }
-                </Infinite>
-                <div className="panel-footer clearfix">
+                </Infinite> : <NoData />}
+                {renderedElements.length ? <div className="panel-footer clearfix">
                     <div className="input-group">
                         <input ref="filterTextInput" type="text" placeholder="Filter News Feed .." className="form-control input-sm" />
                         <span className="input-group-btn">
@@ -280,7 +282,7 @@ export default class ActivityFeed extends React.Component {
                             </button>
                         </span>
                     </div>
-                </div>
+                </div> : null}
                 <DialogBox ref="dialogBox" {...this.props}></DialogBox>
             </div>
         );
