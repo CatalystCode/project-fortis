@@ -6,15 +6,19 @@ import constants from '../../actions/constants';
 import { FromToDateFormat } from '../../utils/Utils';
 import { fetchTermFromMap, hasChanged } from './shared';
 import Timeline from '../Graphics/Timeline';
-import FlatButton from 'material-ui/FlatButton';
-import ActionTimeline from 'material-ui/svg-icons/action/timeline';
-import { fullWhite } from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
+import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
+import ContentUndo from 'material-ui/svg-icons/content/undo';
+import { fullWhite, grey800 } from 'material-ui/styles/colors';
+
+const doNothing = () => {};
 
 export default class TimeSeriesGraph extends React.Component {
     constructor(props) {
         super(props);
         this.range = {};
         this.state = {
+            timelineHasBeenCustomized: false,
             lines: []
         };
     }
@@ -63,6 +67,10 @@ export default class TimeSeriesGraph extends React.Component {
     dateRangeChanged = (range, obj) => {
         const { startIndex, endIndex } = range;
         this.range = { startIndex, endIndex };
+
+        if (!this.state.timelineHasBeenCustomized) {
+            this.setState({timelineHasBeenCustomized: true});
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -77,6 +85,7 @@ export default class TimeSeriesGraph extends React.Component {
 
     resetTimeline = () => {
         this.props.refreshDashboardFunction();
+        this.setState({timelineHasBeenCustomized: false});
     }
 
     handleDataFetch = () => {
@@ -96,17 +105,15 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     render() {
+        const { timelineHasBeenCustomized } = this.state;
+
         const actionButtons = [
-            <FlatButton key="reload-button"
-                icon={<ActionTimeline color={fullWhite} />}
-                label="Reload with Range"
-                primary={true}
-                onClick={this.handleDataFetch} />,
-            <FlatButton key="reset-button"
-                icon={<ActionTimeline color={fullWhite} />}
-                label="Reset Selection"
-                primary={true}
-                onClick={this.resetTimeline} />,
+            <IconButton key="reload-button" tooltip="Click to reload dashboard with custom time range defined by the graph above" onClick={timelineHasBeenCustomized ? this.handleDataFetch : doNothing}>
+                <NavigationRefresh color={timelineHasBeenCustomized ? fullWhite : grey800} />
+            </IconButton>,
+            <IconButton key="reset-button" tooltip="Click to reset custom time range in graph above to previous value" onClick={timelineHasBeenCustomized ? this.resetTimeline : doNothing}>
+                <ContentUndo color={timelineHasBeenCustomized ? fullWhite : grey800} />
+            </IconButton>,
         ];
 
         return (
