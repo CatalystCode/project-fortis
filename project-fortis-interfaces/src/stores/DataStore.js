@@ -3,6 +3,7 @@ import constants from '../actions/constants';
 import { momentGetFromToRange } from '../utils/Utils.js';
 import moment from 'moment';
 import { auth } from '../services/shared';
+import { reactAppAdTokenStoreKey } from '../config';
 
 function makeMap(items, keyFunc, valueFunc) {
     let map = new Map();
@@ -106,6 +107,9 @@ export const DataStore = Fluxxor.createStore({
     intializeSettings(graphqlResponse) {
         if (graphqlResponse.error) {
             this.dataStore.error = graphqlResponse.error;
+            if (graphqlResponse.error.code === 401) {
+                localStorage.removeItem(reactAppAdTokenStoreKey);
+            }
             this.emit("change");
             return;
         }
