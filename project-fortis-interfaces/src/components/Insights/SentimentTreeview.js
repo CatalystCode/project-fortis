@@ -140,12 +140,12 @@ export default class SentimentTreeview extends React.Component {
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
     }
 
-    clearTerms(){
+    clearTerms = () => {
         const { maintopic } = this.props;
         this.handleDataFetch(maintopic, []);
     }
 
-    onFilterMouseUp(e) {
+    onFilterMouseUp = (e) => {
         const filter = e.target.value.trim();
 
         if (!filter) { return this.setState({ treeData: this.state.originalTreeData }); }
@@ -200,7 +200,7 @@ export default class SentimentTreeview extends React.Component {
                     <span style={styles.titleSpan}>FILTERS</span>
                     {
                         this.props.termFilters.size > 0 ?
-                            <button type="button" onClick={() => self.clearTerms()} className="btn btn-primary btn-sm">Clear Selections</button>
+                            <button type="button" onClick={this.clearTerms} className="btn btn-primary btn-sm">Clear Selections</button>
                             : undefined
                     }
                 </Subheader>
@@ -244,7 +244,7 @@ export default class SentimentTreeview extends React.Component {
                         <input type="text"
                             className="form-control edgeFilterInput"
                             placeholder="Search the association list..."
-                            onKeyUp={ev=>self.onFilterMouseUp(ev)} />
+                            onKeyUp={this.onFilterMouseUp} />
                     </div>
                 </div>
                 <div className="list-group" data-scrollable="" style={treeviewStyle}>

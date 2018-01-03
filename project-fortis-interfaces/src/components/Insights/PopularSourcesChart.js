@@ -16,7 +16,7 @@ export default class PopularSourcesChart extends React.Component {
         };
     }
 
-    handleClick(data, activeIndex) {
+    handleClick = (data, activeIndex) => {
         const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, selectedplace  } = this.props;
         const { externalsourcename } = data;
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourcename, null, selectedplace);
@@ -59,7 +59,7 @@ export default class PopularSourcesChart extends React.Component {
         }
 
         return (
-            <DoughnutChart handleClick={(data, activeIndex) => this.handleClick(data, activeIndex)}
+            <DoughnutChart handleClick={this.handleClick}
                 fill={constants.CHART_STYLE.BG_FILL}
                 data={this.state.dataProvider}
                 activeIndex={this.state.activeIndex}>

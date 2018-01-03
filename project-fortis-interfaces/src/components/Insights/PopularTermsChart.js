@@ -15,7 +15,7 @@ export default class PopularTermsChart extends React.Component {
         };
     }
 
-    handleClick(data) {
+    handleClick = (data) => {
         const { dataSource, bbox, timespanType, termFilters, datetimeSelection, zoomLevel, externalsourceid, fromDate, toDate, selectedplace } = this.props;
 
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, data.defaultName, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
@@ -70,7 +70,7 @@ export default class PopularTermsChart extends React.Component {
 
     render() {
         return (
-            <DoughnutChart handleClick={data=>this.handleClick(data)}
+            <DoughnutChart handleClick={this.handleClick}
                 fill={constants.CHART_STYLE.BG_FILL}
                 language={this.props.language}
                 data={this.state.dataProvider}
