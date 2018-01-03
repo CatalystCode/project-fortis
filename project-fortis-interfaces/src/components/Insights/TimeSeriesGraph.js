@@ -104,20 +104,24 @@ export default class TimeSeriesGraph extends React.Component {
         }
     }
 
-    render() {
+    renderActionButtons() {
         const { timelineHasBeenCustomized } = this.state;
+        const actionButtonColor = timelineHasBeenCustomized ? fullWhite : grey800;
+        const tooltipHint = !timelineHasBeenCustomized ? ' (Use the slider below the timeline graph above to customize the time range.)' : '';
 
-        const actionButtons = [
-            <IconButton key="reload-button" tooltip="Click to reload dashboard with custom time range defined by the graph above" onClick={timelineHasBeenCustomized ? this.handleDataFetch : doNothing}>
-                <NavigationRefresh color={timelineHasBeenCustomized ? fullWhite : grey800} />
+        return [
+            <IconButton key="reload-button" tooltip={`Click to reload dashboard with custom time range defined by the timeline graph above.${tooltipHint}`} onClick={timelineHasBeenCustomized ? this.handleDataFetch : doNothing}>
+                <NavigationRefresh color={actionButtonColor} />
             </IconButton>,
-            <IconButton key="reset-button" tooltip="Click to reset custom time range in graph above to previous value" onClick={timelineHasBeenCustomized ? this.resetTimeline : doNothing}>
-                <ContentUndo color={timelineHasBeenCustomized ? fullWhite : grey800} />
+            <IconButton key="reset-button" tooltip={`Click to reset custom time range in timeline graph above to previous value.${tooltipHint}`} onClick={timelineHasBeenCustomized ? this.resetTimeline : doNothing}>
+                <ContentUndo color={actionButtonColor} />
             </IconButton>,
         ];
+    }
 
+    render() {
         return (
-            <GraphCard cardActions={actionButtons}>
+            <GraphCard cardActions={this.renderActionButtons()}>
                 <Timeline fill={constants.CHART_STYLE.BG_FILL}
                     data={this.props.timeSeriesGraphData.graphData}
                     dataKey="date"
