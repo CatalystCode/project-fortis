@@ -9,7 +9,7 @@ class LanguagePicker extends React.Component {
 
   render() {
     const languages = this.props.supportedLanguages.map(lang =>
-      <MenuItem key={lang} value={lang} primaryText={lang} />
+      <MenuItem key={lang} value={lang} primaryText={lang} label={`Language: ${lang}`} />
     );
 
     return (
@@ -18,7 +18,6 @@ class LanguagePicker extends React.Component {
         labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
         value={this.props.language}
         autoWidth={true}
-        style={{maxWidth:'60px'}}
         onChange={this.changeLanguage}>
           {languages}
       </SelectField>
