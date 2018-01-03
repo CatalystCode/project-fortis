@@ -2,7 +2,7 @@ import React from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
-class LanguagePicker extends React.Component {
+export default class LanguagePicker extends React.Component {
   changeLanguage = (event, index, value) => {
     this.props.flux.actions.DASHBOARD.changeLanguage(value, this.props.category);
   }
@@ -24,5 +24,3 @@ class LanguagePicker extends React.Component {
     );
   }
 }
-
-export default LanguagePicker;
