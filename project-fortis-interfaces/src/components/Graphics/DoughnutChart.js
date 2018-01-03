@@ -23,7 +23,6 @@ class CustomTooltip extends Component {
 
 export default class DoughnutChart extends Component {
     renderActiveShape = (props) => {
-      const activeIndex = this.props.activeIndex;
       const RADIAN = Math.PI / 180;
       const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
         fill, payload, value } = props;

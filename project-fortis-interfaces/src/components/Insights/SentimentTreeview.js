@@ -159,7 +159,6 @@ export default class SentimentTreeview extends React.Component {
     }
 
     render() {
-        let self = this;
         let treeviewStyle = {
             height: this.props.height - TopRowHeight
         };
