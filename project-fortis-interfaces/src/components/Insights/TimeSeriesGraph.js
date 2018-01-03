@@ -54,8 +54,16 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     dateFormat = (time) => {
-        let validDatetimeTypes = ["day"];
-        let format = validDatetimeTypes.indexOf(this.props.timespanType || "") > -1 ? "h:mm a" : this.props.timespanType === "week" ? "ddd h a" : "MMM-DD - ha";
+        let format;
+
+        if (this.props.timespanType === "day") {
+            format = "h:mm a";
+        } else if (this.props.timespanType === "week") {
+            format = "ddd h a";
+        } else {
+            format = "MMM-DD - ha";
+        }
+
         return moment(time).format(format);
     }
 
