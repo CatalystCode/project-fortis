@@ -11,14 +11,14 @@ import {routes} from './routes/routes';
 import constants from './actions/constants';
 import 'bootstrap/dist/css/bootstrap.css';
 
-let userProfile = constants.USER_PROFILE;
+const userProfile = constants.USER_PROFILE;
 
-let stores = {
+const stores = {
   DataStore: new DataStore(userProfile),
   AdminStore: new AdminStore(),
 };
 
-let flux = new Fluxxor.Flux(stores, Object.assign({}, DashboardActions, AdminActions, FactsActions));
+const flux = new Fluxxor.Flux(stores, Object.assign({}, DashboardActions, AdminActions, FactsActions));
 
 const createElement = (Component, props) => {
     props.flux = flux;
