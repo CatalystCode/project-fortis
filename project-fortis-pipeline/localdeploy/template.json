@@ -141,8 +141,8 @@
             "type": "Microsoft.Storage/storageAccounts",
             "location": "eastus",
             "sku": {
-                "name": "Premium_LRS",
-                "tier": "Premium"
+                "name": "Standard_LRS",
+                "tier": "Standard"
             },
             "name": "[parameters('storageAccounts_fortisblobstorage_name')]",
             "apiVersion": "2016-01-01",
