@@ -6,12 +6,11 @@ import { UserAgentApplication, Logger } from 'msal';
 
 import '../styles/Global.css';
 import Header from '../components/Header';
-import { reactAppAdClientId } from '../config';
+import { reactAppAdClientId, reactAppAdTokenStoreKey } from '../config';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-const TokenStoreKey = 'Fortis.AD.Token';
 const AdScopes = ['openid'];
 
 export const AppPage = createReactClass({
@@ -38,12 +37,12 @@ export const AppPage = createReactClass({
 
   adHandleError(error) {
     console.error(`AD: ${error}`);
-    localStorage.removeItem(TokenStoreKey);
+    localStorage.removeItem(reactAppAdTokenStoreKey);
   },
 
   adHandleToken(token) {
     const user = this.adApplication.getUser();
-    localStorage.setItem(TokenStoreKey, token);
+    localStorage.setItem(reactAppAdTokenStoreKey, token);
     this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
   },
 
@@ -65,14 +64,14 @@ export const AppPage = createReactClass({
 
   adLogout() {
     this.adApplication.logout();
-    localStorage.removeItem(TokenStoreKey);
+    localStorage.removeItem(reactAppAdTokenStoreKey);
     this.getFlux().actions.DASHBOARD.handleAuth(null);
   },
 
   componentDidMount() {
     if (this.adApplication) {
       const user = this.adApplication.getUser();
-      const token = localStorage.getItem(TokenStoreKey);
+      const token = localStorage.getItem(reactAppAdTokenStoreKey);
       if (user && token) {
         this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
       }
