@@ -3,7 +3,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
 class LanguagePicker extends React.Component {
-  changeLanguage(event, index, value) {
+  changeLanguage = (event, index, value) => {
     this.props.flux.actions.DASHBOARD.changeLanguage(value, this.props.category);
   }
 
@@ -19,7 +19,7 @@ class LanguagePicker extends React.Component {
         value={this.props.language}
         autoWidth={true}
         style={{maxWidth:'60px'}}
-        onChange={(event, index, value) => this.changeLanguage(event, index, value)}>
+        onChange={this.changeLanguage}>
           {languages}
       </SelectField>
     );
