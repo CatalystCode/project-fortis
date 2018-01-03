@@ -3,5 +3,5 @@ function getUserFromArgs(...args) {
 }
 
 module.exports = {
-    getUserFromArgs
+  getUserFromArgs
 };
