@@ -11,7 +11,6 @@ export const getAdminSiteDefinition = `query sites {
         logo
         title
         fbToken
-        mapzenApiKey
         defaultLocation
         defaultLanguage
         storageConnectionString

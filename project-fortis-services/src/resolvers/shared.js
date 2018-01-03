@@ -58,7 +58,7 @@ function getTermsByCategory(translationLanguage, category, ignoreCache) {
 
 function cassandraRowToSite(row) {
   // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
-  // storageConnectionString, featuresConnectionString, mapzenApiKey, fbToken.
+  // storageConnectionString, featuresConnectionString, fbToken.
   return {
     name: row.sitename,
     properties: {

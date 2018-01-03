@@ -60,7 +60,6 @@
     "geotile": "^0.1.6",
     "leaflet": "^1.2.0",
     "leaflet-draw": "^0.4.12",
-    "leaflet-geocoder-mapzen": "^1.9.4",
     "leaflet.markercluster": "^1.1.0",
     "leaflet.markercluster.layersupport": "^1.0.5",
     "lodash": "^4.17.4",

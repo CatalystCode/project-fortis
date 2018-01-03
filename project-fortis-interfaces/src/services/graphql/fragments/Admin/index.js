@@ -7,7 +7,6 @@ export const siteSettingsFragment = `fragment FortisSiteDefinitionView on SiteCo
         logo
         title
         fbToken
-        mapzenApiKey
         defaultLocation
         defaultLanguage
         featureservicenamespace

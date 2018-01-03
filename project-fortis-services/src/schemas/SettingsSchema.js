@@ -41,7 +41,6 @@ module.exports = graphql.buildSchema(`
     storageConnectionString: String,
     featuresConnectionString: String,
     featureservicenamespace: String,
-    mapzenApiKey: String,
     fbToken: String,
     supportedLanguages: [String],
     translationSvcToken: String,
@@ -190,7 +189,6 @@ module.exports = graphql.buildSchema(`
     defaultLocation: [Float],
     storageConnectionString: String,
     featuresConnectionString: String,
-    mapzenApiKey: String,
     fbToken: String,
     supportedLanguages: [String]
   }
