@@ -26,11 +26,12 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, ca
     let { configuration, terms, streams } = settings;
     configuration = configuration && configuration.site && configuration.site.properties;
     const dataSources = toDataSources((streams && streams.streams) || []);
+    const siteName = settings.configuration.site.name;
 
     DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel, category, 
       (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
           if (!err) {
-              callback(null, Object.assign({}, { terms, dataSources }, { configuration }, topics ));
+              callback(null, Object.assign({}, { terms, dataSources, siteName }, { configuration }, topics ));
           } else {
               callback(err, null);
           }

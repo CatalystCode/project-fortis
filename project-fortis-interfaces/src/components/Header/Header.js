@@ -53,25 +53,25 @@ class Header extends React.Component {
 
   renderDashboardLink() {
     return (
-      <Link to={`/site/${this.props.siteKey}/`} activeClassName="current">Dashboard</Link>
+      <Link to={`/site/${this.props.siteName}/`} activeClassName="current">Dashboard</Link>
     );
   }
 
   renderFactsLink() {
     return (
-      <Link to={`/site/${this.props.siteKey}/facts/`} activeClassName="current">Facts</Link>
+      <Link to={`/site/${this.props.siteName}/facts/`} activeClassName="current">Facts</Link>
     );
   }
 
   renderPredictionsLink() {
     return (
-      <Link to={`/site/${this.props.siteKey}/predictions/`} activeClassName="current">Predictions</Link>
+      <Link to={`/site/${this.props.siteName}/predictions/`} activeClassName="current">Predictions</Link>
     );
   }
 
   renderAdminLink() {
     return (
-      <Link to={`/site/${this.props.siteKey}/admin/`} activeClassName="current">Settings</Link>
+      <Link to={`/site/${this.props.siteName}/admin/`} activeClassName="current">Settings</Link>
     );
   }
 

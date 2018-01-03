@@ -34,6 +34,7 @@ export const DataStore = Fluxxor.createStore({
             toDate: false,
             settings: {},
             title: "",
+            siteName: "",
             logo: "",
             category :"",
             conjunctivetopics: [],
@@ -114,10 +115,11 @@ export const DataStore = Fluxxor.createStore({
             return;
         }
 
-        const { terms, configuration, topics, dataSources, category, trustedSources } = graphqlResponse;
+        const { terms, configuration, topics, dataSources, category, trustedSources, siteName } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
+        this.dataStore.siteName = siteName;
         this.dataStore.enabledStreams = dataSources;
         this.dataStore.dataSource = constants.DEFAULT_DATA_SOURCE;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);

@@ -91,6 +91,10 @@ export const AppPage = createReactClass({
       return this.renderLogin();
     }
 
+    if (this.state.siteName && this.props.params.siteKey && this.state.siteName !== this.props.params.siteKey) {
+      return this.renderUnknownSite();
+    }
+
     if (this.state.error) {
       return this.renderError();
     }
@@ -125,6 +129,14 @@ export const AppPage = createReactClass({
     );
   },
 
+  renderUnknownSite() {
+    return (
+      <div className="loadingPage">
+        <h1>The site <em>{this.props.params.siteKey}</em> does not exist; try <em>{this.state.siteName}</em></h1>
+      </div>
+    );
+  },
+
   renderLoading() {
     return (
       <div className="loadingPage">
@@ -148,6 +160,7 @@ export const AppPage = createReactClass({
             category={this.props.params.siteKey}
             language={this.state.language}
             supportedLanguages={this.state.supportedLanguages}
+            siteName={this.state.siteName}
             settings={this.state.settings}
             logoutCallback={this.adApplication ? this.adLogout : null}
             userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}
