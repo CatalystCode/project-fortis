@@ -252,7 +252,7 @@ export default class ActivityFeed extends React.Component {
                     loadingSpinnerDelegate={this.elementInfiniteLoad()}
                     isInfiniteLoading={isInfiniteLoading} >
                     {
-                        renderedElements.map(feature => {
+                         renderedElements.map(feature => {
                          const translatedEdges = this.translateTerms(feature.edges).concat([searchValue]);
 
                          return <FortisEvent key={feature.messageid}
