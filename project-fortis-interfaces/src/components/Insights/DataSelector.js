@@ -5,7 +5,6 @@ import momentLocalizer from 'react-widgets/lib/localizers/moment';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import moment from 'moment';
-import DataSourceFilter from './DataSourceFilter';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import { momentGetFromToRange, momentToggleFormats } from '../../utils/Utils.js';
 import '../../styles/Insights/DataSelector.css';
@@ -56,7 +55,7 @@ export default class DataSelector extends React.Component {
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, timeSelection, dateType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
     }
 
-    handleChange = (event, index, value) => {
+    handleChangeDate = (event, index, value) => {
         var selectionOption = TimeSelectionOptions[index];
 
         if(selectionOption.timeType.startsWith("custom")){
@@ -65,6 +64,12 @@ export default class DataSelector extends React.Component {
             this.refreshDashboard(value, selectionOption.timeType);
         }
     }
+
+    handleChangeDataSource = (event, index, value) => {
+      const { timespanType, selectedplace, datetimeSelection, fromDate, toDate, maintopic, bbox, zoomLevel, termFilters, externalsourceid } = this.props;
+
+      this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, value, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
+  }
 
     handleDatePickerChange = (dateObject, dateStr) => {
         let formatter = constants.TIMESPAN_TYPES[this.state.timeType];
@@ -76,7 +81,7 @@ export default class DataSelector extends React.Component {
         return dateType && dateType.startsWith("custom");
     }
 
-    predefinedDateOptions = () => {
+    renderDateOptions = () => {
         return TimeSelectionOptions.map((timeOption, index) => {
             let timeValue;
             let label = timeOption.label;
@@ -140,8 +145,8 @@ export default class DataSelector extends React.Component {
                     underlineStyle={{ borderColor: '#337ab7', borderBottom: 'solid 3px' }}
                     labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
                     value={this.props.datetimeSelection}
-                    onChange={this.handleChange}>
-                        {this.predefinedDateOptions()}
+                    onChange={this.handleChangeDate}>
+                        {this.renderDateOptions()}
                 </SelectField>
             </div>
         );
@@ -152,9 +157,22 @@ export default class DataSelector extends React.Component {
             return null;
         }
 
+        const options = [];
+        for (const [source, value] of this.props.enabledStreams.entries()) {
+            const label = <div><i className={value.icon}></i>&nbsp;{value.display}</div>;
+            const key = `dataSource-${source}-${value.label}`;
+            options.push(<MenuItem key={key} value={source} primaryText={label} />);
+        }
+
         return (
             <div>
-                <DataSourceFilter {...this.props} />
+                <SelectField key="dataSourceSelection"
+                    underlineStyle={{ borderColor: '#337ab7', borderBottom: 'solid 3px' }}
+                    labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
+                    value={this.props.dataSource}
+                    onChange={this.handleChangeDataSource}>
+                        {options}
+                </SelectField>
             </div>
         );
     }
