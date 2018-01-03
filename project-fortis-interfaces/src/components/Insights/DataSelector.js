@@ -42,7 +42,7 @@ export default class DataSelector extends React.Component {
         this.setState({ timeType: '' });
     }
 
-    cancelDateTimePicker() {
+    cancelDateTimePicker = () => {
         this.setState({ timeType: '' });
     }
 
@@ -56,9 +56,9 @@ export default class DataSelector extends React.Component {
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, timeSelection, dateType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
     }
 
-    handleChange(event, index, value) {
+    handleChange = (event, index, value) => {
         var selectionOption = TimeSelectionOptions[index];
-        
+
         if(selectionOption.timeType.startsWith("custom")){
             this.setState({timeType: value});
         }else{
@@ -66,7 +66,7 @@ export default class DataSelector extends React.Component {
         }
     }
 
-    handleDatePickerChange(dateObject, dateStr) {
+    handleDatePickerChange = (dateObject, dateStr) => {
         let formatter = constants.TIMESPAN_TYPES[this.state.timeType];
         this.refreshDashboard(momentToggleFormats(dateStr, formatter.reactWidgetFormat, formatter.format), this.state.timeType);
         this.setState({ timeType: 'customDatePlaceholder' });
@@ -76,73 +76,100 @@ export default class DataSelector extends React.Component {
         return dateType && dateType.startsWith("custom");
     }
 
-    predefinedDateOptions(self) {
-            return TimeSelectionOptions.map((timeOption, index) => {
-                let timeValue;
-                let label = timeOption.label;
+    predefinedDateOptions = () => {
+        return TimeSelectionOptions.map((timeOption, index) => {
+            let timeValue;
+            let label = timeOption.label;
 
-                //if there is no custom date entered then skip adding the customDatePlaceholder option
-                if (timeOption.timeType === 'customDatePlaceholder') {
-                    timeValue = self.props.datetimeSelection;
-                    label = timeValue;
-                    //format the pre defined date option
-                } else if (!timeOption.timeType.startsWith("custom")) {
-                    timeValue = moment().subtract(timeOption.subtractFromNow, timeOption.timeType)
-                    .format(constants.TIMESPAN_TYPES[timeOption.timeType].format);
-                    //Either the custom date or custom date+time options
-                } else {
-                    label = <div><i className="fa fa-calendar"></i>&nbsp;{label}</div>;
-                    timeValue = timeOption.timeType;
-                }
+            //if there is no custom date entered then skip adding the customDatePlaceholder option
+            if (timeOption.timeType === 'customDatePlaceholder') {
+                timeValue = this.props.datetimeSelection;
+                label = timeValue;
+                //format the pre defined date option
+            } else if (!timeOption.timeType.startsWith("custom")) {
+                timeValue = moment().subtract(timeOption.subtractFromNow, timeOption.timeType)
+                .format(constants.TIMESPAN_TYPES[timeOption.timeType].format);
+                //Either the custom date or custom date+time options
+            } else {
+                label = <div><i className="fa fa-calendar"></i>&nbsp;{label}</div>;
+                timeValue = timeOption.timeType;
+            }
 
-                return <MenuItem key={`${timeValue}-${index}`} value={timeValue} primaryText={label} />
-            });
+            return <MenuItem key={`${timeValue}-${index}`} value={timeValue} primaryText={label} />
+        });
     }
 
     render() {
-        let self = this;
-        let showDatePicker = this.state.timeType && this.state.timeType === 'customDate' ? true : false;
-        let showTimePicker = this.state.timeType && this.state.timeType === 'customDateTime' ? true : false;
-        let showMonthSelector = this.state.timeType && this.state.timeType === 'customMonth' ? true : false;
-        let monthSelectorProps = showMonthSelector ? { initialView: "year", finalView: "year" } : {};
-
         return (
             <div className="row dateRow">
                 <div className="col-sm-12 dateFilterColumn">
-                    <div className="input-group dateFilter">
-                        {!showDatePicker && !showTimePicker && !showMonthSelector ?
-                            <SelectField key="dateSelection" underlineStyle={{ borderColor: '#337ab7', borderBottom: 'solid 3px' }}
-                                labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
-                                value={this.props.datetimeSelection}
-                                onChange={(event, index, value)=>this.handleChange(event, index, value)}>
-                                {self.predefinedDateOptions(self)}
-                            </SelectField>
-                            :
-                            <DateTimePicker value={new Date()}
-                                onChange={(dateObject, dateStr)=>this.handleDatePickerChange(dateObject, dateStr)}
-                                format={constants.TIMESPAN_TYPES[this.state.timeType].reactWidgetFormat}
-                                time={showTimePicker} {...monthSelectorProps} />
-                        }
-                    </div>
-                    <div>
-                        {showTimePicker || showDatePicker || showMonthSelector ?
-                            <button id="cancel-button" type="button" className="btn btn-danger btn-sm" onClick={()=>this.cancelDateTimePicker()}>
-                                <span className="fa fa-times-circle-o" aria-hidden="true"></span>&nbsp;Cancel
-                </button>
-                            : undefined
-                        }
-                    </div>
-                    {this.props.hideHeatmapToggle ? null : <div>
-                        <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={()=>this.props.toggleHeatmapSize()}>
-                            <span className="fa fa-expand" aria-hidden="true">
-                            </span>
-                            <span>{this.props.heatmapToggleText}</span>
-                        </button>
-                    </div>}
-                    {this.props.hideDataSourceFilter ? null : <div>
-                        <DataSourceFilter {...this.props} />
-                    </div>}
+                    {this.renderHeatmapToggle()}
+                    {this.renderDataSourceFilter()}
+                    {this.renderDateFilter()}
                 </div>
+            </div>
+        );
+    }
+
+    renderDateFilter() {
+        const showDatePicker = this.state.timeType && this.state.timeType === 'customDate' ? true : false;
+        const showTimePicker = this.state.timeType && this.state.timeType === 'customDateTime' ? true : false;
+        const showMonthSelector = this.state.timeType && this.state.timeType === 'customMonth' ? true : false;
+
+        if (showDatePicker || showTimePicker || showMonthSelector) {
+            const monthSelectorProps = showMonthSelector ? { initialView: "year", finalView: "year" } : {};
+
+            return (
+                <div className="input-group dateFilter">
+                    <DateTimePicker value={new Date()}
+                        onChange={this.handleDatePickerChange}
+                        format={constants.TIMESPAN_TYPES[this.state.timeType].reactWidgetFormat}
+                        time={showTimePicker}
+                        {...monthSelectorProps} />
+
+                    <button id="cancel-button" type="button" className="btn btn-danger btn-sm" onClick={this.cancelDateTimePicker}>
+                        <span className="fa fa-times-circle-o" aria-hidden="true"></span>&nbsp;Cancel
+                    </button>
+                </div>
+            );
+        }
+
+        return (
+            <div className="input-group dateFilter">
+                <SelectField key="dateSelection"
+                    underlineStyle={{ borderColor: '#337ab7', borderBottom: 'solid 3px' }}
+                    labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
+                    value={this.props.datetimeSelection}
+                    onChange={this.handleChange}>
+                        {this.predefinedDateOptions()}
+                </SelectField>
+            </div>
+        );
+    }
+
+    renderDataSourceFilter() {
+        if (this.props.hideDataSourceFilter) {
+            return null;
+        }
+
+        return (
+            <div>
+                <DataSourceFilter {...this.props} />
+            </div>
+        );
+    }
+
+    renderHeatmapToggle() {
+        if (this.props.hideHeatmapToggle) {
+            return null;
+        }
+
+        return (
+            <div>
+                <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={this.props.toggleHeatmapSize}>
+                    <span className="fa fa-expand" aria-hidden="true"></span>
+                    <span>{this.props.heatmapToggleText}</span>
+                </button>
             </div>
         );
     }
