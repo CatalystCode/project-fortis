@@ -25,8 +25,6 @@ export default class TopicCloud extends Component {
     constructor(props) {
         super(props);
 
-        this.handleClick = this.handleClick.bind(this);
-        this.customRenderer = this.customRenderer.bind(this);
         this.state = {
             selectedTopic: "",
             dataProvider: []
@@ -39,7 +37,7 @@ export default class TopicCloud extends Component {
         });
     }
 
-    customRenderer(tag, size, color) {
+    customRenderer = (tag, size, color) => {
         const fontSize = size + 'px';
         const { selectedTopic } = this.state;
         let key = tag.value || tag.defaultName;
@@ -101,7 +99,7 @@ export default class TopicCloud extends Component {
         this.refreshChart(this.props);
     }
 
-    handleClick(data) {
+    handleClick = (data) => {
         const { dataSource, bbox, timespanType, termFilters, datetimeSelection, zoomLevel, externalsourceid, fromDate, toDate, selectedplace } = this.props;
 
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, data.defaultName, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
