@@ -53,15 +53,15 @@ export default class TimeSeriesGraph extends React.Component {
         }
     }
 
-    dateFormat = (time) => {
+    formatAxisLabelDate = (time) => {
         let format;
 
         if (this.props.timespanType === "day") {
-            format = "h:mm a";
+            format = "LT";
         } else if (this.props.timespanType === "week") {
-            format = "ddd h a";
+            format = "ll";
         } else {
-            format = "MMM-DD - ha";
+            format = "l";
         }
 
         return moment(time).format(format);
@@ -142,7 +142,7 @@ export default class TimeSeriesGraph extends React.Component {
                     })}
                     dataKey="date"
                     dateRangeChanged={this.dateRangeChanged}
-                    tickFormatter={this.dateFormat}>
+                    tickFormatter={this.formatAxisLabelDate}>
                     {this.state.lines}
                 </Timeline>
             </GraphCard>
