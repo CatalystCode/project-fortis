@@ -120,7 +120,7 @@ export default class MarkerClusterGroup extends React.Component {
     const config = {
       chunkedLoading: true,
       zoomToBoundsOnClick: true,
-      showCoverageOnHover: true,
+      showCoverageOnHover: false,
       enableDefaultStyle: true,
       iconCreateFunction: this.clusterIconFunction,
       singleMarkerMode: true
