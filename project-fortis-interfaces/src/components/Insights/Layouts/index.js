@@ -9,7 +9,7 @@ const layout = {
       { "i": "newsfeed", "x": 19, "y": 6, "w": 5, "h": 16 }
     ]
   };
-  
+
   const layoutCollapsed = {
     "lg": [
       { "i": "watchlist", "x": 0, "y": 0, "w": 4, "h": 22, static: true },

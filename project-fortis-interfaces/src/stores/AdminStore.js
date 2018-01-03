@@ -140,7 +140,7 @@ export const AdminStore = Fluxxor.createStore({
         {editable: true, key: "filteredTerms", name: "Blacklisted Terms"}
       ];
       const saveAsColumnName = 'blacklistColumns';
-            
+
       this.loadColumns(columnValues, saveAsColumnName);
     },
 
@@ -174,7 +174,7 @@ export const AdminStore = Fluxxor.createStore({
     handleLoadTrustedSources(response) {
       this.dataStore.action = response.action;
       this.emit("change");
-    }, 
+    },
 
     handlePublishedCustomEvents(response){
         this.dataStore.action = response.action || false;

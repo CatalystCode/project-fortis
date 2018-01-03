@@ -176,8 +176,8 @@ export default class ActivityFeed extends React.Component {
 
     resetNewsFeed() {
         return {
-            elements: [], 
-            filteredSource: null, 
+            elements: [],
+            filteredSource: null,
             processedEventids: new Set(),
             isInfiniteLoading: false,
             searchValue: "",
@@ -231,7 +231,7 @@ export default class ActivityFeed extends React.Component {
     render() {
         const { isInfiniteLoading, filteredSource, searchValue, elements } = this.state;
         const { language, infiniteScrollHeight, enabledStreams } = this.props;
-        //todo: this is a tactical workaround until we arrive at a storage solution that supports full text searches 
+        //todo: this is a tactical workaround until we arrive at a storage solution that supports full text searches
         const renderedElements = searchValue ? elements.filter(event => this.filterElement(event, searchValue)) : elements;
         const selectedTags = this.getSelectedTopicsAndSearchValue();
 

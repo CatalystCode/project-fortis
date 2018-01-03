@@ -152,7 +152,7 @@ export default class TypeaheadSearch extends React.Component {
         <InputGroup.Button>
           <DropdownButton id="dataset-switcher-button" componentClass={InputGroup.Button} title={<i className={activeDataset.icon} title={activeDataset.description}></i>}>
             {Object.values(this.DATASETS).map(dataset =>
-              <MenuItem 
+              <MenuItem
                 active={dataset === activeDataset}
                 key={dataset.type}
                 onClick={() => this.setState({ activeDataset: dataset })} >

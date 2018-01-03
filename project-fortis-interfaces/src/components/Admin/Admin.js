@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Modal, Button } from 'react-bootstrap'; 
+import { Modal, Button } from 'react-bootstrap';
 import { AdminSettings } from './AdminSettings';
 import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
@@ -97,7 +97,7 @@ class Admin extends React.Component {
                       <div className="adminTable">
                         {this.props.settings && this.props.settings.properties && this.state.index === LOCATIONS_TAB &&
                           <AdminLocations name={this.props.settings.name}
-                                          {...this.props} 
+                                          {...this.props}
                                           {...this.props.settings.properties} />}
                       </div>
                     </TabPanel>

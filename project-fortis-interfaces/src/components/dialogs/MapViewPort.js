@@ -6,7 +6,7 @@ import React from 'react';
 const tileStyle = "mapbox.streets";
 const DEFAULT_ZOOM = 8;
 const tileServer = "https://api.mapbox.com/v4";
-const accessToken = "pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg"; 
+const accessToken = "pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg";
 
 class MapViewPort extends React.Component {
     render() {

@@ -73,7 +73,7 @@ module.exports = {
         ELEMENT_ITEM_HEIGHT: 80,
         OFFSET_INCREMENT: 90,
         INFINITE_LOAD_DELAY_MS: 1800
-    },    
+    },
     ANNUAL_TIMESERIES_PERIOD: "day",
     HEATMAP_MAX_ZOOM: 16,
     HEATMAP_DEFAULT_ZOOM: 8,

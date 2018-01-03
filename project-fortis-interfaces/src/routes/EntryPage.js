@@ -14,15 +14,15 @@ export const EntryPage = createReactClass({
   },
 
   propertyLiterals() {
-    const { dataSource, bbox, termFilters, maintopic, externalsourceid, datetimeSelection, 
-            fromDate, toDate, language, zoomLevel, settings, timespanType, enabledStreams, 
+    const { dataSource, bbox, termFilters, maintopic, externalsourceid, datetimeSelection,
+            fromDate, toDate, language, zoomLevel, settings, timespanType, enabledStreams,
             conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
-            timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv, category, 
+            timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv, category,
             topSources, trustedSources, fullTermList, selectedplace } = this.getStateFromFlux();
 
-    return Object.assign({}, { dataSource, maintopic, termFilters, bbox, enabledStreams, 
+    return Object.assign({}, { dataSource, maintopic, termFilters, bbox, enabledStreams,
                                externalsourceid, datetimeSelection, fromDate, toDate, language,
-                               zoomLevel, settings, timespanType, heatmapTileIds, category, 
+                               zoomLevel, settings, timespanType, heatmapTileIds, category,
                                conjunctivetopics, timeSeriesGraphData, popularLocations, popularTerms,
                                timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
                                topSources, trustedSources, fullTermList, selectedplace });
@@ -30,9 +30,9 @@ export const EntryPage = createReactClass({
 
   render() {
     return (
-    this.state.bbox.length ? 
+    this.state.bbox.length ?
       <div>
-        <Dashboard flux={this.props.flux} 
+        <Dashboard flux={this.props.flux}
                 {...this.propertyLiterals()} />
       </div>
     : <div />

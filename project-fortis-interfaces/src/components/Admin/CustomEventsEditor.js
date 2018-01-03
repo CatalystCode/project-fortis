@@ -50,8 +50,8 @@ export const CustomEventsEditor = createReactClass({
         };
 
         return [
-            {   editable: false, 
-                key: "RowKey", 
+            {   editable: false,
+                key: "RowKey",
                 name: "Event ID",
                 resizable: false
             },
@@ -122,8 +122,8 @@ export const CustomEventsEditor = createReactClass({
         ];
     },
     handleSave(mutatedRows, columns){
-        let eventsWithFeatureCollection = []; 
-        
+        let eventsWithFeatureCollection = [];
+
         mutatedRows.forEach(event=>{
             const coordinates = this.state.locationMap.get(event.geo);
             if(!coordinates){
@@ -132,11 +132,11 @@ export const CustomEventsEditor = createReactClass({
             }else{
                 let eventWithGeo = Object.assign({}, event, {
                                                                 featureCollection: {
-                                                                    type: "FeatureCollection", 
+                                                                    type: "FeatureCollection",
                                                                     features: [{"type": "Point", "coordinates": coordinates.split(",").map(coord=>parseFloat(coord))}]
                                                                 }
                                                               });
-                
+
                 delete eventWithGeo.geo;
                 eventsWithFeatureCollection.push(eventWithGeo);
             }
@@ -150,7 +150,7 @@ export const CustomEventsEditor = createReactClass({
     },
     render(){
         return (
-         this.state.locations.size > 0 ? 
+         this.state.locations.size > 0 ?
             <DataGrid rowHeight={40}
                       minHeight={500}
                       rowKey="RowKey"

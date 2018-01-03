@@ -31,7 +31,7 @@ class TrustedSources extends React.Component {
     return `${row.pipelinekey},${row.externalsourceid},${row.sourcetype},${row.rank}`;
   }
 
-  handleRemove(rows) {    
+  handleRemove(rows) {
     const sourcesWithAllFieldsSet = this.filterSourcesWithUnsetFields(rows);
     if (this.trustedSourcesToRemoveExist(sourcesWithAllFieldsSet)) {
       this.props.flux.actions.ADMIN.remove_trusted_sources(sourcesWithAllFieldsSet);
@@ -76,8 +76,8 @@ class TrustedSources extends React.Component {
   getTranslatableFields() {
     const defaultLanguage = this.getDefaultLanguage();
     const alternateLanguage = this.props.settings.properties.supportedLanguages.find(supportedLanguage => supportedLanguage !== defaultLanguage);
-    return { 
-      sourceField: {language: defaultLanguage, key: "name"}, 
+    return {
+      sourceField: {language: defaultLanguage, key: "name"},
       targetField: {language: alternateLanguage, key: TRANSLATED_NAME}
     };
   }
@@ -89,8 +89,8 @@ class TrustedSources extends React.Component {
   render() {
     const trustedSourcesColumns = this.getTrustedSourcesColumns();
     return (
-      trustedSourcesColumns.length > 0 ? 
-        <DataGrid 
+      trustedSourcesColumns.length > 0 ?
+        <DataGrid
           rowHeight={40}
           minHeight={500}
           rowKey='rowKey'

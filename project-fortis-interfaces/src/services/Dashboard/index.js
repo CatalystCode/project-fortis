@@ -6,11 +6,11 @@ import { fetchGqlData, MESSAGES_ENDPOINT, TILES_ENDPOINT, EDGES_ENDPOINT } from 
 
 export const SERVICES = {
     getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, bbox,
-        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, csv, 
+        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, csv,
         enabledStreams, category, callback) {
         const timePeriodType = constants.TIMESPAN_TYPES[periodType].timeseriesType;
         const topsourcespipelinekey = ActionMethods.DataSources(dataSource, enabledStreams);
-        const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
+        const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid
         ? [dataSource] : topsourcespipelinekey;
 
         const limit = 10;
@@ -31,7 +31,7 @@ export const SERVICES = {
         };
         fetchGqlData(EDGES_ENDPOINT, { variables, query }, callback);
     },
-    
+
     getCommonTerms(periodType, fromDate, toDate, bbox, zoomLevel, category, callback) {
         const pipelinekeys = [constants.DEFAULT_DATA_SOURCE];
         const limit = 12;
@@ -43,22 +43,22 @@ export const SERVICES = {
 
         const variables = {
             bbox, limit, fromDate, pipelinekeys,
-            toDate, zoomLevel, periodType, externalsourceid, category, 
+            toDate, zoomLevel, periodType, externalsourceid, category,
             csv
         };
         fetchGqlData(EDGES_ENDPOINT, { variables, query }, callback);
     },
 
-    getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
-                    dataSource, externalsourceid, conjunctivetopics, bbox, 
+    getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileid, periodType,
+                    dataSource, externalsourceid, conjunctivetopics, bbox,
                     enabledStreams, callback) {
         const topsourcespipelinekey = ActionMethods.DataSources(dataSource, enabledStreams);
-        const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid 
+        const pipelinekeys = constants.DEFAULT_EXTERNAL_SOURCE === externalsourceid
         ? [dataSource] : topsourcespipelinekey;
 
         const query = `${DashboardFragments.heatmapFragment}
                        ${DashboardQueries.getHeatmapQuery}`;
-        const variables = { fromDate, toDate, zoomLevel, maintopic, tileid, periodType, 
+        const variables = { fromDate, toDate, zoomLevel, maintopic, tileid, periodType,
             pipelinekeys, externalsourceid, conjunctivetopics, bbox
         };
 
@@ -66,7 +66,7 @@ export const SERVICES = {
     },
 
     FetchMessageDetail(messageId, callback) {
-        const query = ` ${DashboardFragments.eventDetailsFragment} 
+        const query = ` ${DashboardFragments.eventDetailsFragment}
                         ${DashboardQueries.getEventDetailsQuery}`;
 
         const variables = { messageId };

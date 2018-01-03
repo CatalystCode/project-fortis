@@ -40,7 +40,7 @@ const styles = {
 export default class EventDetails extends React.Component {
     render() {
         // show details
-        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, 
+        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey,
                 link, places } = this.props.properties;
         const { enabledStreams } = this.props;
         const dateText = getHumanDateFromNow(eventtime);

@@ -104,12 +104,12 @@ export default class SentimentTreeview extends React.Component {
         const zoomLevel = place && place.zoom ? place.zoom : this.props.zoomLevel;
         maintopic = maintopic && !place ? maintopic : this.props.maintopic;
         termFilters = termFilters != null ? termFilters : this.props.termFilters;
-        
+
         if(!dataSource) {
             dataSource = this.props.dataSource;
             externalsourceid = this.props.externalsourceid;
         }
-        
+
         this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, place);
     }
 

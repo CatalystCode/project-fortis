@@ -52,12 +52,12 @@ export default class MarkerClusterGroup extends React.Component {
 
   asyncFetchHeatmapFromTileService(props, callback) {
     const { dataSource, timespanType, termFilters, zoomLevel,
-      maintopic, externalsourceid, fromDate, toDate, heatmapTileIds, 
+      maintopic, externalsourceid, fromDate, toDate, heatmapTileIds,
       selectedplace, bbox, enabledStreams } = props;
 
     async.concat(heatmapTileIds, (tileId, tileCallback) => {
       SERVICES.getHeatmapTiles(fromDate, toDate, zoomLevel, maintopic, tileId, timespanType,
-        dataSource, externalsourceid, Array.from(termFilters), selectedplace.placeid ? bbox : undefined, 
+        dataSource, externalsourceid, Array.from(termFilters), selectedplace.placeid ? bbox : undefined,
         enabledStreams, (error, response, heatmap) => {
           if (!error) {
             tileCallback(null, heatmap.data.heatmap.features);

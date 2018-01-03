@@ -1,13 +1,13 @@
 import React from 'react';
 import { DataGrid } from './DataGrid';
-import { Glyphicon, Button, Modal } from 'react-bootstrap'; 
+import { Glyphicon, Button, Modal } from 'react-bootstrap';
 import { getColumns } from './shared';
 
 class StreamParamsButtonFormatter extends React.Component {
   constructor(props) {
     super(props);
-    
-    this.state = { 
+
+    this.state = {
       isShowDetailOn: false,
       params: []
     };
@@ -37,13 +37,13 @@ class StreamParamsButtonFormatter extends React.Component {
 
   handleShowDetails() {
     const stream = this.getStream();
-    
+
     let params = stream.params;
     if (typeof stream.params === 'string') {
       params = JSON.parse(stream.params);
     }
 
-    this.setState({ 
+    this.setState({
       isShowDetailOn: true,
       params: params
     });
@@ -54,8 +54,8 @@ class StreamParamsButtonFormatter extends React.Component {
   }
 
   handleHideDetails() {
-    this.setState({ 
-      isShowDetailOn: false 
+    this.setState({
+      isShowDetailOn: false
     });
   }
 
@@ -79,7 +79,7 @@ class StreamParamsButtonFormatter extends React.Component {
             <Modal.Title>Parameters for {this.props.dependentValues.pipelineLabel}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <DataGrid 
+            <DataGrid
               rowHeight={40}
               minHeight={500}
               toolbar={null}

@@ -28,7 +28,7 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, ca
     const dataSources = toDataSources((streams && streams.streams) || []);
     const siteName = settings.configuration.site.name;
 
-    DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel, category, 
+    DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel, category,
       (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
           if (!err) {
               callback(null, Object.assign({}, { terms, dataSources, siteName }, { configuration }, topics ));
@@ -39,10 +39,10 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, ca
 }
 
 function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
-    bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, 
+    bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics,
     includeCsv, enabledStreams, category, callback) {
 
-    DashboardServices.getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate, 
+    DashboardServices.getChartVisualizationData(periodType, maintopic, dataSource, fromDate, toDate,
         bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, !!includeCsv,
         enabledStreams, category, (err, response, body) => ResponseHandler(err, response, body, callback));
 }
@@ -70,8 +70,8 @@ function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, ca
         const maintopic = topics.edges[0].name;//grab the most commonly mentioned term
         //we're defaulting the timeseriesmaintopics to the most popular on the initial load so we can show all in the timeseries
         fetchFullChartData(fromDate, toDate, timespanType, constants.DEFAULT_DATA_SOURCE, maintopic, configuration.targetBbox,
-            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name), 
-            includeCsv, dataSources, category, 
+            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name),
+            includeCsv, dataSources, category,
             (err, chartData) => {
                 const response = Object.assign({}, chartData, resultUnion, { category });
 
@@ -125,7 +125,7 @@ const methods = {
         });
     },
 
-    reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox, 
+    reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
         zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
         let self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;

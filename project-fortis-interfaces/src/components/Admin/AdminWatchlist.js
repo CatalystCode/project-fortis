@@ -107,16 +107,16 @@ class AdminWatchlist extends React.Component {
   getTranslatableFields() {
     const defaultLanguage = this.getDefaultLanguage();
     const alternateLanguage = this.props.settings.properties.supportedLanguages.find(supportedLanguage => supportedLanguage !== defaultLanguage);
-    return { 
-      sourceField: {language: defaultLanguage, key: "name"}, 
+    return {
+      sourceField: {language: defaultLanguage, key: "name"},
       targetField: {language: alternateLanguage, key: TRANSLATED_NAME}
     };
   }
 
   render() {
     return (
-      this.getTopicColumns().length > 0 ? 
-        <DataGrid 
+      this.getTopicColumns().length > 0 ?
+        <DataGrid
           rowHeight={40}
           minHeight={500}
           rowKey="topicid"

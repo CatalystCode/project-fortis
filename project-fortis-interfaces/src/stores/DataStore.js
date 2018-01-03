@@ -81,7 +81,7 @@ export const DataStore = Fluxxor.createStore({
 
     handleLanguageChange(gqlRespomse) {
         const { terms, language } = gqlRespomse;
-        
+
         this.dataStore.language = language;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
         this.emit("change");
@@ -156,7 +156,7 @@ export const DataStore = Fluxxor.createStore({
             const { labels, graphData, tiles } = mutatedTimeSeries;
             this.dataStore.timeSeriesGraphData = Object.assign({}, { labels });
             this.dataStore.timeSeriesCsv = (mutatedTimeSeries.csv && mutatedTimeSeries.csv.url) || "";
-            
+
             const timeseriesMap = makeMap(graphData, item=>item.date, item=>{
                 // eslint-disable-next-line
                 let timeSeriesEntry = {date: moment(new Number(item.date)).format(dateFormat)};
@@ -172,7 +172,7 @@ export const DataStore = Fluxxor.createStore({
     },
 
     syncFilterSelections(mutatedFilters){
-        const { fromDate, toDate, periodType, name, placebbox, placecentroid, zoomLevel, dataSource, placeid, datetimeSelection, maintopic, 
+        const { fromDate, toDate, periodType, name, placebbox, placecentroid, zoomLevel, dataSource, placeid, datetimeSelection, maintopic,
             externalsourceid, selectedconjunctiveterms, bbox } = mutatedFilters;
 
         this.dataStore.fromDate = fromDate;

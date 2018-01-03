@@ -26,6 +26,6 @@ const createElement = (Component, props) => {
 };
 
 ReactDOM.render((<Router history={hashHistory}
-                         createElement={createElement} 
-                         routes={routes} />), 
+                         createElement={createElement}
+                         routes={routes} />),
                   document.getElementById('app'));

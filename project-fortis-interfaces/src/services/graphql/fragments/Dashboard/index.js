@@ -21,7 +21,7 @@ export const getMessagesByBbox = `fragment FortisDashboardView on FeatureCollect
 
 export const topSourcesFragment = `fragment FortisTopSourcesView on TopSourcesCollection {
         edges {
-            name, 
+            name,
             pipelinekey,
             mentions,
             avgsentiment

@@ -25,7 +25,7 @@ class ActiveFiltersView extends React.Component {
   }
 
   getChips = () => {
-    const { dataSource, externalsourceid, selectedplace, maintopic, 
+    const { dataSource, externalsourceid, selectedplace, maintopic,
             termFilters, enabledStreams, allSiteTopics } = this.props;
     const chips = [];
     const edge = fetchTermFromMap(allSiteTopics, maintopic);
@@ -59,7 +59,7 @@ class ActiveFiltersView extends React.Component {
 
     if (dataSource && dataSource !== DEFAULT_DATA_SOURCE) {
       const icon = enabledStreams.get(dataSource).icon;
-      
+
       chips.push({
         type: 'dataSource',
         label: `Publisher: ${dataSource}`,

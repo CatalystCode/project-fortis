@@ -26,7 +26,7 @@ export default class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    
+
     this.onResizeStop = this.onResizeStop.bind(this);
     this.toggleHeatmapSize = this.toggleHeatmapSize.bind(this);
 
@@ -71,7 +71,7 @@ export default class Dashboard extends React.Component {
     const defaultZoom = parseInt(this.props.settings.defaultZoomLevel, 10);
     const conjunctiveTermsLength = termFilters.size;
 
-    return Object.assign({}, { zoomLevel, dataSource, enabledStreams, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage, 
+    return Object.assign({}, { zoomLevel, dataSource, enabledStreams, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage,
        termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
   }
 

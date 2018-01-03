@@ -21,8 +21,8 @@ class StreamEditor extends React.Component {
 
   render() {
     return (
-      this.getStreamColumns().length > 0 ? 
-        <DataGrid 
+      this.getStreamColumns().length > 0 ?
+        <DataGrid
           rowHeight={40}
           minHeight={500}
           toolbar={null}

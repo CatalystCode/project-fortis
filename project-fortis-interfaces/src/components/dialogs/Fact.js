@@ -86,7 +86,7 @@ export default class Fact extends React.Component {
                     {
                         title !== "" ? <span>{title}</span> : undefined
                     }
-                    
+
               </h6>
               <h3>{}</h3>
             </div>
@@ -115,7 +115,7 @@ export default class Fact extends React.Component {
 
                 <p className="subheading">Date created</p>
                 <p className="drop"><i className="fa fa-clock-o fa-1"></i><span className="date">{dateCreated}</span></p>
-                
+
                 <p className="subheading">Sentiment</p>
                 <div className="drop">
                   <Sentiment value={sentiment}></Sentiment>
@@ -125,7 +125,7 @@ export default class Fact extends React.Component {
                 <div className="drop">
                   {originalSource && originalSource.filter(source=>sourcesBlackList.indexOf(source)===-1).map(source => {
                       let sourceFormatted = source.replace(/http:\/\/www./g, '').replace(/.com\//g, '').replace(/http:\/\//g, '').replace(/https:\/\//g, '');
-                      
+
                       return <Chip key={sourceFormatted} onTouchTap={(event) => open(source)} style={styles.chip}>
                                               <Avatar icon={<FontIcon className="material-icons">share</FontIcon>} />
                                             {sourceFormatted}

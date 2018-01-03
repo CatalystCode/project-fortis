@@ -46,7 +46,7 @@ export const BlacklistEditor = createReactClass({
       const state = this.getFlux().store("AdminStore").getState();
 
       return (
-        <DataGrid 
+        <DataGrid
           rowHeight={40}
           minHeight={500}
           rowKey="id"

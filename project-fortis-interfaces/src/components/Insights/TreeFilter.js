@@ -42,7 +42,7 @@ export const expandFilteredNodes = (node, filter, matcher = defaultMatcher) => {
 };
 
 export const addFilteredNodeToRoot = (rootNode, child, filteredNode) => {
-    // eslint-disable-next-line    
+    // eslint-disable-next-line
     child.children ? child.children.forEach(node => {
         if(filteredNode.children[0] && node.folderKey === filteredNode.folderKey){
             filteredNode.added = true;
@@ -72,12 +72,12 @@ export const postOrderTreeTraversal = (child, rootNode, newNode, filters) => {
     if (child.parent.folderKey === rootNode.folderKey){
         return addFilteredNodeToRoot(rootNode, rootNode, displayNode);
     }
-    
+
     postOrderTreeTraversal(child.parent, rootNode, displayNode, filters);
 };
 
 export const treeFilterIterator = (node, matcher, filteredTree, nodeCB, filters) => {
-        // eslint-disable-next-line        
+        // eslint-disable-next-line
         node.children ? node.children.forEach(child => {
              treeFilterIterator(child, matcher, filteredTree, nodeCB, filters);
 

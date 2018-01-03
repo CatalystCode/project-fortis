@@ -16,7 +16,7 @@ export function momentToggleFormats(dateString, fromFormat, targetFormat){
 
  export function momentGetFromToRange(dateString, fromFormat, rangeType){
       let sourceMoment = moment(dateString, fromFormat);
-      
+
       return {
           fromDate: sourceMoment.startOf(rangeType).format(FromToDateFormat),
           toDate: sourceMoment.endOf(rangeType).format(FromToDateFormat),

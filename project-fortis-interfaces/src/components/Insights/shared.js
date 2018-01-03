@@ -71,7 +71,7 @@ function hasChanged(prevProps, nextProps) {
         nextProps.externalsourceid === prevProps.externalsourceid &&
         nextProps.conjunctiveTermsLength === prevProps.conjunctiveTermsLength &&
         nextProps.dataSource === prevProps.dataSource) {
-        
+
         return false;
       }
 

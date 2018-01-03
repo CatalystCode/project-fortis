@@ -24,9 +24,9 @@ export const AdminPage = createReactClass({
   componentWillReceiveProps() {
     this.getFlux().actions.ADMIN.load_settings();
   },
-  
+
   propertyLiterals() {
-    const { 
+    const {
       settings,
       watchlist,
       streams,
@@ -39,7 +39,7 @@ export const AdminPage = createReactClass({
       enabledStreams
     } = this.getStateFromFlux().dataStoreState;
 
-    return Object.assign({}, { 
+    return Object.assign({}, {
       settings,
       watchlist,
       trustedSources,
@@ -52,7 +52,7 @@ export const AdminPage = createReactClass({
   render() {
     return (
       <div>
-        { this.state.adminStoreState.settings.properties ? 
+        { this.state.adminStoreState.settings.properties ?
            <div>
               <Admin flux={this.props.flux} {...this.propertyLiterals()} />
             </div>

@@ -8,11 +8,11 @@ const FluxMixin = Fluxxor.FluxMixin(React),
 
 export const TermFilter = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
-  
+
   getInitialState(){
-    return {};  
+    return {};
   },
-  
+
   onFilterChange(filters){
       this.getFlux().actions.DASHBOARD.changeTermsFilter(filters);
   },
@@ -33,12 +33,12 @@ export const TermFilter = createReactClass({
       return filteredTerms;
  },
 
-  render(){      
+  render(){
       return (
         <div>
         {
-            this.props.data && this.props.data.length > 0 ? 
-             <Multiselect {...this.props} value={this.FilterEnabledTerms()} 
+            this.props.data && this.props.data.length > 0 ?
+             <Multiselect {...this.props} value={this.FilterEnabledTerms()}
                           onChange={this.onFilterChange}/>
             : undefined
         }

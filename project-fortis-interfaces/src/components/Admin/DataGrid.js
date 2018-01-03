@@ -75,7 +75,7 @@ export const DataGrid = createReactClass({
     const rowsToMerge = nextProps.rowsToMerge;
     let state = this.state;
     let rows = this.state.rows.length === 0 || nextProps.rows ? nextProps.rows : this.state.rows;
-    
+
     //if the action state === SAVED and the modified rows set has been cleared then mark the state as saved
     if(state.action === STATE_ACTIONS.SAVED && localAction === STATE_ACTIONS.SAVING){
         localAction = STATE_ACTIONS.SAVED;
@@ -116,7 +116,7 @@ export const DataGrid = createReactClass({
               localAction = STATE_ACTIONS.MODIFIED;
           }
     }
-    
+
     this.setState({rows, localAction, selectedRowKeys, modifiedRows, filters});
   },
   lookupRowIdByKey(rowKey) {
@@ -140,12 +140,12 @@ export const DataGrid = createReactClass({
 
                                                   return row;
                                           });
-    
+
     //remove any selected rows that were marked as modified
     let modifiedRows = new Set(Array.from(this.state.modifiedRows).filter(rowKey => this.state.selectedRowKeys.indexOf(rowKey) === -1));
-    
-    const selectedRowKeys = [];   
-    
+
+    const selectedRowKeys = [];
+
     this.setState({filters: {}, localAction: STATE_ACTIONS.SAVING, modifiedRows: modifiedRows, selectedRowKeys});
     this.props.handleRemove(selectedRows);
   },
@@ -168,7 +168,7 @@ export const DataGrid = createReactClass({
     }
 
     rows.push(newRow);
-    
+
     this.setState({rows});
   },
   handleGridRowsUpdated(updatedRowData) {
@@ -193,7 +193,7 @@ export const DataGrid = createReactClass({
                           if (result) {
                               alert(result);
                           }
-                          
+
                           modifiedRows.delete(rowKey);
                           this.setState({ modifiedRows, localAction, rows});
                       });
@@ -254,7 +254,7 @@ export const DataGrid = createReactClass({
                     rows.push(rowData);
                 }
               }
-              
+
               modifiedRows.add(rowData[this.props.rowKey]);
               currentRow++;
           });
@@ -291,7 +291,7 @@ export const DataGrid = createReactClass({
                     validRow = false;
                 }
             }
-            
+
             if(validRow && column.compositeKey){
                 let valueSet = uniqueDataMap.get(column.key);
 
@@ -342,7 +342,7 @@ export const DataGrid = createReactClass({
     },
     handleFilterChange(filter) {
       let newFilters = Object.assign({}, this.state.filters);
-      
+
       if (filter.filterTerm) {
         newFilters[filter.column.key] = filter;
       } else {
@@ -359,7 +359,7 @@ export const DataGrid = createReactClass({
       this.setState({localAction: STATE_ACTIONS.TRANSLATING});
       let phrasesToTranslate = this.state.rows.filter(row=>selectedRowKeys.indexOf(row[this.props.rowKey]) > -1)
                                                 .map(row=>row[sourceField.key]);
-      
+
       phrasesToTranslate = this.removeUnsetPhrasesToTranslate(phrasesToTranslate);
 
       SERVICES.translateSentences(phrasesToTranslate, sourceField.language, targetField.language, (error, response, body) => {
@@ -383,9 +383,9 @@ export const DataGrid = createReactClass({
           });
 
           self.setState({
-            modifiedRows: modifiedRows, 
-            localAction: STATE_ACTIONS.TRANSLATED, 
-            rows: mutatedRows, 
+            modifiedRows: modifiedRows,
+            localAction: STATE_ACTIONS.TRANSLATED,
+            rows: mutatedRows,
             selectedRowKeys: selectedRowKeys
           });
         } else {
@@ -421,7 +421,7 @@ export const DataGrid = createReactClass({
     render() {
         let rowText = this.state.selectedRowKeys.length === 1 ? 'row' : 'rows';
         let toolBarProps = {};
-        let saveButtonState; 
+        let saveButtonState;
 
         switch(this.state.localAction){
             case STATE_ACTIONS.MODIFIED: saveButtonState = "Upload Changes";
@@ -432,10 +432,10 @@ export const DataGrid = createReactClass({
                 break;
             case STATE_ACTIONS.TRANSLATED: saveButtonState = "Save Translations";
                 break;
-            default: 
+            default:
                 saveButtonState = "Saved Changes";
-        } 
-        
+        }
+
         if(!this.props.rowAddDisabled){
             toolBarProps.onAddRow = this.handleAddRow;
         }
@@ -443,10 +443,10 @@ export const DataGrid = createReactClass({
         return (
           <div>
             {
-                this.showUploadChangesButton() ? 
-                       <button style={styles.actionButton} 
-                                onClick={this.handleSave} 
-                                type="button" 
+                this.showUploadChangesButton() ?
+                       <button style={styles.actionButton}
+                                onClick={this.handleSave}
+                                type="button"
                                 className={this.state.localAction === STATE_ACTIONS.MODIFIED || this.state.localAction === STATE_ACTIONS.SAVING || this.state.localAction === STATE_ACTIONS.TRANSLATED ? `btn btn-primary btn-sm` : `btn btn-success btn-sm`}
                                 disabled={this.state.localAction === STATE_ACTIONS.SAVING || this.state.localAction === STATE_ACTIONS.TRANSLATING || this.state.localAction === STATE_ACTIONS.TRANSLATING }>
                              <i className="fa fa-cloud-upload" aria-hidden="true"></i> {saveButtonState}
@@ -454,14 +454,14 @@ export const DataGrid = createReactClass({
                    : undefined
             }
             {
-                this.state.selectedRowKeys.length > 0 && this.state.localAction !== STATE_ACTIONS.SAVING ? 
+                this.state.selectedRowKeys.length > 0 && this.state.localAction !== STATE_ACTIONS.SAVING ?
                        <button style={styles.actionButton} onClick={this.removeSelectedRows} type="button" className="btn btn-danger btn-sm">
                              <i className="fa fa-remove" aria-hidden="true"></i> Remove Selection(s)
                        </button>
                    : undefined
             }
             {
-              this.hasPhrasesToTranslate() ? 
+              this.hasPhrasesToTranslate() ?
                 <button style={styles.actionButton} onClick={this.translateSelectedRows} type="button" className="btn btn-default btn-sm">
                   <i className="fa fa-language" aria-hidden="true"></i> Translate Selection(s)
                 </button>
@@ -475,7 +475,7 @@ export const DataGrid = createReactClass({
                   onCellCopyPaste={null}
                   onCellSelected={this.onCellSelected}
                   rowGetter={this.rowGetter}
-                  rowRenderer={<RowRenderer rowKey={this.props.rowKey} 
+                  rowRenderer={<RowRenderer rowKey={this.props.rowKey}
                                             modifiedRows={this.state.modifiedRows}/>}
                   onGridRowsUpdated={this.handleGridRowsUpdated}
                   toolbar={<Toolbar enableFilter={true} {...toolBarProps}/>}
