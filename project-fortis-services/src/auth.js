@@ -3,6 +3,7 @@ const passport = require('passport');
 const OIDCBearerStrategy = require('passport-azure-ad').BearerStrategy;
 const NodeCache = require('node-cache');
 const cassandraConnector = require('./clients/cassandra/CassandraConnector');
+const { getUserFromArgs } = require('./utils/request');
 
 const {
   adClientId
@@ -75,10 +76,6 @@ function checkIfUserHasRoleCached(user, role) {
   });
 }
 
-function getUserFromArgs(...args) {
-  return (args && args.length >= 2 && args[1].user && args[1].user.identifier) || '';
-}
-
 function requiresRole(promiseFunc, requiredRole) {
   if (!adClientId) return promiseFunc;
 
@@ -103,6 +100,5 @@ function requiresRole(promiseFunc, requiredRole) {
 
 module.exports = {
   requiresRole,
-  getUserFromArgs,
   initialize
 };

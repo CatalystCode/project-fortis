@@ -2,7 +2,7 @@ const {
   appinsightsInstrumentationkey
 } = require('../../../config').appinsights;
 
-const { getUserFromArgs } = require('../../auth');
+const { getUserFromArgs } = require('../../utils/request');
 
 let client;
 let consoleLog = console.log;
