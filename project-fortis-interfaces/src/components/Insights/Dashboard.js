@@ -242,7 +242,7 @@ export default class Dashboard extends React.Component {
                   isDraggable={false}
                   layouts={this.isHeatmapFullScreen() ? defaultLayout.layoutCollapsed : defaultLayout.layout}
                   cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
-                  rowHeight={28}
+                  rowHeight={34}
                   onResizeStop={this.onResizeStop}
                   breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                   useCSSTransforms={this.state.mounted}>

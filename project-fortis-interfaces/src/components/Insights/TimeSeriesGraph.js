@@ -120,8 +120,12 @@ export default class TimeSeriesGraph extends React.Component {
     }
 
     render() {
+        const cardHeader = {
+            title: 'Timeline'
+        };
+
         return (
-            <GraphCard cardActions={this.renderActionButtons()}>
+            <GraphCard cardActions={this.renderActionButtons()} cardHeader={cardHeader}>
                 <Timeline fill={constants.CHART_STYLE.BG_FILL}
                     data={this.props.timeSeriesGraphData.graphData}
                     dataKey="date"
