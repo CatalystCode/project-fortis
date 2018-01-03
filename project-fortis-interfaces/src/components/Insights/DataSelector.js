@@ -100,7 +100,7 @@ export default class DataSelector extends React.Component {
                 timeValue = timeOption.timeType;
             }
 
-            return <MenuItem key={`${timeValue}-${index}`} value={timeValue} primaryText={label} />
+            return <MenuItem key={`${timeValue}-${index}`} value={timeValue} primaryText={label} label={`Time range: ${timeOption.label}`} />
         });
     }
 
@@ -161,7 +161,7 @@ export default class DataSelector extends React.Component {
         for (const [source, value] of this.props.enabledStreams.entries()) {
             const label = <div><i className={value.icon}></i>&nbsp;{value.display}</div>;
             const key = `dataSource-${source}-${value.label}`;
-            options.push(<MenuItem key={key} value={source} primaryText={label} />);
+            options.push(<MenuItem key={key} value={source} primaryText={label} label={`Data source: ${value.display}`} />);
         }
 
         return (
