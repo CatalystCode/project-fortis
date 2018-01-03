@@ -22,7 +22,7 @@ module.exports = {
              format: "YYYY-MM", blobFormat: "[month]-YYYY-MM", rangeFormat: "month", timeseriesType: "hour"
          },
          'week': {
-             format: "YYYY-ww", blobFormat: "[week]-YYYY-WW", rangeFormat: "week", timeseriesType: "hour"
+             format: "YYYY.ww", blobFormat: "[week]-YYYY-WW", rangeFormat: "week", timeseriesType: "hour"
          },
          'year': {
              format: "YYYY", blobFormat: "[year]-YYYY", rangeFormat: "year", timeseriesType: "day"
