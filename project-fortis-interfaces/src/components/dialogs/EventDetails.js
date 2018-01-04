@@ -5,7 +5,7 @@ import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import MapViewPort from './MapViewPort';
 import { TranslateButton } from '../Insights/TranslateButton';
-import Highlighter from 'react-highlight-words';
+import { Highlighter } from './Highlighter';
 import { extractHostnameIfExists } from '../Insights/shared';
 import Chip from 'material-ui/Chip';
 import { blue300, indigo900 } from 'material-ui/styles/colors';
@@ -31,10 +31,6 @@ const styles = {
         fontWeight: 700,
         fontSize: '16px',
         color: 'rgb(51, 122, 183)'
-    },
-    highlight: {
-        backgroundColor: '#ffd54f',
-        fontWeight: '600'
     }
 };
 
@@ -90,7 +86,8 @@ export default class EventDetails extends React.Component {
                             <div className="article">
                                 <p className="text">
                                     <Highlighter searchWords={tags.concat(places)}
-                                        highlightStyle={styles.highlight}
+                                        highlightStyle="background-color: #ffd54f; font-weight: 600;"
+                                        extraClasses={{img: ['img-responsive']}}
                                         textToHighlight={translatedText || body} />
                                 </p>
                             </div>
