@@ -21,51 +21,85 @@ export default class FortisEvent extends React.Component {
     }
 
     render() {
-        const { source, originalSource, link, featureEdges, edges, postedTime, sentence, sentiment, enabledStreams, pageLanguage, language } = this.props;
+        const { source, featureEdges, sentence, sentiment, enabledStreams, pageLanguage, language } = this.props;
         const dataSourceSchema = enabledStreams.get(source);
-        const newsItemTitle = extractHostnameIfExists(originalSource);
-        const sentimentStyle = getSentimentAttributes(sentiment).style;
+        const eventClassName = `infinite-list-item ${getSentimentAttributes(sentiment).style} sentimentListCard`;
 
-        return <div className={`infinite-list-item ${sentimentStyle} sentimentListCard`} onClick={this.handleClick}>
-            <div className="row">
-                <div className="col-lg-2" style={styles.labelColumn}>
-                    <div className="row" style={styles.labelRow}>
-                        <i style={styles.sourceLogo} className={`fa ${dataSourceSchema.icon} fa-4x`}></i>
+        return (
+            <div className={eventClassName} onClick={this.handleClick}>
+                <div className="row">
+                    <div className="col-lg-2" style={styles.labelColumn}>
+                        <div className="row" style={styles.labelRow}>
+                            <i style={styles.sourceLogo} className={`fa ${dataSourceSchema.icon} fa-4x`}></i>
+                        </div>
+                        <div className="row" style={styles.labelRow}>
+                            <TranslateButton
+                                fromLanguage={language}
+                                toLanguage={pageLanguage}
+                                sentence={sentence}
+                                onTranslationResults={this.translateNewsItem}
+                                tooltipPosition="top-right" />
+                        </div>
                     </div>
-                    <div className="row" style={styles.labelRow}>
-                        <TranslateButton
-                            fromLanguage={language}
-                            toLanguage={pageLanguage}
-                            sentence={sentence}
-                            onTranslationResults={this.translateNewsItem}
-                            tooltipPosition="top-right" />
-                    </div>
-                </div>
-                <div className="col-lg-10">
-                    <div className="row" style={styles.contentRow}>
-                        <h6 style={styles.listItemHeader}>
-                            {
-                                (link || "") !== "" ? <a style={styles.newsItemAnchor} href={link} onClick={stopPropagation} target="_blank">{newsItemTitle}</a>
-                                    :
-                                    <span style={styles.newsItemTitle}>{newsItemTitle}</span>
-                            }
-                            <i className="fa fa-clock-o fa-1"></i>&nbsp;
-                                    {getHumanDateFromNow(postedTime, constants.ACTIVITY_FEED.SERVICE_DATETIME_FORMAT)}
-                        </h6>
-                    </div>
-                    <div className="row" style={styles.contentRow}>
-                        <Highlighter
-                            searchWords={featureEdges}
-                            highlightStyle={styles.highlight}
-                            textToHighlight={sentence} />
-                    </div>
-                    <div className="row" style={styles.contentRow}>
-                        {edges.map(item =>
-                            <span key={item} style={styles.tagStyle} className={`edgeTag sentimentBorder ${sentimentStyle}`}>{item}</span>
-                        )}
+                    <div className="col-lg-10">
+                        <div className="row" style={styles.contentRow}>
+                            <h6 style={styles.listItemHeader}>
+                                {this.renderHeader()}
+                                {this.renderPostedTime()}
+                            </h6>
+                        </div>
+                        <div className="row" style={styles.contentRow}>
+                            <Highlighter
+                                searchWords={featureEdges}
+                                highlightStyle={styles.highlight}
+                                textToHighlight={sentence} />
+                        </div>
+                        <div className="row" style={styles.contentRow}>
+                            {this.renderTags()}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>;
+        );
+    }
+
+    renderHeader() {
+        const { originalSource, link } = this.props;
+        const newsItemTitle = extractHostnameIfExists(originalSource);
+
+        if (link) {
+            return (
+                <a style={styles.newsItemAnchor} href={link} onClick={stopPropagation} target="_blank">
+                    {newsItemTitle}
+                </a>
+            );
+        }
+
+        return (
+            <span style={styles.newsItemTitle}>
+                {newsItemTitle}
+            </span>
+        );
+    }
+
+    renderPostedTime() {
+        const { postedTime } = this.props;
+
+        return (
+            <span>
+                <i className="fa fa-clock-o fa-1"></i>&nbsp;
+                {getHumanDateFromNow(postedTime, constants.ACTIVITY_FEED.SERVICE_DATETIME_FORMAT)}
+            </span>
+        );
+    }
+
+    renderTags() {
+        const { edges, sentiment } = this.props;
+
+        return edges.map(item =>
+            <span key={item} style={styles.tagStyle} className={`edgeTag sentimentBorder ${getSentimentAttributes(sentiment).style}`}>
+                {item}
+            </span>
+        );
     }
 }
