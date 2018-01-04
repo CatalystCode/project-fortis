@@ -4,6 +4,7 @@ import Sentiment from '../Graphics/Sentiment';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import MapViewPort from './MapViewPort';
+import { TranslateButton } from '../Insights/TranslateButton';
 import Highlighter from 'react-highlight-words';
 import { extractHostnameIfExists } from '../Insights/shared';
 import Chip from 'material-ui/Chip';
@@ -38,11 +39,26 @@ const styles = {
 };
 
 export default class EventDetails extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            translatedText: '',
+        };
+    }
+
+    translateEvent = (error, translatedText) => {
+        if (translatedText && !error) {
+            this.setState({ translatedText });
+        } else {
+            console.error(`[${error}] occured while translating sentense`);
+        }
+    }
+
     render() {
-        // show details
-        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey,
-                link, places } = this.props.properties;
-        const { enabledStreams } = this.props;
+        const { translatedText } = this.state;
+        const { enabledStreams, pageLanguage } = this.props;
+        const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, link, places, language } = this.props.properties;
         const dateText = getHumanDateFromNow(eventtime);
         const dataSourceSchema = enabledStreams.get(pipelinekey);
         const tags = edges || [];
@@ -75,7 +91,7 @@ export default class EventDetails extends React.Component {
                                 <p className="text">
                                     <Highlighter searchWords={tags.concat(places)}
                                         highlightStyle={styles.highlight}
-                                        textToHighlight={body} />
+                                        textToHighlight={translatedText || body} />
                                 </p>
                             </div>
                         </div>
@@ -86,6 +102,14 @@ export default class EventDetails extends React.Component {
                                         link !== "" ? <a href={link} target="_blank">Read Original</a>
                                             : undefined
                                     }
+                                </p>
+                                <p className="drop">
+                                    <TranslateButton
+                                        fromLanguage={language}
+                                        toLanguage={pageLanguage}
+                                        sentence={body}
+                                        onTranslationResults={this.translateEvent}
+                                        tooltipPosition="top-left" />
                                 </p>
                                 <p className="subheading">Date created</p>
                                 <p className="drop"><i className="fa fa-clock-o fa-1"></i><span className="date">{dateText}</span></p>

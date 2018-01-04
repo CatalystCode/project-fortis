@@ -60,7 +60,7 @@ export default class DialogBox extends React.Component {
                 contentStyle={dialogWideStyle}
             >
                 <div className="content">
-                    <EventDetails {...this.state} />
+                    <EventDetails {...this.state} pageLanguage={this.props.language} />
                 </div>
             </Dialog>
         );
