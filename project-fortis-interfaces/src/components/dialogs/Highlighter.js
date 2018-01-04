@@ -17,11 +17,10 @@ export class Highlighter extends React.Component {
     }
 
     highlightHtml(html) {
-        const { searchWords, highlightStyle } = this.props;
-        const highlightWords = new Set(searchWords);
+        const { highlightWords } = this.props;
 
-        highlightWords.forEach(highlightWord => {
-            html = html.replace(new RegExp(highlightWord, 'ig'), `<mark style="${highlightStyle}">${highlightWord}</mark>`);
+        highlightWords.forEach(({ word, className }) => {
+            html = html.replace(new RegExp(word, 'ig'), `<mark class="${className}">${word}</mark>`);
         });
 
         return html;

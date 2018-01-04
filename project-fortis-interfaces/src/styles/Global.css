@@ -107,3 +107,13 @@ html, body, #leafletMap {
 .sentimentIcon{
   font-size: 35px;
 }
+
+.highlight-tag {
+  background-color: #ffd54f;
+  font-style: italic;
+}
+
+.highlight-place {
+  background-color: #ffd54f;
+  font-weight: 600;
+}

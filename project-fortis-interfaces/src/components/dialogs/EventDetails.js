@@ -59,6 +59,9 @@ export default class EventDetails extends React.Component {
         const dataSourceSchema = enabledStreams.get(pipelinekey);
         const tags = edges || [];
 
+        const highlightWords = tags.map(word => ({word, className: 'highlight-tag'}))
+            .concat(places.map(word => ({word, className: 'highlight-place'})));
+
         return (
             <div id="fact">
                 <div className="container-fluid">
@@ -78,15 +81,15 @@ export default class EventDetails extends React.Component {
                             <div className="drop">
                                 {places.length && places.map(place => <Chip key={place} backgroundColor={blue300} style={styles.chip}>
                                     <Avatar icon={<FontIcon className="material-icons">place</FontIcon>} />
-                                    {place}
+                                    <span className="highlight-place">{place}</span>
                                 </Chip>)}
                             </div>
                         </div>
                         <div className="col-md-6">
                             <div className="article">
                                 <p className="text">
-                                    <Highlighter searchWords={tags.concat(places)}
-                                        highlightStyle="background-color: #ffd54f; font-weight: 600;"
+                                    <Highlighter
+                                        highlightWords={highlightWords}
                                         extraClasses={{img: ['img-responsive']}}
                                         textToHighlight={translatedText || body} />
                                 </p>
@@ -132,7 +135,7 @@ export default class EventDetails extends React.Component {
                                         <Avatar size={32} color={blue300} backgroundColor={indigo900}>
                                             {tag.substring(0, 2)}
                                         </Avatar>
-                                        {tag}
+                                        <span className="highlight-tag">{tag}</span>
                                     </Chip>)}
                                 </div>
                             </div>
