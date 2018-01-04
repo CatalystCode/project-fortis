@@ -14,6 +14,7 @@ services:
     environment:
       - REACT_APP_SERVICE_HOST=${PROJECT_FORTIS_SERVICES_HOST}
       - REACT_APP_AD_CLIENT_ID=${AD_CLIENT_ID}
+      - REACT_APP_MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN}
     env_file:
       - .env-secrets
 
