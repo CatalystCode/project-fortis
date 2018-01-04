@@ -1,6 +1,6 @@
 import React from 'react';
 import { SERVICES } from '../../services/Dashboard';
-import { getHumanDateFromNow } from '../../utils/Utils.js';
+import { getHumanDateFromNow, doNothing } from '../../utils/Utils.js';
 import constants from '../../actions/constants';
 import { extractHostnameIfExists } from './shared';
 import '../../styles/Insights/ActivityFeed.css';
@@ -53,12 +53,25 @@ export default class FortisEvent extends React.Component {
         this.props.handleOpenDialog(this.props.id);
     }
 
-    render() {
-        const { source, originalSource, link, pageLanguage, featureEdges,
-                edges, postedTime, language, sentence, sentiment,
-                enabledStreams } = this.props;
-        const dataSourceSchema = enabledStreams.get(source);
+    renderTranslateButton() {
         const { translated } = this.state;
+        const { pageLanguage, language } = this.props;
+        const canTranslate = !translated && pageLanguage !== language;
+
+        return (
+            <button
+                className={`btn btn-sm ${translated ? 'btn-success' : 'btn-primary'}`}
+                disabled={!canTranslate}
+                style={styles.translateButton}
+                onClick={canTranslate ? this.translateNewsItem : doNothing}>
+                    {translated ? 'Translated' : 'Translate'}
+            </button>
+        );
+    }
+
+    render() {
+        const { source, originalSource, link, featureEdges, edges, postedTime, sentence, sentiment, enabledStreams } = this.props;
+        const dataSourceSchema = enabledStreams.get(source);
         const newsItemTitle = extractHostnameIfExists(originalSource);
 
         return <div className="infinite-list-item" onClick={this.handleClick}>
@@ -68,13 +81,7 @@ export default class FortisEvent extends React.Component {
                         <i style={styles.sourceLogo} className={`fa ${dataSourceSchema.icon} fa-4x`}></i>
                     </div>
                     <div className="row" style={styles.labelRow}>
-                        {
-                            pageLanguage !== language ? <button className={translated ? "btn btn-success btn-sm" : "btn btn-primary btn-sm"}
-                                style={styles.translateButton}
-                                onClick={this.translateNewsItem} >
-                                {translated ? "Translated" : "Translate"}
-                                                                                    </button> : ''
-                        }
+                        {this.renderTranslateButton()}
                     </div>
                 </div>
                 <div className="col-lg-10">
