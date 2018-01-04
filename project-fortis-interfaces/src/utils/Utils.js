@@ -107,3 +107,7 @@ export function open(url) {
 
 export function doNothing() {
 }
+
+export function stopPropagation(event) {
+    event.stopPropagation();
+}
