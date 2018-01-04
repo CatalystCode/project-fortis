@@ -58,8 +58,8 @@ export default class EventDetails extends React.Component {
         const dataSourceSchema = enabledStreams.get(pipelinekey);
         const tags = edges || [];
 
-        const highlightWords = tags.map(word => ({word, className: 'highlight-tag'}))
-            .concat(places.map(word => ({word, className: 'highlight-place'})));
+        const highlightWords = tags.map((word, i) => ({word, className: `highlight-tag highlight-tag-${i}`}))
+            .concat(places.map((word, i) => ({word, className: `highlight-place highlight-place-${i}`})));
 
         return (
             <div id="fact">
@@ -78,9 +78,9 @@ export default class EventDetails extends React.Component {
                             </p>
                             <p className="subheading">Recognized Place(s)</p>
                             <div className="drop">
-                                {places.length && places.map(place => <Chip key={place} style={styles.chip}>
+                                {places && places.map((place, i) => <Chip key={place} style={styles.chip}>
                                     <Avatar icon={<FontIcon className="material-icons">place</FontIcon>} />
-                                    <span className="highlight-place">{place}</span>
+                                    <span className={`highlight-place highlight-place-${i}`}>{place}</span>
                                 </Chip>)}
                             </div>
                         </div>
@@ -130,9 +130,9 @@ export default class EventDetails extends React.Component {
                                 </div>
                                 <p className="subheading">Tags</p>
                                 <div className="drop">
-                                    {tags && tags.map(tag => <Chip key={tag} style={styles.chip}>
+                                    {tags && tags.map((tag, i) => <Chip key={tag} style={styles.chip}>
                                         <Avatar icon={<FontIcon className="fa fa-tag" />} />
-                                        <span className="highlight-tag">{tag}</span>
+                                        <span className={`highlight-tag highlight-tag-${i}`}>{tag}</span>
                                     </Chip>)}
                                 </div>
                             </div>

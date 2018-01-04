@@ -108,12 +108,16 @@ html, body, #leafletMap {
   font-size: 35px;
 }
 
-.highlight-tag {
-  background-color: #ffd54f;
-  font-style: italic;
-}
-
-.highlight-place {
-  background-color: #ffd54f;
-  font-weight: 600;
-}
+/* colors are from http://jan.moesen.nu/code/html-css/google-highlighting/ */
+.highlight-tag { font-style: italic; }
+.highlight-tag.highlight-tag-0 { color: #000; background-color: #ff6; }
+.highlight-tag.highlight-tag-1 { color: #000; background-color: #aff; }
+.highlight-tag.highlight-tag-2 { color: #000; background-color: #9f9; }
+.highlight-tag.highlight-tag-3 { color: #000; background-color: #f99; }
+.highlight-tag.highlight-tag-4 { color: #000; background-color: #f6f; }
+.highlight-place { text-decoration: underline; }
+.highlight-place.highlight-place-0 { color: #fff; background-color: #800; }
+.highlight-place.highlight-place-1 { color: #fff; background-color: #0a0; }
+.highlight-place.highlight-place-2 { color: #fff; background-color: #860; }
+.highlight-place.highlight-place-3 { color: #fff; background-color: #049; }
+.highlight-place.highlight-place-4 { color: #fff; background-color: #909; }
