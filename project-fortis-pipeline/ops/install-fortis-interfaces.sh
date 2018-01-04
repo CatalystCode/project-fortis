@@ -22,9 +22,12 @@ jq --arg homepage "$fortis_interface_host" ". + {homepage: \$homepage}" > "$pack
 mv "$package_json" ./package.json
 
 # build the frontend
+# TODO: don't hard code the mapbox credentials
 REACT_APP_SERVICE_HOST="${graphql_service_host}" \
 REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}" \
 REACT_APP_AD_CLIENT_ID="${aad_client}" \
+REACT_APP_MAPBOX_ACCESS_TOKEN="pk.eyJ1IjoiZXJpa3NjaGxlZ2VsIiwiYSI6ImNpaHAyeTZpNjAxYzd0c200dWp4NHA2d3AifQ.5bnQcI_rqBNH0rBO0pT2yg" \
+REACT_APP_MAPBOX_TILE_LAYER_URL="https://api.mapbox.com/styles/v1/erikschlegel/cj82h6wyt9rel2st658r6teto/tiles/256/{z}/{x}/{y}" \
 npm run build
 
 # deploy the frontend to blob storage
