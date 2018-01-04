@@ -7,6 +7,10 @@ import '../../styles/Insights/ActivityFeed.css';
 import styles from '../../styles/Insights/ActivityFeed';
 import Highlighter from 'react-highlight-words';
 
+function stopPropagation(event) {
+    event.stopPropagation();
+}
+
 export default class FortisEvent extends React.Component {
     constructor(props){
         super(props);
@@ -40,15 +44,16 @@ export default class FortisEvent extends React.Component {
         }
     }
 
-    translateNewsItem(event, sentence, sourcelanguage, targetLanguage, eventId) {
-        let self = this;
+    translateNewsItem = (event) => {
+        const { pageLanguage, language, sentence, id } = this.props;
+        const self = this;
         event.stopPropagation();
 
-        SERVICES.translateSentence(sentence, sourcelanguage, targetLanguage, (error, response, body) => {
+        SERVICES.translateSentence(sentence, language, pageLanguage, (error, response, body) => {
             const { translatedSentence } = body.data.translate;
 
             if (translatedSentence && !error) {
-                self.props.updateFeedWithText(eventId, translatedSentence);
+                self.props.updateFeedWithText(id, translatedSentence);
                 self.setState({ translated: true });
             } else {
                 console.error(`[${error}] occured while translating sentense`);
@@ -56,18 +61,19 @@ export default class FortisEvent extends React.Component {
         });
     }
 
+    handleClick = () => {
+        this.props.handleOpenDialog(this.props.id);
+    }
+
     render() {
-        const{ source, originalSource, link, pageLanguage, featureEdges,
-               edges, postedTime, language, sentence, id, sentiment,
-               enabledStreams } = this.props;
+        const { source, originalSource, link, pageLanguage, featureEdges,
+                edges, postedTime, language, sentence, sentiment,
+                enabledStreams } = this.props;
         const dataSourceSchema = enabledStreams.get(source);
         const { translated } = this.state;
         const newsItemTitle = extractHostnameIfExists(originalSource);
 
-        return <div className="infinite-list-item" onClick={() => {
-            this.props.handleOpenDialog(this.props.id)
-        }
-        }>
+        return <div className="infinite-list-item" onClick={this.handleClick}>
             <div className="row">
                 <div className="col-lg-2" style={styles.labelColumn}>
                     <div className="row" style={styles.labelRow}>
@@ -77,7 +83,7 @@ export default class FortisEvent extends React.Component {
                         {
                             pageLanguage !== language ? <button className={translated ? "btn btn-success btn-sm" : "btn btn-primary btn-sm"}
                                 style={styles.translateButton}
-                                onClick={ev => { this.translateNewsItem(ev, sentence, language, pageLanguage, id) }} >
+                                onClick={this.translateNewsItem} >
                                 {translated ? "Translated" : "Translate"}
                                                                                     </button> : ''
                         }
@@ -87,7 +93,7 @@ export default class FortisEvent extends React.Component {
                     <div className="row" style={styles.contentRow}>
                         <h6 style={styles.listItemHeader}>
                             {
-                                (link || "") !== "" ? <a style={styles.newsItemAnchor} href={link} onClick={ev => ev.stopPropagation()} target="_blank">{newsItemTitle}</a>
+                                (link || "") !== "" ? <a style={styles.newsItemAnchor} href={link} onClick={stopPropagation} target="_blank">{newsItemTitle}</a>
                                     :
                                     <span style={styles.newsItemTitle}>{newsItemTitle}</span>
                             }
