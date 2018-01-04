@@ -4,7 +4,7 @@ import async from 'async';
 import L from 'leaflet';
 import '../../../styles/Insights/HeatMap.css';
 import numeralLibs from 'numeral';
-import { hasChanged } from '../shared';
+import { hasChanged, getSentimentAttributes } from '../shared';
 import ClusterGroup from './MarkerCluster';
 
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.0.2/dist/images/";
@@ -76,23 +76,12 @@ export default class MarkerClusterGroup extends React.Component {
     return Object.assign({}, { lat: coordinates[1], lng: coordinates[0] }, { options });
   }
 
-  getSentimentCategory(level) {
-    if (level >= 0 && level < 30) {
-      return "negative";
-    } else if (level >= 30 && level < 60) {
-      return "neutral";
-    } else {
-      return "positive";
-    }
-  }
-
   clusterCssFunction(cluster) {
     const { clusterColorField } = this.props;
-    const baseCssClass = 'marker-cluster-base marker-cluster';
     const maxClusterValue = cluster.getAllChildMarkers().reduce((prevMax, b) => Math.max(prevMax, b.options[clusterColorField]), 0);
-    const clusterCssClass = this.getSentimentCategory((maxClusterValue || 0) * 100);
+    const sentiment = getSentimentAttributes(maxClusterValue || 0);
 
-    return `${baseCssClass}-${clusterCssClass}`;
+    return `marker-cluster-base ${sentiment.style}`;
   }
 
   clusterIconFunction(cluster) {

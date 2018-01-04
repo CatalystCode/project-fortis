@@ -5,26 +5,11 @@
 .marker-cluster-base {
   border: 3px solid #ececec;
   border-radius: 50%;
-  color: #ededed;
   height: 40px;
   line-height: 37px;
   font-weight: 700;
   text-align: center;
   width: 40px;
-}
-
-.marker-cluster-positive {
-  background: #6ecc39;
-  color: #333;
-}
-
-.marker-cluster-neutral {
-  background: #f0c20c;
-  color: #333;
-}
-
-.marker-cluster-negative {
-  background: rgba(241, 76, 23, 0.60);
 }
 
 #leafletMap{

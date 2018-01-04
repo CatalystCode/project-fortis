@@ -45,11 +45,6 @@ module.exports = {
         BG_FILL: "#30303d",
         COLORS: ['#CD0D74', '#8A0CCF', '#2A0CD0', '#0D52D1', '#0D8ECF', '#04D215', '#B0DE09', '#448e4d', '#754DEB', '#FF9E01', '#FF6600', '#FF0F00']
     },
-    SENTIMENT_COLOR_MAPPING : {
-        "negative": "red",
-        "neutral": "yellow",
-        "positive": "green"
-    },
     EVENT_SOURCE_ICON_MAP : {
         "twitter": "fa fa-twitter",
         "facebook": "fa fa-facebook-official"

@@ -2,22 +2,10 @@ import React from 'react';
 import { getHumanDateFromNow } from '../../utils/Utils.js';
 import { TranslateButton } from './TranslateButton';
 import constants from '../../actions/constants';
-import { extractHostnameIfExists, stopPropagation } from './shared';
+import { extractHostnameIfExists, stopPropagation, getSentimentAttributes } from './shared';
 import '../../styles/Insights/ActivityFeed.css';
 import styles from '../../styles/Insights/ActivityFeed';
 import Highlighter from 'react-highlight-words';
-
-function getSentimentStyle(sentimentScore) {
-    if (sentimentScore >= 0 && sentimentScore < 30) {
-        return styles.highlightStyles.positive;
-    } else if (sentimentScore >= 30 && sentimentScore < 55) {
-        return styles.highlightStyles.neutral;
-    } else if (sentimentScore >= 55 && sentimentScore < 80) {
-        return styles.highlightStyles.negative;
-    } else {
-        return styles.highlightStyles.veryNegative;
-    }
-}
 
 export default class FortisEvent extends React.Component {
     translateNewsItem = (error, translatedSentence) => {
@@ -36,8 +24,9 @@ export default class FortisEvent extends React.Component {
         const { source, originalSource, link, featureEdges, edges, postedTime, sentence, sentiment, enabledStreams, pageLanguage, language } = this.props;
         const dataSourceSchema = enabledStreams.get(source);
         const newsItemTitle = extractHostnameIfExists(originalSource);
+        const sentimentStyle = getSentimentAttributes(sentiment).style;
 
-        return <div className="infinite-list-item" onClick={this.handleClick}>
+        return <div className={`infinite-list-item ${sentimentStyle} sentimentListCard`} onClick={this.handleClick}>
             <div className="row">
                 <div className="col-lg-2" style={styles.labelColumn}>
                     <div className="row" style={styles.labelRow}>
@@ -71,7 +60,9 @@ export default class FortisEvent extends React.Component {
                             textToHighlight={sentence} />
                     </div>
                     <div className="row" style={styles.contentRow}>
-                        {edges.map(item => <span key={item} style={Object.assign({}, styles.tagStyle, getSentimentStyle(sentiment * 100))} className="edgeTag">{item}</span>)}
+                        {edges.map(item =>
+                            <span key={item} style={styles.tagStyle} className={`edgeTag sentimentBorder ${sentimentStyle}`}>{item}</span>
+                        )}
                     </div>
                 </div>
             </div>

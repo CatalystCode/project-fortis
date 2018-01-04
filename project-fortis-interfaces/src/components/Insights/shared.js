@@ -29,28 +29,37 @@ function innerJoin(arr1, arr2) {
     return Array.from(out);
 }
 
-function getSentimentAttributes(avgsentiment) {
-    let color = '#4CAF50', tooltip = 'success', icon = 'sentiment_very_satisfied', style = 'positiveSentiment';
+function getSentimentAttributes(sentiment) {
+    let color;
+    let icon;
+    let style;
+    let tooltip;
 
-    if (avgsentiment < 0.3) {
+    if (sentiment < 0.3) {
         color = '#a43834';
         icon = 'sentiment_very_dissatisfied';
         style = 'negativeSentiment';
         tooltip = 'error';
-    } else if (avgsentiment < 0.45) {
-        color = '#FF9800';
+    } else if (sentiment < 0.45) {
+        color = '#ff9800';
         icon = 'sentiment_dissatisfied';
         style = 'neutralNegativeSentiment';
         tooltip = 'warning';
-    } else if (avgsentiment < 0.60) {
+    } else if (sentiment < 0.60) {
         color = ' #f0c20c';
         icon = 'sentiment_neutral';
         style = 'neutralSentiment';
         tooltip = 'warning';
-    } else if (avgsentiment < 0.8) {
-        color = ' #FDD835';
+    } else if (sentiment < 0.8) {
+        color = ' #fdd835';
         icon = 'sentiment_satisfied';
         style = 'neutralPositiveSentiment';
+        tooltip = 'success';
+    } else {
+        color = '#4caf50';
+        icon = 'sentiment_very_satisfied';
+        style = 'positiveSentiment';
+        tooltip = 'success';
     }
 
     return { color, icon, style, tooltip};

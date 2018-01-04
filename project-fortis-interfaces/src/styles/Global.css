@@ -50,49 +50,30 @@ html, body, #leafletMap {
   height: 35px;
 }
 
-.positiveSentiment{
-  background-color: rgb(98, 227, 30);
-}
+.negativeSentiment { background-color: #a43834; color: #ededed; }
+.negativeSentiment.sentimentIcon { color: #a43834; }
+.negativeSentiment.sentimentBorder { border-color: #a43834; }
+.negativeSentiment.sentimentListCard { border-left-color: #a43834; color: #333; }
 
-.neutralPositiveSentiment{
-  background-color: rgb(234, 224, 34);
-}
+.neutralNegativeSentiment { background-color: #ff9800; color: #333; }
+.neutralNegativeSentiment.sentimentIcon { color: #ff9800 }
+.neutralNegativeSentiment.sentimentBorder { border-color: #ff9800 }
+.neutralNegativeSentiment.sentimentListCard { border-left-color: #ff9800; color: #333; }
 
-.negativeSentiment{
-  background-color: #a43834;
-}
+.neutralSentiment { background-color: #f0c20c; color: #333; }
+.neutralSentiment.sentimentIcon { color: #f0c20c; }
+.neutralSentiment.sentimentBorder { border-color: #f0c20c; }
+.neutralSentiment.sentimentListCard { border-left-color: #f0c20c; color: #333; }
 
-.neutralNegativeSentiment{
-  background-color: #FF9800;
-}
+.neutralPositiveSentiment { background-color: #fdd835; color: #333; }
+.neutralPositiveSentiment.sentimentIcon { color: #fdd835; }
+.neutralPositiveSentiment.sentimentBorder { border-color: #fdd835; }
+.neutralPositiveSentiment.sentimentListCard { border-left-color: #fdd835; color: #333; }
 
-.neutralSentiment{
-  background-color: #FDD835;
-}
-
-.positiveSentimentIcon{
-  color: rgb(98, 227, 30);
-}
-
-.neutralPositiveSentimentIcon{
-  color: rgb(234, 224, 34);
-}
-
-.negativeSentimentIcon{
-  color: #a43834;
-}
-
-.neutralNegativeSentimentIcon{
-  color: #FF9800
-}
-
-.loadingPage {
-  color: #fff;
-}
-
-.neutralSentimentIcon{
-  color: #FDD835;
-}
+.positiveSentiment { background-color: #4caf50; color: #333; }
+.positiveSentiment.sentimentIcon { color: #4caf50; }
+.positiveSentiment.sentimentBorder { border-color: #4caf50; }
+.positiveSentiment.sentimentListCard { border-left-color: #4caf50; color: #333; }
 
 .sentimentGraphBar{
     color: #fff;
@@ -106,6 +87,10 @@ html, body, #leafletMap {
 
 .sentimentIcon{
   font-size: 35px;
+}
+
+.loadingPage {
+  color: #fff;
 }
 
 /* colors are from http://jan.moesen.nu/code/html-css/google-highlighting/ */

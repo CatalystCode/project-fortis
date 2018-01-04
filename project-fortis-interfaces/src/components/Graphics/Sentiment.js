@@ -6,7 +6,7 @@ export default class Sentiment extends React.Component {
   render() {
     const { value } = this.props;
     const sentiment = getSentimentAttributes(value);
-    const className = `material-icons sentimentIcon ${sentiment.style}Icon`;
+    const className = `material-icons sentimentIcon ${sentiment.style}`;
     const sentimentIcon = <span className={className}>{sentiment.icon}</span>;
     const displayValue = parseFloat(this.props.value * 10).toFixed(0);
     const graphbarClassname = `sentimentGraphBar ${sentiment.style}`;

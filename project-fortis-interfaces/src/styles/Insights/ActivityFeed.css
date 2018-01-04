@@ -238,14 +238,6 @@ background-color: #333;
     padding: 2px 10px!important;
 }
 
-.label-neutral {
-    background-color: #caaa00;
-}
-
-.label-warning{
-    background-color: #f48342!important;
-}
-
 .label-news-feed{
     color:#000!important;
     border-radius: 5.25em!important

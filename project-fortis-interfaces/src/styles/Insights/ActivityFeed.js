@@ -22,33 +22,12 @@ module.exports = {
         paddingRight: '4px',
         fontWeight: 600
     },
-    highlightStyles: {
-        positive: {
-            borderColor: "#337ab7",
-            border: '1px solid',
-            color: "#337ab7"
-        },
-        neutral: {
-            borderColor: "#caaa00",
-            border: '1px solid',
-            color: "#caaa00"
-        },
-        negative: {
-            borderColor: "#f48342",
-            border: '1px solid',
-            color: "#f48342"
-        },
-        veryNegative: {
-            borderColor: "#d9534f",
-            border: '1px solid',
-            color: "#d9534f"
-        }
-    },
     tabStyle: {
         backgroundColor: "#3f3f4f",
         height: '60px'
     },
     tagStyle: {
+        border: "1px solid",
         marginLeft: "4px",
         marginTop: "6px",
         fontSize: "11px"
