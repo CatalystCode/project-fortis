@@ -8,7 +8,6 @@ import { TranslateButton } from '../Insights/TranslateButton';
 import { Highlighter } from './Highlighter';
 import { extractHostnameIfExists } from '../Insights/shared';
 import Chip from 'material-ui/Chip';
-import { blue300, indigo900 } from 'material-ui/styles/colors';
 
 const styles = {
     listItemHeader: {
@@ -79,7 +78,7 @@ export default class EventDetails extends React.Component {
                             </p>
                             <p className="subheading">Recognized Place(s)</p>
                             <div className="drop">
-                                {places.length && places.map(place => <Chip key={place} backgroundColor={blue300} style={styles.chip}>
+                                {places.length && places.map(place => <Chip key={place} style={styles.chip}>
                                     <Avatar icon={<FontIcon className="material-icons">place</FontIcon>} />
                                     <span className="highlight-place">{place}</span>
                                 </Chip>)}
@@ -131,10 +130,8 @@ export default class EventDetails extends React.Component {
                                 </div>
                                 <p className="subheading">Tags</p>
                                 <div className="drop">
-                                    {tags && tags.map(tag => <Chip key={tag} backgroundColor={blue300} style={styles.chip}>
-                                        <Avatar size={32} color={blue300} backgroundColor={indigo900}>
-                                            {tag.substring(0, 2)}
-                                        </Avatar>
+                                    {tags && tags.map(tag => <Chip key={tag} style={styles.chip}>
+                                        <Avatar icon={<FontIcon className="fa fa-tag" />} />
                                         <span className="highlight-tag">{tag}</span>
                                     </Chip>)}
                                 </div>
