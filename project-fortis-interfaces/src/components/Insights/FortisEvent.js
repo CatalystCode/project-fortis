@@ -11,6 +11,18 @@ function stopPropagation(event) {
     event.stopPropagation();
 }
 
+function getSentimentStyle(sentimentScore) {
+    if (sentimentScore >= 0 && sentimentScore < 30) {
+        return styles.highlightStyles.positive;
+    } else if (sentimentScore >= 30 && sentimentScore < 55) {
+        return styles.highlightStyles.neutral;
+    } else if (sentimentScore >= 55 && sentimentScore < 80) {
+        return styles.highlightStyles.negative;
+    } else {
+        return styles.highlightStyles.veryNegative;
+    }
+}
+
 export default class FortisEvent extends React.Component {
     constructor(props){
         super(props);
@@ -18,30 +30,6 @@ export default class FortisEvent extends React.Component {
         this.state = {
             translated: false
         };
-    }
-
-    getSentimentStyle(sentimentScore) {
-        if (sentimentScore >= 0 && sentimentScore < 30) {
-            return styles.highlightStyles.positive;
-        } else if (sentimentScore >= 30 && sentimentScore < 55) {
-            return styles.highlightStyles.neutral;
-        } else if (sentimentScore >= 55 && sentimentScore < 80) {
-            return styles.highlightStyles.negative;
-        } else {
-            return styles.highlightStyles.veryNegative;
-        }
-    }
-
-    getSentimentLabelStyle(sentimentScore) {
-        if (sentimentScore >= 0 && sentimentScore < 30) {
-            return "label label-primary label-news-feed";
-        } else if (sentimentScore >= 30 && sentimentScore < 55) {
-            return "label label-neutral label-news-feed";
-        } else if (sentimentScore >= 55 && sentimentScore < 80) {
-            return "label label-warning label-news-feed";
-        } else {
-            return "label label-danger label-news-feed";
-        }
     }
 
     translateNewsItem = (event) => {
@@ -108,7 +96,7 @@ export default class FortisEvent extends React.Component {
                             textToHighlight={sentence} />
                     </div>
                     <div className="row" style={styles.contentRow}>
-                        {edges.map(item => <span key={item} style={Object.assign({}, styles.tagStyle, this.getSentimentStyle(sentiment * 100))} className="edgeTag">{item}</span>)}
+                        {edges.map(item => <span key={item} style={Object.assign({}, styles.tagStyle, getSentimentStyle(sentiment * 100))} className="edgeTag">{item}</span>)}
                     </div>
                 </div>
             </div>
