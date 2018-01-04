@@ -56,9 +56,8 @@ export default class EventDetails extends React.Component {
         const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, link, places, language } = this.props.properties;
         const dateText = getHumanDateFromNow(eventtime);
         const dataSourceSchema = enabledStreams.get(pipelinekey);
-        const tags = edges || [];
 
-        const highlightWords = tags.map((word, i) => ({word, className: `highlight-tag highlight-tag-${i}`}))
+        const highlightWords = (edges || []).map((word, i) => ({word, className: `highlight-tag highlight-tag-${i}`}))
             .concat(places.map((word, i) => ({word, className: `highlight-place highlight-place-${i}`})));
 
         return (
@@ -66,24 +65,20 @@ export default class EventDetails extends React.Component {
                 <div className="container-fluid">
                     <div className="row whitespace">
                         <div className="caption">
-                            <h6 style={styles.listItemHeader}>
-                                {
-                                    title !== "" ? <span>{title}</span> : undefined
-                                }
-                            </h6>
+                            <h6 style={styles.listItemHeader}>{title !== "" ? <span>{title}</span> : undefined}</h6>
                         </div>
+
                         <div className="col-md-4 viewport">
                             <p className="drop">
                                 <MapViewPort coordinates={this.props.coordinates} mapSize={[575, 600]} />
                             </p>
+
                             <p className="subheading">Recognized Place(s)</p>
                             <div className="drop">
-                                {places && places.map((place, i) => <Chip key={place} style={styles.chip}>
-                                    <Avatar icon={<FontIcon className="material-icons">place</FontIcon>} />
-                                    <span className={`highlight-place highlight-place-${i}`}>{place}</span>
-                                </Chip>)}
+                                {this.renderPlaces()}
                             </div>
                         </div>
+
                         <div className="col-md-6">
                             <div className="article">
                                 <p className="text">
@@ -94,14 +89,13 @@ export default class EventDetails extends React.Component {
                                 </p>
                             </div>
                         </div>
+
                         <div className="col-md-2">
                             <div className="details">
                                 <p className="drop">
-                                    {
-                                        link !== "" ? <a href={link} target="_blank">Read Original</a>
-                                            : undefined
-                                    }
+                                    { link !== "" ? <a href={link} target="_blank">Read Original</a> : undefined}
                                 </p>
+
                                 <p className="drop">
                                     <TranslateButton
                                         fromLanguage={language}
@@ -110,8 +104,12 @@ export default class EventDetails extends React.Component {
                                         onTranslationResults={this.translateEvent}
                                         tooltipPosition="top-left" />
                                 </p>
+
                                 <p className="subheading">Date created</p>
-                                <p className="drop"><i className="fa fa-clock-o fa-1"></i><span className="date">{dateText}</span></p>
+                                <p className="drop">
+                                    <i className="fa fa-clock-o fa-1"></i>
+                                    <span className="date">{dateText}</span>
+                                </p>
 
                                 <p className="subheading">Sentiment</p>
                                 <div className="drop">
@@ -121,19 +119,15 @@ export default class EventDetails extends React.Component {
                                 <p className="subheading">Sources</p>
                                 <div className="drop">
                                     <i style={styles.sourceLogo} className={`fa ${dataSourceSchema.icon} fa-4x`}></i>
-                                    {
-                                        <Chip key={externalsourceid} style={styles.chip}>
-                                            <Avatar icon={<FontIcon className="material-icons">share</FontIcon>} />
+                                    <Chip key={externalsourceid} style={styles.chip}>
+                                        <Avatar icon={<FontIcon className="material-icons">share</FontIcon>} />
                                             {extractHostnameIfExists(externalsourceid)}
-                                        </Chip>
-                                    }
+                                     </Chip>
                                 </div>
+
                                 <p className="subheading">Tags</p>
                                 <div className="drop">
-                                    {tags && tags.map((tag, i) => <Chip key={tag} style={styles.chip}>
-                                        <Avatar icon={<FontIcon className="fa fa-tag" />} />
-                                        <span className={`highlight-tag highlight-tag-${i}`}>{tag}</span>
-                                    </Chip>)}
+                                    {this.renderTags()}
                                 </div>
                             </div>
                         </div>
@@ -143,4 +137,33 @@ export default class EventDetails extends React.Component {
         );
     }
 
+    renderPlaces() {
+        const { places } = this.props.properties;
+
+        if (!places || !places.length) {
+            return null;
+        }
+
+        return places.map((place, i) =>
+            <Chip key={place} style={styles.chip}>
+                <Avatar icon={<FontIcon className="material-icons">place</FontIcon>} />
+                <span className={`highlight-place highlight-place-${i}`}>{place}</span>
+            </Chip>
+        );
+    }
+
+    renderTags() {
+        const { edges } = this.props.properties;
+
+        if (!edges || !edges.length) {
+            return null;
+        }
+
+        return edges.map((tag, i) =>
+            <Chip key={tag} style={styles.chip}>
+                <Avatar icon={<FontIcon className="fa fa-tag" />} />
+                <span className={`highlight-tag highlight-tag-${i}`}>{tag}</span>
+            </Chip>
+        );
+    }
 };
