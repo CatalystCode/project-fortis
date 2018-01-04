@@ -104,3 +104,6 @@ export function open(url) {
         window.open(url);
     }
 }
+
+export function doNothing() {
+}

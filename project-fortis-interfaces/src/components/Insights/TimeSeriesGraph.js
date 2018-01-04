@@ -4,15 +4,13 @@ import moment from 'moment';
 import GraphCard from '../Graphics/GraphCard';
 import NoData from '../Graphics/NoData';
 import constants from '../../actions/constants';
-import { FromToDateFormat } from '../../utils/Utils';
+import { FromToDateFormat, doNothing } from '../../utils/Utils';
 import { fetchTermFromMap, hasChanged } from './shared';
 import Timeline from '../Graphics/Timeline';
 import IconButton from 'material-ui/IconButton';
 import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
 import ContentUndo from 'material-ui/svg-icons/content/undo';
 import { fullWhite, grey800 } from 'material-ui/styles/colors';
-
-const doNothing = () => {};
 
 export default class TimeSeriesGraph extends React.Component {
     constructor(props) {
