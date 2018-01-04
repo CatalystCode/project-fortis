@@ -65,10 +65,12 @@ ENV FORTIS_CASSANDRA_SITE_TYPE=""
 # page and you're done
 ENV AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 
-ADD . /app
-ADD docker/run-node.sh /app/run-node.sh
 WORKDIR /app
+ADD package.json /app/package.json
 RUN npm install
+
+ADD docker/run-node.sh /app/run-node.sh
+ADD . /app
 
 EXPOSE 80
 CMD "/app/run-node.sh"
