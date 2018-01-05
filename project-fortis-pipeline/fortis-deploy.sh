@@ -14,9 +14,6 @@ Arguments
   --subscription_id|-si              [Required] : Subscription Id
   --tenant_id|-ti                    [Required] : Tenant Id
   --user_name|-un                    [Required] : Admin user name for the Kubernetes cluster
-  --aad_client|-ad                   [Required] : Active Directory Client Id to use for this deployment
-  --fortis_admins|-fa                [Required] : Email addresses of fortis admins, comma separated
-  --fortis_users|-fu                 [Required] : Email addresses of fortis users, comma separated
   --resource_group|-rg               [Required] : Resource group containing your Kubernetes cluster
   --master_fqdn|-mf                  [Required] : Master FQDN of your Kubernetes cluster
   --storage_account_name|-san        [Required] : Storage Account name used for Kubernetes's persistent storage
@@ -33,6 +30,9 @@ Arguments
   --sb_conn_str|-sb                  [Required] : Service Bus Connection String
   --agent_vm_size|-avms              [Required] : Size of the VMs used for the Kubernetes cluster
   --mapbox_access_token|-mat         [Required] : Mapbox access token
+  --aad_client|-ad                   [Optional] : Active Directory Client Id to use for this deployment
+  --fortis_admins|-fa                [Optional] : Email addresses of fortis admins, comma separated
+  --fortis_users|-fu                 [Optional] : Email addresses of fortis users, comma separated
 EOF
 }
 
