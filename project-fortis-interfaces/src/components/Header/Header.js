@@ -52,7 +52,6 @@ class Header extends React.Component {
         <li>{ this.renderDashboardLink() }</li>
         <li>{ this.renderFactsLink() }</li>
         <li>{ this.renderAdminLink() }</li>
-        { this.props.siteKey === "dengue" && <li>{ this.renderPredictionsLink() }</li> }
       </ul>
     );
   }
@@ -66,12 +65,6 @@ class Header extends React.Component {
   renderFactsLink() {
     return (
       <Link to={`/site/${this.props.siteName}/facts/`} activeClassName="current">Facts</Link>
-    );
-  }
-
-  renderPredictionsLink() {
-    return (
-      <Link to={`/site/${this.props.siteName}/predictions/`} activeClassName="current">Predictions</Link>
     );
   }
 
