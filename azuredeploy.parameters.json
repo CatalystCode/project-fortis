@@ -44,6 +44,9 @@
         "sshPublicKey": {
             "value": "GEN-UNIQUE"
         },
+        "mapboxAccessToken": {
+            "value": "GEN-UNIQUE"
+        },
         "servicePrincipalAppId": {
             "value": "GEN-UNIQUE"
         },

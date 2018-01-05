@@ -16,6 +16,7 @@ readonly agent_vm_size="${13}"
 readonly fortis_admins="${14}"
 readonly fortis_users="${15}"
 readonly aad_client="${16}"
+readonly mapbox_access_token="${17}"
 
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
@@ -71,7 +72,8 @@ echo "Finished. Now setting up fortis react frontend."
     "${storage_account_key}" \
     "${fortis_interface_container}" \
     "${fortis_interface_host}" \
-    "${aad_client}"
+    "${aad_client}" \
+    "${mapbox_access_token}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \

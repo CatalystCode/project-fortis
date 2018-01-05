@@ -1,8 +1,3 @@
-const {
-    reactAppMapboxAccessToken,
-    reactAppMapboxTileLayerUrl
-} = require('../config');
-
 module.exports = {
     SENTIMENT_JSON_MAPPING : {
          "0": -5,
@@ -12,9 +7,7 @@ module.exports = {
     MAP: {
         MINZOOM: 8,
         MAXZOOM: 8,
-        DEBOUNCE: 3000,
-        MAPBOX_ACCESS_TOKEN: reactAppMapboxAccessToken,
-        TILE_LAYER_URL: `${reactAppMapboxTileLayerUrl}?access_token=${reactAppMapboxAccessToken}`
+        DEBOUNCE: 3000
     },
     TIMESPAN_TYPES : {
          'hour': {

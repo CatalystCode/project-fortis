@@ -32,6 +32,7 @@ Arguments
   --eh_conn_str|-ec                  [Required] : Event Hub Connection String
   --sb_conn_str|-sb                  [Required] : Service Bus Connection String
   --agent_vm_size|-avms              [Required] : Size of the VMs used for the Kubernetes cluster
+  --mapbox_access_token|-mat         [Required] : Mapbox access token
 EOF
 }
 
@@ -137,6 +138,10 @@ while [[ $# -gt 0 ]]; do
       agent_vm_size="$1"
       shift
       ;;
+    --mapbox_access_token|-mat)
+      mapbox_access_token="$1"
+      shift
+      ;;
     *)
       echo "ERROR: Unknown argument '${key}' to script '$0'" 1>&2
       exit -1
@@ -227,6 +232,7 @@ throw_if_empty --site_name "${site_name}"
 throw_if_empty --eh_conn_str "${eh_conn_str}"
 throw_if_empty --sb_conn_str "${sb_conn_str}"
 throw_if_empty --agent_vm_size "${agent_vm_size}"
+throw_if_empty --mapbox_access_token "${mapbox_access_token}"
 
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
@@ -274,4 +280,5 @@ echo "Finished. Setting up cluster"
     "${agent_vm_size}" \
     "${fortis_admins}" \
     "${fortis_users}" \
-    "${aad_client}"
+    "${aad_client}" \
+    "${mapbox_access_token}"
