@@ -12,6 +12,10 @@ import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
 import ContentUndo from 'material-ui/svg-icons/content/undo';
 import { fullWhite, grey800 } from 'material-ui/styles/colors';
 
+function formatTime(time, toFormat) {
+    return moment(time).format(toFormat);
+}
+
 export default class TimeSeriesGraph extends React.Component {
     constructor(props) {
         super(props);
@@ -63,7 +67,7 @@ export default class TimeSeriesGraph extends React.Component {
             format = "l";
         }
 
-        return moment(time).format(format);
+        return formatTime(time, format);
     }
 
     componentDidMount() {
@@ -86,10 +90,6 @@ export default class TimeSeriesGraph extends React.Component {
         }
     }
 
-    momentFormat(dateString, format) {
-        return moment(dateString).format(format);
-    }
-
     resetTimeline = () => {
         this.props.refreshDashboardFunction();
         this.setState({timelineHasBeenCustomized: false});
@@ -103,9 +103,9 @@ export default class TimeSeriesGraph extends React.Component {
 
         if (fromDateSlice && toDateSlice) {
             const datetimeSelectionFormat = "YY-MM-DD HH:mm";
-            const fromDate = this.momentFormat(fromDateSlice.date, FromToDateFormat);
-            const toDate = this.momentFormat(toDateSlice.date, FromToDateFormat);
-            const datetimeSelection = `${this.momentFormat(fromDateSlice.date, datetimeSelectionFormat)} - ${this.momentFormat(toDateSlice.date, datetimeSelectionFormat)}`
+            const fromDate = formatTime(fromDateSlice.date, FromToDateFormat);
+            const toDate = formatTime(toDateSlice.date, FromToDateFormat);
+            const datetimeSelection = `${formatTime(fromDateSlice.date, datetimeSelectionFormat)} - ${formatTime(toDateSlice.date, datetimeSelectionFormat)}`
             const timeseriesType = constants.TIMESPAN_TYPES[timespanType].timeseriesType
             this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timeseriesType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
         }
@@ -144,7 +144,7 @@ export default class TimeSeriesGraph extends React.Component {
                 <Timeline fill={constants.CHART_STYLE.BG_FILL}
                     data={this.props.timeSeriesGraphData.graphData.map(graphData => {
                         const localizedGraphData = Object.assign({}, graphData);
-                        localizedGraphData.date = this.momentFormat(graphData.date, 'lll');
+                        localizedGraphData.date = formatTime(graphData.date, 'lll');
                         return localizedGraphData;
                     })}
                     dataKey="date"
