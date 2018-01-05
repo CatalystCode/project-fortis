@@ -106,6 +106,9 @@ docker-compose up --build -d
   the `Application ID` will be used for the `Service Principal App ID` field
   and the `Authentication Key` will be used for the `Service Principal App Key`.
 
+* You'll need a Mapbox access token. If you don't have one yet, [sign up](https://www.mapbox.com/signup/)
+  to create a new token for free.
+
 #### Setting up a new Azure deployment
 
 Hit the deploy to Azure button below:

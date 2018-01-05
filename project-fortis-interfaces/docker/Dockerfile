@@ -27,8 +27,7 @@ ENV REACT_APP_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure
 ENV REACT_APP_AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 
 # mapbox configuration
-# you can create a new access token for free by following the steps outlined in
-# the guide at https://www.mapbox.com/help/how-access-tokens-work/#mapbox-tokens-api
+# you can create a new access token for free at https://www.mapbox.com/signup/
 # the tile layer url defines the style of the map that will be used in the site
 # any v1 static api url should work here; more information about possible style
 # urls is here: https://www.mapbox.com/help/mapbox-with-openlayers/#mapbox-studio-style-or-mapbox-style-url

@@ -141,7 +141,7 @@
         },
         "mapboxAccessToken": {
             "metadata": {
-                "description": "Mapbox access token (create one for free at https://www.mapbox.com/help/how-access-tokens-work/#mapbox-tokens-api)"
+                "description": "Mapbox access token (create one for free at https://www.mapbox.com/signup/)"
             },
             "type": "securestring"
         },
