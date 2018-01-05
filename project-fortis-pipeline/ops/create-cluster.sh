@@ -18,10 +18,11 @@ readonly fortis_users="${15}"
 readonly aad_client="${16}"
 readonly mapbox_access_token="${17}"
 
+if [ -z "${aad_client}" ]; then readonly fortis_interface_protocol="http"; else readonly fortis_interface_protocol="https"; fi
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly fortis_interface_container="public"
-readonly fortis_interface_host="http://${storage_account_name}.blob.core.windows.net/${fortis_interface_container}"
+readonly fortis_interface_host="${fortis_interface_protocol}://${storage_account_name}.blob.core.windows.net/${fortis_interface_container}"
 readonly eh_path="published-messages"
 readonly eh_consumer_group="\$Default"
 readonly sb_queue_config="configuration"
