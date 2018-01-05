@@ -12,8 +12,9 @@ import NavigationRefresh from 'material-ui/svg-icons/navigation/refresh';
 import ContentUndo from 'material-ui/svg-icons/content/undo';
 import { fullWhite, grey800 } from 'material-ui/styles/colors';
 
-function formatTime(time, toFormat) {
-    return moment(time).format(toFormat);
+function formatTime(dateString, toFormat) {
+    const date = moment(dateString, 'YYYY-MM-DD HH:mm', true);
+    return date.isValid() ? date.format(toFormat) : dateString;
 }
 
 export default class TimeSeriesGraph extends React.Component {
