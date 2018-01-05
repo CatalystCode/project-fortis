@@ -1,5 +1,4 @@
 module.exports = {
-    publicUrl: process.env.PUBLIC_URL,
     reactAppMapboxAccessToken: process.env.REACT_APP_MAPBOX_ACCESS_TOKEN,
     reactAppMapboxTileLayerUrl: process.env.REACT_APP_MAPBOX_TILE_LAYER_URL,
     reactAppAdClientId: process.env.REACT_APP_AD_CLIENT_ID,

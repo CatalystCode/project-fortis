@@ -4,8 +4,6 @@ import { Link } from 'react-router';
 
 import LanguagePicker from './LanguagePicker';
 
-import { publicUrl } from '../../config';
-
 class Header extends React.Component {
   render() {
     return (
@@ -21,9 +19,17 @@ class Header extends React.Component {
     );
   }
 
-  renderNavHeader() {
-    const { title, logo } = this.props;
+  renderLogo() {
+    if (!this.props.logo) {
+      return null;
+    }
 
+    return (
+      <img src={this.props.logo} style={{display: 'inline'}} height="48" alt="" />
+    );
+  }
+
+  renderNavHeader() {
     return (
       <div className="navbar-header">
         <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapsible">
@@ -33,8 +39,8 @@ class Header extends React.Component {
           <span className="icon-bar"></span>
         </button>
         <a className="navbar-brand text-danger">
-          { logo && <img src={logo.startsWith("http:") ? logo : `${publicUrl}/images/${logo}`} style={{display: 'inline'}} height="48" alt="" /> }
-          <span className="brandLabel">{title}</span>
+          {this.renderLogo()}
+          <span className="brandLabel">{this.props.title}</span>
         </a>
       </div>
     );
