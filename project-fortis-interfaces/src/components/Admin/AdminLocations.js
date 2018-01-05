@@ -1,7 +1,7 @@
 import React from 'react';
-import { Map, TileLayer, ZoomControl, Rectangle, FeatureGroup } from 'react-leaflet';
+import { Map, ZoomControl, Rectangle, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw"
-import constants from '../../actions/constants';
+import { TileLayer } from '../Insights/Maps/TileLayer';
 import '../../styles/Insights/HeatMap.css';
 
 const styles = {
@@ -128,9 +128,7 @@ export default class AdminLocations extends React.Component {
                             zoom={defaultZoomLevel}
                             zoomControl={false} >
 
-                            <TileLayer url={constants.MAP.TILE_LAYER_URL}
-                                attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
-                                accessToken={constants.MAP.MAPBOX_ACCESS_TOKEN} />
+                            <TileLayer />
 
                             <FeatureGroup>
                                 <EditControl

@@ -1,6 +1,7 @@
 import MarkerClusterGroup from './MarkerClusterGroup';
-import { Map, TileLayer, ZoomControl, Rectangle } from 'react-leaflet';
+import { Map, ZoomControl, Rectangle } from 'react-leaflet';
 import constants from '../../../actions/constants';
+import { TileLayer } from './TileLayer';
 import React from 'react';
 import { tileFromTileId } from 'geotile';
 import { hasChanged } from '../shared';
@@ -128,11 +129,7 @@ export default class HeatMap extends React.Component {
         useFlyTo={true}
         zoomControl={false} >
 
-        <TileLayer url={constants.MAP.TILE_LAYER_URL}
-          maxZoom={maxzoom}
-          minZoom={defaultZoom}
-          attribution='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>'
-          accessToken={constants.MAP.MAPBOX_ACCESS_TOKEN} />
+        <TileLayer maxZoom={maxzoom} minZoom={defaultZoom} />
 
         <ZoomControl
           position={'topright'}
