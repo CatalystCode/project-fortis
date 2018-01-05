@@ -2,11 +2,17 @@ function ResponseHandler (error, response, body, callback) {
     if (!error && response.statusCode === 200 && body.data && !body.errors) {
         callback(undefined, body.data);
     } else {
-        callback({ code: response.statusCode, message: `GraphQL call failed: ${formatGraphQlErrorDetails(body)}` }, undefined);
+        const code = response ? response.statusCode : 500;
+        const message = `GraphQL call failed: ${formatGraphQlErrorDetails(body, error)}`;
+        callback({ code, message }, undefined);
     }
 }
 
-function formatGraphQlErrorDetails(body) {
+function formatGraphQlErrorDetails(body, error) {
+    if (!body) {
+        return error;
+    }
+
     if (!body.errors) {
         return body;
     }
