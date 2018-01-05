@@ -22,7 +22,7 @@ Arguments
   --storage_account_name|-san        [Required] : Storage Account name used for Kubernetes's persistent storage
   --storage_account_key|-sak         [Required] : Storage Account key used for Kubernetes persistent storage
   --spark_worker_count|-sw           [Required] : Spark Worker Node Count
-  --cassandra_node_count|-cn         [Required] : Port used for Front50, defaulted to 8080
+  --cassandra_node_count|-cn         [Required] : Cassandra Node Count
   --app_insights_id|-aii             [Required] : Application Insights Instramentation Key
   --gh_clone_path|-gc                [Required] : Github path to clone
   --location|-lo                     [Required] : Container cluster location
