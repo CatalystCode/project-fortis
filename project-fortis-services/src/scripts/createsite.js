@@ -49,7 +49,10 @@ function createSite(args) {
     if (!siteName || !siteName.length) return reject('siteName is not defined');
     if (!siteType || !siteType.length) return reject('siteType is not defined');
 
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings WHERE sitename = ?', [siteName])
+    const siteQuery = 'SELECT * FROM fortis.sitesettings WHERE sitename = ?';
+    const siteQueryParams = [siteName];
+
+    cassandraConnector.executeQuery(siteQuery, siteQueryParams)
       .then(rows => {
         if (!rows || !rows.length) return insertTopics(siteType);
         else return reject(`Sites with sitename ${siteName} already exist.`);
@@ -82,18 +85,13 @@ function createSite(args) {
       .then(() => {
         streamingController.restartStreaming();
       })
-      .then(() => {
-        resolve({
-          name: args.input.name,
-          properties: {
-            targetBbox: args.input.targetBbox,
-            defaultZoomLevel: args.input.defaultZoomLevel,
-            logo: args.input.logo,
-            title: args.input.title,
-            defaultLocation: args.input.defaultLocation,
-            supportedLanguages:args.input.supportedLanguages
-          }
-        });
+      .then(() => cassandraConnector.executeQuery(siteQuery, siteQueryParams))
+      .then(addedSite => {
+        if (addedSite.length === 1) {
+          resolve(addedSite);
+        } else {
+          reject('Tried to add site but query-back did not return it');
+        }
       })
       .catch(reject);
   });

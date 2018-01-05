@@ -14,9 +14,20 @@ function addUsers(role, users) {
       query: 'INSERT INTO fortis.users(identifier, role) VALUES (?, ?) IF NOT EXISTS',
       params: [user, role]
     }));
+    const queries = users.map(user => ({
+      query: 'SELECT * FROM fortis.users WHERE identifier = ? AND role = ?',
+      params: [user, role]
+    }));
 
     Promise.all(mutations.map(mutation => cassandraConnector.executeBatchMutations([mutation])))
-      .then(() => resolve({ numUsersAdded: mutations.length }))
+      .then(() => Promise.all(queries.map(({ query, params }) => cassandraConnector.executeQuery(query, params))))
+      .then(addedUsers => {
+        if (addedUsers.length === users.length) {
+          resolve(addedUsers);
+        } else {
+          reject('Tried to add users but query-back did not return them');
+        }
+      })
       .catch(reject);
   });
 }
