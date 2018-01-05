@@ -8,6 +8,7 @@ readonly blob_container_name="$5"
 readonly fortis_interface_host="$6"
 readonly aad_client="$7"
 readonly mapbox_access_token="$8"
+readonly mapbox_tile_layer_url="$9"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
@@ -27,7 +28,7 @@ REACT_APP_SERVICE_HOST="${graphql_service_host}" \
 REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}" \
 REACT_APP_AD_CLIENT_ID="${aad_client}" \
 REACT_APP_MAPBOX_ACCESS_TOKEN="${mapbox_access_token}" \
-REACT_APP_MAPBOX_TILE_LAYER_URL="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}" \
+REACT_APP_MAPBOX_TILE_LAYER_URL="${mapbox_tile_layer_url}" \
 npm run build
 
 # deploy the frontend to blob storage

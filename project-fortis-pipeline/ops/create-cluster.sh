@@ -26,6 +26,7 @@ readonly eh_path="published-messages"
 readonly eh_consumer_group="\$Default"
 readonly sb_queue_config="configuration"
 readonly sb_queue_command="command"
+readonly mapbox_tile_layer_url="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}"
 
 chmod -R 752 .
 
@@ -73,7 +74,8 @@ echo "Finished. Now setting up fortis react frontend."
     "${fortis_interface_container}" \
     "${fortis_interface_host}" \
     "${aad_client}" \
-    "${mapbox_access_token}"
+    "${mapbox_access_token}" \
+    "${mapbox_tile_layer_url}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \
