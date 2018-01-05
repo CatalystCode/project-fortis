@@ -30,7 +30,7 @@ readonly sb_queue_command="command"
 chmod -R 752 .
 
 echo "Waiting for Tiller pod to get ready"
-while ! (kubectl get po --namespace kube-system | grep -i tiller | grep -i running); do echo "Waiting for Tiller pod"; sleep 10s; done
+while ! (kubectl get po --namespace kube-system | grep -i 'tiller' | grep -i 'running' | grep -i '1/1'); do echo "Waiting for Tiller pod"; sleep 10s; done
 
 echo "Finished. Now installing Cassandra helm chart."
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
