@@ -95,7 +95,16 @@ export const AppPage = createReactClass({
   },
 
   shouldRenderError() {
-    return this.state.error;
+    if (!this.state.error) {
+      return false;
+    }
+
+    if (this.state.error.code === 401 && this.state.authInfo && this.state.authInfo.token) {
+      window.location.reload();
+      return false;
+    }
+
+    return true;
   },
 
   shouldRenderApp() {
