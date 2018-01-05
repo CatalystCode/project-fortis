@@ -86,20 +86,36 @@ export const AppPage = createReactClass({
     return this.getFlux().store("DataStore").getState();
   },
 
+  shouldRenderLogin() {
+    return this.adApplication && (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token);
+  },
+
+  shouldRenderUnknownSite() {
+    return this.state.siteName && this.props.params.siteKey && this.state.siteName !== this.props.params.siteKey;
+  },
+
+  shouldRenderError() {
+    return this.state.error;
+  },
+
+  shouldRenderApp() {
+    return this.state.bbox.length;
+  },
+
   render() {
-    if (this.adApplication && (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token)) {
+    if (this.shouldRenderLogin()) {
       return this.renderLogin();
     }
 
-    if (this.state.siteName && this.props.params.siteKey && this.state.siteName !== this.props.params.siteKey) {
+    if (this.shouldRenderUnknownSite()) {
       return this.renderUnknownSite();
     }
 
-    if (this.state.error) {
+    if (this.shouldRenderError()) {
       return this.renderError();
     }
 
-    if (this.state.bbox.length) {
+    if (this.shouldRenderApp()) {
       return this.renderApp();
     }
 
