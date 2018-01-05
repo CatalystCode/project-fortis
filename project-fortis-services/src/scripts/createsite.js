@@ -125,7 +125,8 @@ function cli() {
   const siteName = process.argv[2];
   const siteType = process.argv[3];
 
-  createSiteWithDefaults(siteName, siteType)
+  cassandraConnector.initialize()
+    .then(() => createSiteWithDefaults(siteName, siteType))
     .then(result => {
       console.log(`Site ${siteName} of type ${siteType} created!`);
       console.log(result);

@@ -30,7 +30,8 @@ function cli() {
   const role = process.argv[2];
   const users = process.argv[3].split(',');
 
-  addUsers(role, users)
+  cassandraConnector.initialize()
+    .then(() => addUsers(role, users))
     .then(result => {
       console.log('Added new users');
       console.log(result);
