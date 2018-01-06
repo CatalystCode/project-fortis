@@ -32,13 +32,16 @@ readonly mapbox_tile_layer_url="https://api.mapbox.com/styles/v1/mapbox/satellit
 chmod -R 752 .
 
 echo "Waiting for Tiller pod to get ready"
-while ! (kubectl get po --namespace kube-system | grep -i 'tiller' | grep -i 'running' | grep -i '1/1'); do echo "Waiting for Tiller pod"; sleep 10s; done
+while ! (kubectl get po --namespace kube-system | grep -i 'tiller' | grep -i 'running' | grep -i '1/1'); do
+  echo "Waiting for Tiller pod"
+  sleep 10s
+done
 
 echo "Finished. Now installing Cassandra helm chart."
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
 while :; do
-    cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
-    if [ -n "${cassandra_ip}" ]; then break; else echo "Waiting for Cassandra IP"; sleep 5s; fi
+  cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
+  if [ -n "${cassandra_ip}" ]; then break; else echo "Waiting for Cassandra IP"; sleep 5s; fi
 done
 
 echo "Finished. Now setting up fortis graphql service in kubernetes."
@@ -61,50 +64,50 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${site_type}" \
   "${aad_client}"
 while :; do
-    fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
-    if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
+  fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
+  if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
 done
 readonly graphql_service_host="http://${fortis_service_ip}"
 
 echo "Finished. Now setting up fortis react frontend."
 ./install-fortis-interfaces.sh \
-    "${graphql_service_host}" \
-    "${feature_service_host}" \
-    "${storage_account_name}" \
-    "${storage_account_key}" \
-    "${fortis_interface_container}" \
-    "${fortis_interface_host}" \
-    "${aad_client}" \
-    "${mapbox_access_token}" \
-    "${mapbox_tile_layer_url}"
+  "${graphql_service_host}" \
+  "${feature_service_host}" \
+  "${storage_account_name}" \
+  "${storage_account_key}" \
+  "${fortis_interface_container}" \
+  "${fortis_interface_host}" \
+  "${aad_client}" \
+  "${mapbox_access_token}" \
+  "${mapbox_tile_layer_url}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \
-    "${cassandra_ip}" \
-    "${app_insights_id}" \
-    "${site_name}" \
-    "${feature_service_host}" \
-    "${graphql_service_host}" \
-    "${k8resource_group}" \
-    "${fortis_interface_host}" \
-    "${eh_conn_str}" \
-    "${fortis_central_directory}" \
-    "${sb_conn_str}" \
-    "${storage_account_name}" \
-    "${storage_account_key}" \
-    "${eh_path}" \
-    "${eh_consumer_group}" \
-    "${sb_queue_config}" \
-    "${sb_queue_command}" \
-    "${checkpointfileshare}" \
-    "${k8spark_worker_count}" \
-    "${agent_vm_size}"
+  "${cassandra_ip}" \
+  "${app_insights_id}" \
+  "${site_name}" \
+  "${feature_service_host}" \
+  "${graphql_service_host}" \
+  "${k8resource_group}" \
+  "${fortis_interface_host}" \
+  "${eh_conn_str}" \
+  "${fortis_central_directory}" \
+  "${sb_conn_str}" \
+  "${storage_account_name}" \
+  "${storage_account_key}" \
+  "${eh_path}" \
+  "${eh_consumer_group}" \
+  "${sb_queue_config}" \
+  "${sb_queue_command}" \
+  "${checkpointfileshare}" \
+  "${k8spark_worker_count}" \
+  "${agent_vm_size}"
 
 echo "Finished. Finally, creating tags containing URLs for resources so that the user can find them later."
 ./create-tags.sh \
-    "${k8resource_group}" \
-    "${fortis_interface_host}" \
-    "${site_name}" \
-    "${graphql_service_host}"
+  "${k8resource_group}" \
+  "${fortis_interface_host}" \
+  "${site_name}" \
+  "${graphql_service_host}"
 
 echo "All done :)"
