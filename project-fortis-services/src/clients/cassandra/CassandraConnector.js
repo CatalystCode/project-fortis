@@ -156,7 +156,14 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
  * @returns {Promise}
  */
 function intialize() {
-  return executeQuery('select sitename from fortis.sitesettings limit 1', []);
+  return new Promise((resolve, reject) => {
+    executeQuery('select sitename from fortis.sitesettings limit 1', [])
+      .then(() => {
+        console.log(`Established connection to cassandra keyspace ${cassandraKeyspace} at contact points ${cassandraContactPoints}`);
+        resolve();
+      })
+      .catch(reject);
+  });
 }
 
 module.exports = {
