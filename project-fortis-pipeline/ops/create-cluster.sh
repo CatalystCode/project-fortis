@@ -37,8 +37,8 @@ while ! (kubectl get po --namespace kube-system | grep -i 'tiller' | grep -i 'ru
 echo "Finished. Now installing Cassandra helm chart."
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
 while :; do
-   cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
-   if [ -n "${cassandra_ip}" ]; then break; else echo "Waiting for Cassandra IP"; sleep 5s; fi
+    cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
+    if [ -n "${cassandra_ip}" ]; then break; else echo "Waiting for Cassandra IP"; sleep 5s; fi
 done
 
 echo "Finished. Now setting up fortis graphql service in kubernetes."
@@ -61,8 +61,8 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${site_type}" \
   "${aad_client}"
 while :; do
-   fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
-   if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
+    fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
+    if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
 done
 readonly graphql_service_host="http://${fortis_service_ip}"
 
