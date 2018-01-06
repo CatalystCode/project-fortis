@@ -18,5 +18,11 @@ helm install \
   --name cassandra-cluster \
   ./cassandra
 
+# wait for all cassandra nodes to be ready
+while [ -z "$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..ip}')" ]; do
+  echo "Waiting for Cassandra to get ready"
+  sleep 10s
+done
+
 # cleanup
 cd ..

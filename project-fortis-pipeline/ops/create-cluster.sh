@@ -36,9 +36,6 @@ while ! (kubectl get po --namespace kube-system | grep -i 'tiller' | grep -i 'ru
 
 echo "Finished. Now installing Cassandra helm chart."
 ./install-cassandra.sh "${k8cassandra_node_count}" "${agent_vm_size}"
-while [ -z "$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..ip}')" ]; do
-    echo "Waiting for Cassandra external IP"; sleep 5s;
-done
 while :; do
     cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
     if [ -n "${cassandra_ip}" ]; then break; else echo "Waiting for Cassandra IP"; sleep 5s; fi
