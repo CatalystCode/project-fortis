@@ -49,42 +49,42 @@ cat > "${namespace_yaml}" << EOF
 EOF
 kubectl create -f "${namespace_yaml}"
 kubectl create configmap "${spark_config_map_name}" \
-    --namespace spark \
-    --from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" \
-    --from-literal=FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" \
-    --from-literal=APPLICATION_INSIGHTS_IKEY="${app_insights_id}" \
-    --from-literal=APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" \
-    --from-literal=SPARK_DAEMON_MEMORY="${spark_daemon_memory}" \
-    --from-literal=DEFAULT_LANGUAGE="${default_language}" \
-    --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
-    --from-literal=FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" \
-    --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
-    --from-literal=FORTIS_SB_CONN_STR="${sb_conn_str}" \
-    --from-literal=FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" \
-    --from-literal=FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" \
-    --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
-    --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
-    --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
+  --namespace spark \
+  --from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" \
+  --from-literal=FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" \
+  --from-literal=APPLICATION_INSIGHTS_IKEY="${app_insights_id}" \
+  --from-literal=APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" \
+  --from-literal=SPARK_DAEMON_MEMORY="${spark_daemon_memory}" \
+  --from-literal=DEFAULT_LANGUAGE="${default_language}" \
+  --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
+  --from-literal=FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" \
+  --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
+  --from-literal=FORTIS_SB_CONN_STR="${sb_conn_str}" \
+  --from-literal=FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" \
+  --from-literal=FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" \
+  --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
+  --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
+  --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
 helm install \
-    --set Worker.Replicas="${k8spark_worker_count}" \
-    --set Master.ImageTag="2.2" \
-    --set Worker.ImageTag="2.2" \
-    --set Worker.ConfigMapName="${spark_config_map_name}" \
-    --set Master.ConfigMapName="${spark_config_map_name}" \
-    --set Master.SparkSubmitCommand="${spark_command}" \
-    --set Worker.VmInstanceType="${agent_vm_size}" \
-    --set Worker.Resources.Requests.Cpu="1" \
-    --set Worker.Resources.Requests.Memory="10Gi" \
-    --set Worker.Resources.Limits.Cpu="2.8" \
-    --set Worker.Resources.Limits.Memory="20Gi" \
-    --set Master.Resources.Requests.Cpu="1" \
-    --set Master.Resources.Requests.Memory="3Gi" \
-    --set Master.Resources.Limits.Cpu="2" \
-    --set Master.Resources.Limits.Memory="5Gi" \
-    --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="20g" \
-    --namespace spark \
-    --name spark-cluster \
-    ./spark
+  --set Worker.Replicas="${k8spark_worker_count}" \
+  --set Master.ImageTag="2.2" \
+  --set Worker.ImageTag="2.2" \
+  --set Worker.ConfigMapName="${spark_config_map_name}" \
+  --set Master.ConfigMapName="${spark_config_map_name}" \
+  --set Master.SparkSubmitCommand="${spark_command}" \
+  --set Worker.VmInstanceType="${agent_vm_size}" \
+  --set Worker.Resources.Requests.Cpu="1" \
+  --set Worker.Resources.Requests.Memory="10Gi" \
+  --set Worker.Resources.Limits.Cpu="2.8" \
+  --set Worker.Resources.Limits.Memory="20Gi" \
+  --set Master.Resources.Requests.Cpu="1" \
+  --set Master.Resources.Requests.Memory="3Gi" \
+  --set Master.Resources.Limits.Cpu="2" \
+  --set Master.Resources.Limits.Memory="5Gi" \
+  --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="20g" \
+  --namespace spark \
+  --name spark-cluster \
+  ./spark
 
 # cleanup
 cd ..

@@ -249,9 +249,9 @@ if ! (command -v helm >/dev/null); then install_helm; fi
 echo "Finished. Adding storage share for spark checkpointing"
 readonly checkpointfileshare="checkpoint"
 az storage share create \
-    --name "${checkpointfileshare}" \
-    --account-key "${storage_account_key}" \
-    --account-name "${storage_account_name}"
+  --name "${checkpointfileshare}" \
+  --account-key "${storage_account_key}" \
+  --account-name "${storage_account_name}"
 
 echo "Finished. Installing deployment scripts"
 if ! (command -v git >/dev/null); then sudo apt-get -qq install -y git; fi
@@ -262,20 +262,20 @@ chmod 752 create-cluster.sh
 
 echo "Finished. Setting up cluster"
 ./create-cluster.sh \
-    "${location}" \
-    "${cassandra_node_count}" \
-    "${spark_worker_count}" \
-    "${resource_group}" \
-    "${storage_account_name}" \
-    "${app_insights_id}" \
-    "${site_name}" \
-    "${eh_conn_str}" \
-    "${sb_conn_str}" \
-    "${storage_account_key}" \
-    "${checkpointfileshare}" \
-    "${site_type}" \
-    "${agent_vm_size}" \
-    "${fortis_admins}" \
-    "${fortis_users}" \
-    "${aad_client}" \
-    "${mapbox_access_token}"
+  "${location}" \
+  "${cassandra_node_count}" \
+  "${spark_worker_count}" \
+  "${resource_group}" \
+  "${storage_account_name}" \
+  "${app_insights_id}" \
+  "${site_name}" \
+  "${eh_conn_str}" \
+  "${sb_conn_str}" \
+  "${storage_account_key}" \
+  "${checkpointfileshare}" \
+  "${site_type}" \
+  "${agent_vm_size}" \
+  "${fortis_admins}" \
+  "${fortis_users}" \
+  "${aad_client}" \
+  "${mapbox_access_token}"

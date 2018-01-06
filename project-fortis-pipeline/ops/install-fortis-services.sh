@@ -107,5 +107,5 @@ kubectl create -f "${deployment_yaml}","${service_yaml}"
 
 # request a public ip for the service
 kubectl expose deployment project-fortis-services \
-    --type "LoadBalancer" \
-    --name "project-fortis-services-lb"
+  --type "LoadBalancer" \
+  --name "project-fortis-services-lb"
