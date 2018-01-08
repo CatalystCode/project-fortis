@@ -95,7 +95,7 @@ function isMostPopularTopicSelected(maintopic, popularTopics){
     return popularTopics.length && popularTopics[0].name === maintopic;
 }
 
-const methods = {
+const _methods = {
     initializeDashboard(category) {
         const { timespanType, datetimeSelection } = this.flux.stores.DataStore.dataStore;
         const formatter = constants.TIMESPAN_TYPES[timespanType];
@@ -170,7 +170,9 @@ const methods = {
     }
 };
 
+const methods = { DASHBOARD: _methods };
+
 module.exports = {
     constants,
-    methods: { DASHBOARD: methods }
+    methods
 };

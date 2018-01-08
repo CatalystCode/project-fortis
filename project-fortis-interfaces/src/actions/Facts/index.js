@@ -1,7 +1,7 @@
 import { SERVICES } from '../../services/Facts';
 import { ResponseHandler } from '../shared';
 
-const methods = {
+const _methods = {
   loadFacts(pipelinekeys, mainTerm, fromDate, toDate, callback) {
     SERVICES.loadFacts(
       pipelinekeys, mainTerm, fromDate, toDate,
@@ -9,6 +9,8 @@ const methods = {
   },
 };
 
+const methods = { FACTS: _methods };
+
 module.exports = {
-  methods: {FACTS: methods}
+  methods
 };

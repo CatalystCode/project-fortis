@@ -7,7 +7,7 @@ function getListAfterRemove(listBeforeRemove, itemsRemoved, keyBy) {
   return differenceBy(listBeforeRemove, itemsRemoved, keyBy);
 }
 
-const methods = {
+const _methods = {
   restart_pipeline() {
     const self = this;
     AdminServices.restartPipeline((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
@@ -242,7 +242,9 @@ const methods = {
     }
 };
 
+const methods = { ADMIN: _methods };
+
 module.exports = {
     constants,
-    methods: {ADMIN: methods}
+    methods
 };
