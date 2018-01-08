@@ -16,18 +16,6 @@ has_seed_data() {
   echo 'SELECT eventid FROM fortis.events LIMIT 100;' | cassandra_exec | grep -q '(100 rows)'
 }
 
-has_site() {
-  echo 'SELECT * FROM fortis.sitesettings;' | cassandra_exec | grep -q '(1 rows)'
-}
-
-has_mapbox_token() {
-  echo 'COPY fortis.sitesettings(mapsvctoken) TO STDOUT;' | cassandra_exec | tr -d '\r' | grep -qv '""'
-}
-
-get_sitename() {
-  echo 'COPY fortis.sitesettings(sitename) TO STDOUT;' | cassandra_exec | tr -d '\r'
-}
-
 # wait for cassandra to start
 while ! cassandra_exec; do
   echo "Cassandra not yet available, waiting..."
@@ -56,9 +44,7 @@ fi
 if [ -n "$FORTIS_CASSANDRA_ADMINS" ]; then
   echo "Got Fortis admins, ingesting..."
   npm run addusers -- 'user' "$FORTIS_CASSANDRA_ADMINS"
-  if [ $? -ne 0 ]; then echo "Failed to ingest admins!" >&2; exit 1; fi
   npm run addusers -- 'admin' "$FORTIS_CASSANDRA_ADMINS"
-  if [ $? -ne 0 ]; then echo "Failed to ingest admins!" >&2; exit 1; fi
   echo "...done, Fortis admins are now ingested"
 fi
 
@@ -74,22 +60,24 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
 fi
 
 # set up site entry
-if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ] && ! has_site; then
+if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ]; then
   echo "Got Fortis site name and type, ingesting default site settings..."
   npm run createsite -- "$FORTIS_CASSANDRA_SITE_NAME" "$FORTIS_CASSANDRA_SITE_TYPE"
-  if [ $? -ne 0 ]; then echo "Failed to create site!" >&2; exit 1; fi
   echo "...done, Fortis default site is now ingested"
 fi
 
 # set up cognitive services secrets if preconfigured
 if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvisionsvctoken" ] && [ -n "$cogtextsvctoken" ]; then
   echo "Got Fortis cognitive services secrets, ingesting..."
-  echo "UPDATE fortis.sitesettings SET translationsvctoken = '$translationsvctoken', cogspeechsvctoken = '$cogspeechsvctoken', cogvisionsvctoken = '$cogvisionsvctoken', cogtextsvctoken = '$cogtextsvctoken' WHERE sitename = '$(get_sitename)';" | cassandra_exec
+  npm run ingestsetting -- "translationSvcToken" "translationsvctoken" "$translationsvctoken"
+  npm run ingestsetting -- "cogSpeechSvcToken" "cogspeechsvctoken" "$cogspeechsvctoken"
+  npm run ingestsetting -- "cogVisionSvcToken" "cogvisionsvctoken" "$cogvisionsvctoken"
+  npm run ingestsetting -- "covTextSvcToken" "cogtextsvctoken" "$cogtextsvctoken"
   echo "...done, Fortis cognitive services secrets are now ingested"
 fi
 
 # set up mapbox credentials
-if [ -n "$MAPBOX_ACCESS_TOKEN" ] && ! has_mapbox_token; then
+if [ -n "$MAPBOX_ACCESS_TOKEN" ]; then
   echo "Got MapBox token, ingesting..."
   npm run ingestsetting -- "mapSvcToken" "mapsvctoken" "$MAPBOX_ACCESS_TOKEN"
   echo "...done, MapBox token is now ingested"

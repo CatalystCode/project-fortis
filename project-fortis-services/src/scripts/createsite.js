@@ -54,8 +54,11 @@ function createSite(args) {
 
     cassandraConnector.executeQuery(siteQuery, siteQueryParams)
       .then(rows => {
-        if (!rows || !rows.length) return insertTopics(siteType);
-        else return reject(`Sites with sitename ${siteName} already exist.`);
+        if (rows && rows.length) {
+          return resolve(`Site with sitename ${siteName} already exists.`);
+        } else {
+          return insertTopics(siteType);
+        }
       })
       .then(() => {
         return cassandraConnector.executeBatchMutations([{

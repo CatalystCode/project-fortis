@@ -19,7 +19,13 @@ function ingestSetting(settingName, columnName, value) {
     `;
 
     getSiteDefinition()
-      .then(({ site }) => cassandraConnector.executeBatchMutations([{ query, params: [value, site.name] }]))
+      .then(({ site }) => {
+        if (site.properties[settingName]) {
+          return resolve(`Setting ${settingName} is already at value ${site.properties[settingName]}`);
+        } else {
+          return cassandraConnector.executeBatchMutations([{ query, params: [value, site.name] }]);
+        }
+      })
       .then(() => getSiteDefinition())
       .then(({ site }) => {
         if (site.properties[settingName] === value) {
