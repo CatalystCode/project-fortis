@@ -21,7 +21,7 @@ function ingestSetting(settingName, columnName, value) {
     getSiteDefinition()
       .then(({ site }) => {
         if (site.properties[settingName]) {
-          return resolve(`Setting ${settingName} is already at value ${site.properties[settingName]}`);
+          return resolve(`Setting ${settingName} is already set, keeping existing value`);
         } else {
           return cassandraConnector.executeBatchMutations([{ query, params: [value, site.name] }]);
         }
