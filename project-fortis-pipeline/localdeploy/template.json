@@ -228,19 +228,19 @@
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_fortisblobstorage_name')), '2016-01-01').keys[0].value]"
         },
-        "translationsvctoken": {
+        "COGNITIVE_TRANSLATION_SERVICE_TOKEN": {
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortistranslator_name')), '2016-02-01-preview').key1]"
         },
-        "cogspeechsvctoken": {
+        "COGNITIVE_SPEECH_SERVICE_TOKEN": {
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortisspeechtotext_name')), '2016-02-01-preview').key1]"
         },
-        "cogvisionsvctoken": {
+        "COGNITIVE_VISION_SERVICE_TOKEN": {
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortiscomputervision_name')), '2016-02-01-preview').key1]"
         },
-        "cogtextsvctoken": {
+        "COGNITIVE_TEXT_SERVICE_TOKEN": {
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('accounts_fortistextanalytics_name')), '2016-02-01-preview').key1]"
         }

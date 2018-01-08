@@ -66,14 +66,26 @@ if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ];
   echo "...done, Fortis default site is now ingested"
 fi
 
-# set up cognitive services secrets if preconfigured
-if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvisionsvctoken" ] && [ -n "$cogtextsvctoken" ]; then
-  echo "Got Fortis cognitive services secrets, ingesting..."
-  npm run ingestsetting -- "translationSvcToken" "translationsvctoken" "$translationsvctoken"
-  npm run ingestsetting -- "cogSpeechSvcToken" "cogspeechsvctoken" "$cogspeechsvctoken"
-  npm run ingestsetting -- "cogVisionSvcToken" "cogvisionsvctoken" "$cogvisionsvctoken"
-  npm run ingestsetting -- "covTextSvcToken" "cogtextsvctoken" "$cogtextsvctoken"
-  echo "...done, Fortis cognitive services secrets are now ingested"
+# set up cognitive services secrets
+if [ -n "$COGNITIVE_TRANSLATION_SERVICE_TOKEN" ]; then
+  echo "Got Fortis text translation cognitive services secrets, ingesting..."
+  npm run ingestsetting -- "translationSvcToken" "translationsvctoken" "$COGNITIVE_TRANSLATION_SERVICE_TOKEN"
+  echo "...done, Fortis text translation cognitive services secrets are now ingested"
+fi
+if [ -n "$COGNITIVE_SPEECH_SERVICE_TOKEN" ]; then
+  echo "Got Fortis speech transcription cognitive services secrets, ingesting..."
+  npm run ingestsetting -- "cogSpeechSvcToken" "cogspeechsvctoken" "$COGNITIVE_SPEECH_SERVICE_TOKEN"
+  echo "...done, Fortis speech transcription cognitive services secrets are now ingested"
+fi
+if [ -n "$COGNITIVE_VISION_SERVICE_TOKEN" ]; then
+  echo "Got Fortis image analysis cognitive services secrets, ingesting..."
+  npm run ingestsetting -- "cogVisionSvcToken" "cogvisionsvctoken" "$COGNITIVE_VISION_SERVICE_TOKEN"
+  echo "...done, Fortis image analysis cognitive services secrets are now ingested"
+fi
+if [ -n "$COGNITIVE_TEXT_SERVICE_TOKEN" ]; then
+  echo "Got Fortis text analytics cognitive services secrets, ingesting..."
+  npm run ingestsetting -- "covTextSvcToken" "cogtextsvctoken" "$COGNITIVE_TEXT_SERVICE_TOKEN"
+  echo "...done, Fortis text analytics cognitive services secrets are now ingested"
 fi
 
 # set up mapbox credentials
