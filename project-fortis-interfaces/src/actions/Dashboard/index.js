@@ -171,6 +171,6 @@ const methods = {
 };
 
 module.exports = {
-    constants: constants,
+    constants,
     methods: { DASHBOARD: methods }
 };

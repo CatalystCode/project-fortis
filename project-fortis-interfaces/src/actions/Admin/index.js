@@ -243,6 +243,6 @@ const methods = {
 };
 
 module.exports = {
-    constants: constants,
+    constants,
     methods: {ADMIN: methods}
 };
