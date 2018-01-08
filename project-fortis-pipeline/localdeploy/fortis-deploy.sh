@@ -59,4 +59,6 @@ az group create --name "$resourceGroupName" --location "$resourceGroupLocation" 
 
 # start deployment
 
+sed -i "s@\"value\": \"fortis@\"value\": \"${USER}fortis@g" "$parametersFilePath"
+
 az group deployment create --name "$deploymentName" --resource-group "$resourceGroupName" --template-file "$templateFilePath" --parameters "$parametersFilePath" | python "$outputParserScriptPath"
