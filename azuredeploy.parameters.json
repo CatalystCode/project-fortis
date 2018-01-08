@@ -47,6 +47,18 @@
         "mapboxAccessToken": {
             "value": "GEN-UNIQUE"
         },
+        "cognitiveServicesTextAnalyticsToken": {
+            "value": ""
+        },
+        "cognitiveServicesTextTranslationToken": {
+            "value": ""
+        },
+        "cognitiveServicesComputerVisionToken": {
+            "value": ""
+        },
+        "cognitiveServicesBingSpeechToken": {
+            "value": ""
+        },
         "servicePrincipalAppId": {
             "value": "GEN-UNIQUE"
         },

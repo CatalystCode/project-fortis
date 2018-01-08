@@ -29,6 +29,10 @@ Arguments
   --aad_client|-ad                   [Optional] : Active Directory Client Id to use for this deployment
   --fortis_admins|-fa                [Optional] : Email addresses of fortis admins, comma separated
   --fortis_users|-fu                 [Optional] : Email addresses of fortis users, comma separated
+  --cogvisionsvctoken|-cvst          [Optional] : Cognitive Services Vision access token
+  --cogtextsvctoken|-ctst            [Optional] : Cognitive Services Text access token
+  --cogspeechsvctoken|-csst          [Optional] : Cognitive Services Speech access token
+  --translationsvctoken|-tst         [Optional] : Cognitive Services Translation access token
 EOF
 }
 
@@ -136,6 +140,22 @@ while [[ $# -gt 0 ]]; do
       ;;
     --mapbox_access_token|-mat)
       mapbox_access_token="$1"
+      shift
+      ;;
+    --cogvisionsvctoken|-cvst)
+      cogvisionsvctoken="$1"
+      shift
+      ;;
+    --cogtextsvctoken|-ctst)
+      cogtextsvctoken="$1"
+      shift
+      ;;
+    --cogspeechsvctoken|-csst)
+      cogspeechsvctoken="$1"
+      shift
+      ;;
+    --translationsvctoken|-tst)
+      translationsvctoken="$1"
       shift
       ;;
     *)
@@ -249,6 +269,31 @@ az storage share create \
   --account-key "${storage_account_key}" \
   --account-name "${storage_account_name}"
 
+if [ -z "${cogvisionsvctoken}" ]; then
+  echo "Finished. Now setting up cognitive services vision account"
+  name="${storage_account_name}ComputerVision"
+  az cognitiveservices account create -l "${location}" --kind "ComputerVision" --sku "S1" --yes -g "${resource_group}" -n "${name}"
+  cogvisionsvctoken="$(az cognitiveservices account keys list -g "${resource_group}" -n "${name}" --output tsv | cut -f1)"
+fi
+if [ -z "${cogspeechsvctoken}" ]; then
+  echo "Finished. Now setting up cognitive services speech account"
+  name="${storage_account_name}STT"
+  az cognitiveservices account create -l "global" --kind "Bing.Speech" --sku "S0" --yes -g "${resource_group}" -n "${name}"
+  cogspeechsvctoken="$(az cognitiveservices account keys list -g "${resource_group}" -n "${name}" --output tsv | cut -f1)"
+fi
+if [ -z "${cogtextsvctoken}" ]; then
+  echo "Finished. Now setting up cognitive services text account"
+  name="${storage_account_name}NLP"
+  az cognitiveservices account create -l "${location}" --kind "TextAnalytics" --sku "S0" --yes -g "${resource_group}" -n "${name}"
+  cogtextsvctoken="$(az cognitiveservices account keys list -g "${resource_group}" -n "${name}" --output tsv | cut -f1)"
+fi
+if [ -z "${translationsvctoken}" ]; then
+  echo "Finished. Now setting up cognitive services translation account"
+  name="${storage_account_name}Translation"
+  az cognitiveservices account create -l "global" --kind "TextTranslation" --sku "S1" --yes -g "${resource_group}" -n "${name}"
+  translationsvctoken="$(az cognitiveservices account keys list -g "${resource_group}" -n "${name}" --output tsv | cut -f1)"
+fi
+
 echo "Finished. Installing deployment scripts"
 if ! (command -v git >/dev/null); then sudo apt-get -qq install -y git; fi
 git clone --depth=1 "${gh_clone_path}" /tmp/fortis-project
@@ -274,4 +319,8 @@ echo "Finished. Setting up cluster"
   "${fortis_admins}" \
   "${fortis_users}" \
   "${aad_client}" \
-  "${mapbox_access_token}"
+  "${mapbox_access_token}" \
+  "${cogvisionsvctoken}" \
+  "${cogspeechsvctoken}" \
+  "${cogtextsvctoken}" \
+  "${translationsvctoken}"

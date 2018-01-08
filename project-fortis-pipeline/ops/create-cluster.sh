@@ -17,6 +17,10 @@ readonly fortis_admins="${14}"
 readonly fortis_users="${15}"
 readonly aad_client="${16}"
 readonly mapbox_access_token="${17}"
+readonly cogvisionsvctoken="${18}"
+readonly cogspeechsvctoken="${19}"
+readonly cogtextsvctoken="${20}"
+readonly translationsvctoken="${21}"
 
 if [ -z "${aad_client}" ]; then readonly fortis_interface_protocol="http"; else readonly fortis_interface_protocol="https"; fi
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
@@ -63,7 +67,11 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${site_name}" \
   "${site_type}" \
   "${aad_client}" \
-  "${mapbox_access_token}"
+  "${mapbox_access_token}" \
+  "${cogvisionsvctoken}" \
+  "${cogspeechsvctoken}" \
+  "${cogtextsvctoken}" \
+  "${translationsvctoken}"
 while :; do
   fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
   if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi

@@ -18,6 +18,10 @@ readonly site_name="${15}"
 readonly site_type="${16}"
 readonly aad_client="${17}"
 readonly mapbox_access_token="${18}"
+readonly cogvisionsvctoken="${19}"
+readonly cogspeechsvctoken="${20}"
+readonly cogtextsvctoken="${21}"
+readonly translationsvctoken="${22}"
 
 # setup
 mkdir -p "/tmp/fortis-services"
@@ -80,6 +84,14 @@ spec:
           value: ${aad_client}
         - name: MAPBOX_ACCESS_TOKEN
           value: ${mapbox_access_token}
+        - name: COGNITIVE_TEXT_SERVICE_TOKEN
+          value: ${cogtextsvctoken}
+        - name: COGNITIVE_TRANSLATION_SERVICE_TOKEN
+          value: ${translationsvctoken}
+        - name: COGNITIVE_SPEECH_SERVICE_TOKEN
+          value: ${cogspeechsvctoken}
+        - name: COGNITIVE_VISION_SERVICE_TOKEN
+          value: ${cogvisionsvctoken}
         image: cwolff/project_fortis_services
         name: project-fortis-services
         ports:
