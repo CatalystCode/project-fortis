@@ -109,6 +109,7 @@ CREATE TABLE sitesettings(
     featureservicenamespace text,
     title text,
     logo text,
+    mapsvctoken text,
     translationsvctoken text,
     cogspeechsvctoken text,
     cogvisionsvctoken text,
