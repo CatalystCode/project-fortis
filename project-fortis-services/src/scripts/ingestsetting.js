@@ -29,7 +29,7 @@ function ingestSetting(settingName, columnName, value) {
       .then(() => getSiteDefinition())
       .then(({ site }) => {
         if (site.properties[settingName] === value) {
-          resolve(site);
+          resolve(`Setting ${settingName} updated to value ${value}`);
         } else {
           reject('Tried to ingest setting but query-back did not return it');
         }
@@ -51,7 +51,6 @@ function cli() {
   cassandraConnector.initialize()
     .then(() => ingestSetting(settingName, columnName, value))
     .then(result => {
-      console.log('Ingested setting');
       console.log(result);
       process.exit(0);
     })

@@ -23,7 +23,7 @@ function addUsers(role, users) {
       .then(() => Promise.all(queries.map(({ query, params }) => cassandraConnector.executeQuery(query, params))))
       .then(addedUsers => {
         if (addedUsers.length === users.length) {
-          resolve(addedUsers);
+          resolve(`${addedUsers.length} users have role ${role}`);
         } else {
           reject('Tried to add users but query-back did not return them');
         }
@@ -44,7 +44,6 @@ function cli() {
   cassandraConnector.initialize()
     .then(() => addUsers(role, users))
     .then(result => {
-      console.log('Added new users');
       console.log(result);
       process.exit(0);
     })

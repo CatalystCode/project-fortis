@@ -91,7 +91,7 @@ function createSite(args) {
       .then(() => cassandraConnector.executeQuery(siteQuery, siteQueryParams))
       .then(addedSite => {
         if (addedSite.length === 1) {
-          resolve(addedSite);
+          resolve(`Site with sitename ${siteName} of type ${siteType} created.`);
         } else {
           reject('Tried to add site but query-back did not return it');
         }
@@ -129,7 +129,6 @@ function cli() {
   cassandraConnector.initialize()
     .then(() => createSiteWithDefaults(siteName, siteType))
     .then(result => {
-      console.log(`Site ${siteName} of type ${siteType} created!`);
       console.log(result);
       process.exit(0);
     })
