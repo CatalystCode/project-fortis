@@ -3,28 +3,28 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "namespaces_fortiseventhubs_name": {
-            "value": "fortiseventhubs"
+            "value": "fortisev"
         },
         "namespaces_fortisservicebus_name": {
-            "value": "fortisservicebus"
+            "value": "fortissb"
         },
         "storageAccounts_fortisblobstorage_name": {
-            "value": "fortisblobstorage"
+            "value": "fortisblob"
         },
         "accounts_fortistranslator_name": {
-            "value": "fortistranslator"
+            "value": "fortistrans"
         },
         "accounts_fortisspeechtotext_name": {
-            "value": "fortisspeechtotext"
+            "value": "fortisstt"
         },
         "components_fortisapplicationinsights_name": {
-            "value": "fortisapplicationinsights"
+            "value": "fortislog"
         },
         "accounts_fortistextanalytics_name": {
-            "value": "fortistextanalytics"
+            "value": "fortisnlp"
         },
         "accounts_fortiscomputervision_name": {
-            "value": "fortiscomputervision"
+            "value": "fortiscv"
         }
     }
 }
