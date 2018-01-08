@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-const Promise = require("promise");
-const cassandraConnector = require("../clients/cassandra/CassandraConnector");
-const { getSiteDefinition } = require("../resolvers/shared");
+const Promise = require('promise');
+const cassandraConnector = require('../clients/cassandra/CassandraConnector');
+const { getSiteDefinition } = require('../resolvers/shared');
 
 function ingestSetting(settingName, columnName, value) {
   return new Promise((resolve, reject) => {
-    if (!settingName) return reject("settingName is not defined");
-    if (!columnName) return reject("columnName is not defined");
-    if (!value) return reject("value is not defined");
+    if (!settingName) return reject('settingName is not defined');
+    if (!columnName) return reject('columnName is not defined');
+    if (!value) return reject('value is not defined');
 
     const query = `
     UPDATE fortis.sitesettings
@@ -25,7 +25,7 @@ function ingestSetting(settingName, columnName, value) {
         if (site.properties[settingName] === value) {
           resolve(site);
         } else {
-          reject("Tried to ingest setting but query-back did not return it");
+          reject('Tried to ingest setting but query-back did not return it');
         }
       })
       .catch(reject);
@@ -45,12 +45,12 @@ function cli() {
   cassandraConnector.initialize()
     .then(() => ingestSetting(settingName, columnName, value))
     .then(result => {
-      console.log("Ingested setting");
+      console.log('Ingested setting');
       console.log(result);
       process.exit(0);
     })
     .catch(error => {
-      console.error("Failed to ingest setting");
+      console.error('Failed to ingest setting');
       console.error(error);
       process.exit(1);
     });
