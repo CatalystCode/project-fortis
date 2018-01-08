@@ -65,6 +65,12 @@ ENV FORTIS_CASSANDRA_SITE_TYPE=""
 # page and you're done
 ENV AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 
+# mapbox credentials
+# you can create a new mapbox access token for free at https://www.mapbox.com/signup/
+# this will be persisted to cassandra on first load and is changable via the
+# admin settings UI afterwards
+ENV MAPBOX_ACCESS_TOKEN="..."
+
 WORKDIR /app
 ADD package.json /app/package.json
 RUN npm install

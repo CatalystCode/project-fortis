@@ -10,6 +10,7 @@ export const getAdminSiteDefinition = `query sites {
         defaultZoomLevel
         logo
         title
+        mapSvcToken
         fbToken
         defaultLocation
         defaultLanguage

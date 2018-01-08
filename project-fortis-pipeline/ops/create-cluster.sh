@@ -62,7 +62,8 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${fortis_users}" \
   "${site_name}" \
   "${site_type}" \
-  "${aad_client}"
+  "${aad_client}" \
+  "${mapbox_access_token}"
 while :; do
   fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
   if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
@@ -78,7 +79,6 @@ echo "Finished. Now setting up fortis react frontend."
   "${fortis_interface_container}" \
   "${fortis_interface_host}" \
   "${aad_client}" \
-  "${mapbox_access_token}" \
   "${mapbox_tile_layer_url}"
 
 echo "Finished. Now installing Spark helm chart."

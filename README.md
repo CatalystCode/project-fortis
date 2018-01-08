@@ -63,6 +63,14 @@ ServiceBus, EventHubs, Cognitive Services, and so forth. The secrets to access
 these services are stored in a `.env-secrets` file which the rest of the
 development setup will leverage.
 
+Next, you need to create a Mapbox access token. If you don't have one yet, you
+can create a new one for free by [signing up](https://www.mapbox.com/signup/).
+Once you have the token, append it to the `.env-secrets` file like so:
+
+```
+MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
+```
+
 Now you can start the full Fortis pipeline with one command:
 
 ```sh

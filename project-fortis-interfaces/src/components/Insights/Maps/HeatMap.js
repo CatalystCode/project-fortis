@@ -115,7 +115,7 @@ export default class HeatMap extends React.Component {
 
   render() {
     const { maxbounds, defaultZoom } = this.state;
-    const { selectedplace } = this.props;
+    const { selectedplace, mapSvcToken } = this.props;
     const maxzoom = defaultZoom + constants.MAP.MAXZOOM;
 
     return (
@@ -129,7 +129,7 @@ export default class HeatMap extends React.Component {
         useFlyTo={true}
         zoomControl={false} >
 
-        <TileLayer maxZoom={maxzoom} minZoom={defaultZoom} />
+        <TileLayer maxZoom={maxzoom} minZoom={defaultZoom} accessToken={mapSvcToken} />
 
         <ZoomControl
           position={'topright'}

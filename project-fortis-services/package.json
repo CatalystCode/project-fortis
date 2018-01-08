@@ -63,6 +63,7 @@
   "scripts": {
     "createsite": "node src/scripts/createsite.js",
     "addusers": "node src/scripts/addusers.js",
+    "ingestsetting": "node src/scripts/ingestsetting.js",
     "lint": "eslint --max-warnings=0 src *.js"
   },
   "generator-swaggerize": {

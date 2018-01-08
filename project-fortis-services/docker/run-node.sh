@@ -20,6 +20,10 @@ has_site() {
   echo 'SELECT * FROM fortis.sitesettings;' | cassandra_exec | grep -q '(1 rows)'
 }
 
+has_mapbox_token() {
+  echo 'COPY fortis.sitesettings(mapsvctoken) TO STDOUT;' | cassandra_exec | tr -d '\r' | grep -qv '""'
+}
+
 get_sitename() {
   echo 'COPY fortis.sitesettings(sitename) TO STDOUT;' | cassandra_exec | tr -d '\r'
 }
@@ -82,6 +86,13 @@ if [ -n "$translationsvctoken" ] && [ -n "$cogspeechsvctoken" ] && [ -n "$cogvis
   echo "Got Fortis cognitive services secrets, ingesting..."
   echo "UPDATE fortis.sitesettings SET translationsvctoken = '$translationsvctoken', cogspeechsvctoken = '$cogspeechsvctoken', cogvisionsvctoken = '$cogvisionsvctoken', cogtextsvctoken = '$cogtextsvctoken' WHERE sitename = '$(get_sitename)';" | cassandra_exec
   echo "...done, Fortis cognitive services secrets are now ingested"
+fi
+
+# set up mapbox credentials
+if [ -n "$MAPBOX_ACCESS_TOKEN" ] && ! has_mapbox_token; then
+  echo "Got MapBox token, ingesting..."
+  npm run ingestsetting -- "mapSvcToken" "mapsvctoken" "$MAPBOX_ACCESS_TOKEN"
+  echo "...done, MapBox token is now ingested"
 fi
 
 # start node server

@@ -27,14 +27,12 @@ ENV REACT_APP_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure
 ENV REACT_APP_AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 
 # mapbox configuration
-# you can create a new access token for free at https://www.mapbox.com/signup/
 # the tile layer url defines the style of the map that will be used in the site
 # any v1 static api url should work here; more information about possible style
 # urls is here: https://www.mapbox.com/help/mapbox-with-openlayers/#mapbox-studio-style-or-mapbox-style-url
 # for example, here are some nice alternative map styles:
 # - standard street map:  https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}
 # - custom satellite map: https://api.mapbox.com/styles/v1/erikschlegel/cj82h6wyt9rel2st658r6teto/tiles/256/{z}/{x}/{y}
-ENV REACT_APP_MAPBOX_ACCESS_TOKEN=""
 ENV REACT_APP_MAPBOX_TILE_LAYER_URL="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}"
 
 WORKDIR /app

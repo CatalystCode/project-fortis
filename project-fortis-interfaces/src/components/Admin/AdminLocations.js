@@ -34,7 +34,7 @@ export default class AdminLocations extends React.Component {
     constructor(props) {
         super(props);
 
-        const { defaultZoomLevel, targetBbox } = props;
+        const { defaultZoomLevel, targetBbox, mapSvcToken } = props;
         this.onEditBox = this.onEditBox.bind(this);
         this.handleSaveSettings = this.handleSaveSettings.bind(this);
         this.onViewportChanged = this.onViewportChanged.bind(this);
@@ -42,6 +42,7 @@ export default class AdminLocations extends React.Component {
             defaultZoomLevel: defaultZoomLevel,
             originalBounds: targetBbox,
             targetBbox: targetBbox,
+            mapSvcToken,
             "saving": false,
             locationNameBlacklist: []
         }
@@ -56,6 +57,7 @@ export default class AdminLocations extends React.Component {
             featureservicenamespace,
             defaultLocation,
             translationSvcToken,
+            mapSvcToken,
             cogSpeechSvcToken,
             cogVisionSvcToken,
             cogTextSvcToken
@@ -75,6 +77,7 @@ export default class AdminLocations extends React.Component {
             featureservicenamespace,
             defaultLocation,
             translationSvcToken,
+            mapSvcToken,
             cogSpeechSvcToken,
             cogVisionSvcToken,
             cogTextSvcToken,
@@ -98,7 +101,7 @@ export default class AdminLocations extends React.Component {
         this.setState({ targetBbox: [bounds.getNorth(), bounds.getWest(), bounds.getSouth(), bounds.getEast()] });
     }
     render() {
-        const { defaultZoomLevel, targetBbox, originalBounds } = this.state;
+        const { defaultZoomLevel, targetBbox, originalBounds, mapSvcToken } = this.state;
         const bboxRectangleColor = "#0ff";
         const bounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
         const originalBoundsTarget = originalBounds.length && originalBounds.length === 4 ? [[originalBounds[0], originalBounds[1]], [originalBounds[2], originalBounds[3]]] : [];
@@ -128,7 +131,7 @@ export default class AdminLocations extends React.Component {
                             zoom={defaultZoomLevel}
                             zoomControl={false} >
 
-                            <TileLayer />
+                            <TileLayer accessToken={mapSvcToken} />
 
                             <FeatureGroup>
                                 <EditControl

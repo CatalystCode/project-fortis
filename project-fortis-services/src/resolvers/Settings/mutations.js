@@ -28,6 +28,7 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           cogtextsvctoken = ?,
           cogvisionsvctoken = ?,
           featureservicenamespace = ?,
+          mapSvcToken = ?,
           translationsvctoken = ?
         WHERE sitename = ?`,
           params: [
@@ -41,6 +42,7 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
             args.input.cogTextSvcToken === PlaceholderForSecret ? site.properties.cogTextSvcToken : args.input.cogTextSvcToken,
             args.input.cogVisionSvcToken === PlaceholderForSecret ? site.properties.cogVisionSvcToken : args.input.cogVisionSvcToken,
             args.input.featureservicenamespace,
+            args.input.mapSvcToken,
             args.input.translationSvcToken === PlaceholderForSecret ? site.properties.translationSvcToken : args.input.translationSvcToken,
             args.input.name
           ]

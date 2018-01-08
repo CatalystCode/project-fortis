@@ -17,6 +17,7 @@ readonly fortis_users="${14}"
 readonly site_name="${15}"
 readonly site_type="${16}"
 readonly aad_client="${17}"
+readonly mapbox_access_token="${18}"
 
 # setup
 mkdir -p "/tmp/fortis-services"
@@ -77,6 +78,8 @@ spec:
           value: ${site_type}
         - name: AD_CLIENT_ID
           value: ${aad_client}
+        - name: MAPBOX_ACCESS_TOKEN
+          value: ${mapbox_access_token}
         image: cwolff/project_fortis_services
         name: project-fortis-services
         ports:

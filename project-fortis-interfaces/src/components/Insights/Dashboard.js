@@ -85,6 +85,7 @@ export default class Dashboard extends React.Component {
         <div>
           <div id='leafletMap'></div>
           <HeatMap
+            mapSvcToken={this.props.settings.mapSvcToken}
             targetBbox={this.props.settings.targetBbox}
             heatmapTileIds={this.props.heatmapTileIds}
             placeCentroid={this.props.placeCentroid}

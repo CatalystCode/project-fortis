@@ -67,6 +67,7 @@ function cassandraRowToSite(row) {
       logo: row.logo,
       title: row.title,
       translationSvcToken: row.translationsvctoken,
+      mapSvcToken: row.mapsvctoken,
       featureservicenamespace: row.featureservicenamespace,
       defaultLocation: row.geofence,
       defaultLanguage: row.defaultlanguage,

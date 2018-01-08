@@ -7,6 +7,7 @@ export const siteSettingsFragment = `fragment FortisSiteDefinitionView on SiteCo
         logo
         title
         fbToken
+        mapSvcToken
         defaultLocation
         defaultLanguage
         featureservicenamespace
@@ -29,6 +30,7 @@ export const site = `fragment SiteView on SiteCollection {
       defaultLanguage
       supportedLanguages
       featureservicenamespace
+      mapSvcToken
       translationSvcToken
       cogSpeechSvcToken
       cogVisionSvcToken

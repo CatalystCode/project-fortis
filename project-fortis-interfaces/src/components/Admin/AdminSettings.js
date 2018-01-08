@@ -107,6 +107,7 @@ export const AdminSettings = createReactClass({
       defaultLanguage,
       supportedLanguages,
       featureservicenamespace,
+      mapSvcToken,
       translationSvcToken,
       cogSpeechSvcToken,
       cogVisionSvcToken,
@@ -126,6 +127,7 @@ export const AdminSettings = createReactClass({
       supportedLanguages: JSON.parse(languageJSON),
       title: title.value,
       featureservicenamespace: featureservicenamespace.value,
+      mapSvcToken: mapSvcToken.value,
       translationSvcToken: translationSvcToken.value,
       cogSpeechSvcToken: cogSpeechSvcToken.value,
       cogVisionSvcToken: cogVisionSvcToken.value,
@@ -180,6 +182,11 @@ export const AdminSettings = createReactClass({
                       <div className="form-group">
                           <label>Feature Service Namespace</label>
                           <input onChange={this.handleInputChange} required name="featureservicenamespace" ref="featureservicenamespace" value={this.state.siteSettings.properties.featureservicenamespace} type="text" style={styles.settings.input} className="form-control settings" />
+                          <div className="validation"></div>
+                      </div>
+                      <div className="form-group">
+                          <label>MapBox Token</label>
+                          <input onChange={this.handleInputChange} required name="mapSvcToken" ref="mapSvcToken" value={this.state.siteSettings.properties.mapSvcToken} type="text" style={styles.settings.input} className="form-control settings secret" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
