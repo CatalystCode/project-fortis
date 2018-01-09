@@ -47,6 +47,7 @@ export default class AdminLocations extends React.Component {
             locationNameBlacklist: []
         }
     }
+
     handleSaveSettings() {
         const {
             name,
@@ -96,10 +97,12 @@ export default class AdminLocations extends React.Component {
         const defaultZoomLevel = this.refs.map.leafletElement.getZoom();
         this.setState({ defaultZoomLevel });
     }
+
     onEditBox(el) {
         const bounds = el.target.getBounds();
         this.setState({ targetBbox: [bounds.getNorth(), bounds.getWest(), bounds.getSouth(), bounds.getEast()] });
     }
+
     render() {
         const { defaultZoomLevel, targetBbox, originalBounds, mapSvcToken } = this.state;
         const bboxRectangleColor = "#0ff";
