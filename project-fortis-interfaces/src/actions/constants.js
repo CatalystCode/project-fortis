@@ -61,11 +61,17 @@ const CATEGORY_KEY_MAPPING = {
 };
 
 const DEFAULT_TIMESERIES_PERIOD = "hour";
+
 const DEFAULT_DATA_SOURCE = "all";
+
 const PIPELINE_ALL = "all";
+
 const PIPELINE_CUSTOM = "custom";
+
 const DEFAULT_EXTERNAL_SOURCE = "all";
+
 const DEFAULT_TIMESPAN_TYPE = "week";
+
 const DEFAULT_TIMEPERIOD_FORMAT = "YYYY-ww";
 
 const ACTIVITY_FEED = {
