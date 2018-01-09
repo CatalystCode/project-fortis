@@ -145,7 +145,7 @@ const _methods = {
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
             } else {
-                console.error(`[${err}] occured while processing tile visualization re-sync request`);
+                console.error(`[${err.message}] occured while processing tile visualization re-sync request`);
             }
         })
     },
