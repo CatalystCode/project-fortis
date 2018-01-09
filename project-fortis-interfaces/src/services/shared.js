@@ -1,5 +1,5 @@
 import request from 'request';
-import { reactAppServiceHost } from '../config';
+import { reactAppServiceHost, reactAppAdTokenStoreKey } from '../config';
 
 const auth = { token: null }; // token will get set as soon as it's available
 
@@ -11,7 +11,13 @@ function fetchGqlData(endpoint, { query, variables }, callback) {
         withCredentials: false,
         headers: { 'Authorization': `Bearer ${auth.token}` },
         body: { query, variables }
-    }, callback);
+    }, (error, response, body) => {
+        if (response && response.statusCode === 401) {
+            auth.token = null;
+            localStorage.removeItem(reactAppAdTokenStoreKey);
+        }
+        callback(error, response, body);
+    });
 }
 
 const MESSAGES_ENDPOINT = 'messages';
