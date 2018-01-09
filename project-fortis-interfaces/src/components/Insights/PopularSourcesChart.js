@@ -54,16 +54,18 @@ export default class PopularSourcesChart extends React.Component {
     }
 
     render() {
-        if (!this.state.colorsCells || !this.state.colorCells.length) {
+        const { colorCells, dataProvider, activeIndex } = this.state;
+
+        if (!colorCells.length) {
             return <NoData />;
         }
 
         return (
             <DoughnutChart handleClick={this.handleClick}
                 fill={constants.CHART_STYLE.BG_FILL}
-                data={this.state.dataProvider}
-                activeIndex={this.state.activeIndex}>
-                {this.state.colorCells}
+                data={dataProvider}
+                activeIndex={activeIndex}>
+                {colorCells}
             </DoughnutChart>
         );
     }
