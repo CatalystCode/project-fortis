@@ -134,10 +134,10 @@ export default class SentimentTreeview extends React.Component {
     }
 
     deleteTermFilters = () => {
-        const { dataSource, externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, maintopic, bbox } = this.props;
+        const { dataSource, externalsourceid, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, maintopic, bbox, selectedplace } = this.props;
         const termFilters = new Set();
 
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, selectedplace);
     }
 
     clearTerms = () => {
