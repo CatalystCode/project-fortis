@@ -130,7 +130,7 @@ export default class SentimentTreeview extends React.Component {
     deleteSelectedPlace = () => {
         const { externalsourceid, dataSource, timespanType, datetimeSelection, zoomLevel, fromDate, toDate, termFilters, maintopic, defaultBbox } = this.props;
 
-        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, defaultBbox, zoomLevel, Array.from(termFilters), externalsourceid);
+        this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, defaultBbox, zoomLevel, Array.from(termFilters), externalsourceid, null, null);
     }
 
     deleteTermFilters = () => {
