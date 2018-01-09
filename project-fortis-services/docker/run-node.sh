@@ -84,7 +84,7 @@ if [ -n "$COGNITIVE_VISION_SERVICE_TOKEN" ]; then
 fi
 if [ -n "$COGNITIVE_TEXT_SERVICE_TOKEN" ]; then
   echo "Got Fortis text analytics cognitive services secrets, ingesting..."
-  npm run ingestsetting -- "covTextSvcToken" "cogtextsvctoken" "$COGNITIVE_TEXT_SERVICE_TOKEN"
+  npm run ingestsetting -- "cogTextSvcToken" "cogtextsvctoken" "$COGNITIVE_TEXT_SERVICE_TOKEN"
   echo "...done, Fortis text analytics cognitive services secrets are now ingested"
 fi
 
