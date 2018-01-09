@@ -70,9 +70,9 @@ const PIPELINE_CUSTOM = "custom";
 
 const DEFAULT_EXTERNAL_SOURCE = "all";
 
-const DEFAULT_TIMESPAN_TYPE = "week";
-
-const DEFAULT_TIMEPERIOD_FORMAT = "YYYY-ww";
+const defaultTimespan = TIMESPAN_TYPES.week;
+const DEFAULT_TIMESPAN_TYPE = defaultTimespan.rangeFormat;
+const DEFAULT_TIMEPERIOD_FORMAT = defaultTimespan.format;
 
 const ACTIVITY_FEED = {
     NEWS_FEED_SEARCH_CONTAINER_HEIGHT: 115,
