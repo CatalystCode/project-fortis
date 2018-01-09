@@ -19,9 +19,6 @@ ENV USER_FILES_BLOB_ACCOUNT_NAME="..."
 ENV USER_FILES_BLOB_ACCOUNT_KEY="..."
 ENV APPINSIGHTS_INSTRUMENTATIONKEY="..."
 
-# TODO: document this
-ENV FACEBOOK_AUTH_TOKEN="..."
-
 # setting up the feature service is a lengthy process so we provide a shared
 # instance for convenience; if you wish to run this service locally, please
 # follow the instructions at https://github.com/CatalystCode/featureService and

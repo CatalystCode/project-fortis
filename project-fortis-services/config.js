@@ -13,11 +13,6 @@ module.exports = {
     userFilesBlobAccountName: process.env.USER_FILES_BLOB_ACCOUNT_NAME,
     userFilesBlobAccountKey: process.env.USER_FILES_BLOB_ACCOUNT_KEY
   },
-  facebook: {
-    facebookAuthToken: process.env.FACEBOOK_AUTH_TOKEN,
-    facebookApiHost: process.env.FACEBOOK_API_HOST || 'https://graph.facebook.com',
-    facebookApiVersion: process.env.FACEBOOK_API_VERSION || 'v2.9'
-  },
   eventHub: {
     publishEventsEventhubConnectionString: process.env.PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING,
     publishEventsEventhubPath: process.env.PUBLISH_EVENTS_EVENTHUB_PATH,
