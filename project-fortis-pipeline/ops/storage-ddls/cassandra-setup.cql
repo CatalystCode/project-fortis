@@ -4,36 +4,34 @@ CREATE KEYSPACE fortis WITH replication = {
     'replication_factor': 3
 };
 
-USE fortis;
-
 /******************************************************************************
  * Down migration
  *****************************************************************************/
-DROP MATERIALIZED VIEW IF EXISTS eventbatches;
-DROP MATERIALIZED VIEW IF EXISTS popularsources;
-DROP MATERIALIZED VIEW IF EXISTS populartopics;
-DROP MATERIALIZED VIEW IF EXISTS eventplacesbysource;
-DROP INDEX IF EXISTS events_fulltext_idx;
+DROP MATERIALIZED VIEW IF EXISTS fortis.eventbatches;
+DROP MATERIALIZED VIEW IF EXISTS fortis.popularsources;
+DROP MATERIALIZED VIEW IF EXISTS fortis.populartopics;
+DROP MATERIALIZED VIEW IF EXISTS fortis.eventplacesbysource;
+DROP INDEX IF EXISTS fortis.events_fulltext_idx;
 
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS watchlist;
-DROP TABLE IF EXISTS blacklist;
-DROP TABLE IF EXISTS sitesettings;
-DROP TABLE IF EXISTS streams;
-DROP TABLE IF EXISTS trustedsources;
-DROP TABLE IF EXISTS conjunctivetopics;
-DROP TABLE IF EXISTS computedtiles;
-DROP TABLE IF EXISTS heatmap;
-DROP TABLE IF EXISTS popularplaces;
-DROP TABLE IF EXISTS eventplaces;
-DROP TABLE IF EXISTS events;
-DROP TABLE IF EXISTS computedtrends;
+DROP TABLE IF EXISTS fortis.users;
+DROP TABLE IF EXISTS fortis.watchlist;
+DROP TABLE IF EXISTS fortis.blacklist;
+DROP TABLE IF EXISTS fortis.sitesettings;
+DROP TABLE IF EXISTS fortis.streams;
+DROP TABLE IF EXISTS fortis.trustedsources;
+DROP TABLE IF EXISTS fortis.conjunctivetopics;
+DROP TABLE IF EXISTS fortis.computedtiles;
+DROP TABLE IF EXISTS fortis.heatmap;
+DROP TABLE IF EXISTS fortis.popularplaces;
+DROP TABLE IF EXISTS fortis.eventplaces;
+DROP TABLE IF EXISTS fortis.events;
+DROP TABLE IF EXISTS fortis.computedtrends;
 
-DROP TYPE IF EXISTS features;
-DROP TYPE IF EXISTS computedgender;
-DROP TYPE IF EXISTS sentiment;
-DROP TYPE IF EXISTS computedentities;
-DROP TYPE IF EXISTS place;
+DROP TYPE IF EXISTS fortis.features;
+DROP TYPE IF EXISTS fortis.computedgender;
+DROP TYPE IF EXISTS fortis.sentiment;
+DROP TYPE IF EXISTS fortis.computedentities;
+DROP TYPE IF EXISTS fortis.place;
 
 /******************************************************************************
  * Up migration
@@ -43,47 +41,47 @@ DROP TYPE IF EXISTS place;
  * Types
  *************************************/
 
-CREATE TYPE computedgender (
+CREATE TYPE fortis.computedgender (
     male_mentions bigint,
     female_mentions bigint
 );
 
-CREATE TYPE sentiment (
+CREATE TYPE fortis.sentiment (
     neg_avg double
 );
 
-CREATE TYPE computedentities (
+CREATE TYPE fortis.computedentities (
     name text,
     externalsource text,
     externalrefid text,
     count bigint
 );
 
-CREATE TYPE place (
+CREATE TYPE fortis.place (
     placeid text,
     centroidlat double,
     centroidlon double
 );
 
-CREATE TYPE features (
+CREATE TYPE fortis.features (
     mentions bigint,
-    sentiment frozen<sentiment>,
-    entities frozen<list<computedentities>>,
+    sentiment frozen<fortis.sentiment>,
+    entities frozen<list<fortis.computedentities>>,
     keywords frozen<list<text>>,
-    places frozen<list<place>>
+    places frozen<list<fortis.place>>
 );
 
 /**************************************
  * Tables
- *************************************/
+// *****************************************************************************
 
-CREATE TABLE users(
+CREATE TABLE fortis.users(
     identifier text,
     role text,
     PRIMARY KEY ((identifier, role))
 );
 
-CREATE TABLE watchlist(
+CREATE TABLE fortis.watchlist(
     topicid uuid,
     topic text,
     lang_code text,
@@ -93,14 +91,14 @@ CREATE TABLE watchlist(
     PRIMARY KEY ((topic, lang_code), category)
 );
 
-CREATE TABLE blacklist(
+CREATE TABLE fortis.blacklist(
     id uuid,
     conjunctivefilter frozen<list<text>>,
     islocation boolean,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE sitesettings(
+CREATE TABLE fortis.sitesettings(
     sitename text,
     geofence list<double>,
     languages set<text>,
@@ -118,7 +116,7 @@ CREATE TABLE sitesettings(
     PRIMARY KEY (sitename)
 );
 
-CREATE TABLE streams (
+CREATE TABLE fortis.streams (
     streamid uuid,
     pipelinekey text,
     pipelinelabel text,
@@ -129,7 +127,7 @@ CREATE TABLE streams (
     PRIMARY KEY (pipelinekey, streamid)
 );
 
-CREATE TABLE trustedsources (
+CREATE TABLE fortis.trustedsources (
    externalsourceid text,
    sourcetype text,
    pipelinekey text,
@@ -140,7 +138,7 @@ CREATE TABLE trustedsources (
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
 
-CREATE TABLE computedtiles (
+CREATE TABLE fortis.computedtiles (
     perioddate timestamp,
     periodtype text,
     pipelinekey text,
@@ -155,7 +153,7 @@ CREATE TABLE computedtiles (
     PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, externalsourceid, tileid), perioddate)
 );
 
-CREATE TABLE heatmap (
+CREATE TABLE fortis.heatmap (
     perioddate timestamp,
     periodtype text,
     pipelinekey text,
@@ -171,7 +169,7 @@ CREATE TABLE heatmap (
     PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, externalsourceid, tileid), perioddate, heatmaptileid)
 );
 
-CREATE TABLE popularplaces (
+CREATE TABLE fortis.popularplaces (
     perioddate timestamp,
     periodtype text,
     pipelinekey text,
@@ -187,7 +185,7 @@ CREATE TABLE popularplaces (
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, tileid), perioddate, placeid)
 );
 
-CREATE TABLE conjunctivetopics (
+CREATE TABLE fortis.conjunctivetopics (
     perioddate timestamp,
     periodtype text,
     pipelinekey text,
@@ -200,7 +198,7 @@ CREATE TABLE conjunctivetopics (
     PRIMARY KEY ((periodtype, pipelinekey, externalsourceid, tilez, topic, tileid), perioddate, conjunctivetopic)
 );
 
-CREATE TABLE eventplaces(
+CREATE TABLE fortis.eventplaces(
     eventid text,
     conjunctiontopic1 text,
     conjunctiontopic2 text,
@@ -217,7 +215,7 @@ CREATE TABLE eventplaces(
     PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, tileid), eventtime, eventid, placeid)
 ) WITH CLUSTERING ORDER BY (eventtime DESC);
 
-CREATE TABLE computedtrends(
+CREATE TABLE fortis.computedtrends(
     topic text,
     pipelinekey text,
     periodstartdate timestamp,
@@ -231,7 +229,7 @@ CREATE TABLE computedtrends(
     PRIMARY KEY ((pipelinekey, periodtype, tilez, period), topic, tilex, tiley)
 ) WITH CLUSTERING ORDER BY (topic ASC, tilex ASC, tiley ASC);
 
-CREATE TABLE events(
+CREATE TABLE fortis.events(
     eventid text,
     sourceeventid text,
     batchid uuid,
@@ -243,7 +241,7 @@ CREATE TABLE events(
     body text,
     imageurl text,
     summary text,
-    computedfeatures frozen<features>,
+    computedfeatures frozen<fortis.features>,
     insertiontime timestamp,
     eventtime timestamp,
     topics frozen<set<text>>,
@@ -256,10 +254,10 @@ CREATE TABLE events(
  * Views
  *************************************/
 
-CREATE MATERIALIZED VIEW populartopics
+CREATE MATERIALIZED VIEW fortis.populartopics
 AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, externalsourceid, pipelinekey, tilez, 
           tileid, perioddate, mentioncount, avgsentimentnumerator
-   FROM computedtiles
+   FROM fortis.computedtiles
    WHERE periodtype IS NOT NULL
      AND conjunctiontopic1 IS NOT NULL
      AND conjunctiontopic2 = ''
@@ -274,10 +272,10 @@ AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, e
 PRIMARY KEY ((periodtype, externalsourceid, tilez, pipelinekey, tileid, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3), perioddate, mentioncount)
 WITH CLUSTERING ORDER BY (perioddate DESC, mentioncount DESC);
 
-CREATE MATERIALIZED VIEW eventplacesbysource
+CREATE MATERIALIZED VIEW fortis.eventplacesbysource
 AS SELECT eventid, pipelinekey, eventtime, centroidlat, centroidlon, placeid, conjunctiontopic1, 
           conjunctiontopic2, conjunctiontopic3, externalsourceid, tileid, tilez
-   FROM eventplaces
+   FROM fortis.eventplaces
    WHERE eventid IS NOT NULL
      AND pipelinekey IS NOT NULL
      AND eventtime IS NOT NULL
@@ -295,17 +293,17 @@ PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinek
 /**
  * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
 **/
-CREATE MATERIALIZED VIEW eventbatches
+CREATE MATERIALIZED VIEW fortis.eventbatches
 AS SELECT batchid, eventid
-   FROM events
+   FROM fortis.events
    WHERE batchid IS NOT NULL
      AND eventid IS NOT NULL
 PRIMARY KEY (batchid, eventid);
 
-CREATE MATERIALIZED VIEW popularsources
+CREATE MATERIALIZED VIEW fortis.popularsources
 AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, externalsourceid, pipelinekey, 
           tileid, perioddate, mentioncount, avgsentimentnumerator
-   FROM computedtiles
+   FROM fortis.computedtiles
    WHERE periodtype IS NOT NULL
      AND conjunctiontopic1 IS NOT NULL
      AND conjunctiontopic2 IS NOT NULL
@@ -320,9 +318,9 @@ AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, t
 PRIMARY KEY ((periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez, pipelinekey, tileid), perioddate, mentioncount, externalsourceid)
 WITH CLUSTERING ORDER BY (perioddate DESC, mentioncount DESC);
 
-CREATE MATERIALIZED VIEW eventsbypipeline
+CREATE MATERIALIZED VIEW fortis.eventsbypipeline
 AS SELECT eventid, pipelinekey, eventtime,conjunctiontopic3,conjunctiontopic2,tilez,tileid,placeid,conjunctiontopic1
-   FROM eventplaces
+   FROM fortis.eventplaces
    WHERE eventid IS NOT NULL
      AND pipelinekey IS NOT NULL
      AND eventtime IS NOT NULL
@@ -339,7 +337,7 @@ WITH CLUSTERING ORDER BY (eventtime DESC);
  * Indices
  *************************************/
 
-CREATE CUSTOM INDEX ON events (fulltext) USING 'org.apache.cassandra.index.sasi.SASIIndex'
+CREATE CUSTOM INDEX ON fortis.events (fulltext) USING 'org.apache.cassandra.index.sasi.SASIIndex'
 WITH OPTIONS = {
 'mode': 'CONTAINS',
 'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
