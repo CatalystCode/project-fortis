@@ -1,6 +1,7 @@
 import React from 'react';
 import { Map, ZoomControl, Rectangle, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw"
+import { tileIdsForBoundingBox } from 'geotile';
 import { TileLayer } from '../Insights/Maps/TileLayer';
 import '../../styles/Insights/HeatMap.css';
 
@@ -100,7 +101,17 @@ export default class AdminLocations extends React.Component {
 
     onEditBox(el) {
         const bounds = el.target.getBounds();
-        this.setState({ targetBbox: [bounds.getNorth(), bounds.getWest(), bounds.getSouth(), bounds.getEast()] });
+        const { defaultZoomLevel } = this.state;
+
+        const geofence = {north: bounds.getNorth(), west: bounds.getWest(), south: bounds.getSouth(), east: bounds.getEast()};
+        const { north, west, south, east } = geofence;
+
+        const tileIds = tileIdsForBoundingBox(geofence, defaultZoomLevel);
+        if (tileIds.length) {
+            this.setState({ targetBbox: [north, west, south, east] });
+        } else {
+            console.error(`No tile ids for fence ${JSON.stringify(geofence)} at zoom ${defaultZoomLevel}`)
+        }
     }
 
     render() {
