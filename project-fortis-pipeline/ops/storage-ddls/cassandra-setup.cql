@@ -4,9 +4,10 @@ CREATE KEYSPACE fortis WITH replication = {
     'replication_factor': 3
 };
 
-/******************************************************************************
- * Down migration
- *****************************************************************************/
+// *****************************************************************************
+// * Down migration
+// *****************************************************************************
+
 DROP MATERIALIZED VIEW IF EXISTS fortis.eventbatches;
 DROP MATERIALIZED VIEW IF EXISTS fortis.popularsources;
 DROP MATERIALIZED VIEW IF EXISTS fortis.populartopics;
@@ -33,13 +34,9 @@ DROP TYPE IF EXISTS fortis.sentiment;
 DROP TYPE IF EXISTS fortis.computedentities;
 DROP TYPE IF EXISTS fortis.place;
 
-/******************************************************************************
- * Up migration
- *****************************************************************************/
-
-/**************************************
- * Types
- *************************************/
+// *****************************************************************************
+// * Types
+// *****************************************************************************
 
 CREATE TYPE fortis.computedgender (
     male_mentions bigint,
@@ -71,8 +68,8 @@ CREATE TYPE fortis.features (
     places frozen<list<fortis.place>>
 );
 
-/**************************************
- * Tables
+// *****************************************************************************
+// * Tables
 // *****************************************************************************
 
 CREATE TABLE fortis.users(
@@ -250,9 +247,9 @@ CREATE TABLE fortis.events(
     PRIMARY KEY (eventid)
 );
 
-/**************************************
- * Views
- *************************************/
+// *****************************************************************************
+// * Views
+// *****************************************************************************
 
 CREATE MATERIALIZED VIEW fortis.populartopics
 AS SELECT periodtype, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, externalsourceid, pipelinekey, tilez, 
@@ -290,9 +287,7 @@ AS SELECT eventid, pipelinekey, eventtime, centroidlat, centroidlon, placeid, co
      AND centroidlon IS NOT NULL
 PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, externalsourceid, tileid), eventtime, placeid, eventid);
 
-/**
- * Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
-**/
+// Allows for linking the batchid to saveToCassandra spark call so we can filter out dupes from the original rdd.
 CREATE MATERIALIZED VIEW fortis.eventbatches
 AS SELECT batchid, eventid
    FROM fortis.events
@@ -333,9 +328,9 @@ AS SELECT eventid, pipelinekey, eventtime,conjunctiontopic3,conjunctiontopic2,ti
 PRIMARY KEY ((pipelinekey, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez), eventtime, eventid, tileid, placeid)
 WITH CLUSTERING ORDER BY (eventtime DESC);
 
-/**************************************
- * Indices
- *************************************/
+// *****************************************************************************
+// * Indices
+// *****************************************************************************
 
 CREATE CUSTOM INDEX ON fortis.events (fulltext) USING 'org.apache.cassandra.index.sasi.SASIIndex'
 WITH OPTIONS = {
