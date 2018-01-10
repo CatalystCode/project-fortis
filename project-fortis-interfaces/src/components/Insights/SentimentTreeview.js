@@ -193,7 +193,9 @@ export default class SentimentTreeview extends React.Component {
             }
         };
 
-        const relatedTermsLabel = 'Search for terms related to the main keyword. Click a term in the list below to set the main keyword to that term, or click a checkbox to add the term to the list of filters.'
+        const relatedTermsLabel = this.props.maintopic
+            ? 'Search for terms related to the main keyword. Click a term in the list below to set the main keyword to that term, or click a checkbox to add the term to the list of filters.'
+            : 'First select a main keyword in the input box above.';
 
         return (
             <div className="panel panel-selector">
@@ -241,6 +243,7 @@ export default class SentimentTreeview extends React.Component {
                 <div style={styles.searchBox}>
                     <div className="input-group">
                         <input type="text"
+                            disabled={!this.props.maintopic}
                             className={this.props.inputClassName}
                             placeholder={relatedTermsLabel}
                             title={relatedTermsLabel}
