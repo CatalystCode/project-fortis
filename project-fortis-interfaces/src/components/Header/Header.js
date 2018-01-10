@@ -2,12 +2,10 @@ import React from 'react';
 import '../../styles/Header.css';
 import { Link } from 'react-router';
 
-import LanguagePicker from './LanguagePicker';
-
 class Header extends React.Component {
   render() {
     return (
-      <nav className="navbar navbar-trans">
+      <nav className="navbar navbar-trans fortis-navbar">
         <div>
           { this.renderNavHeader() }
           <div className="navbar-collapse collapse" id="navbar-collapsible">
@@ -85,20 +83,8 @@ class Header extends React.Component {
   renderRightNav() {
     return (
       <ul className="nav navbar-nav navbar-right">
-        { this.props.settings && <li>{ this.renderLanguagePicker() }</li> }
         { this.props.logoutCallback && <li>{ this.renderLogoutLink() }</li> }
       </ul>
-    );
-  }
-
-  renderLanguagePicker() {
-    return (
-      <LanguagePicker
-        supportedLanguages={this.props.supportedLanguages}
-        language={this.props.language}
-        category={this.props.category}
-        flux={this.props.flux}
-      />
     );
   }
 };

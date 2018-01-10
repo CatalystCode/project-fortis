@@ -178,15 +178,10 @@ export const AppPage = createReactClass({
         <div id="app">
           <Header
             id="header"
-            flux={this.props.flux}
             {...this.props.params}
             title={this.state.title}
             logo={this.state.logo}
-            category={this.props.params.siteKey}
-            language={this.state.language}
-            supportedLanguages={this.state.supportedLanguages}
             siteName={this.state.siteName}
-            settings={this.state.settings}
             logoutCallback={this.adApplication ? this.adLogout : null}
             userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}
           />

@@ -50,3 +50,12 @@
     padding-right: 25px;
     padding-bottom: 25px;
 }
+
+.dashboard-footer {
+    border-top-width: 1px !important;
+}
+
+.dashboard-footer .dashboard-actions {
+    display: flex;
+    justify-content: space-around;
+}

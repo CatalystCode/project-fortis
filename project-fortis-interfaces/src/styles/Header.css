@@ -68,10 +68,7 @@ ul.navbar-nav>li>a.current {
 }
 
 .navbar-trans {
-    background: #3f3f4f;
-    color: #61A5E4;
-    border-bottom: 1px solid #61A5E4!important;
-    border-width: 0;
+    border-bottom-width: 1px !important;
 }
 
 .navbar-trans .navbar-brand, .navbar-trans >.container-fluid .navbar-brand {

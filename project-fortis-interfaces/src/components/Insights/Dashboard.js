@@ -16,6 +16,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
 import { HeatmapToggle } from './HeatmapToggle';
+import LanguagePicker from './LanguagePicker';
 
 let ResponsiveReactGridLayout = ReactGridLayout.Responsive;
 const WidthProvider = ReactGridLayout.WidthProvider;
@@ -234,18 +235,17 @@ export default class Dashboard extends React.Component {
     );
   }
 
-  render() {
+  renderActionsFooter() {
     return (
-      <div>
-        <div className="app-container">
-          <div className="container-fluid">
-            <DataSelector
-              {...this.filterLiterals() }
-            />
+      <footer className="navbar-fixed-bottom footer dashboard-footer fortis-navbar">
+        <div className="dashboard-actions">
+          <div className="dashboard-action">
             <HeatmapToggle
               text={this.state.heatmapToggleText}
               onClick={this.toggleHeatmapSize}
             />
+          </div>
+          <div className="dashboard-action">
             <CsvExporter
               csvs={[
                 {name: 'Timeseries', url: this.props.timeSeriesCsv},
@@ -254,6 +254,29 @@ export default class Dashboard extends React.Component {
                 {name: 'Top sources', url: this.props.topSourcesCsv},
               ]}
               fetchCsvs={this.refreshDashboardWithCsv}
+            />
+          </div>
+          <div className="dashboard-action">
+            <LanguagePicker
+              supportedLanguages={this.props.settings.supportedLanguages}
+              language={this.props.language}
+              category={this.props.category}
+              flux={this.props.flux}
+            />
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        <div className="app-container">
+          <div className="container-fluid">
+            {this.renderActionsFooter()}
+            <DataSelector
+              {...this.filterLiterals() }
             />
             <div className="row" id="contentArea">
               <div className="dashboard-grid">
