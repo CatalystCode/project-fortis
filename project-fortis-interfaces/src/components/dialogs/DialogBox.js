@@ -36,7 +36,7 @@ export default class DialogBox extends React.Component {
         return;
       }
 
-      let payload = Object.assign({}, body.data.event, {open: true});
+      const payload = Object.assign({}, body.data.event, {open: true});
       this.setState({...payload});
     });
   }
