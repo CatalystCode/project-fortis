@@ -99,18 +99,27 @@ export default class Dashboard extends React.Component {
   }
 
   newsfeedComponent() {
-    const { bbox } = this.props;
+    const { bbox, fullTermList, trustedSources, settings } = this.props;
     const { contentAreaHeight, contentRowHeight, newsfeedResizedHeight, isHeatmapFullScreen } = this.state;
+
+    let height;
+    if (isHeatmapFullScreen) {
+      height = contentAreaHeight;
+    } else if (newsfeedResizedHeight > 0) {
+      height = newsfeedResizedHeight;
+    } else {
+      height = contentRowHeight;
+    }
 
     return (
       <div key={'newsfeed'}>
         <div id="newsfeed-container">
           {bbox.length ?
             <ActivityFeed
-              allSiteTopics={this.props.fullTermList}
-              trustedSources={this.props.trustedSources}
-              settings={this.props.settings}
-              infiniteScrollHeight={isHeatmapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
+              allSiteTopics={fullTermList}
+              trustedSources={trustedSources}
+              settings={settings}
+              infiniteScrollHeight={height}
               {...this.filterLiterals() }
             />
             : undefined}
