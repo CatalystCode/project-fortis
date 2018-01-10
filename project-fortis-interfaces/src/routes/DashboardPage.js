@@ -3,8 +3,8 @@ import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import Dashboard from '../components/Insights/Dashboard';
 
-const FluxMixin = Fluxxor.FluxMixin(React),
-      StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
+const FluxMixin = Fluxxor.FluxMixin(React);
+const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
 export const DashboardPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
@@ -29,12 +29,13 @@ export const DashboardPage = createReactClass({
   },
 
   render() {
+    if (!this.state.bbox.length) {
+      return <div />;
+    }
+
     return (
-    this.state.bbox.length ?
       <div>
-        <Dashboard flux={this.props.flux}
-                {...this.propertyLiterals()} />
+        <Dashboard flux={this.props.flux} {...this.propertyLiterals()} />
       </div>
-    : <div />
   )}
 });
