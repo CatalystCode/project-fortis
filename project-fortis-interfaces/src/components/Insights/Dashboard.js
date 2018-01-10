@@ -57,6 +57,10 @@ export default class Dashboard extends React.Component {
     }
   }
 
+  onChangeLanguage = (language) => {
+    this.props.flux.actions.DASHBOARD.changeLanguage(language, this.props.category);
+  }
+
   toggleHeatmapSize() {
     const newsfeedResizedHeight = 0;
     const watchlistResizedHeight = 0;
@@ -243,8 +247,7 @@ export default class Dashboard extends React.Component {
               tooltipPosition="top-left"
               supportedLanguages={this.props.settings.supportedLanguages}
               language={this.props.language}
-              category={this.props.category}
-              flux={this.props.flux}
+              onChangeLanguage={this.onChangeLanguage}
             />
           </div>
         </div>

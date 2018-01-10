@@ -6,8 +6,8 @@ import MenuItem from 'material-ui/MenuItem';
 import { fullWhite } from 'material-ui/styles/colors';
 
 export default class LanguagePicker extends React.Component {
-  changeLanguage = (event, index, value) => {
-    this.props.flux.actions.DASHBOARD.changeLanguage(value, this.props.category);
+  changeLanguage = (event, value) => {
+    this.props.onChangeLanguage(value);
   }
 
   renderMenuItems() {
