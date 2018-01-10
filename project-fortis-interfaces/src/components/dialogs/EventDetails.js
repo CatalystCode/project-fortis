@@ -52,8 +52,9 @@ export default class EventDetails extends React.Component {
 
     render() {
         const { translatedText } = this.state;
-        const { enabledStreams, pageLanguage } = this.props;
+        const { enabledStreams, pageLanguage, settings } = this.props;
         const { body, edges, eventtime, sentiment, title, externalsourceid, pipelinekey, link, places, language } = this.props.properties;
+        const { mapSvcToken } = settings;
         const dateText = getHumanDateFromNow(eventtime);
         const dataSourceSchema = enabledStreams.get(pipelinekey);
 
@@ -70,7 +71,7 @@ export default class EventDetails extends React.Component {
 
                         <div className="col-md-4 viewport">
                             <p className="drop">
-                                <MapViewPort coordinates={this.props.coordinates} mapSize={[575, 600]} />
+                                <MapViewPort coordinates={this.props.coordinates} mapSize={[575, 600]} accessToken={mapSvcToken} />
                             </p>
 
                             <p className="subheading">Recognized Place(s)</p>
