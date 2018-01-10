@@ -1,8 +1,7 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import {SERVICES} from '../../services/Dashboard';
-// view components
+import { SERVICES } from '../../services/Dashboard';
 import EventDetails from './EventDetails';
 import '../../styles/Insights/DialogBox.css';
 
@@ -15,9 +14,10 @@ const dialogWideStyle = {
 export default class DialogBox extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
             open: false,
-            enabledStreams: this.props.enabledStreams
+            enabledStreams: props.enabledStreams
         };
     }
 
@@ -42,6 +42,9 @@ export default class DialogBox extends React.Component {
     }
 
     render() {
+        const { open } = this.state;
+        const { language, settings } = this.props;
+
         const actions = [
             <FlatButton
                 label="Done"
@@ -54,28 +57,19 @@ export default class DialogBox extends React.Component {
             <Dialog
                 actions={actions}
                 modal={false}
-                open={this.state.open}
+                open={open}
                 onRequestClose={this.close}
-                autoScrollBodyContent={true}
                 contentStyle={dialogWideStyle}
+                autoScrollBodyContent
             >
                 <div className="content">
                     <EventDetails
                         {...this.state}
-                        pageLanguage={this.props.language}
-                        settings={this.props.settings}
+                        pageLanguage={language}
+                        settings={settings}
                     />
                 </div>
             </Dialog>
         );
     }
-
-    renderText(title) {
-        return (
-            <div className="default">
-                <h1>{title}</h1>
-            </div>
-        );
-    }
-
 };
