@@ -2,10 +2,11 @@ import geoViewport from 'geo-viewport';
 import PropTypes from 'prop-types';
 import turfExtent from 'turf-extent';
 import React from 'react';
+import { reactAppMapboxTileServerUrl } from '../../config';
 
-const tileStyle = "mapbox.streets";
 const DEFAULT_ZOOM = 8;
-const tileServer = "https://api.mapbox.com/v4";
+const PIN_COLOR = '0000FF';
+const PIN_SIZE = 'l';
 
 class MapViewPort extends React.Component {
 render() {
@@ -19,13 +20,11 @@ render() {
         }
     ));
 
-    const color = '0000FF';
-    const pinsize = 'l';
     const geoJson = Object.assign({}, {"type": "FeatureCollection", "features": geoJsonFeatures});
     const bounds = turfExtent(geoJson);
     const vp = geoViewport.viewport(bounds, this.props.mapSize);
-    const pins = this.props.coordinates.map(coordinatePair => `pin-${pinsize}-cross+${color}(${coordinatePair.join(",")})`);
-    const mapImageSrc = `${tileServer}/${tileStyle}/${pins.join(',')}/${vp.center.join(',')},${pins.length > 1 ? vp.zoom : DEFAULT_ZOOM}@2x/${this.props.mapSize.join('x')}.png?access_token=${this.props.accessToken}`;
+    const pins = this.props.coordinates.map(coordinatePair => `pin-${PIN_SIZE}-cross+${PIN_COLOR}(${coordinatePair.join(",")})`);
+    const mapImageSrc = `${reactAppMapboxTileServerUrl}/${pins.join(',')}/${vp.center.join(',')},${pins.length > 1 ? vp.zoom : DEFAULT_ZOOM}@2x/${this.props.mapSize.join('x')}.png?access_token=${this.props.accessToken}`;
 
         return (
             <img src={mapImageSrc} alt="" width="100%"/>

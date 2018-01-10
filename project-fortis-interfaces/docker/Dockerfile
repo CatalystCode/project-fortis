@@ -33,7 +33,10 @@ ENV REACT_APP_AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 # for example, here are some nice alternative map styles:
 # - standard street map:  https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}
 # - custom satellite map: https://api.mapbox.com/styles/v1/erikschlegel/cj82h6wyt9rel2st658r6teto/tiles/256/{z}/{x}/{y}
+# the tile server url defines the style for any static maps used in the app, for
+# example when displaying the location of an event
 ENV REACT_APP_MAPBOX_TILE_LAYER_URL="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}"
+ENV REACT_APP_MAPBOX_TILE_SERVER_URL="https://api.mapbox.com/v4/mapbox.streets"
 
 WORKDIR /app
 ADD package.json /app/package.json
