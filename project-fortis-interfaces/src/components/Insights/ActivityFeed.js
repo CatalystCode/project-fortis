@@ -243,7 +243,7 @@ export default class ActivityFeed extends React.Component {
                     onChange={this.sourceOnClickHandler}>
                     {this.renderDataSourceTabs(styles.iconStyle)}
                 </Tabs>
-                {renderedElements.length ?
+                {renderedElements.length || isInfiniteLoading ?
                 <Infinite elementHeight={ActivityConsts.ELEMENT_ITEM_HEIGHT}
                     containerHeight={infiniteScrollHeight - ActivityConsts.NEWS_FEED_SEARCH_CONTAINER_HEIGHT}
                     infiniteLoadBeginEdgeOffset={600}
