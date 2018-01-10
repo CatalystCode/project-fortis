@@ -6,7 +6,7 @@ import Dashboard from '../components/Insights/Dashboard';
 const FluxMixin = Fluxxor.FluxMixin(React),
       StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-export const EntryPage = createReactClass({
+export const DashboardPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   getStateFromFlux() {
