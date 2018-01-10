@@ -1,7 +1,6 @@
 import React from 'react';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton/IconButton';
 import FileCloudDownload from 'material-ui/svg-icons/file/cloud-download';
 import { fullWhite } from 'material-ui/styles/colors';
