@@ -49,6 +49,7 @@
     "react-dom": "^15.4.2"
   },
   "dependencies": {
+    "@turf/bbox": "^5.1.5",
     "async": "^2.5.0",
     "bootstrap": "^3.3.7",
     "create-react-class": "^15.6.2",
@@ -85,8 +86,7 @@
     "react-treebeard": "^1.1.4",
     "react-widgets": "^3.5.0",
     "recharts": "^0.22.4",
-    "request": "^2.83.0",
-    "turf-extent": "^1.0.4"
+    "request": "^2.83.0"
   },
   "scripts": {
     "start": "react-scripts start",
