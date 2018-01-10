@@ -108,7 +108,6 @@ export default class DataSelector extends React.Component {
         return (
             <div className="row dateRow">
                 <div className="col-sm-12 dateFilterColumn">
-                    {this.renderHeatmapToggle()}
                     {this.renderDataSourceFilter()}
                     {this.renderDateFilter()}
                 </div>
@@ -173,21 +172,6 @@ export default class DataSelector extends React.Component {
                     onChange={this.handleChangeDataSource}>
                         {options}
                 </SelectField>
-            </div>
-        );
-    }
-
-    renderHeatmapToggle() {
-        if (this.props.hideHeatmapToggle) {
-            return null;
-        }
-
-        return (
-            <div>
-                <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={this.props.toggleHeatmapSize}>
-                    <span className="fa fa-expand" aria-hidden="true"></span>
-                    <span>{this.props.heatmapToggleText}</span>
-                </button>
             </div>
         );
     }

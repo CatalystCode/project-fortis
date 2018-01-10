@@ -77,7 +77,6 @@ export const FactsList = createReactClass({
         <div className="inputs-container">
           <DataSelector
             hideDataSourceFilter
-            hideHeatmapToggle
             {...this.props}
           />
           <TypeaheadSearch

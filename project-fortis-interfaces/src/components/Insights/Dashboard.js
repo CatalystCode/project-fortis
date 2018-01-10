@@ -15,6 +15,7 @@ import { hasChanged } from './shared';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
+import { HeatmapToggle } from './HeatmapToggle';
 
 let ResponsiveReactGridLayout = ReactGridLayout.Responsive;
 const WidthProvider = ReactGridLayout.WidthProvider;
@@ -220,15 +221,30 @@ export default class Dashboard extends React.Component {
       : [this.topLocationsComponent(), this.topTopicsComponent(), this.topSourcesComponent(), this.timelineComponent(), this.watchlistComponent(), this.heatmapComponent(), this.newsfeedComponent()];
   }
 
+  renderHeatmapToggle() {
+    const { heatmapToggleText } = this.state;
+
+    return (
+        <div>
+            <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={this.toggleHeatmapSize}>
+                <span className="fa fa-expand" aria-hidden="true"></span>
+                <span>{heatmapToggleText}</span>
+            </button>
+        </div>
+    );
+  }
+
   render() {
     return (
       <div>
         <div className="app-container">
           <div className="container-fluid">
             <DataSelector
-              heatmapToggleText={this.state.heatmapToggleText}
-              toggleHeatmapSize={this.toggleHeatmapSize}
               {...this.filterLiterals() }
+            />
+            <HeatmapToggle
+              text={this.state.heatmapToggleText}
+              onClick={this.toggleHeatmapSize}
             />
             <CsvExporter
               csvs={[
