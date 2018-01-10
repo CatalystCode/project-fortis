@@ -3,6 +3,7 @@ import Autosuggest from 'react-autosuggest';
 import { fromMapToArray, fetchTermFromMap } from './shared';
 import flatten from 'lodash/flatten';
 import last from 'lodash/last';
+import first from 'lodash/first';
 import initial from 'lodash/initial';
 import { fetchLocationsFromFeatureService } from '../../services/featureService';
 import '../../styles/Insights/TypeaheadSearch.css';
@@ -148,7 +149,9 @@ export default class TypeaheadSearch extends React.Component {
 
   formatLabel() {
     const datasetNames = Object.values(this.DATASETS).map(dataset => dataset.displayName);
-    return `Search for ${initial(datasetNames).join(', ')} and ${last(datasetNames)}`;
+    return datasetNames.length > 1
+      ? `Search for ${initial(datasetNames).join(', ')} and ${last(datasetNames)}`
+      : `Search for ${first(datasetNames)}`;
   }
 
   render() {
