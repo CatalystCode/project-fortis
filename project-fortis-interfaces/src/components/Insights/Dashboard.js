@@ -109,6 +109,7 @@ export default class Dashboard extends React.Component {
             <ActivityFeed
               allSiteTopics={this.props.fullTermList}
               trustedSources={this.props.trustedSources}
+              settings={this.props.settings}
               infiniteScrollHeight={isHeatmapFullScreen ? contentAreaHeight : newsfeedResizedHeight > 0 ? newsfeedResizedHeight : contentRowHeight}
               {...this.filterLiterals() }
             />
