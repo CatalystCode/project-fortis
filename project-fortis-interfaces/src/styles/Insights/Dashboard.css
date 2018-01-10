@@ -43,14 +43,6 @@
   width: 100%;
 }
 
-.react-grid-item > .react-resizable-handle{
-    background: url('/images/handleIcon.svg')!important;
-    font-family: FontAwesome!important;
-    color: #757575!important;
-    padding-right: 25px;
-    padding-bottom: 25px;
-}
-
 .dashboard-footer {
     border-top-width: 1px !important;
 }

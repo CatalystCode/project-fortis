@@ -13,7 +13,6 @@ import ReactGridLayout from 'react-grid-layout';
 import { defaultLayout } from './Layouts';
 import { hasChanged } from './shared';
 import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
 import { HeatmapToggle } from './HeatmapToggle';
 import LanguagePicker from './LanguagePicker';
@@ -26,7 +25,6 @@ export default class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    this.onResizeStop = this.onResizeStop.bind(this);
     this.toggleHeatmapSize = this.toggleHeatmapSize.bind(this);
 
     this.state = {
@@ -43,18 +41,6 @@ export default class Dashboard extends React.Component {
     const rowInitialHeight = document.getElementById("leafletMap") || { clientHeight: 0 };
     const contentAreaHeight = document.getElementById("contentArea");
     this.setState({ contentRowHeight: rowInitialHeight.clientHeight, contentAreaHeight: contentAreaHeight.clientHeight, mounted: true });
-  }
-
-  onResizeStop(item, oldItem, newItem, placeholder, e, element) {
-    const height = e.toElement.clientHeight;
-
-    const resizedItemId = newItem.i;
-    const resizeStateHeightItems = ['newsfeed', 'watchlist'];
-    if (resizeStateHeightItems.indexOf(resizedItemId) > -1) {
-      const newState = {};
-      newState[resizedItemId + 'ResizedHeight'] = height;
-      this.setState(newState);
-    }
   }
 
   onChangeLanguage = (language) => {
@@ -282,10 +268,10 @@ export default class Dashboard extends React.Component {
                   measureBeforeMount={false}
                   className="layout"
                   isDraggable={false}
+                  isResizable={false}
                   layouts={isHeatmapFullScreen ? defaultLayout.layoutCollapsed : defaultLayout.layout}
                   cols={{ lg: 24, md: 20, sm: 12, xs: 8, xxs: 4 }}
                   rowHeight={34}
-                  onResizeStop={this.onResizeStop}
                   breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                   useCSSTransforms={mounted}>
                     {this.renderGridCards()}
