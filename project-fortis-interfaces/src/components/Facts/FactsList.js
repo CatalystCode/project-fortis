@@ -84,6 +84,7 @@ export const FactsList = createReactClass({
             excludeLocations
             excludeSources
             allSiteTopics={this.props.fullTermList}
+            className="form-control edgeFilterInput"
             {...this.props}
           />
         </div>
