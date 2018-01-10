@@ -1,4 +1,6 @@
 import React from 'react';
+import FontIcon from 'material-ui/FontIcon';
+import RaisedButton from 'material-ui/RaisedButton';
 
 export class HeatmapToggle extends React.Component {
   constructor(props) {
@@ -20,10 +22,11 @@ export class HeatmapToggle extends React.Component {
     const iconClassName = this.state.expanded ? 'fa fa-compress' : 'fa fa-expand';
 
     return (
-      <div>
-        <button id="save-button" type="button" className="btn btn-primary btn-sm" onClick={this.onClick}>
-          <span className={iconClassName} aria-hidden="true"></span>&nbsp;<span>{this.props.text}</span>
-        </button>
+      <div style={{paddingTop: '1em'}}>
+        <RaisedButton
+          label={this.props.text}
+          icon={<FontIcon className={iconClassName} />}
+          onClick={this.onClick} />
       </div>
     );
   }
