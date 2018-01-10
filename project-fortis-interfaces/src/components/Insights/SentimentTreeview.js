@@ -193,6 +193,8 @@ export default class SentimentTreeview extends React.Component {
             }
         };
 
+        const relatedTermsLabel = 'Search for terms related to the main keyword. Click a term in the list below to set the main keyword to that term, or click a checkbox to add the term to the list of filters.'
+
         return (
             <div className="panel panel-selector">
                 <Subheader style={styles.subHeader}>
@@ -240,7 +242,8 @@ export default class SentimentTreeview extends React.Component {
                     <div className="input-group">
                         <input type="text"
                             className="form-control edgeFilterInput"
-                            placeholder="Search for related terms"
+                            placeholder={relatedTermsLabel}
+                            title={relatedTermsLabel}
                             onKeyUp={this.onFilterMouseUp} />
                     </div>
                 </div>
