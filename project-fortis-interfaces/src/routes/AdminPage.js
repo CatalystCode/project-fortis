@@ -9,6 +9,7 @@ const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
 export const AdminPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
+
   componentDidMount(){
     this.getFlux().actions.ADMIN.load_settings();
   },
