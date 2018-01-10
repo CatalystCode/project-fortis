@@ -1,26 +1,37 @@
 import React from 'react';
-import SelectField from 'material-ui/SelectField';
+import ActionLanguage from 'material-ui/svg-icons/action/language';
+import IconButton from 'material-ui/IconButton';
+import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
+import { fullWhite } from 'material-ui/styles/colors';
 
 export default class LanguagePicker extends React.Component {
   changeLanguage = (event, index, value) => {
     this.props.flux.actions.DASHBOARD.changeLanguage(value, this.props.category);
   }
 
-  render() {
-    const languages = this.props.supportedLanguages.map(lang =>
+  renderMenuItems() {
+    return this.props.supportedLanguages.map(lang =>
       <MenuItem key={lang} value={lang} primaryText={lang} label={`Language: ${lang}`} />
     );
+  }
+
+  renderMenuIcon() {
+    const { language, tooltipPosition } = this.props;
+    const tooltip = `Current language: '${language}'. Click to change language`;
 
     return (
-      <SelectField
-        underlineStyle={{ borderColor: '#337ab7', borderBottom: 'solid 3px' }}
-        labelStyle={{ fontWeight: 600, color: '#2ebd59' }}
-        value={this.props.language}
-        autoWidth={true}
-        onChange={this.changeLanguage}>
-          {languages}
-      </SelectField>
+      <IconButton tooltip={tooltip} tooltipPosition={tooltipPosition}>
+        <ActionLanguage color={fullWhite} />
+      </IconButton>
+    );
+  }
+
+  render() {
+    return (
+      <IconMenu onChange={this.changeLanguage} iconButtonElement={this.renderMenuIcon()}>
+        {this.renderMenuItems()}
+      </IconMenu>
     );
   }
 }

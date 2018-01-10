@@ -1,8 +1,10 @@
 import React from 'react';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton/IconButton';
+import FileCloudDownload from 'material-ui/svg-icons/file/cloud-download';
+import { fullWhite } from 'material-ui/styles/colors';
 
 class CsvExporter extends React.Component {
   constructor(props) {
@@ -25,12 +27,14 @@ class CsvExporter extends React.Component {
   }
 
   render() {
+    const tooltip = 'Click to export current view to Excel';
+    const tooltipPosition = this.props.tooltipPosition;
+
     return (
-      <div style={{paddingTop: '1em'}}>
-        <RaisedButton
-          label="Export to Excel"
-          icon={<FontIcon className="fa fa-table" />}
-          onClick={this.handleDrawerToggle} />
+      <div>
+        <IconButton tooltip={tooltip} tooltipPosition={tooltipPosition} onClick={this.handleDrawerToggle}>
+          <FileCloudDownload color={fullWhite} />
+        </IconButton>
         <Drawer
           docked={false}
           width={200}

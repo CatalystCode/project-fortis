@@ -1,6 +1,8 @@
 import React from 'react';
-import FontIcon from 'material-ui/FontIcon';
-import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton/IconButton';
+import NavigationFullscreen from 'material-ui/svg-icons/navigation/fullscreen';
+import NavigationFullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
+import { fullWhite } from 'material-ui/styles/colors';
 
 export class HeatmapToggle extends React.Component {
   constructor(props) {
@@ -19,14 +21,14 @@ export class HeatmapToggle extends React.Component {
   }
 
   render() {
-    const iconClassName = this.state.expanded ? 'fa fa-compress' : 'fa fa-expand';
+    const { tooltip, tooltipPosition } = this.props;
+    const { expanded } = this.state;
 
     return (
-      <div style={{paddingTop: '1em'}}>
-        <RaisedButton
-          label={this.props.text}
-          icon={<FontIcon className={iconClassName} />}
-          onClick={this.onClick} />
+      <div>
+        <IconButton tooltip={tooltip} onClick={this.onClick} tooltipPosition={tooltipPosition}>
+          {expanded ? <NavigationFullscreenExit color={fullWhite} /> : <NavigationFullscreen color={fullWhite} />}
+        </IconButton>
       </div>
     );
   }

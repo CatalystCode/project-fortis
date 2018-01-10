@@ -241,7 +241,8 @@ export default class Dashboard extends React.Component {
         <div className="dashboard-actions">
           <div className="dashboard-action">
             <HeatmapToggle
-              text={this.state.heatmapToggleText}
+              tooltip={this.state.heatmapToggleText}
+              tooltipPosition="top-right"
               onClick={this.toggleHeatmapSize}
             />
           </div>
@@ -253,11 +254,13 @@ export default class Dashboard extends React.Component {
                 {name: 'Top terms', url: this.props.popularTermsCsv},
                 {name: 'Top sources', url: this.props.topSourcesCsv},
               ]}
+              tooltipPosition="top-center"
               fetchCsvs={this.refreshDashboardWithCsv}
             />
           </div>
           <div className="dashboard-action">
             <LanguagePicker
+              tooltipPosition="top-left"
               supportedLanguages={this.props.settings.supportedLanguages}
               language={this.props.language}
               category={this.props.category}
