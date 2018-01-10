@@ -49,12 +49,12 @@
     "react-dom": "^15.4.2"
   },
   "dependencies": {
+    "@mapbox/geo-viewport": "^0.2.2",
     "@turf/bbox": "^5.1.5",
     "async": "^2.5.0",
     "bootstrap": "^3.3.7",
     "create-react-class": "^15.6.2",
     "fluxxor": "^1.7.3",
-    "geo-viewport": "^0.2.1",
     "geotile": "^0.1.6",
     "leaflet": "^1.2.0",
     "leaflet-draw": "^0.4.12",

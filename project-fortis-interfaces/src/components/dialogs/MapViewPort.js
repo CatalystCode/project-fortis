@@ -1,4 +1,4 @@
-import geoViewport from 'geo-viewport';
+import geoViewport from '@mapbox/geo-viewport';
 import PropTypes from 'prop-types';
 import bbox from '@turf/bbox';
 import React from 'react';
