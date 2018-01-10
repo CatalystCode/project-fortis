@@ -23,13 +23,14 @@
 } 
 
 .input-group .form-control.edgeFilterInput {
-    width: 250px;
-}
-
-.edgeFilterInput.edgeFilterInput {
     text-overflow: ellipsis;
     border-radius: 0;
     height: 30px;
+    width: 250px;
+}
+
+.input-group .form-control.edgeFilterInput.small {
+    width: 200px;
 }
 
 .badge{

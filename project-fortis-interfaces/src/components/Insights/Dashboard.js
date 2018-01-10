@@ -195,6 +195,7 @@ export default class Dashboard extends React.Component {
       <div key={'watchlist'}>
         <GraphCard>
           <SentimentTreeview
+            inputClassName={`form-control edgeFilterInput ${isHeatmapFullScreen ? 'small' : ''}`}
             trustedSources={this.props.trustedSources}
             conjunctivetopics={this.props.conjunctivetopics}
             defaultBbox={this.props.settings.targetBbox}
