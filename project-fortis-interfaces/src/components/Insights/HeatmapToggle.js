@@ -21,12 +21,12 @@ export class HeatmapToggle extends React.Component {
   }
 
   render() {
-    const { tooltip, tooltipPosition } = this.props;
+    const { tooltipOn, tooltipOff, tooltipPosition } = this.props;
     const { expanded } = this.state;
 
     return (
       <div>
-        <IconButton tooltip={tooltip} onClick={this.onClick} tooltipPosition={tooltipPosition}>
+        <IconButton tooltip={expanded ? tooltipOff : tooltipOn } onClick={this.onClick} tooltipPosition={tooltipPosition}>
           {expanded ? <NavigationFullscreenExit color={fullWhite} /> : <NavigationFullscreen color={fullWhite} />}
         </IconButton>
       </div>
