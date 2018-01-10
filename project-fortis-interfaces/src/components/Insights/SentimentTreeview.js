@@ -205,6 +205,7 @@ export default class SentimentTreeview extends React.Component {
                 </Subheader>
                 <div style={styles.searchBox}>
                     <TypeaheadSearch
+                        className="form-control edgeFilterInput"
                         trustedSources={this.props.trustedSources}
                         dashboardRefreshFunc={this.handleDataFetch}
                         bbox={this.props.bbox}
@@ -237,12 +238,9 @@ export default class SentimentTreeview extends React.Component {
                 </div>
                 <div style={styles.searchBox}>
                     <div className="input-group">
-                        <span className="input-group-addon">
-                            <i className="fa fa-filter" id="edge-filter-icon"></i>
-                        </span>
                         <input type="text"
                             className="form-control edgeFilterInput"
-                            placeholder="Search the association list..."
+                            placeholder="Search for related terms"
                             onKeyUp={this.onFilterMouseUp} />
                     </div>
                 </div>

@@ -22,8 +22,14 @@
     box-shadow: none !important;
 } 
 
-.edgeFilterInput{
-    height: 30px!important;
+.input-group .form-control.edgeFilterInput {
+    width: 250px;
+}
+
+.edgeFilterInput.edgeFilterInput {
+    text-overflow: ellipsis;
+    border-radius: 0;
+    height: 30px;
 }
 
 .badge{

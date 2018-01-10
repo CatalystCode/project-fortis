@@ -1,7 +1,9 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { fromMapToArray, fetchTermFromMap } from './shared';
-import { MenuItem, DropdownButton, InputGroup } from 'react-bootstrap';
+import flatten from 'lodash/flatten';
+import last from 'lodash/last';
+import initial from 'lodash/initial';
 import { fetchLocationsFromFeatureService } from '../../services/featureService';
 import '../../styles/Insights/TypeaheadSearch.css';
 
@@ -10,13 +12,12 @@ export default class TypeaheadSearch extends React.Component {
     super(props);
 
     this.DATASETS = {};
-    this.DATASETS.TERM = { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, description: 'Search for terms' };
-    if (!props.excludeLocations) this.DATASETS.LOCATION = { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, description: 'Search for locations' };
-    if (!props.excludeSources) this.DATASETS.SOURCE = { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchSourcesSuggestions, description: 'Search for trusted sources' };
+    this.DATASETS.TERM = { type: 'Term', icon: 'fa fa-tag', fetcher: this.fetchTermSuggestions, displayName: 'terms' };
+    if (!props.excludeLocations) this.DATASETS.LOCATION = { type: 'Location', icon: 'fa fa-map-marker', fetcher: this.fetchLocationSuggestions, displayName: 'locations' };
+    if (!props.excludeSources) this.DATASETS.SOURCE = { type: 'Source', icon: 'fa fa-share-alt', fetcher: this.fetchSourcesSuggestions, displayName: 'sources' };
 
     this.state = {
       suggestions: [],
-      activeDataset: this.DATASETS.TERM,
       value: ''
     };
   }
@@ -48,13 +49,11 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   onSuggestionSelected = (event, { suggestion }) => {
-    const { activeDataset } = this.state;
-
-    if(activeDataset.type === 'Source'){
-      return this.props.dashboardRefreshFunc(null, null, null, suggestion.pipelinekey, suggestion.value);
+    if (suggestion.pipelinekey) {
+      this.props.dashboardRefreshFunc(null, null, null, suggestion.pipelinekey, suggestion.value);
+    } else {
+      this.props.dashboardRefreshFunc(suggestion.name, [], this.parsePlace(suggestion));
     }
-
-    this.props.dashboardRefreshFunc(suggestion.name, [], this.parsePlace(suggestion));
   }
 
   onChange = (event, { newValue }) => {
@@ -109,7 +108,10 @@ export default class TypeaheadSearch extends React.Component {
   }
 
   onSuggestionsFetchRequested = ({ value }) => {
-    this.state.activeDataset.fetcher(value, (suggestions) => this.setState({ suggestions }));
+    const suggestionFetchers = Object.values(this.DATASETS).map(dataset => dataset.fetcher);
+    const suggestionPromises = suggestionFetchers.map(fetcher => new Promise(resolve => fetcher(value, resolve)));
+    Promise.all(suggestionPromises)
+      .then(nestedSuggestions => this.setState({ suggestions: flatten(nestedSuggestions) }));
   }
 
   getTopicFieldName = () => this.props.language === this.props.defaultLanguage ? 'name' : 'translatedname'
@@ -144,34 +146,37 @@ export default class TypeaheadSearch extends React.Component {
     });
   }
 
+  formatLabel() {
+    const datasetNames = Object.values(this.DATASETS).map(dataset => dataset.displayName);
+    return `Search for ${initial(datasetNames).join(', ')} and ${last(datasetNames)}`;
+  }
+
   render() {
-    const { suggestions, value, activeDataset } = this.state;
+    const { className } = this.props;
+    const { suggestions, value } = this.state;
+    const label = this.formatLabel();
+
+    const inputProps = {
+      value,
+      className,
+      placeholder: label,
+      title: label.length > 35 ? label : null,
+      onChange: this.onChange
+    };
 
     return (
-      <InputGroup>
-        <InputGroup.Button>
-          <DropdownButton id="dataset-switcher-button" componentClass={InputGroup.Button} title={<i className={activeDataset.icon} title={activeDataset.description}></i>}>
-            {Object.values(this.DATASETS).map(dataset =>
-              <MenuItem
-                active={dataset === activeDataset}
-                key={dataset.type}
-                onClick={() => this.setState({ activeDataset: dataset })} >
-                <span><i className={dataset.icon} /> {dataset.description}</span>
-              </MenuItem>
-            )}
-          </DropdownButton>
-        </InputGroup.Button>
+      <div className="input-group">
         <Autosuggest
+          focusInputOnSuggestionClick
           suggestions={suggestions}
-          inputProps={{ placeholder: "Type 'c'", value, onChange: this.onChange }}
-          focusInputOnSuggestionClick={true}
+          inputProps={inputProps}
           onSuggestionSelected={this.onSuggestionSelected}
           onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
           onSuggestionsClearRequested={this.onSuggestionsClearRequested}
           renderSuggestion={this.renderSuggestion}
           getSuggestionValue={this.getSuggestionValue}
         />
-      </InputGroup>
+      </div>
     );
   }
 }
