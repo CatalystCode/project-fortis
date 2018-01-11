@@ -159,7 +159,7 @@ const _methods = {
     },
 
     handleLoadSharedDashboardError(error) {
-        handleError(error, self.dispatch, 'restoring dashboard from shared link');
+        handleError(error, this.dispatch, 'restoring dashboard from shared link');
     },
 
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
