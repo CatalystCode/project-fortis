@@ -6,6 +6,9 @@ import { TileLayer } from '../Insights/Maps/TileLayer';
 import '../../styles/Insights/HeatMap.css';
 
 const styles = {
+    error: {
+        color: 'red'
+    },
     settings: {
         input: {
             width: '65%',
@@ -44,6 +47,7 @@ export default class AdminLocations extends React.Component {
             originalBounds: targetBbox,
             targetBbox: targetBbox,
             mapSvcToken,
+            error: '',
             "saving": false,
             locationNameBlacklist: []
         }
@@ -108,10 +112,23 @@ export default class AdminLocations extends React.Component {
 
         const tileIds = tileIdsForBoundingBox(geofence, defaultZoomLevel);
         if (tileIds.length) {
-            this.setState({ targetBbox: [north, west, south, east] });
+            this.setState({ targetBbox: [north, west, south, east], error: '' });
         } else {
-            console.error(`No tile ids for fence ${JSON.stringify(geofence)} at zoom ${defaultZoomLevel}`)
+            const error = `No tile ids for fence ${JSON.stringify(geofence)} at zoom ${defaultZoomLevel}. Please select a different geo-area.`;
+            this.setState({ error });
         }
+    }
+
+    renderError() {
+        const { error } = this.state;
+
+        if (!error) {
+            return null;
+        }
+
+        return (
+            <em style={styles.error}>{error}</em>
+        )
     }
 
     render() {
@@ -174,6 +191,7 @@ export default class AdminLocations extends React.Component {
                                 color={bboxRectangleColor}
                             />
                         </Map>
+                        {this.renderError()}
                     </div>
                 </div>
             </div>
