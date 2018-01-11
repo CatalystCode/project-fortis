@@ -11,9 +11,9 @@ import 'leaflet/dist/leaflet.css';
 export default class HeatMap extends React.Component {
   constructor(props) {
     super(props);
-    const { defaultZoom, targetBbox } = props;
+    const { defaultZoom, targetBbox, bbox } = props;
 
-    const bounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[1], targetBbox[0]], [targetBbox[3], targetBbox[2]]] : [];
+    const bounds = bbox.length && bbox.length === 4 ? [[bbox[1], bbox[0]], [bbox[3], bbox[2]]] : [];
     this.onViewportChanged = this.onViewportChanged.bind(this);
     this.updateBounds = this.asyncInvokeDashboardRefresh.bind(this);
     this.changeMapBoundsWithTile = this.changeMapBoundsWithTile.bind(this);

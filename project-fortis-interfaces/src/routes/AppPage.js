@@ -79,7 +79,38 @@ export const AppPage = createReactClass({
       console.warn('!!!!!!!!!!!! No Active Directory Client Id configured; auth is disabled !!!!!!!!!!!!');
     }
 
+    if (this.props.params.sharedViewState) {
+      this.loadDashboardFromShareLink();
+    } else {
+      this.loadDefaultDashboard();
+    }
+  },
+
+  loadDefaultDashboard() {
     this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
+  },
+
+  loadDashboardFromShareLink() {
+    let dataStore;
+    try {
+      dataStore = JSON.parse(atob(decodeURIComponent(this.props.params.sharedViewState)));
+    } catch (err) {
+      return console.error(err);
+    }
+
+    const {
+      fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
+      bbox, zoomLevel, conjunctivetopics, externalsourceid, selectedplace, category
+    } = dataStore;
+    const includeCsv = false;
+
+    this.getFlux().actions.DASHBOARD.initializeDashboard(category, () => {
+      this.getFlux().actions.DASHBOARD.reloadVisualizationState(
+        fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
+        bbox, zoomLevel, conjunctivetopics, externalsourceid, includeCsv, selectedplace, () => {
+          this.props.router.push(`/site/${this.props.params.siteKey}`);
+        });
+    });
   },
 
   getStateFromFlux() {

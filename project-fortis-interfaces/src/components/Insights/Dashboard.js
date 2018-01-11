@@ -15,6 +15,7 @@ import { hasChanged } from './shared';
 import 'react-grid-layout/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
 import { HeatmapToggle } from './HeatmapToggle';
+import ShareButton from './ShareButton';
 import LanguagePicker from './LanguagePicker';
 
 let ResponsiveReactGridLayout = ReactGridLayout.Responsive;
@@ -241,15 +242,40 @@ export default class Dashboard extends React.Component {
           </div>
           <div className="dashboard-action">
             <LanguagePicker
-              tooltipPosition="top-left"
+              tooltipPosition="top-center"
               supportedLanguages={this.props.settings.supportedLanguages}
               language={this.props.language}
               onChangeLanguage={this.onChangeLanguage}
             />
           </div>
+          <div className="dashboard-action">
+            <ShareButton
+              tooltipPosition="top-left"
+              tooltip="Click to copy a link to share the current dashboard view"
+              notification="Dashboard share link was copied to clipboard!"
+              link={this.formatDashboardShareLink()}
+            />
+          </div>
         </div>
       </footer>
     );
+  }
+
+  formatDashboardShareLink() {
+    const {
+      fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
+      bbox, zoomLevel, termFilters, externalsourceid, selectedplace,
+    } = this.props;
+    const conjunctivetopics = Array.from(termFilters);
+    const category = window.location.hash.split('/')[2];
+    const filters = {
+      fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
+      bbox, zoomLevel, conjunctivetopics, externalsourceid, selectedplace,
+      category
+    };
+    const serializedFilters = encodeURIComponent(btoa(JSON.stringify(filters)));
+    const urlPrefix = `${window.location.origin}${window.location.pathname}`;
+    return `${urlPrefix}#/site/${category}/share/${serializedFilters}`;
   }
 
   render() {

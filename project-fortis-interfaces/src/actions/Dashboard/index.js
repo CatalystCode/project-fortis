@@ -3,7 +3,7 @@ import { SERVICES as AdminServices } from '../../services/Admin';
 import seqAsync from 'async/seq';
 import constants from '../constants';
 import { ResponseHandler } from '../shared';
-import { momentGetFromToRange } from '../../utils/Utils';
+import { momentGetFromToRange, doNothing } from '../../utils/Utils';
 
 function toDataSources(streams) {
     const dataSources = new Map();
@@ -96,7 +96,7 @@ function isMostPopularTopicSelected(maintopic, popularTopics){
 }
 
 const _methods = {
-    initializeDashboard(category) {
+    initializeDashboard(category, onFinished) {
         const { timespanType, datetimeSelection } = this.flux.stores.DataStore.dataStore;
         const formatter = constants.TIMESPAN_TYPES[timespanType];
         const dates = momentGetFromToRange(datetimeSelection, formatter.format, formatter.rangeFormat);
@@ -104,6 +104,7 @@ const _methods = {
         const self = this;
 
         const reportProgress = () => self.dispatch(constants.DASHBOARD.INITIALIZE_PROGRESS);
+        onFinished = onFinished != null ? onFinished : doNothing;
 
         seqAsync(
             callback => {
@@ -129,6 +130,7 @@ const _methods = {
         )((error, results) => {
             if (!error) {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
+                onFinished();
             } else {
                 const { message, code } = error;
                 console.error(`${code}: error [${message}] occured while fetching edges or site defintion`);
@@ -138,10 +140,11 @@ const _methods = {
     },
 
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
-                             zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
+                             zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place, onFinished) {
         const self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;
         const { category, popularTerms, enabledStreams } = dataStore;
+        onFinished = onFinished != null ? onFinished : doNothing;
 
         const timeseriesmaintopics = isMostPopularTopicSelected(maintopic, popularTerms) ? popularTerms.map(topic => topic.name) : [maintopic];
 
@@ -156,6 +159,7 @@ const _methods = {
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
+                onFinished();
             } else {
                 const { message, code } = err;
                 console.error(`${code}: error [${message}] occured while processing tile visualization re-sync request`);
