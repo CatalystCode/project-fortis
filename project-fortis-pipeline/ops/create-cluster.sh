@@ -115,6 +115,7 @@ echo "Finished. Verifying deployment."
 ./verify-deployment.sh \
   "${graphql_service_host}"
 
+# shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
   echo "Deployment verification failed" >&2
   exit 1

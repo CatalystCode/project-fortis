@@ -325,6 +325,7 @@ echo "Finished. Setting up cluster"
   "${cogtextsvctoken}" \
   "${translationsvctoken}"
 
+# shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
   echo "Cluster creation failed" >&2
   exit 1
