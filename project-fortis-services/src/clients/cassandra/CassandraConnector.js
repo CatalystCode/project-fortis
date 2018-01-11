@@ -70,8 +70,9 @@ function executeBatchMutations(mutations) {
       if (err) {
         trackException(err);
         reject(err);
+      } else {
+        resolve({numBatchMutations: chunkedMutations.length});
       }
-      else resolve({numBatchMutations: chunkedMutations.length});
     });
   });
 }
@@ -94,7 +95,7 @@ function executeQuery(query, params, options) {
       const stream = client.stream(query, params, options)
         .on('readable', () => {
           let row;
-          while((row = stream.read()) != undefined) {
+          while ((row = stream.read()) != undefined) {
             rows.push(row);
           }
         })
