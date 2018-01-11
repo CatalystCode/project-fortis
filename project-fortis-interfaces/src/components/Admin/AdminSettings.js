@@ -20,6 +20,10 @@ const styles = {
       color: '#3f3f4f',
       margin: '0 0 2px'
     },
+    lablelLink: {
+      color: '#3f3f4f',
+      textDecoration: 'underline'
+    },
     buttonRow: {
       marginTop: '20px'
     },
@@ -158,7 +162,7 @@ export const AdminSettings = createReactClass({
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label htmlFor="targetBbox">Bounding Box (<span style={styles.settings.labelInfo}>comma seperated i.e. 1,2,3,4</span>)<span>*</span></label>
+                          <label htmlFor="targetBbox"><a style={styles.settings.lablelLink} href="http://boundingbox.klokantech.com/" title="Click to open bounding box selection helper too and copy the bounding box in the format north,west,south,east into the field below">Bounding Box</a> (<span style={styles.settings.labelInfo}>comma seperated e.g. 40.9,-74,40.47,-73.7</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required data-rule="required" name="targetBbox" data-msg="Please enter a bounding box. The format is four comma separated numbers: north,west,south,east" ref="targetBbox" value={this.state.siteSettings.properties.targetBbox} type="text" style={styles.settings.input} className="form-control settings" />
                           <div className="validation"></div>
                       </div>
@@ -168,12 +172,12 @@ export const AdminSettings = createReactClass({
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label>Supported Languages (<span style={styles.settings.labelInfo}>comma seperated i.e. en,ar</span>)<span>*</span></label>
+                          <label>Supported Languages (<span style={styles.settings.labelInfo}>comma seperated e.g. en,ar</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="supportedLanguages" ref="supportedLanguages" value={this.state.siteSettings.properties.supportedLanguages} type="text" style={styles.settings.input} className="form-control settings" />
                           <div className="validation"></div>
                       </div>
                       <div className="form-group">
-                          <label>Default Languages (<span style={styles.settings.labelInfo}>i.e. en or ar</span>)<span>*</span></label>
+                          <label>Default Languages (<span style={styles.settings.labelInfo}>e.g. en</span>)<span>*</span></label>
                           <input onChange={this.handleInputChange} required name="defaultLanguage" ref="defaultLanguage" value={this.state.siteSettings.properties.defaultLanguage} type="text" style={styles.settings.input} className="form-control settings" />
                           <div className="validation"></div>
                       </div>
