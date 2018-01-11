@@ -4,7 +4,7 @@ import NavigationFullscreen from 'material-ui/svg-icons/navigation/fullscreen';
 import NavigationFullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
 import { fullWhite } from 'material-ui/styles/colors';
 
-export class HeatmapToggle extends React.Component {
+export default class HeatmapToggle extends React.Component {
   constructor(props) {
     super(props);
 
@@ -26,7 +26,7 @@ export class HeatmapToggle extends React.Component {
 
     return (
       <div>
-        <IconButton tooltip={expanded ? tooltipOff : tooltipOn } onClick={this.onClick} tooltipPosition={tooltipPosition}>
+        <IconButton tooltip={expanded ? tooltipOff : tooltipOn} onClick={this.onClick} tooltipPosition={tooltipPosition}>
           {expanded ? <NavigationFullscreenExit color={fullWhite} /> : <NavigationFullscreen color={fullWhite} />}
         </IconButton>
       </div>
