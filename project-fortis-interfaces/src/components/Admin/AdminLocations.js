@@ -48,7 +48,7 @@ export default class AdminLocations extends React.Component {
             targetBbox: targetBbox,
             mapSvcToken,
             error: '',
-            "saving": false,
+            saving: false,
             locationNameBlacklist: []
         }
     }
@@ -91,9 +91,7 @@ export default class AdminLocations extends React.Component {
             targetBbox
         };
 
-        this.setState({
-            "saving": true
-        });
+        this.setState({ saving: true });
 
         this.props.flux.actions.ADMIN.save_settings(site);
     }
@@ -132,7 +130,7 @@ export default class AdminLocations extends React.Component {
     }
 
     render() {
-        const { defaultZoomLevel, targetBbox, originalBounds, mapSvcToken } = this.state;
+        const { defaultZoomLevel, targetBbox, originalBounds, mapSvcToken, saving } = this.state;
         const bboxRectangleColor = "#0ff";
         const bounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
         const originalBoundsTarget = originalBounds.length && originalBounds.length === 4 ? [[originalBounds[0], originalBounds[1]], [originalBounds[2], originalBounds[3]]] : [];
@@ -141,8 +139,9 @@ export default class AdminLocations extends React.Component {
             <div className="row">
                 <div className="col-lg-8" style={styles.settings.mapColumn}>
                     <div className="row" style={styles.settings.row}>
-                        <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
-                            <i className="fa fa-cloud-upload" aria-hidden="true"></i> {this.state.saving ? "Saved Changes" : "Save Settings"}
+                        <button onClick={this.handleSaveSettings} type="button" className={!saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
+                            <i className="fa fa-cloud-upload" aria-hidden="true"></i>
+                            {saving ? "Saved Changes" : "Save Settings"}
                         </button>
                     </div>
                     <div className="row" style={styles.settings.row}>
