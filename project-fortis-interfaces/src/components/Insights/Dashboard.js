@@ -267,15 +267,14 @@ export default class Dashboard extends React.Component {
       bbox, zoomLevel, termFilters, externalsourceid, selectedplace,
     } = this.props;
     const conjunctivetopics = Array.from(termFilters);
-    const category = window.location.hash.split('/')[2];
+    const siteKey = window.location.hash.split('/')[2];
     const filters = {
       fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
-      bbox, zoomLevel, conjunctivetopics, externalsourceid, selectedplace,
-      category
+      bbox, zoomLevel, conjunctivetopics, externalsourceid, selectedplace
     };
     const serializedFilters = encodeURIComponent(btoa(JSON.stringify(filters)));
     const urlPrefix = `${window.location.origin}${window.location.pathname}`;
-    return `${urlPrefix}#/site/${category}/share/${serializedFilters}`;
+    return `${urlPrefix}#/site/${siteKey}/share/${serializedFilters}`;
   }
 
   render() {
