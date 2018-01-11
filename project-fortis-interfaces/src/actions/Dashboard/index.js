@@ -6,9 +6,10 @@ import { ResponseHandler } from '../shared';
 import { momentGetFromToRange, doNothing } from '../../utils/Utils';
 
 function toDataSources(streams) {
+    streams = streams.filter(stream => stream.enabled);
+
     const dataSources = new Map();
 
-    streams = streams.filter(stream=>stream.enabled);
     const allDataSource = {display: 'All', sourceValues: Array.from(new Set(streams.map(stream => stream.pipelineKey))), icon: 'fa fa-share-alt', label: constants.PIPELINE_ALL};
     dataSources.set(constants.PIPELINE_ALL, allDataSource);
     streams.forEach(stream => {
@@ -27,15 +28,17 @@ function fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, ca
     configuration = configuration && configuration.site && configuration.site.properties;
     const dataSources = toDataSources((streams && streams.streams) || []);
     const siteName = settings.configuration.site.name;
+    const bbox = configuration.targetBbox;
+    const zoomLevel = configuration.defaultZoomLevel;
 
-    DashboardServices.getCommonTerms(timespanType, fromDate, toDate, configuration.targetBbox, configuration.defaultZoomLevel, category,
-      (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
-          if (!err) {
-              callback(null, Object.assign({}, { terms, dataSources, siteName }, { configuration }, topics ));
-          } else {
-              callback(err, null);
-          }
-      }));
+    DashboardServices.getCommonTerms(timespanType, fromDate, toDate, bbox, zoomLevel, category,
+        (error, response, body) => ResponseHandler(error, response, body, (err, topics) => {
+            if (!err) {
+                callback(null, Object.assign({}, { terms, dataSources, siteName }, { configuration }, topics ));
+            } else {
+                callback(err, null);
+            }
+        }));
 }
 
 function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
@@ -48,47 +51,56 @@ function fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic,
 }
 
 function fetchAllTrustedSources(resultsUnion, callback) {
-  AdminServices.fetchTrustedSources((trustedSourcesErr, response, body) => {
-    ResponseHandler(trustedSourcesErr, response, body, (err, data) => {
-      if (err) {
-        console.error(`Non-fatal error while fetching trusted sources: ${err}`)
-        callback(null, resultsUnion);
-      } else {
-        const trustedSources = data.trustedSources && data.trustedSources.sources;
-        resultsUnion.trustedSources = trustedSources;
-        callback(null, resultsUnion);
-      }
-    });
-  });
+    AdminServices.fetchTrustedSources((trustedSourcesErr, response, body) =>
+        ResponseHandler(trustedSourcesErr, response, body, (err, data) => {
+            if (err) {
+                console.error(`Non-fatal error while fetching trusted sources: ${err}`)
+                callback(null, resultsUnion);
+            } else {
+                const trustedSources = data.trustedSources && data.trustedSources.sources;
+                resultsUnion.trustedSources = trustedSources;
+                callback(null, resultsUnion);
+            }
+        })
+    );
 }
 
 function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback) {
     const { configuration, topics, dataSources } = resultUnion;
 
-    if (topics.edges.length) {
-        const includeCsv = false;
-        const maintopic = topics.edges[0].name;//grab the most commonly mentioned term
-        //we're defaulting the timeseriesmaintopics to the most popular on the initial load so we can show all in the timeseries
-        fetchFullChartData(fromDate, toDate, timespanType, constants.DEFAULT_DATA_SOURCE, maintopic, configuration.targetBbox,
-            configuration.defaultZoomLevel, [], constants.DEFAULT_EXTERNAL_SOURCE, topics.edges.map(populartopic=>populartopic.name),
-            includeCsv, dataSources, category,
-            (err, chartData) => {
-                const response = Object.assign({}, chartData, resultUnion, { category });
-
-                if (err) {
-                    console.error(`initializing dashboard error occured ${err}`);
-                    callback(err, response);
-                } else {
-                    callback(null, response);
-                }
-            });
-    } else {
-        callback(null, resultUnion);
+    if (!topics.edges.length) {
+        return callback(null, resultUnion);
     }
+
+    // grab the most commonly mentioned term
+    const maintopic = topics.edges[0].name;
+
+    // we're defaulting the timeseriesmaintopics to the most popular on the initial load so we can show all in the timeseries
+    const timeseriesmaintopics = topics.edges.map(populartopic => populartopic.name);
+
+    const includeCsv = false;
+    const bbox = configuration.targetBbox;
+    const dataSource = constants.DEFAULT_DATA_SOURCE;
+    const externalsourceid = constants.DEFAULT_EXTERNAL_SOURCE;
+    const zoomLevel = configuration.defaultZoomLevel;
+    const conjunctivetopics = [];
+
+    fetchFullChartData(fromDate, toDate, timespanType, dataSource, maintopic, bbox,
+        zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics,
+        includeCsv, dataSources, category, (err, chartData) => {
+            const response = Object.assign({}, chartData, resultUnion, { category });
+
+            if (err) {
+                callback(err, response);
+            } else {
+                callback(null, response);
+            }
+        });
 }
 
 function fetchDashboardSiteDefinition(callback) {
-    AdminServices.getDashboardSiteDefinition(null, null, (error, response, body) => ResponseHandler(error, response, body, callback));
+    AdminServices.getDashboardSiteDefinition(null, null, (error, response, body) =>
+        ResponseHandler(error, response, body, callback));
 }
 
 function isMostPopularTopicSelected(maintopic, popularTopics){
@@ -142,8 +154,7 @@ const _methods = {
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
                              zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place, onFinished) {
         const self = this;
-        const dataStore = this.flux.stores.DataStore.dataStore;
-        const { category, popularTerms, enabledStreams } = dataStore;
+        const { category, popularTerms, enabledStreams } = this.flux.stores.DataStore.dataStore;
         onFinished = onFinished != null ? onFinished : doNothing;
 
         const timeseriesmaintopics = isMostPopularTopicSelected(maintopic, popularTerms) ? popularTerms.map(topic => topic.name) : [maintopic];
@@ -175,10 +186,10 @@ const _methods = {
         const self = this;
 
         AdminServices.getWatchlist(language, category, (error, response, body) => {
-            if(!error && response.statusCode === 200 && body.data && !body.errors) {
+            if (!error && response.statusCode === 200 && body.data && !body.errors) {
                 const { terms } = body.data;
 
-                this.dispatch(constants.DASHBOARD.CHANGE_LANGUAGE, { language, terms });
+                self.dispatch(constants.DASHBOARD.CHANGE_LANGUAGE, { language, terms });
             } else {
                 console.error(error, null);
                 self.dispatch(constants.DASHBOARD.LOAD_DETAIL_ERROR, error);
