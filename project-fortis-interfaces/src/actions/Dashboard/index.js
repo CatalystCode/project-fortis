@@ -107,6 +107,15 @@ function isMostPopularTopicSelected(maintopic, popularTopics){
     return popularTopics.length && popularTopics[0].name === maintopic;
 }
 
+function handleError(error, dispatch, stepName) {
+    error = error.message != null ? error : { message: error, code: -1}
+    dispatch = dispatch != null ? dispatch : doNothing;
+
+    const { message, code } = error;
+    console.error(`${code}: error [${message}] occured while ${stepName}`);
+    dispatch(constants.DASHBOARD.INITIALIZE, { error });
+}
+
 const _methods = {
     initializeDashboard(category, onFinished) {
         const { timespanType, datetimeSelection } = this.flux.stores.DataStore.dataStore;
@@ -144,11 +153,13 @@ const _methods = {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
                 onFinished();
             } else {
-                const { message, code } = error;
-                console.error(`${code}: error [${message}] occured while fetching edges or site defintion`);
-                self.dispatch(constants.DASHBOARD.INITIALIZE, { error });
+                handleError(error, self.dispatch, 'fetching edge or site definition');
             }
         });
+    },
+
+    handleLoadSharedDashboardError(error) {
+        handleError(error, self.dispatch, 'restoring dashboard from shared link');
     },
 
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
@@ -172,8 +183,7 @@ const _methods = {
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
                 onFinished();
             } else {
-                const { message, code } = err;
-                console.error(`${code}: error [${message}] occured while processing tile visualization re-sync request`);
+                handleError(err, null, 'processing tile visualization re-sync request');
             }
         })
     },
@@ -191,8 +201,7 @@ const _methods = {
 
                 self.dispatch(constants.DASHBOARD.CHANGE_LANGUAGE, { language, terms });
             } else {
-                console.error(error, null);
-                self.dispatch(constants.DASHBOARD.LOAD_DETAIL_ERROR, error);
+                handleError(error, self.dispatch, 'changing language');
             }
         })
     }

@@ -95,7 +95,7 @@ export const AppPage = createReactClass({
     try {
       dataStore = JSON.parse(atob(decodeURIComponent(this.props.params.sharedViewState)));
     } catch (err) {
-      return console.error(err);
+      return this.getFlux().actions.DASHBOARD.handleLoadSharedDashboardError(err);
     }
 
     const {
