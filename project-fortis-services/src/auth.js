@@ -12,7 +12,7 @@ const {
 const MINUTES = 60;
 const rolesCache = new NodeCache( { stdTTL: 5 * MINUTES } );
 
-function initialize(app) {
+function initialize(app, route) {
   if (!adClientId) return console.warn('!!!!!!!!!!!! No Active Directory Client Id configured; auth is disabled !!!!!!!!!!!!');
 
   const adOptions = {
@@ -33,7 +33,7 @@ function initialize(app) {
   app.use(passport.initialize());
   app.use(passport.session());
   passport.use(bearerStrategy);
-  app.use('/', passport.authenticate('oauth-bearer', { session: false }));
+  app.use(route, passport.authenticate('oauth-bearer', { session: false }));
 }
 
 function checkIfUserHasRole(user, role) {

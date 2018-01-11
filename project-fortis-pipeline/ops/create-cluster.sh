@@ -111,6 +111,15 @@ echo "Finished. Now installing Spark helm chart."
   "${k8spark_worker_count}" \
   "${agent_vm_size}"
 
+echo "Finished. Verifying deployment."
+./verify-deployment.sh \
+  "${graphql_service_host}"
+
+if [ $? -ne 0 ]; then
+  echo "Deployment verification failed" >&2
+  exit 1
+fi
+
 echo "Finished. Finally, creating tags containing URLs for resources so that the user can find them later."
 ./create-tags.sh \
   "${k8resource_group}" \

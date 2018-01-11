@@ -24,13 +24,16 @@ const MessageResolver = require('./src/resolvers/Messages');
 const SettingsResolver = require('./src/resolvers/Settings');
 const TileResolver = require('./src/resolvers/Tiles');
 
+const healthCheckHandler = require('./src/routes/healthcheck');
+
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+initializeAuth(app, '/api');
 
-initializeAuth(app);
+app.get('/healthcheck', healthCheckHandler);
 
 app.use('/api/messages', graphqlHTTP({
   schema: MessageSchema,

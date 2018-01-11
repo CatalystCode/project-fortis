@@ -324,3 +324,8 @@ echo "Finished. Setting up cluster"
   "${cogspeechsvctoken}" \
   "${cogtextsvctoken}" \
   "${translationsvctoken}"
+
+if [ $? -ne 0 ]; then
+  echo "Cluster creation failed" >&2
+  exit 1
+fi

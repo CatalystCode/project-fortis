@@ -35,6 +35,10 @@ if (cassandraUsername && cassandraPassword) {
 }
 const client = new cassandra.Client(options);
 
+const status = {
+  isInitialized: false
+};
+
 /**
  * @param {Array<{query: string, params: Array<string|map>}>} mutations
  * @returns {Promise}
@@ -140,10 +144,12 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
     }
 
     client.execute(query, params, options)
-      .then(result => resolve({
-        pageState: result.pageState,
-        rows: result.rows
-      }))
+      .then(result => {
+        resolve({
+          pageState: result.pageState,
+          rows: result.rows
+        });
+      })
       .catch(error => {
         trackException(error);
         reject(error);
@@ -160,6 +166,7 @@ function intialize() {
   return new Promise((resolve, reject) => {
     executeQuery('select sitename from fortis.sitesettings limit 1', [])
       .then(() => {
+        status.isInitialized = true;
         console.log(`Established connection to cassandra keyspace ${cassandraKeyspace} at contact points ${cassandraContactPoints}`);
         resolve();
       })
@@ -168,6 +175,7 @@ function intialize() {
 }
 
 module.exports = {
+  status,
   initialize: trackDependency(intialize, 'Cassandra', 'initialize'),
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
   executeQueryWithPageState: trackDependency(executeQueryWithPageState, 'Cassandra', 'executeQueryWithPageState'),
