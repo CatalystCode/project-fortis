@@ -106,14 +106,26 @@ const _methods = {
         const reportProgress = () => self.dispatch(constants.DASHBOARD.INITIALIZE_PROGRESS);
 
         seqAsync(
-            //Load the site settings
-            callback => { fetchDashboardSiteDefinition(callback); reportProgress(); },
-            //Load the top 5 most popular terms
-            (settings, callback) => { fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category); reportProgress(); },
-            //Merged Results(Settings + Full Term List + Popular Terms)
-            (resultUnion, callback) => { fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback); reportProgress(); },
-            //Merged Results(Settings + Full Term List + Popular Terms)
-            (resultUnion2, callback) => { fetchAllTrustedSources(resultUnion2, callback); reportProgress(); },
+            callback => {
+                // Load the site settings
+                fetchDashboardSiteDefinition(callback);
+                reportProgress();
+            },
+            (settings, callback) => {
+                // Load the top 5 most popular terms
+                fetchCommonTerms(settings, callback, timespanType, fromDate, toDate, category);
+                reportProgress();
+            },
+            (resultUnion, callback) => {
+                // Merged Results(Settings + Full Term List + Popular Terms)
+                fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, category, callback);
+                reportProgress();
+            },
+            (resultUnion2, callback) => {
+                // Merged Results(Settings + Full Term List + Popular Terms)
+                fetchAllTrustedSources(resultUnion2, callback);
+                reportProgress();
+            },
         )((error, results) => {
             if (!error) {
                 self.dispatch(constants.DASHBOARD.INITIALIZE, results);
@@ -126,14 +138,14 @@ const _methods = {
     },
 
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
-        zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
-        let self = this;
+                             zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place) {
+        const self = this;
         const dataStore = this.flux.stores.DataStore.dataStore;
         const { category, popularTerms, enabledStreams } = dataStore;
 
-        let timeserieslabels = isMostPopularTopicSelected(maintopic, popularTerms) ? popularTerms.map(topic=>topic.name) : [maintopic];
+        const timeseriesmaintopics = isMostPopularTopicSelected(maintopic, popularTerms) ? popularTerms.map(topic => topic.name) : [maintopic];
 
-        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeserieslabels, includeCsv, enabledStreams, category, (err, chartData) => {
+        fetchFullChartData(fromDate, toDate, periodType, dataSource, maintopic, bbox, zoomLevel, conjunctivetopics, externalsourceid, timeseriesmaintopics, includeCsv, enabledStreams, category, (err, chartData) => {
             if (!err) {
                 const placeid = place && place.placeid ? place.placeid : "";
                 const name = place && place.name ? place.name : "";
@@ -145,7 +157,8 @@ const _methods = {
 
                 self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
             } else {
-                console.error(`[${err.message}] occured while processing tile visualization re-sync request`);
+                const { message, code } = err;
+                console.error(`${code}: error [${message}] occured while processing tile visualization re-sync request`);
             }
         })
     },
