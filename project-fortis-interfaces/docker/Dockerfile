@@ -46,6 +46,12 @@ ADD public /app/public
 ADD package.json /app/package.json
 RUN npm install
 
+# note that this dockerfile does not expose port 80 since it wouldn't make sense
+# to run the webpack dev-server in production; for a production deployment,
+# follow the example in project-fortis-pipeline/ops/install-fortis-interfaces.sh
+# to create an optimized build and then upload the resulting assets to a static
+# file host such as azure blob storage; the ports exposed below are a websocket
+# port for hot-reloading and a http port for the webpack dev-server
 EXPOSE 35729
 EXPOSE 3000
 ENV PORT="3000"
