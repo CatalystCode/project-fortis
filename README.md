@@ -71,6 +71,9 @@ Once you have the token, append it to the `.env-secrets` file like so:
 MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
 ```
 
+You may also want to add your email address to the `USERS` or `ADMINS` list in
+the `.env` file; otherwise you wouldn't be able to log into your Fortis site!
+
 Now you can start the full Fortis pipeline with one command:
 
 ```sh
