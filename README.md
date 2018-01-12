@@ -79,7 +79,7 @@ the `.env` file; otherwise you wouldn't be able to log into your Fortis site!
 #### Preparing Docker
 
 This project runs entirely inside of Docker containers orchestrated by
-docker-compose, so please ensure thath you have installed Docker on your system,
+docker-compose, so please ensure that you have installed Docker on your system,
 e.g. [Docker for Windows](https://docs.docker.com/docker-for-windows/install/).
 
 We're using a volume mount to enable support for code hot-reload. As such,
