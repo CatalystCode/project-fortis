@@ -86,9 +86,13 @@ We're using a volume mount to enable support for code hot-reload. As such,
 please ensure that you've shared the drive on which your code resides with
 Docker via the "Shared Drives" tab in the [Docker settings](https://docs.docker.com/docker-for-windows/#docker-settings).
 
+<img src="https://user-images.githubusercontent.com/1086421/34893261-6b615fca-f7aa-11e7-80bc-833ee2d8c9a7.png" height="400" />
+
 The containers created for this project use quite a lot of resources, so if any
 of the services die with exit code 137, please give more memory to Docker via
 the "Advanced" tab in the [Docker settings](https://docs.docker.com/docker-for-windows/#docker-settings).
+
+<img src="https://user-images.githubusercontent.com/1086421/34893275-7ef30872-f7aa-11e7-8514-e1e17bf4064e.png" height="400" />
 
 #### Running the service
 
