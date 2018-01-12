@@ -1,3 +1,5 @@
 node_modules/
 build/
 travis/
+README.md
+.gitignore

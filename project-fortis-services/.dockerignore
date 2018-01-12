@@ -1,2 +1,5 @@
 node_modules/
 travis/
+README.md
+.gitignore
+.gitattributes

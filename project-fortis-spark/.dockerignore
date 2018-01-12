@@ -1,2 +1,4 @@
 travis/
 target/
+README.md
+.gitignore
