@@ -39,11 +39,16 @@ ENV REACT_APP_MAPBOX_TILE_LAYER_URL="https://api.mapbox.com/styles/v1/mapbox/sat
 ENV REACT_APP_MAPBOX_TILE_SERVER_URL="https://api.mapbox.com/v4/mapbox.streets"
 
 WORKDIR /app
+
+# add static files; the dynamic files in /app/src (JS and CSS) are provided via
+# a volume in the docker-compose.yml file so that we can hot-reload the code
+ADD public /app/public
 ADD package.json /app/package.json
 RUN npm install
 
-ADD . /app
+EXPOSE 35729
+EXPOSE 3000
+ENV PORT="3000"
+ENV PATH="/app/node_modules/.bin:$PATH"
 
-EXPOSE 80
-ENV PORT="80"
 CMD ["npm", "start"]

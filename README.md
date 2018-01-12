@@ -76,6 +76,20 @@ MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
 You may also want to add your email address to the `USERS` or `ADMINS` list in
 the `.env` file; otherwise you wouldn't be able to log into your Fortis site!
 
+#### Preparing Docker
+
+This project runs entirely inside of Docker containers orchestrated by
+docker-compose, so please ensure thath you have installed Docker on your system,
+e.g. [Docker for Windows](https://docs.docker.com/docker-for-windows/install/).
+
+We're using a volume mount to enable support for code hot-reload. As such,
+please ensure that you've shared the drive on which your code resides with
+Docker via the "Shared Drives" tab in the [Docker settings](https://docs.docker.com/docker-for-windows/#docker-settings).
+
+The containers created for this project use quite a lot of resources, so if any
+of the services die with exit code 137, please give more memory to Docker via
+the "Advanced" tab in the [Docker settings](https://docs.docker.com/docker-for-windows/#docker-settings).
+
 #### Running the service
 
 Now you can start the full Fortis pipeline with one command:
@@ -105,8 +119,9 @@ After making changes, you can re-build and re-start the affected services using:
 docker-compose up --build -d
 ```
 
-If any of the services die with exit code 137, please give more memory to Docker
-via the "Advanced" tab in the [Docker settings](https://docs.docker.com/docker-for-windows/#docker-settings).
+Note that any changes to the React code in project-fortis-interfaces project
+will be automatically detected and re-loaded so the re-build step above won't be
+necessary.
 
 #### Accessing Cassandra
 
