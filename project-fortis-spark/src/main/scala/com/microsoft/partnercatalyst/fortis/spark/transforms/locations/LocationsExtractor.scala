@@ -34,7 +34,7 @@ class LocationsExtractor private[locations](
     var candidatePlaces = Seq[(String, Int)]()
 
     if (placeRecognizer.isDefined) {
-      candidatePlaces = placeRecognizer.get.extractPlacesAndOccurrance(text)
+      candidatePlaces = placeRecognizer.get.extractPlacesAndOccurrence(text)
     }
 
     // TODO: ngrams will be very expensive on large text. Limit text or use summary only?

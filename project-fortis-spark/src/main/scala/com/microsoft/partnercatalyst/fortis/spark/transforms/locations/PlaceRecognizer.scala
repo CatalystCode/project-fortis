@@ -13,7 +13,7 @@ class PlaceRecognizer(
 
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 
-  def extractPlacesAndOccurrance(text: String): Seq[(String, Int)] = {
+  def extractPlacesAndOccurrence(text: String): Seq[(String, Int)] = {
     // See: https://github.com/opener-project/kaf/wiki/KAF-structure-overview
     entityRecognizer.extractTerms(TextNormalizer(text, language.getOrElse("")))
       .filter(term => {
