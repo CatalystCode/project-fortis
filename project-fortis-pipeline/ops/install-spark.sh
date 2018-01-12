@@ -26,7 +26,6 @@ cd charts || exit -2
 readonly spark_daemon_memory="1g"
 readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
-readonly fortis_models_directory="${fortis_central_directory}/sentiment/"
 readonly latest_version="$(curl 'https://api.github.com/repos/CatalystCode/project-fortis/releases/latest' | jq -r '.tag_name')"
 readonly spark_config_map_name="spark-master-conf"
 readonly fortis_jar="fortis-${latest_version}.jar"
@@ -58,7 +57,6 @@ kubectl create configmap "${spark_config_map_name}" \
   --from-literal=DEFAULT_LANGUAGE="${default_language}" \
   --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
   --from-literal=FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" \
-  --from-literal=FORTIS_MODELS_DIRECTORY="${fortis_models_directory}" \
   --from-literal=FORTIS_SB_CONN_STR="${sb_conn_str}" \
   --from-literal=FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" \
   --from-literal=FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" \

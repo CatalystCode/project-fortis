@@ -21,10 +21,9 @@ class StreamsChangeListenerTestSpec extends FlatSpec with BeforeAndAfter {
     "managementBusConnectionString",
     "managementBusConfigQueueName",
     "managementBusCommandQueueName",
-    None,
-    7,
-    7,
-    None,
+    appInsightsKey = None,
+    sscInitRetryAfterMillis = 7,
+    sscShutdownDelayMillis = 7,
     maxKeywordsPerEvent = 5,
     maxLocationsPerEvent = 3
   )

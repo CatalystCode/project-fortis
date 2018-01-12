@@ -1,15 +1,14 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
-import com.microsoft.partnercatalyst.fortis.spark.IntegrationTestSpec
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{Negative, Neutral, Positive}
 
-class WordListSentimentDetectorIntegrationSpec extends IntegrationTestSpec {
+import org.scalatest.FlatSpec
+
+class WordListSentimentDetectorIntegrationSpec extends FlatSpec {
   "The word list sentiment detector" should "download models from blob" in {
-    val localModels = checkIfShouldRunWithLocalModels()
     val modelsProvider = new ZipModelsProvider(
-      language => s"https://fortiscentral.blob.core.windows.net/sentiment/sentiment-$language.zip",
-      localModels)
+      language => s"https://fortiscentral.blob.core.windows.net/sentiment/sentiment-$language.zip")
 
     val testCases = List(
       ("victoire supérieure véritable siège tuer révolte révolte", "fr", Negative),

@@ -16,7 +16,6 @@ object Constants {
     val SparkStreamingBatchSize = "FORTIS_STREAMING_DURATION_IN_SECONDS"
     val HighlyAvailableProgressDir = "HA_PROGRESS_DIR"
     val AppInsightsKey = "APPINSIGHTS_INSTRUMENTATIONKEY"
-    val LanguageModelDir = "FORTIS_MODELS_DIRECTORY"
     val FeatureServiceUrlBase = "FORTIS_FEATURE_SERVICE_HOST"
     val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
     val CassandraHost = "FORTIS_CASSANDRA_HOST"

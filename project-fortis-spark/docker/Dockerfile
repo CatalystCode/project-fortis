@@ -78,10 +78,6 @@ ENV FORTIS_SB_COMMAND_QUEUE="command"
 # root url for downloading opener model files
 ENV FORTIS_CENTRAL_ASSETS_HOST="https://fortiscentral.blob.core.windows.net"
 
-# set this to a local directory if you want to use your own opener model files
-# as opposed to the ones provided at the FORTIS_CENTRAL_ASSETS_HOST above
-ENV FORTIS_MODELS_DIRECTORY=""
-
 # a one-node local cassandra is set up via docker-compose, if you wish to use a
 # larger cluster (e.g. hosted in Azure), just override this variable with the
 # hostname of your cluster

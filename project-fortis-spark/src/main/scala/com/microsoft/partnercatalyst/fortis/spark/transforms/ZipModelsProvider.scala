@@ -13,27 +13,19 @@ import scala.sys.process._
 
 @SerialVersionUID(100L)
 class ZipModelsProvider(
-  modelsUrlFromLanguage: String => String,
-  modelsSource: Option[String] = None
+  modelsUrlFromLanguage: String => String
 ) extends Serializable with Loggable {
 
   @transient private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
   def ensureModelsAreDownloaded(language: String): String = {
-    val localPath = modelsSource.getOrElse("")
-    if (hasModelFiles(localPath, language)) {
-      logDebug(s"Using locally provided model files from $localPath")
-      modelDirectories.putIfAbsent(language, localPath)
-      return localPath
-    }
-
     val previouslyDownloadedPath = modelDirectories.getOrElse(language, "")
     if (hasModelFiles(previouslyDownloadedPath, language)) {
       logDebug(s"Using previously downloaded model files from $previouslyDownloadedPath")
       return previouslyDownloadedPath
     }
 
-    val remotePath = modelsSource.getOrElse(modelsUrlFromLanguage(language))
+    val remotePath = modelsUrlFromLanguage(language)
     if ((!remotePath.startsWith("http://") && !remotePath.startsWith("https://")) || !remotePath.endsWith(".zip")) {
       throw new FileNotFoundException(s"Unable to process $remotePath, should be http(s) link to zip file")
     }
