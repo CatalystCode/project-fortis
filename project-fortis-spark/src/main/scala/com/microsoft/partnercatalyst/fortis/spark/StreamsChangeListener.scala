@@ -9,6 +9,7 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import org.apache.spark.streaming.StreamingContext
 
 import scala.reflect.io.Path
+import scala.util.control.NonFatal
 
 object StreamsChangeListener {
 
@@ -116,7 +117,7 @@ object StreamsChangeListener {
           Path(settings.progressDir).deleteRecursively()
         }
       } catch {
-        case e: Throwable => e.printStackTrace(System.err)
+        case NonFatal(e) => e.printStackTrace(System.err)
       }
     }
   }
