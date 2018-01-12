@@ -82,7 +82,7 @@ object Pipeline {
             langToKeywordExtractor.value.get(lang) match {
               case Some(extractor) => event.copy(
                 analysis = event.analysis.copy(
-                  // Take maxKeywordsPerEvent which will prioritize title keywords over body. 
+                  // Take maxKeywordsPerEvent which will prioritize title keywords over body.
                   keywords = analyzer.extractKeywords(event.details, extractor).take(maxKeywordsPerEvent).map(
                     tag => tag.copy(name = tag.name.toLowerCase(locale))
                   )
