@@ -271,6 +271,7 @@ module.exports = graphql.buildSchema(`
 
   type TermFilter {
     id: String!,
+    isLocation: Boolean!,
     filteredTerms: [String]
   }
 
@@ -280,6 +281,7 @@ module.exports = graphql.buildSchema(`
 
   input TermFilterInput {
     id: String,
+    isLocation: Boolean,
     filteredTerms: [String]
   }
 `);

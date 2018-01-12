@@ -120,13 +120,17 @@ export const AdminStore = Fluxxor.createStore({
       if (response.response) {
         action = response.action || false;
         response.response.forEach(term => {
+          const row = { id: term.id, isLocation: term.isLocation.toString() };
+
           if (term.filteredTerms.constructor === Array) {
-            rows.push({id: term.id, filteredTerms: JSON.stringify(term.filteredTerms)});
+            row.filteredTerms = JSON.stringify(term.filteredTerms);
           } else if (typeof term.filteredTerms === 'string') {
-            rows.push({id: term.id, filteredTerms: term.filteredTerms});
+            row.filteredTerms = term.filteredTerms;
           } else {
-            rows.push({id: term.id, filteredTerms: JSON.stringify([term.filteredTerms])});
+            row.filteredTerms = JSON.stringify([term.filteredTerms]);
           }
+
+          rows.push(row);
         });
       }
       this.dataStore.blacklist = rows;
@@ -137,7 +141,8 @@ export const AdminStore = Fluxxor.createStore({
     handleLoadBlackListColumns() {
       const columnValues = [
         {key: "id", name: "Id"},
-        {editable: true, key: "filteredTerms", name: "Blacklisted Terms"}
+        {editable: true, key: "filteredTerms", name: "Blacklisted Terms"},
+        {editable: true, key: "isLocation", name: "Apply to locations?"}
       ];
       const saveAsColumnName = 'blacklistColumns';
 

@@ -7,12 +7,14 @@ const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
 
 function getValidatedTermFilters(termFilters) {
-  termFilters.map(termFilter => {
+  termFilters.forEach(termFilter => {
     try {
-      return termFilter.filteredTerms = JSON.parse(termFilter.filteredTerms);
+      termFilter.filteredTerms = JSON.parse(termFilter.filteredTerms);
     } catch (error) {
-      return termFilter.filteredTerms = [];
+      termFilter.filteredTerms = [];
     }
+
+    termFilter.isLocation = termFilter.isLocation === 'true';
   });
 
   return termFilters;

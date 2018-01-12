@@ -293,14 +293,14 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
     termFilters.forEach(termFilter => {
       if (termFilter.id) {
         mutations.push({
-          query: 'UPDATE blacklist SET conjunctivefilter = ? WHERE id = ?',
-          params: [termFilter.filteredTerms, termFilter.id]
+          query: 'UPDATE fortis.blacklist SET conjunctivefilter = ?, islocation = ? WHERE id = ?',
+          params: [termFilter.filteredTerms, termFilter.isLocation, termFilter.id]
         });
       } else {
         termFilter.id = uuid();
         mutations.push({
-          query:'INSERT INTO blacklist (id, conjunctivefilter) VALUES (?, ?)',
-          params:[termFilter.id, termFilter.filteredTerms]
+          query: 'INSERT INTO fortis.blacklist (id, conjunctivefilter, islocation) VALUES (?, ?, ?)',
+          params: [termFilter.id, termFilter.filteredTerms, termFilter.isLocation]
         });
       }
       filterRecords.push(termFilter);

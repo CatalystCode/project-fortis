@@ -114,13 +114,14 @@ function paramsToParamsEntries(params) {
 function cassandraRowToTermFilter(row) {
   return {
     id: row.id,
+    isLocation: !!row.islocation,
     filteredTerms: row.conjunctivefilter
   };
 }
 
 function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const blacklistQuery = 'SELECT id, conjunctivefilter FROM fortis.blacklist';
+    const blacklistQuery = 'SELECT id, conjunctivefilter, islocation FROM fortis.blacklist';
     cassandraConnector.executeQuery(blacklistQuery, [])
       .then(rows => {
         const filters = rows.map(cassandraRowToTermFilter);

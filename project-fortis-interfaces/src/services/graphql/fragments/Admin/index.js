@@ -58,6 +58,7 @@ export const blacklist = `fragment BlacklistView on BlacklistCollection {
   filters {
     id
     filteredTerms
+    isLocation
   }
 }`;
 
