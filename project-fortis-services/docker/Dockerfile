@@ -104,8 +104,9 @@ WORKDIR /app
 ADD package.json /app/package.json
 RUN npm install
 
-ADD docker/run-node.sh /app/run-node.sh
+ADD docker/run-node.sh /app/server
+ADD docker/run-cqlsh.sh /app/cqlsh
 ADD . /app
 
 EXPOSE 80
-CMD "/app/run-node.sh"
+CMD "/app/server"

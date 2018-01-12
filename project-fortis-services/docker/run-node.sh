@@ -1,23 +1,15 @@
 #!/usr/bin/env sh
 
-cassandra_exec() {
-  /opt/cassandra/bin/cqlsh \
-    --request-timeout=3600 \
-    --username="$CASSANDRA_USERNAME" \
-    --password="$CASSANDRA_PASSWORD" \
-    "$CASSANDRA_CONTACT_POINTS"
-}
-
 has_cassandra_schema() {
-  echo 'DESCRIBE KEYSPACE fortis;' | cassandra_exec 2>&1 | grep -q 'CREATE KEYSPACE fortis'
+  echo 'DESCRIBE KEYSPACE fortis;' | /app/cqlsh 2>&1 | grep -q 'CREATE KEYSPACE fortis'
 }
 
 has_seed_data() {
-  echo 'SELECT eventid FROM fortis.events LIMIT 100;' | cassandra_exec | grep -q '(100 rows)'
+  echo 'SELECT eventid FROM fortis.events LIMIT 100;' | /app/cqlsh | grep -q '(100 rows)'
 }
 
 # wait for cassandra to start
-while ! cassandra_exec; do
+while ! /app/cqlsh; do
   echo "Cassandra not yet available, waiting..."
   sleep 10s
 done
@@ -28,7 +20,7 @@ if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ] && ! has_cassandra_schema; then
   echo "Got Fortis schema definition at $FORTIS_CASSANDRA_SCHEMA_URL, ingesting..."
   wget -qO- "$FORTIS_CASSANDRA_SCHEMA_URL" \
   | sed "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" \
-  | cassandra_exec
+  | /app/cqlsh
   echo "...done, Fortis schema definition is now ingested"
 fi
 
@@ -54,7 +46,7 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
   mkdir -p /tmp/cassandra-seed-data
   cd /tmp/cassandra-seed-data
   wget -qO- "$FORTIS_CASSANDRA_SEED_DATA_URL" | tar xzf -
-  cassandra_exec < import.cql
+  /app/cqlsh < import.cql
   cd -
   echo "...done, Fortis sample data is now ingested"
 fi

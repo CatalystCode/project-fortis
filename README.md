@@ -101,6 +101,13 @@ After making changes, you can re-build and re-start the affected services using:
 docker-compose up --build -d
 ```
 
+If you need more low-level access to the Cassandra database, you can do the
+following to log into a CQL shell:
+
+```
+docker-compose exec project_fortis_services /app/cqlsh
+```
+
 ### Production deployment
 
 #### Prerequisites
