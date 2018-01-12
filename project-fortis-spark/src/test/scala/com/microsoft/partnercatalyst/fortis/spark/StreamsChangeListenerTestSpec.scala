@@ -45,7 +45,7 @@ class StreamsChangeListenerTestSpec extends FlatSpec with BeforeAndAfter {
     assert(StreamsChangeListener.messageHandler.isDefined)
   }
 
-  it should "call stop on context after delay" in {
+  ignore should "call stop on context after delay" in {
     val sparkContext = Mockito.mock(classOf[SparkContext])
     val ssc: StreamingContext = Mockito.mock(classOf[StreamingContext])
     Mockito.when(ssc.sparkContext).thenReturn(sparkContext)
