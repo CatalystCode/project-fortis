@@ -36,6 +36,7 @@ module.exports = {
     appinsightsInstrumentationkey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
   },
   activeDirectory: {
+    adLogLevel: process.env.AD_LOG_LEVEL || 'warn',
     adClientId: process.env.AD_CLIENT_ID
   },
   server: {

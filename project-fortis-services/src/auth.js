@@ -6,7 +6,7 @@ const cassandraConnector = require('./clients/cassandra/CassandraConnector');
 const { getUserFromArgs } = require('./utils/request');
 
 const {
-  adClientId
+  adClientId, adLogLevel
 } = require('../config').activeDirectory;
 
 const MINUTES = 60;
@@ -22,7 +22,7 @@ function initialize(app, route) {
     issuer: null,
     passReqToCallback: true,
     allowMultiAudiencesInToken: false,
-    loggingLevel: 'warn'
+    loggingLevel: adLogLevel
   };
 
   const bearerStrategy = new OIDCBearerStrategy(adOptions, (req, token, done) => {

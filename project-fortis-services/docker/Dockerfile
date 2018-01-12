@@ -62,7 +62,10 @@ ENV FORTIS_CASSANDRA_SITE_TYPE=""
 # next up ensure that the "User.Read" permission is added in the section
 # "Delegated Permissions" (it's the default); hit "Save" at the bottom of the
 # page and you're done
+# the log level determines how much information the passport-active-directory
+# module will output; 'info' is usually plenty to trouble-shoot issues
 ENV AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
+ENV AD_LOG_LEVEL='warn'
 
 # mapbox credentials
 # you can create a new mapbox access token for free at https://www.mapbox.com/signup/
