@@ -40,6 +40,8 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 
 ### Local deployment
 
+#### One-time setup
+
 First, you need to get the code:
 
 ```sh
@@ -74,6 +76,8 @@ MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
 You may also want to add your email address to the `USERS` or `ADMINS` list in
 the `.env` file; otherwise you wouldn't be able to log into your Fortis site!
 
+#### Running the service
+
 Now you can start the full Fortis pipeline with one command:
 
 ```sh
@@ -100,6 +104,8 @@ After making changes, you can re-build and re-start the affected services using:
 ```sh
 docker-compose up --build -d
 ```
+
+#### Accessing Cassandra
 
 If you need more low-level access to the Cassandra database, you can do the
 following to log into a CQL shell:
