@@ -105,6 +105,9 @@ After making changes, you can re-build and re-start the affected services using:
 docker-compose up --build -d
 ```
 
+If any of the services die with exit code 137, please give more memory to Docker
+via the "Advanced" tab in the [Docker settings](https://docs.docker.com/docker-for-windows/#docker-settings).
+
 #### Accessing Cassandra
 
 If you need more low-level access to the Cassandra database, you can do the
