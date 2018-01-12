@@ -109,10 +109,12 @@ ENV FORTIS_SSC_SHUTDOWN_DELAY_MILLIS="60000"
 ENV FORTIS_INTEGRATION_TESTS="true"
 
 ADD . /app
-ADD docker/run-spark.sh /app/run-spark.sh
+ADD docker/run-spark.sh /app/spark
+ADD docker/run-cqlsh.sh /app/cqlsh
+
 RUN cd /app && \
     echo 'version := "0.0.0"' > version.sbt && \
     JAVA_OPTS="-Xmx2048M" sbt assembly && \
     cd -
 
-CMD /app/run-spark.sh
+CMD /app/spark
