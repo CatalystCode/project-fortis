@@ -78,7 +78,7 @@ object Pipeline {
       def addKeywords(event: ExtendedFortisEvent[T]): ExtendedFortisEvent[T] = {
         event.analysis.language match {
           case Some(lang) =>
-            val locale = new Locale(lang);
+            val locale = new Locale(lang)
             langToKeywordExtractor.value.get(lang) match {
               case Some(extractor) => event.copy(
                 analysis = event.analysis.copy(
