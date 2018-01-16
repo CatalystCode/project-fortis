@@ -16,9 +16,11 @@ class AppInsightsTelemetry extends FortisTelemetry {
     metrics.foreach(kv => appInsightsMetrics.put(kv._1, kv._2))
 
     client.trackEvent(name, appInsightsProperties, appInsightsMetrics)
+    client.flush()
   }
 
   def logDependency(name: String, method: String, success: Boolean, durationInMs: Long): Unit = {
     client.trackDependency(name, method, new Duration(durationInMs), success)
+    client.flush()
   }
 }
