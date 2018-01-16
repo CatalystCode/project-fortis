@@ -1,14 +1,12 @@
 # project-fortis-spark
 
-A repository for Project Fortis's data processing pipeline, built on Apache Spark.
+## Overview
 
-## What's this? ##
+This repository contains the data ingestion tier of the Fortis architecture,
+below highlighted in red in the architecture diagram for the entire system.
 
-This project contains a Spark Streaming job that ingests data into the Fortis system. Specifically, we:
+![Overview of Fortis architecture with project-fortis-spark responsibility highlighted](https://user-images.githubusercontent.com/1086421/34999220-32304984-faaf-11e7-855e-c2d52244992d.png)
 
-1. Ingest data in real time from sources such as Twitter, Facebook, Online Radio, Newspapers, Instagram, TadaWeb, and so forth.
-2. Analyze and augment the raw data with intelligence like sentiment analysis, entity extraction, place recognition, or image understanding.
-3. Narrow down the stream of events based on user-defined geo-areas, target keywords and blacklisted terms.
-4. Perform trend detection and aggregate the metrics that back Project Fortis.
-
-At the end of the ingestion pipeline, we publish the events and various aggregations to Cassandra.
+This repository implements a real-time job (Spark Streaming) that listens to
+various data feeds (e.g. Twitter, Bing, RSS, Instagram, ...), analyzes and
+filters the events and persists them to the Fortis data-store (Cassandra).
