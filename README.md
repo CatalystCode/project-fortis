@@ -75,6 +75,10 @@ MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
 
 You may also want to add your email address to the `USERS` or `ADMINS` list in
 the `.env` file; otherwise you wouldn't be able to log into your Fortis site!
+Alternatively, you can also clear out the value for the key `AD_CLIENT_ID` in
+the `.env` file in order to disable authentication entirely. This is for example
+useful if you want to talk directly to the GraphQL server via the GraphiQL tool
+instead of accessing the API endpoints via the UI.
 
 #### Preparing Docker
 
