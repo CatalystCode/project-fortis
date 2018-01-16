@@ -37,8 +37,6 @@ libraryDependencies ++= Seq(
   "org.apache.lucene" % "lucene-analyzers-common" % "7.0.0",
   "com.microsoft.azure" % "azure-servicebus" % "1.0.0-PREVIEW-3",
   "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
-  "com.github.benfradet" %% "spark-kafka-0-10-writer" % "0.3.0",
-  "org.apache.kafka" %% "kafka" % "0.10.2.1",
   "net.liftweb" %% "lift-json" % "3.0.1",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0",
