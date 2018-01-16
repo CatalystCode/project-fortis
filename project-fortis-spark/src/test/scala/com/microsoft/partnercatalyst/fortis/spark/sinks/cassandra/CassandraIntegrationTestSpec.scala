@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.sink.cassandra
+package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra._
 import org.scalatest.FlatSpec
