@@ -5,6 +5,7 @@ import java.util.Locale
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
@@ -152,21 +153,26 @@ object Pipeline {
         event.copy(analysis = event.analysis.copy(summary = summary))
       }
 
+      def logFilter(isFiltered: Boolean, filterName: String) = {
+        FortisTelemetry.get.logEvent(s"pipeline.filters.$filterName", Map("isFiltered" -> isFiltered.toString))
+        isFiltered
+      }
+
       // Configure analysis pipeline
       rdd
         .map(convertToSchema)
-        .filter(requiredValuesProvided)
-        .filter(item => !hasBlacklistedTerms(item))
+        .filter(item => logFilter(requiredValuesProvided(item), "missingvalues"))
+        .filter(item => logFilter(!hasBlacklistedTerms(item), "blacklistterms"))
         .map(addLanguage)
-        .filter(item => isLanguageSupported(item.analysis))
+        .filter(item => logFilter(isLanguageSupported(item.analysis), "language"))
         .map(addKeywords)
-        .filter(item => hasKeywords(item.analysis))
+        .filter(item => logFilter(hasKeywords(item.analysis), "keywords"))
         .map(item => addLocations(item))
         .map(item => removeBlacklistedLocations(item))
-        .filter(item => item.analysis.locations.nonEmpty)
+        .filter(item => logFilter(item.analysis.locations.nonEmpty, "locations"))
         .map(item => limitLocationsToMax(item))
         .map(item => addEntities(item))
-        .filter(item => !hasBlacklistedEntities(item))
+        .filter(item => logFilter(!hasBlacklistedEntities(item), "blacklistentities"))
         .map(item => addSentiments(addSummary(item)))
     }))
   }
