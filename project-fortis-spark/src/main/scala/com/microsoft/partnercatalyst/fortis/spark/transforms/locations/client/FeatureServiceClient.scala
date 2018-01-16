@@ -1,7 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 
+import java.lang.System.currentTimeMillis
+
 import com.microsoft.partnercatalyst.fortis.spark.dto.Geofence
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
 
@@ -71,6 +73,9 @@ class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extend
   }
 
   private def fetchResponse(url: String): Try[String] = {
-    Try(Source.fromURL(url)("UTF-8").mkString)
+    val startTime = currentTimeMillis()
+    val response = Try(Source.fromURL(url)("UTF-8").mkString)
+    FortisTelemetry.get.logDependency("transforms.locations", "callFeatureService", response.isSuccess, currentTimeMillis() - startTime)
+    response
   }
 }

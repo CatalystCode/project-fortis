@@ -1,5 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
+import java.lang.System.currentTimeMillis
+
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import net.liftweb.json
 
 import scalaj.http.Http
@@ -20,13 +23,16 @@ class CognitiveServicesSentimentDetector(
   }
 
   protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"${auth.apiUrlBase}/text/analytics/v2.0/sentiment")
+    val startTime = currentTimeMillis()
+    val response = Http(s"${auth.apiUrlBase}/text/analytics/v2.0/sentiment")
       .headers(
         "Content-Type" -> "application/json",
         "Ocp-Apim-Subscription-Key" -> auth.key)
       .postData(requestBody)
       .asString
-      .body
+
+    FortisTelemetry.get.logDependency("transforms.language", "callCognitiveServices", success = response.code == 200, currentTimeMillis() - startTime)
+    response.body
   }
 
   protected def buildRequestBody(text: String, textId: String): String = {

@@ -1,6 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.image
 
+import java.lang.System.currentTimeMillis
+
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Location, Tag}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature.toLocation
 import net.liftweb.json
@@ -18,7 +21,8 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
   }
 
   protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"${auth.apiUrlBase}/vision/v1.0/analyze")
+    val startTime = currentTimeMillis()
+    val response = Http(s"${auth.apiUrlBase}/vision/v1.0/analyze")
       .params(
         "details" -> "Celebrities,Landmarks",
         "visualFeatures" -> "Categories,Tags,Description,Faces")
@@ -27,7 +31,9 @@ class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServic
         "Ocp-Apim-Subscription-Key" -> auth.key)
       .postData(requestBody)
       .asString
-      .body
+
+    FortisTelemetry.get.logDependency("transforms.image", "callCognitiveServices", success = response.code == 200, currentTimeMillis() - startTime)
+    response.body
   }
 
   protected def buildRequestBody(imageUrl: String): String = {

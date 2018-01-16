@@ -8,7 +8,7 @@ import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable}
 import org.apache.spark.SparkContext
 
 @SerialVersionUID(100L)
@@ -113,6 +113,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
   private class MessageHandler(sparkContext: SparkContext) extends IMessageHandler {
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
       logError("Service Bus client threw error while processing message.", exception)
+      FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = false, durationInMs = 0)
     }
 
     /**
@@ -133,23 +134,29 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
           case Some(value) => value match {
             case "settings" =>
               val siteSettings = configManager.fetchSiteSettings(sparkContext)
+              FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = true, durationInMs = 0)
               Delta(transformContext, featureServiceClientUrlBase, siteSettings = Some(siteSettings))
             case "watchlist" =>
               val langToWatchlist = configManager.fetchWatchlist(sparkContext)
+              FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = true, durationInMs = 0)
               Delta(transformContext, featureServiceClientUrlBase, langToWatchlist = Some(langToWatchlist))
             case "blacklist" =>
               val blacklist = configManager.fetchBlacklist(sparkContext)
+              FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = true, durationInMs = 0)
               Delta(transformContext, featureServiceClientUrlBase, blacklist = Some(blacklist))
             case unknown =>
               logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
+              FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = false, durationInMs = 0)
               Delta()
             }
           case None =>
             logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
+            FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = false, durationInMs = 0)
             Delta()
         }
         case None => Delta
           logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
+          FortisTelemetry.get.logDependency("pipeline.settings", "transformcontext.messageHandler", success = false, durationInMs = 0)
           Delta()
       }
 

@@ -1,5 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.language
 
+import java.lang.System.currentTimeMillis
+
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import net.liftweb.json
 
 import scalaj.http.Http
@@ -24,7 +27,8 @@ class CognitiveServicesLanguageDetector(
   }
 
   protected def callCognitiveServices(requestBody: String): String = {
-    Http(s"${auth.apiUrlBase}/text/analytics/v2.0/languages")
+    val startTime = currentTimeMillis()
+    val response = Http(s"${auth.apiUrlBase}/text/analytics/v2.0/languages")
       .params(
         "numberOfLanguagesToDetect" -> "1")
       .headers(
@@ -33,7 +37,9 @@ class CognitiveServicesLanguageDetector(
       .timeout(connTimeoutMs = 2500, readTimeoutMs = 2500)
       .postData(requestBody)
       .asString
-      .body
+
+    FortisTelemetry.get.logDependency("transforms.language", "callCognitiveServices", success = response.code == 200, currentTimeMillis() - startTime)
+    response.body
   }
 
   protected def buildRequestBody(text: String, textId: String): String = {
