@@ -2,41 +2,23 @@ package com.microsoft.partnercatalyst.fortis.spark.logging
 
 import java.util
 
+import com.microsoft.applicationinsights.telemetry.Duration
 import com.microsoft.applicationinsights.{TelemetryClient, TelemetryConfiguration}
 
 class AppInsightsTelemetry extends FortisTelemetry {
   private val client: TelemetryClient = new TelemetryClient(TelemetryConfiguration.createDefault())
 
-  def logIncomingEventBatch(streamId: String, connectorName: String, batchSize: Long): Unit = {
-    val properties = new util.HashMap[String, String](2)
-    properties.put("streamId", streamId)
-    properties.put("connectorName", connectorName)
+  def logEvent(name: String, properties: Map[String, String]=Map(), metrics: Map[String, Double]=Map()): Unit = {
+    val appInsightsProperties = new util.HashMap[String, String](properties.size)
+    properties.foreach(kv => appInsightsProperties.put(kv._1, kv._2))
 
-    val metrics = new util.HashMap[String, java.lang.Double](1)
-    metrics.put("batchSize", batchSize.toDouble)
+    val appInsightsMetrics = new util.HashMap[String, java.lang.Double](metrics.size)
+    metrics.foreach(kv => appInsightsMetrics.put(kv._1, kv._2))
 
-    client.trackEvent("batch.receive", properties, metrics)
+    client.trackEvent(name, appInsightsProperties, appInsightsMetrics)
   }
 
-  def logSinkPhase(eventName: String, succeeded: Boolean, duration: Long, batchSize: Long): Unit = {
-    val properties = new util.HashMap[String, String](1)
-    properties.put("succeeded", succeeded.toString)
-
-    val metrics = new util.HashMap[String, java.lang.Double](2)
-    metrics.put("batchSize", batchSize.toDouble)
-    metrics.put("duration", duration.toDouble)
-
-    val name = s"batch.sink.$eventName"
-    client.trackEvent(name, properties, metrics)
-  }
-
-  def logLanguageDetection(language: Option[String]): Unit = {
-    val properties = new util.HashMap[String, String](2)
-    properties.put("success", language.isDefined.toString)
-    properties.put("detectedLanguage", language.getOrElse(""))
-
-    val metrics = new util.HashMap[String, java.lang.Double](0)
-
-    client.trackEvent("transforms.language", properties, metrics)
+  def logDependency(name: String, method: String, success: Boolean, durationInMs: Long): Unit = {
+    client.trackDependency(name, method, new Duration(durationInMs), success)
   }
 }

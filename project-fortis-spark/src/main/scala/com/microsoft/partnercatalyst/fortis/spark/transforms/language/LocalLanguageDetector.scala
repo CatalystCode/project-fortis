@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.language
 
+import java.lang.System.currentTimeMillis
+
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import com.optimaize.langdetect.LanguageDetectorBuilder
 import com.optimaize.langdetect.ngram.NgramExtractors
@@ -18,9 +20,11 @@ class LocalLanguageDetector extends LanguageDetector {
       return None
     }
 
+    val startTime = currentTimeMillis()
     val language = detectWithFactory(text, if (text.length <= 200) shortTextFactory else largeTextFactory)
+    val endTime = currentTimeMillis()
 
-    FortisTelemetry.get.logLanguageDetection(language)
+    FortisTelemetry.get.logDependency("transforms.localLanguageDetector", "detectLanguage", language.isDefined, endTime - startTime)
     language
   }
 

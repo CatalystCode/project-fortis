@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
+import java.lang.System.currentTimeMillis
 import java.util.UUID
 
 import com.datastax.spark.connector._
@@ -7,22 +8,22 @@ import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.WriteConf
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Telemetry}
-import com.microsoft.partnercatalyst.fortis.spark.logging.{Loggable, Timer}
+import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.Time
 import org.apache.spark.streaming.dstream.DStream
+
+import scala.util.{Failure, Success, Try}
 
 object CassandraEventsSink extends Loggable {
   private val KeyspaceName = "fortis"
   private val TableEvent = "events"
   private val TableEventPlaces = "eventplaces"
   private val TableEventBatches = "eventbatches"
-  private val CassandraFormat = "org.apache.spark.sql.cassandra"
 
   def apply(dstream: DStream[FortisEvent], sparkSession: SparkSession, configurationManager: ConfigurationManager): Unit = {
     implicit lazy val connector: CassandraConnector = CassandraConnector(sparkSession.sparkContext)
@@ -34,23 +35,15 @@ object CassandraEventsSink extends Loggable {
       entities = event.analysis.entities.distinct
     )))
     .foreachRDD { (eventsRDD, _: Time) => {
-      Timer.time(Telemetry.logSinkPhase("all", _, _, -1)) {
-        Timer.time(Telemetry.logSinkPhase("eventsRDD.cache", _, _, -1)) {
-          eventsRDD.cache()
-        }
+        eventsRDD.cache()
 
         if (!eventsRDD.isEmpty) {
-          val batchSize = eventsRDD.count()
           val batchid = UUID.randomUUID().toString
           val fortisEventsRDD = eventsRDD.map(CassandraEventSchema(_, batchid))
 
-          val fortisEventsRDDRepartitioned = Timer.time(Telemetry.logSinkPhase("fortisEventsRDD.cache", _, _, -1)) {
-            fortisEventsRDD.repartition(2 * sparkSession.sparkContext.defaultParallelism).cache()
-          }
+          val fortisEventsRDDRepartitioned = repartition(sparkSession, fortisEventsRDD)
 
-          Timer.time(Telemetry.logSinkPhase("writeEvents", _, _, batchSize)) {
-            writeFortisEvents(fortisEventsRDDRepartitioned)
-          }
+          writeFortisEvents(fortisEventsRDDRepartitioned)
 
           val offlineAggregators = Seq[OfflineAggregator[_]](
             new ConjunctiveTopicsOffineAggregator(configurationManager),
@@ -59,13 +52,8 @@ object CassandraEventsSink extends Loggable {
           )
 
           val filteredEvents = removeDuplicates(batchid, fortisEventsRDDRepartitioned)
-          Timer.time(Telemetry.logSinkPhase("fetchEventsByBatchId", _, _, batchSize)) {
-            filteredEvents.cache()
-          }
 
-          Timer.time(Telemetry.logSinkPhase("writeTagTables", _, _, batchSize)) {
-            writeEventBatchToEventTagTables(filteredEvents, sparkSession.sparkContext)
-          }
+          writeEventBatchToEventTagTables(filteredEvents, sparkSession.sparkContext)
 
           val eventsExploded = filteredEvents.flatMap(event=>{
             Seq(
@@ -75,17 +63,7 @@ object CassandraEventsSink extends Loggable {
             )
           })
 
-          offlineAggregators.foreach(aggregator => {
-            val aggregatorName = aggregator.getClass.getSimpleName
-            Timer.time(Telemetry.logSinkPhase(s"offlineAggregators.$aggregatorName", _, _, -1)) {
-              try {
-                aggregator.aggregateAndSave(eventsExploded, KeyspaceName)
-              } catch {
-                case e: Exception =>
-                  logError(s"Failed performing offline aggregation $aggregatorName", e)
-              }
-            }
-          })
+          offlineAggregators.foreach(aggregator => writeAggregates(eventsExploded, aggregator))
 
           eventsExploded.unpersist(blocking = true)
           filteredEvents.unpersist(blocking = true)
@@ -94,29 +72,66 @@ object CassandraEventsSink extends Loggable {
           eventsRDD.unpersist(blocking = true)
         }
       }
-    }}
+    }
 
     def writeFortisEvents(events: RDD[Event]): Unit = {
-      events.saveToCassandra(KeyspaceName, TableEvent, writeConf = WriteConf(ifNotExists = true))
+      val startTime = currentTimeMillis()
+      val success = Try(events.saveToCassandra(KeyspaceName, TableEvent, writeConf = WriteConf(ifNotExists = true))).isSuccess
+      FortisTelemetry.get.logDependency("sinks.cassandra", s"write.$TableEvent", success, currentTimeMillis() - startTime)
     }
 
     def removeDuplicates(batchid: String, events: RDD[Event]): RDD[Event] = {
-      events.repartitionByCassandraReplica(KeyspaceName, TableEventBatches)
-      val filteredEvents = events.joinWithCassandraTable(
+      val repartitionStartTime = currentTimeMillis()
+      val repartitionSuccess = Try(events.repartitionByCassandraReplica(KeyspaceName, TableEventBatches)).isSuccess
+      val repartitionEndTime = currentTimeMillis()
+      FortisTelemetry.get.logDependency("sinks.cassandra", s"repartition.$TableEventBatches", repartitionSuccess, repartitionEndTime - repartitionStartTime)
+
+      val joinStartTime = currentTimeMillis()
+      Try(events.joinWithCassandraTable(
         KeyspaceName,
         TableEventBatches,
         selectedColumns = SomeColumns("eventid", "batchid"),
         joinColumns = SomeColumns("eventid", "batchid")
-      ).map(_._1)
-
-      filteredEvents
+      ).map(_._1).cache()) match {
+        case Success(joined) =>
+          FortisTelemetry.get.logDependency("sinks.cassandra", s"join.$TableEventBatches", success = true, currentTimeMillis() - joinStartTime)
+          joined
+        case Failure(ex) =>
+          FortisTelemetry.get.logDependency("sinks.cassandra", s"join.$TableEventBatches", success = false, currentTimeMillis() - joinStartTime)
+          throw ex
+      }
     }
 
     def writeEventBatchToEventTagTables(events: RDD[Event], sparkContext: SparkContext): Unit = {
       val defaultZoom = configurationManager.fetchSiteSettings(sparkContext).defaultzoom
 
-      Timer.time(Telemetry.logSinkPhase(s"saveToCassandra-$TableEventPlaces", _, _, -1)) {
-        events.flatMap(CassandraEventPlacesSchema(_, defaultZoom)).saveToCassandra(KeyspaceName, TableEventPlaces)
+      val eventsWithSchema = events.flatMap(CassandraEventPlacesSchema(_, defaultZoom))
+      val startTime = currentTimeMillis()
+      val success = Try(eventsWithSchema.saveToCassandra(KeyspaceName, TableEventPlaces)).isSuccess
+      FortisTelemetry.get.logDependency("sinks.cassandra", s"write.$TableEventPlaces", success, currentTimeMillis() - startTime)
+    }
+
+    def repartition(sparkSession: SparkSession, fortisEventsRDD: RDD[Event]) = {
+      val startTime = currentTimeMillis()
+      Try(fortisEventsRDD.repartition(2 * sparkSession.sparkContext.defaultParallelism).cache()) match {
+        case Success(fortisEventsRDDRepartitioned) =>
+          FortisTelemetry.get.logDependency("sinks.cassandra", s"spark.repartition", success = true, currentTimeMillis() - startTime)
+          fortisEventsRDDRepartitioned
+        case Failure(ex) =>
+          FortisTelemetry.get.logDependency("sinks.cassandra", s"spark.repartition", success = false, currentTimeMillis() - startTime)
+          throw ex
+      }
+    }
+
+    def writeAggregates(eventsExploded: RDD[Event], aggregator: OfflineAggregator[_]): Unit = {
+      val aggregatorName = aggregator.getClass.getSimpleName
+      val startTime = currentTimeMillis()
+      Try(aggregator.aggregateAndSave(eventsExploded, KeyspaceName)) match {
+        case Success(_) =>
+          FortisTelemetry.get.logDependency("sinks.cassandra", s"aggregateAndSave.$aggregatorName", success = true, currentTimeMillis() - startTime)
+        case Failure(e) =>
+          FortisTelemetry.get.logDependency("sinks.cassandra", s"aggregateAndSave.$aggregatorName", success = false, currentTimeMillis() - startTime)
+          logError(s"Failed performing offline aggregation $aggregatorName", e)
       }
     }
   }
