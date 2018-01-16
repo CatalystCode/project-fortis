@@ -141,7 +141,7 @@ function removeKeywordsExtraProps() {
 
 function keywordsExtraMetrics() {
   return (graphqlResult) => {
-    const totalRows = graphqlResult.edges.length;
+    const totalRows = graphqlResult && graphqlResult.edges && graphqlResult.edges.length;
     return {
       totalRows
     };

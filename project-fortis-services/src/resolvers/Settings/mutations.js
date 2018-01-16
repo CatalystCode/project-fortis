@@ -170,11 +170,19 @@ function removeKeywords(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+const MAX_KEYWORD_BYTE_SIZE = 40;
+
 function addKeywords(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.input || !args.input.edges || !args.input.edges.length) {
       loggingClient.logNoKeywordsToAdd();
       return reject('No keywords to add specified.');
+    }
+
+    const keywordByteLength = Buffer.byteLength(args.input.edges.map(edge => edge.name).join(' '));
+    if (keywordByteLength > MAX_KEYWORD_BYTE_SIZE) {
+      // refer to the twitter docs for the track api at https://aka.ms/Tw2fin for more context on the limitation
+      return reject(`Keywords can be at most ${MAX_KEYWORD_BYTE_SIZE} bytes, got ${keywordByteLength}.`);
     }
 
     let mutations = [];
