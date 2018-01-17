@@ -13,7 +13,7 @@ web and darknet data sources.
 Learn more about Fortis in our [article](https://aka.ms/fortis-story) and in our
 [dashboard walkthrough (in Spanish)](http://aka.ms/fortis-colombia-demo).
 
-![Overview of the Fortis project workflow](https://user-images.githubusercontent.com/7635865/31245700-cd8193be-a9d0-11e7-9558-e78dd15951a2.png)
+![Overview of the Fortis project workflow](https://user-images.githubusercontent.com/1086421/35058654-a326c8e8-fb86-11e7-9dbb-f3e719aabf48.png)
 
 ### Monitoring
 
