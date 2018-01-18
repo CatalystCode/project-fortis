@@ -195,8 +195,11 @@ setup_k8_cluster() {
   ssh-keygen -t rsa -N "" -f "${temp_key_path}" -V "+1d"
   temp_pub_key="$(cat "${temp_key_path}.pub")"
 
-  master_vm_ids=$(az vm list -g "${resource_group}" --query "[].id" -o tsv | grep "${resource_group}" | grep "k8s-master-")
-  >&2 echo "Master VM ids: ${master_vm_ids}"
+  while :; do
+    master_vm_ids=$(az vm list -g "${resource_group}" --query "[].id" -o tsv | grep "${resource_group}" | grep "k8s-master-")
+    if [ -n "${master_vm_ids}" ]; then break; else echo "Waiting for k8s-master"; sleep 10s; fi
+  done
+  echo "Master VM ids: ${master_vm_ids}"
 
   # Enable temporary credentials on every kubernetes master vm (since we don't know which vm will be used when we scp)
   az vm user update -u "${temp_user_name}" --ssh-key-value "${temp_pub_key}" --ids "${master_vm_ids}"
