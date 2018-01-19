@@ -28,6 +28,7 @@ export const AdminPage = createReactClass({
 
   propertyLiterals() {
     const {
+      users,
       settings,
       watchlist,
       streams,
@@ -36,11 +37,14 @@ export const AdminPage = createReactClass({
 
 
     const {
+      authInfo,
       trustedSources,
       enabledStreams
     } = this.getStateFromFlux().dataStoreState;
 
     return Object.assign({}, {
+      authInfo,
+      users,
       settings,
       watchlist,
       trustedSources,

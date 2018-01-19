@@ -35,6 +35,39 @@ function restartPipelineExtraProps() {
   });
 }
 
+function usersExtraProps() {
+  return () => ({
+    operation: 'query',
+    table: 'users',
+    success: 'true'
+  });
+}
+
+function addUsersExtraProps() {
+  return () => ({
+    operation: 'modify',
+    table: 'users',
+    success: 'true'
+  });
+}
+
+function removeUsersExtraProps() {
+  return () => ({
+    operation: 'remove',
+    table: 'users',
+    success: 'true'
+  });
+}
+
+function usersExtraMetrics() {
+  return (graphqlResult) => {
+    const totalRows = graphqlResult && graphqlResult.users && graphqlResult.users.length;
+    return {
+      totalRows
+    };
+  };
+}
+
 function termsExtraProps() {
   return () => ({
     operation: 'query',
@@ -53,7 +86,7 @@ function trustedSourcesExtraProps() {
 
 function trustedSourcesExtraMetrics() {
   return (graphqlResult) => {
-    const totalRows = graphqlResult.sources.length;
+    const totalRows = graphqlResult && graphqlResult.sources && graphqlResult.sources.length;
     return {
       totalRows
     };
@@ -100,7 +133,7 @@ function modifyStreamsExtraProps() {
 
 function streamsExtraMetrics() {
   return (graphqlResult) => {
-    const totalRows = graphqlResult.streams.length;
+    const totalRows = graphqlResult && graphqlResult.streams && graphqlResult.streams.length;
     return {
       totalRows
     };
@@ -211,6 +244,10 @@ module.exports = {
   logNoMutationsDefined,
   logExecuteQueryError,
   restartPipelineExtraProps,
+  usersExtraProps,
+  addUsersExtraProps,
+  removeUsersExtraProps,
+  usersExtraMetrics,
   termsExtraProps,
   trustedSourcesExtraProps,
   trustedSourcesExtraMetrics,

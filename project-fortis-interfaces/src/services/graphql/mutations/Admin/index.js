@@ -2,6 +2,18 @@ export const restartPipeline = `mutation RestartPipeline {
   restartPipeline
 }`;
 
+export const addUsers = `mutation AddUsers($input: UserListInput!) {
+  addUsers(input: $input) {
+    ...UsersView
+  }
+}`;
+
+export const removeUsers = `mutation RemoveUsers($input: UserListInput!) {
+  removeUsers(input: $input) {
+    ...UsersView
+  }
+}`;
+
 export const editSite = `mutation EditSite($input: EditableSiteSettings!) {
   editSite(input: $input) {
     name

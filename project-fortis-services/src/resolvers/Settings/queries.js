@@ -7,6 +7,29 @@ const { trackException, trackEvent } = require('../../clients/appinsights/AppIns
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { requiresRole } = require('../../auth');
 
+function users(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    cassandraConnector.executeQuery('SELECT * FROM fortis.users', [])
+      .then(rows => {
+        const users = rows.map(cassandraRowToUser);
+        resolve({
+          users
+        });
+      })
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
+  });
+}
+
+function cassandraRowToUser(row) {
+  return {
+    identifier: row.identifier,
+    role: row.role
+  };
+}
+
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { translationLanguage, category } = args;
@@ -132,6 +155,7 @@ function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
+  users: requiresRole(trackEvent(withRunTime(users), 'users', loggingClient.usersExtraProps(), loggingClient.usersExtraMetrics()), 'user'),
   sites: requiresRole(trackEvent(withRunTime(sites), 'sites'), 'user'),
   streams: requiresRole(trackEvent(withRunTime(streams), 'streams', loggingClient.streamsExtraProps(), loggingClient.streamsExtraMetrics()), 'user'),
   siteTerms: requiresRole(trackEvent(withRunTime(terms), 'terms', loggingClient.termsExtraProps(), loggingClient.keywordsExtraMetrics()), 'user'),

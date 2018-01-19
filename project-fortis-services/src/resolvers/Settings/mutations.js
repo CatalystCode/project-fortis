@@ -1,5 +1,7 @@
 'use strict';
 
+const groupBy = require('lodash/groupBy');
+const differenceBy = require('lodash/differenceBy');
 const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
@@ -8,6 +10,101 @@ const { PlaceholderForSecret, getSiteDefinition, withRunTime, limitForInClause }
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { requiresRole } = require('../../auth');
+const { getUserFromArgs } = require('../../utils/request');
+
+function isCurrentUser(args, res, user) {
+  return getUserFromArgs(args, res) === user.identifier;
+}
+
+function addUsers(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const users = args && args.input && args.input.users;
+    if (!users || !users.length) {
+      return reject('No users specified to add.');
+    }
+
+    const adminWithoutUserRole = getAllAdminWithoutUserRole(users);
+    const missingUserRoles = adminWithoutUserRole.map(({identifier}) => ({identifier, role: 'user'}));
+    const usersToAdd = users.concat(missingUserRoles);
+    const mutations = createInsertUserMutations(usersToAdd);
+    return cassandraConnector.executeBatchMutations(mutations)
+      .then(() => {
+        resolve({
+          users: usersToAdd
+        });
+      })
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
+  });
+}
+
+function getAllAdminWithoutUserRole(users) {
+  const usersGroupedByRole = groupBy(users, 'role');
+  return differenceBy(usersGroupedByRole.admin, usersGroupedByRole.user, 'identifier');
+}
+
+function createInsertUserMutations(users) {
+  const mutations = [];
+  users.forEach(user => {
+    mutations.push({
+      query: `INSERT INTO fortis.users (identifier, role) 
+      VALUES (?, ?)`,
+      params: [
+        user.identifier,
+        user.role
+      ]
+    });
+  });
+  return mutations;
+}
+
+function removeUsers(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const users = args && args.input && args.input.users;
+    if (!users || !users.length) {
+      return reject('No users specified to remove.');
+    }
+
+    const usersWithoutAdminRole = getAllUsersWithoutAdminRole(users);
+    const missingAdminRoles = usersWithoutAdminRole.map(({identifier}) => ({identifier, role: 'admin'}));
+    const usersToRemove = removeCurrentUser(users.concat(missingAdminRoles), args, res);   
+    const mutations = [];
+    usersToRemove.forEach(user => {
+      if (!isCurrentUser(args, res, user)) {
+        mutations.push({
+          query: `DELETE FROM fortis.users 
+          WHERE identifier = ? AND role = ?`,
+          params: [
+            user.identifier,
+            user.role
+          ]
+        });
+      }
+    });
+
+    cassandraConnector.executeBatchMutations(mutations)
+      .then(() => {
+        resolve({
+          users: usersToRemove
+        });
+      })
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
+  });
+}
+
+function removeCurrentUser(users, args, res) {
+  return users.filter(user => !isCurrentUser(args, res, user));
+}
+
+function getAllUsersWithoutAdminRole(users) {
+  const usersGroupedByRole = groupBy(users, 'role');
+  return differenceBy(usersGroupedByRole.user, usersGroupedByRole.admin, 'identifier');
+}
 
 function editSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
@@ -354,6 +451,8 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 }
 
 module.exports = {
+  addUsers: requiresRole(trackEvent(addUsers, 'addUsers', loggingClient.addUsersExtraProps(), loggingClient.usersExtraMetrics()), 'admin'),
+  removeUsers: requiresRole(trackEvent(removeUsers, 'removeUsers', loggingClient.removeUsersExtraProps(), loggingClient.usersExtraMetrics()), 'admin'),
   removeSite: requiresRole(trackEvent(removeSite, 'removeSite'), 'admin'),
   modifyStreams: requiresRole(trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()), 'admin'),
   removeKeywords: requiresRole(trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()), 'admin'),

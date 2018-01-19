@@ -17,6 +17,7 @@ const DEFAULT_COLUMN = {
 export const AdminStore = Fluxxor.createStore({
     initialize() {
         this.dataStore = {
+            users: [],
             streams: [],
             streamColumns: [],
             streamParamColumns: [],
@@ -35,6 +36,7 @@ export const AdminStore = Fluxxor.createStore({
         };
 
         this.bindActions(
+            constants.ADMIN.LOAD_USERS, this.handleLoadUsers,
             constants.ADMIN.LOAD_SITE_SETTINGS, this.handleLoadSiteSettings,
             constants.ADMIN.LOAD_STREAMS, this.handleLoadStreams,
             constants.ADMIN.MODIFY_STREAMS, this.handleModifyStreams,
@@ -55,6 +57,12 @@ export const AdminStore = Fluxxor.createStore({
         Object.assign({}, DEFAULT_COLUMN, value));
 
       this.dataStore[saveAsColumnName] = columns;
+    },
+
+    handleLoadUsers(response) {
+      this.dataStore.users = response.response || [];
+      this.dataStore.action = response.action || false;
+      this.emit("change");
     },
 
     handleLoadSiteSettings(response) {

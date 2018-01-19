@@ -1,4 +1,10 @@
- export const getAdminSite = `sites {
+export const getUsers = `query users {
+  users {
+    ...UsersView
+  }
+}`;
+
+export const getAdminSite = `sites {
         ...FortisSiteDefinitionView
 }`;
 
