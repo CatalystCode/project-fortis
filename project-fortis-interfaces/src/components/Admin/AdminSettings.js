@@ -120,7 +120,7 @@ export const AdminSettings = createReactClass({
 
     const languageArray = supportedLanguages.value.split(",");
     const languageJSON = `["${languageArray.join('","')}"]`;
-    const bboxJSON = `[${targetBbox.value}]`
+    const bboxJSON = `[${targetBbox.value}]`;
     const site = {
       name: name.value,
       targetBbox: JSON.parse(bboxJSON),

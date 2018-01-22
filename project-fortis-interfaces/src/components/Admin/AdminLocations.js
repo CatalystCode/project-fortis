@@ -130,8 +130,13 @@ export default class AdminLocations extends React.Component {
     }
 
     render() {
-        const { defaultZoomLevel, targetBbox, originalBounds, mapSvcToken, saving } = this.state;
+        const { defaultZoomLevel, mapSvcToken, saving } = this.state;
+        let { targetBbox, originalBounds } = this.state;
         const bboxRectangleColor = "#0ff";
+
+        if (typeof targetBbox  === 'string') targetBbox = targetBbox.split(',');
+        if (typeof originalBounds  === 'string') originalBounds = originalBounds.split(',');
+
         const bounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
         const originalBoundsTarget = originalBounds.length && originalBounds.length === 4 ? [[originalBounds[0], originalBounds[1]], [originalBounds[2], originalBounds[3]]] : [];
 
