@@ -74,7 +74,7 @@ class AdminWatchlist extends React.Component {
       topic.translatednamelang = this.getTranslationLanguage()
       topic.translations = [{
         key: this.getTranslationLanguage(),
-        value: topic.translatedname
+        value: this.getDefaultLanguage() === this.getTranslationLanguage() ? topic.name : topic.translatedname 
       }]
       return topic;
     });
