@@ -1,62 +1,73 @@
 import { DataGrid } from './DataGrid';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Fluxxor from 'fluxxor';
+import { getColumns } from './shared';
+const { Editors, Formatters } = require('react-data-grid-addons');
+const { DropDownEditor } = Editors;
+const { DropDownFormatter } = Formatters;
 
-const FluxMixin = Fluxxor.FluxMixin(React);
-const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
+const booleans = ['false', 'true'];
 
-function getValidatedTermFilters(termFilters) {
-  termFilters.forEach(termFilter => {
-    try {
-      termFilter.filteredTerms = JSON.parse(termFilter.filteredTerms);
-    } catch (error) {
-      termFilter.filteredTerms = [];
-    }
+class BlacklistEditor extends React.Component {
+  componentDidMount() {
+    this.props.flux.actions.ADMIN.load_blacklist();
+  }
 
-    termFilter.isLocation = termFilter.isLocation === 'true';
-  });
+  handleSave = rows => {
+    this.prepareBlacklistForSave(rows);
+    this.props.flux.actions.ADMIN.save_blacklist(rows);
+  }
 
-  return termFilters;
-}
+  handleRemove = rows => {
+    this.props.flux.actions.ADMIN.remove_blacklist(rows);
+  }
 
-export const BlacklistEditor = createReactClass({
-    mixins: [FluxMixin, StoreWatchMixin],
+  getBlacklistColumns = () => {
+    const columnValues = [
+      {editable: true, filterable: true, sortable: true, key: "filteredTerms", name: "Blacklisted Terms"},
+      {editable: true, filterable: true, sortable: true, key: "isLocation", name: "Is location?", editor: <DropDownEditor options={booleans}/>, formatter: <DropDownFormatter options={booleans}/>}
+    ];
 
-    getInitialState() {
-      return {};
-    },
+    return getColumns(columnValues);
+  }
 
-    componentDidMount() {
-      this.getFlux().actions.ADMIN.load_blacklist();
-    },
+  prepareBlacklistForSave(rows) {
+    rows.forEach((row, index) => {
+      if (this.isEmptyBlacklistRow(row)) {
+        rows.splice(index, 1);
+      } else {
+        this.formatBlacklistRowForCassandra(row);
+      }
+    });
+  }
 
-    getStateFromFlux() {
-      return this.getFlux().store("AdminStore").getState();
-    },
+  isEmptyBlacklistRow(row) {
+    return !row || !row.filteredTerms || row.filteredTerms.length === 0;
+  }
 
-    handleSave(rows) {
-      const reducedRows = getValidatedTermFilters(rows);
-      this.getFlux().actions.ADMIN.save_blacklist(reducedRows);
-    },
+  formatBlacklistRowForCassandra(row) {
+    if (row.filteredTerms.indexOf(',') < 0) return row;
+    row.filteredTerms = row.filteredTerms.split(",").map(term => term.trim());
+    row.isLocation = (row.isLocation === 'true');
+    return row;
+  }
 
-    handleRemove(rows) {
-      this.getFlux().actions.ADMIN.remove_blacklist(rows);
-    },
+  render() {
+    return (
+      this.getBlacklistColumns().length <= 0 ?
+        <div /> :
+        <div>
+          <DataGrid
+            rowHeight={40}
+            minHeight={500}
+            rowKey="id"
+            guidAutofillColumn="id"
+            handleSave={this.handleSave}
+            handleRemove={this.handleRemove}
+            columns={this.getBlacklistColumns()}
+            rows={this.props.blacklist} />
+          </div>
+    );
+  }
+};
 
-    render() {
-      const state = this.getFlux().store("AdminStore").getState();
-
-      return (
-        <DataGrid
-          rowHeight={40}
-          minHeight={500}
-          rowKey="id"
-          guidAutofillColumn="id"
-          handleSave={this.handleSave}
-          handleRemove={this.handleRemove}
-          columns={this.state.blacklistColumns}
-          rows={state.blacklist} />
-      );
-    }
-});
+export default BlacklistEditor;

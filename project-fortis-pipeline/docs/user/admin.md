@@ -44,15 +44,6 @@ For example, in Excel you may have:
 | armed conflict      | gun           |
 | health              | medicine      |
 
-## Monitored Places / Geofence
-
-Specify coordinates and the zoom level of a location you would like to monitor.
-
-| Value               | Description   |
-| ------------------- | ------------- |
-| Target Bbox         | Uses `WOF`. Provide a comma delimited string `maxY,minX,minY,maxX` |
-| Zoom Level          | Specify as an `Integer`. |
-
 ## Event Import
 
 Still needs to be implemented.
@@ -89,12 +80,12 @@ A table of all supported `trusted sources` with their associated `pipeline keys`
 
 ## Blacklisted Terms
 
-Manage keywords to blacklist in the pipeline. For example, if you have `["Trump", "Obama", "election"]` in your blacklist, then events containing one or more of these keywords will be filtered in the pipeline and will not be displayed on the ui.
+Manage keywords to blacklist in the pipeline. For example, if you have `Trump, Obama, election` in your blacklist, then events containing one or more of these keywords will be filtered in the pipeline and will not be displayed on the ui.
 
 | Column Name         | Description   |
 | ------------------- | ------------- |
-| Id                  | Autopopulated `guid` of blacklisted term list. |
-| Blacklisted Terms   | Enter a grouping of keywords for a blacklist as an array of strings `["Trump", "Obama", "election"]`. |
+| Blacklisted Terms   | Enter a grouping of keywords for a blacklist as a comma delimited string: Trump, Obama, election. |
+| Is Location | A boolean specifying whether the blacklist should only be only applied to a particular location. |
 
 ## Streams
 

@@ -33,6 +33,7 @@ export const AdminPage = createReactClass({
       watchlist,
       streams,
       translatableFields,
+      blacklist
     } = this.getStateFromFlux().adminStoreState;
 
 
@@ -50,7 +51,8 @@ export const AdminPage = createReactClass({
       trustedSources,
       streams,
       translatableFields,
-      enabledStreams
+      enabledStreams,
+      blacklist
     });
   },
 

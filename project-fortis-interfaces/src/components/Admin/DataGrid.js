@@ -118,7 +118,7 @@ export const DataGrid = createReactClass({
     }
 
     selectedRowKeys = [];
-    this.setState({rows, localAction, selectedRowKeys, modifiedRows, filters});
+    this.setState({rows, localAction: STATE_ACTIONS.MODIFIED, selectedRowKeys, modifiedRows, filters});
   },
   lookupRowIdByKey(rowKey) {
     let targetRowId = -1;
@@ -170,7 +170,7 @@ export const DataGrid = createReactClass({
     rows.unshift(newRow);
 
     const selectedRowKeys = [];
-    this.setState({rows, selectedRowKeys});
+    this.setState({rows, selectedRowKeys, localAction: STATE_ACTIONS.MODIFIED});
   },
   handleGridRowsUpdated(updatedRowData) {
       let rows = this.state.rows;
@@ -196,7 +196,7 @@ export const DataGrid = createReactClass({
                           }
 
                           modifiedRows.delete(rowKey);
-                          this.setState({ modifiedRows, localAction, rows});
+                          this.setState({ modifiedRows, localAction: STATE_ACTIONS.MODIFIED, rows});
                       });
                   }
               }
@@ -469,6 +469,7 @@ export const DataGrid = createReactClass({
               : undefined
             }
             <span style={styles.rowSelectionLabel}>{this.state.selectedRowKeys.length} {rowText} selected</span>
+
             <ReactDataGrid
                   ref="grid"
                   onGridSort={this.handleGridSort}

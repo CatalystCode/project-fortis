@@ -12,6 +12,20 @@ function addIdsToUsersForGrid(users) {
   users.forEach(user => user.id = `${user.identifier}-${user.role}`);
 }
 
+function prepareBlacklistForGrid(rows) {
+  rows.forEach(row => {
+    if (row && row.filteredTerms && row.filteredTerms.constructor === Array) {
+      row.filteredTerms = row.filteredTerms.join();
+    }
+  });
+}
+
+function stringValueToBoolean(rows) {
+  rows.forEach(row => {
+    row.isLocation = (row.isLocation === 'true');
+  });
+}
+
 const _methods = {
   restart_pipeline() {
     const self = this;
@@ -34,9 +48,8 @@ const _methods = {
         addIdsToUsersForGrid(users);
         self.dispatch(constants.ADMIN.LOAD_USERS, { response: users });
       } else {
-        const action = 'failed';
         console.error(`[${error}] occured while loading users.`);
-        self.dispatch(constants.ADMIN.LOAD_FAIL, {action});
+        self.dispatch(constants.ADMIN.LOAD_FAIL, { action: 'failed' });
       }
     }));
   },
@@ -76,50 +89,45 @@ const _methods = {
   },
 
   load_blacklist() {
-    const self = this;
     AdminServices.fetchBlacklists((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
       if (graphqlResponse && !error) {
-        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, { response: graphqlResponse.termBlacklist.filters });
+        const blacklist = graphqlResponse.termBlacklist.filters;
+        prepareBlacklistForGrid(blacklist);
+        this.dispatch(constants.ADMIN.LOAD_BLACKLIST, { response: blacklist });
       } else {
-        const action = 'failed';
         console.error(`[${error}] occured while loading blacklist.`);
-        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action});
+        this.dispatch(constants.ADMIN.LOAD_BLACKLIST, { action: 'failed' });
       }
     }));
   },
 
   save_blacklist(termFilters) {
-    const self = this;
+    if (!termFilters && termFilters.length === 0) return;
+    stringValueToBoolean(termFilters);
     AdminServices.saveBlacklists(termFilters, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-      let action = false;
-
       if (graphqlResponse && !error) {
-        action = "saved";
         const blacklistAfterSave = this.flux.stores.AdminStore.dataStore.blacklist;
-        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action, response: blacklistAfterSave});
-      } else{
-        action = 'failed';
+        prepareBlacklistForGrid(blacklistAfterSave);
+        this.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action: 'saved', response: blacklistAfterSave});
+      } else {
         console.error(`[${error}] occured while processing blacklist request.`);
-        self.dispatch(constants.ADMIN.LOAD_FAIL, {action});
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { action: 'failed'});
       }
     }));
   },
 
   remove_blacklist(termFilters) {
-    const self = this;
+    if (!termFilters && termFilters.length === 0) return;
+    stringValueToBoolean(termFilters);
     AdminServices.removeBlacklists(termFilters, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-      let action = false;
-
       if (graphqlResponse && !error) {
-        action = "saved";
         const blacklistBeforeRemove = this.flux.stores.AdminStore.dataStore.blacklist;
         const blacklistRemoved = graphqlResponse.removeBlacklist.filters;
         const blacklistAfterRemove = getListAfterRemove(blacklistBeforeRemove, blacklistRemoved, 'id');
-        self.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action, response: blacklistAfterRemove});
+        this.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action: 'saved', response: blacklistAfterRemove});
       } else {
-        action = 'failed';
         console.error(`[${error}] occured while processing blacklist request`);
-        self.dispatch(constants.ADMIN.LOAD_FAIL, {action});
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { action: 'failed' });
       }
     }));
   },

@@ -5,9 +5,12 @@ import { AdminSettings } from './AdminSettings';
 import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';
 import TrustedSources from './TrustedSources';
-import { BlacklistEditor } from './BlacklistEditor';
+import BlacklistEditor from './BlacklistEditor';
 import StreamEditor from './StreamEditor';
 import UserRoles from './UserRoles';
+import FontIcon from 'material-ui/FontIcon';
+import ReactTooltip from 'react-tooltip'
+import {blue500, blue700} from 'material-ui/styles/colors';
 import '../../styles/Admin/Admin.css';
 
 const SETTINGS_TAB = 0;
@@ -41,7 +44,9 @@ class Admin extends React.Component {
   }
 
   closeModal = () => {
-    this.setState({ showModal: false });
+    this.setState({ 
+      showModal: false
+    });
   }
 
   openModal = () => {
@@ -117,7 +122,10 @@ class Admin extends React.Component {
                       </div>
                     </TabPanel>
                     <TabPanel>
-                      <h2>Blacklisted Terms</h2>
+                      <h2>Blacklisted Terms <FontIcon className="fa fa-question" data-tip data-for='blacklist' data-place='right' color={blue500} hoverColor={blue700}/></h2>
+                      <ReactTooltip id='blacklist'>
+                        <span>Provide a comma delimited list of blacklist terms, i.e. hunger, flood, hurricane. If an event matches all the blacklist terms, then it will be discarded.</span>
+                      </ReactTooltip>
                       <div className="adminTable">
                         {this.props.settings && this.props.settings.properties && this.state.index === BLACKLIST_TAB &&
                           <BlacklistEditor {...this.props}/>}
