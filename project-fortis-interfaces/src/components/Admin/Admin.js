@@ -7,18 +7,16 @@ import { CustomEventsEditor } from './CustomEventsEditor';
 import TrustedSources from './TrustedSources';
 import { BlacklistEditor } from './BlacklistEditor';
 import StreamEditor from './StreamEditor';
-import AdminLocations from './AdminLocations';
 import UserRoles from './UserRoles';
 import '../../styles/Admin/Admin.css';
 
 const SETTINGS_TAB = 0;
 const WATCHLIST_TAB = 1;
-const LOCATIONS_TAB = 2;
-const USERS_TAB = 3;
-const CUSTOM_EVENTS_TAB = 4;
-const TRUSTED_SOURCES = 5;
-const BLACKLIST_TAB = 6;
-const STREAM_TAB = 7;
+const USERS_TAB = 2;
+const CUSTOM_EVENTS_TAB = 3;
+const TRUSTED_SOURCES = 4;
+const BLACKLIST_TAB = 5;
+const STREAM_TAB = 6;
 
 const styles = {
   container: {
@@ -73,7 +71,6 @@ class Admin extends React.Component {
                     <TabList>
                       <Tab>Site Settings</Tab>
                       <Tab>Watchlist</Tab>
-                      <Tab>Geofence / Monitored places</Tab>
                       <Tab>Users</Tab>
                       <Tab>Event Import</Tab>
                       <Tab>Trusted Sources</Tab>
@@ -94,15 +91,6 @@ class Admin extends React.Component {
                           {this.props.settings && this.props.settings.properties && this.props.watchlist && this.state.index === WATCHLIST_TAB &&
                             <AdminWatchlist {...this.props}/>}
                         </div>
-                    </TabPanel>
-                    <TabPanel>
-                      <h2>Monitored Places&nbsp; / Geo-Fence<small></small></h2>
-                      <div className="adminTable">
-                        {this.props.settings && this.props.settings.properties && this.state.index === LOCATIONS_TAB &&
-                          <AdminLocations name={this.props.settings.name}
-                                          {...this.props}
-                                          {...this.props.settings.properties} />}
-                      </div>
                     </TabPanel>
                     <TabPanel>
                       <h2>Users</h2>
