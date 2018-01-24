@@ -23,32 +23,26 @@ trap cleanup EXIT
 
 while getopts ":i:l:o:" arg; do
   case "${arg}" in
-    i)
-      subscriptionId="${OPTARG}"
-      ;;
-    l)
-      resourceGroupLocation="${OPTARG}"
-      ;;
-    o)
-      outputFile="${OPTARG}"
-      ;;
+    i) subscriptionId="${OPTARG}" ;;
+    l) resourceGroupLocation="${OPTARG}" ;;
+    o) outputFile="${OPTARG}" ;;
   esac
 done
 shift $((OPTIND-1))
 
-if [ ! -f "$templateFilePath" ]; then echo "$templateFilePath not found"; exit 1; fi
-if [ ! -f "$parametersTemplatePath" ]; then echo "$parametersTemplatePath not found"; exit 1; fi
-if [ -z "$subscriptionId" ]; then echo "Subscription ID not provided"; usage; fi
-if [ -z "$resourceGroupLocation" ]; then echo "Resource group location not provided"; usage; fi
-if [ -z "$outputFile" ]; then echo "Output file location not provided"; usage; fi
+if [ ! -f "$templateFilePath" ]; then echo "$templateFilePath not found" >&2; exit 1; fi
+if [ ! -f "$parametersTemplatePath" ]; then echo "$parametersTemplatePath not found" >&2; exit 1; fi
+if [ -z "$subscriptionId" ]; then echo "Subscription ID not provided" >&2; usage; fi
+if [ -z "$resourceGroupLocation" ]; then echo "Resource group location not provided" >&2; usage; fi
+if [ -z "$outputFile" ]; then echo "Output file location not provided" >&2; usage; fi
 
-readonly personalIdentifier="$(echo ${USER} | tr -dC '[a-zA-Z]')${RANDOM:0:2}"
+readonly personalIdentifier="$(echo "${USER}" | tr -dC 'a-zA-Z')${RANDOM:0:2}"
 readonly resourceGroupName="fortisdev${personalIdentifier}${resourceGroupLocation}"
 readonly deploymentName="fortisdeployment${personalIdentifier}${resourceGroupLocation}"
 
 # login to azure using your credentials
 
-az account show > /dev/null || az login
+az account show || az login
 az account set --subscription "$subscriptionId"
 
 # create resource group if it doesn't exist
