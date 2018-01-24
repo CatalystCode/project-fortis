@@ -131,14 +131,14 @@ After making changes, you can re-build and re-start the affected services using:
 docker-compose up --build -d
 ```
 
-Note that any changes to the React code in project-fortis-interfaces project
-will be automatically detected and re-loaded so the re-build step above won't be
-necessary.
+Note that any changes to the React code in project-fortis-interfaces folder will
+be automatically detected and re-loaded so the re-build step above won't be
+necessary for changes to the frontend.
 
 #### Accessing Cassandra
 
-If you need more low-level access to the Cassandra database, you can do the
-following to log into a CQL shell:
+If you need more low-level access to the Cassandra database, you can execute the
+following command to log into a CQL shell:
 
 ```
 docker-compose exec project_fortis_services /app/cqlsh
