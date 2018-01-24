@@ -222,7 +222,6 @@ function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinut
     const reportName = promiseFunc.name;
 
     if (!args || !args.length || !args[0] || !args[0].csv) {
-      console.log(`No CSV requested for ${reportName}, skipping creation of report`);
       return promiseFunc(...args);
     }
 
