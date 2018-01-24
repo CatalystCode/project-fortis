@@ -2,7 +2,6 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import java.util.{Date, UUID}
 
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.Period
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraConjunctiveTopics
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.scalatest.FlatSpec

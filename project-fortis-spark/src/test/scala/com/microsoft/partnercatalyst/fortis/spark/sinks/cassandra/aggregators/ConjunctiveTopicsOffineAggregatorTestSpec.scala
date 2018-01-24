@@ -2,9 +2,9 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
 import java.util.{Date, UUID}
 
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.Period
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.Period
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}

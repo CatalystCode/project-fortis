@@ -1,4 +1,4 @@
-package com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries
+package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date, GregorianCalendar, TimeZone}

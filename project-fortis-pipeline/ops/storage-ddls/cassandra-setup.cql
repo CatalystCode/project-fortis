@@ -216,20 +216,6 @@ CREATE TABLE fortis.eventplaces(
     PRIMARY KEY ((conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, pipelinekey, tilez, tileid), eventtime, eventid, placeid)
 ) WITH CLUSTERING ORDER BY (eventtime DESC);
 
-CREATE TABLE fortis.computedtrends(
-    topic text,
-    pipelinekey text,
-    periodstartdate timestamp,
-    periodtype text,
-    period text,
-    tilez int,
-    tilex int,
-    tiley int,
-    score float,
-    insertion_time timestamp,
-    PRIMARY KEY ((pipelinekey, periodtype, tilez, period), topic, tilex, tiley)
-) WITH CLUSTERING ORDER BY (topic ASC, tilex ASC, tiley ASC);
-
 CREATE TABLE fortis.events(
     eventid text,
     sourceeventid text,

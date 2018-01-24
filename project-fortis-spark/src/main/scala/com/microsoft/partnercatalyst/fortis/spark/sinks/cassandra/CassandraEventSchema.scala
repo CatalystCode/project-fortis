@@ -3,7 +3,6 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 import java.text.Collator
 import java.util.{Date, Locale}
 
-import com.microsoft.partnercatalyst.fortis.spark.analyzer.timeseries.{Period, PeriodType}
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs.FortisUdfFunctions
