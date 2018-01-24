@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-import fileinput
+import argparse
 import json
 
-json_payload = json.loads(''.join(line for line in fileinput.input()))
+parser = argparse.ArgumentParser()
+parser.add_argument('file_to_parse', type=argparse.FileType('r'))
+args = parser.parse_args()
+
+json_payload = json.load(args.file_to_parse)
 
 outputs = json_payload.get('properties', {}).get('outputs', {})
 for key, value in outputs.items():

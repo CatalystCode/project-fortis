@@ -54,16 +54,16 @@ Then, you need to set up some services in Azure:
 ```sh
 ./project-fortis-pipeline/localdeploy/fortis-deploy.sh \
   -i YOUR_SUBSCRIPTION_ID_HERE \
-  -g SOME_RESOURCE_GROUP_NAME \
-  -l SOME_RESOURCE_GROUP_LOCATION \
-  -n SOME_DEPLOYMENT_NAME \
-> .env-secrets
+  -l YOUR_CLOSEST_AZURE_LOCATION_HERE \
+  -o .env-secrets
 ```
 
 This script will deploy to Azure a number of services used by Fortis, such as
 ServiceBus, EventHubs, Cognitive Services, and so forth. The secrets to access
 these services are stored in a `.env-secrets` file which the rest of the
-development setup will leverage.
+development setup will leverage. All the services are stored inside of a single
+resource group whose name is stored under the `FORTIS_RESOURCE_GROUP_NAME` key
+in the secrets file.
 
 Next, you need to create a Mapbox access token. If you don't have one yet, you
 can create a new one for free by [signing up](https://www.mapbox.com/signup/).
