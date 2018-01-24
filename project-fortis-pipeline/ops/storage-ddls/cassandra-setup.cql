@@ -69,7 +69,7 @@ CREATE TYPE fortis.features (
 );
 
 // *****************************************************************************
-// * Tables
+// * Configuration tables
 // *****************************************************************************
 
 CREATE TABLE fortis.users(
@@ -134,6 +134,10 @@ CREATE TABLE fortis.trustedsources (
    insertiontime timestamp,
    PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
+
+// *****************************************************************************
+// * Data tables
+// *****************************************************************************
 
 CREATE TABLE fortis.computedtiles (
     perioddate timestamp,
