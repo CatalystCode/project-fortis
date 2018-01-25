@@ -33,10 +33,9 @@ class PopularPlacesOfflineAggregator(configurationManager: ConfigurationManager)
     val places = aggregate(events).cache()
     places.count() match {
       case 0 => return
-      case _ => {
-        implicit val rowWriter = SqlRowWriter.Factory
+      case _ =>
+        implicit val rowWriter: SqlRowWriter.Factory.type = SqlRowWriter.Factory
         places.saveToCassandra(keyspace, "popularplaces")
-      }
     }
 
     places.unpersist(blocking = true)

@@ -5,7 +5,6 @@ import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ComputedTile, Event, HeatmapTile}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraTileBucket}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
 import com.datastax.spark.connector._
 import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 
@@ -74,17 +73,15 @@ class HeatmapOfflineAggregator(configurationManager: ConfigurationManager) exten
     val tiles = aggregate(events).cache()
     tiles.count() match {
       case 0 => return
-      case _ => {
-        implicit val rowWriter = SqlRowWriter.Factory
+      case _ =>
+        implicit val rowWriter: SqlRowWriter.Factory.type = SqlRowWriter.Factory
         tiles.saveToCassandra(keyspace, "heatmap")
         try {
           aggregateAndSaveTileBuckets(tiles, keyspace)
         } catch {
-          case e: Exception => {
-            logError(s"Failed to write aggregate tiles to keyspace ${keyspace}", e)
-          }
+          case e: Exception =>
+            logError(s"Failed to write aggregate tiles to keyspace $keyspace", e)
         }
-      }
     }
 
     tiles.unpersist(blocking = true)

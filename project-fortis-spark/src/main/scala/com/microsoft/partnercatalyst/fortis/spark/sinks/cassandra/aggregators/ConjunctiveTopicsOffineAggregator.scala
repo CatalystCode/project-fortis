@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
-import com.datastax.spark.connector._
 import com.datastax.spark.connector.writer.SqlRowWriter
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraConjunctiveTopics
@@ -29,10 +28,9 @@ class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManag
     val topics = aggregate(events).cache()
     topics.count() match {
       case 0 => return
-      case _ => {
-        implicit val rowWriter = SqlRowWriter.Factory
+      case _ =>
+        implicit val rowWriter: SqlRowWriter.Factory.type = SqlRowWriter.Factory
         topics.saveToCassandra(keyspace, "conjunctivetopics")
-      }
     }
 
     topics.unpersist(blocking = true)
