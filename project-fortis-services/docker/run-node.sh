@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 has_cassandra_schema() {
-  echo 'DESCRIBE KEYSPACE fortis;' | /app/cqlsh 2>&1 | grep -q 'CREATE KEYSPACE fortis'
+  echo 'DESCRIBE KEYSPACES;' | /app/cqlsh | grep -q 'fortis'
 }
 
 has_seed_data() {
@@ -16,11 +16,16 @@ done
 echo "...done, Cassandra is now available"
 
 # set up cassandra schema
-if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ] && ! has_cassandra_schema; then
+if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ]; then
   echo "Got Fortis schema definition at $FORTIS_CASSANDRA_SCHEMA_URL, ingesting..."
-  wget -qO- "$FORTIS_CASSANDRA_SCHEMA_URL" \
-  | sed "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" \
-  | /app/cqlsh
+  mkdir -p /tmp/cassandra-schema
+  cd /tmp/cassandra-schema
+  wget -qO- "$FORTIS_CASSANDRA_SCHEMA_URL" > setup.cql
+  sed -i "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" setup.cql
+  while ! has_cassandra_schema; do
+    /app/cqlsh < setup.cql || sleep 20s
+  done
+  cd -
   echo "...done, Fortis schema definition is now ingested"
 fi
 
@@ -28,7 +33,6 @@ fi
 if [ -n "$FORTIS_CASSANDRA_USERS" ]; then
   echo "Got Fortis users, ingesting..."
   npm run addusers -- 'user' "$FORTIS_CASSANDRA_USERS"
-  if [ $? -ne 0 ]; then echo "Failed to ingest users!" >&2; exit 1; fi
   echo "...done, Fortis users are now ingested"
 fi
 
@@ -41,12 +45,14 @@ if [ -n "$FORTIS_CASSANDRA_ADMINS" ]; then
 fi
 
 # set up cassandra seed data
-if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
+if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
   echo "Got Fortis sample data at $FORTIS_CASSANDRA_SEED_DATA_URL, ingesting..."
   mkdir -p /tmp/cassandra-seed-data
   cd /tmp/cassandra-seed-data
   wget -qO- "$FORTIS_CASSANDRA_SEED_DATA_URL" | tar xzf -
-  /app/cqlsh < import.cql
+  while ! has_seed_data; do
+    /app/cqlsh < import.cql || sleep 20s
+  done
   cd -
   echo "...done, Fortis sample data is now ingested"
 fi
