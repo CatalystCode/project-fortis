@@ -5,8 +5,8 @@ print_usage() {
 Command
   $0
 Arguments
-  --app_id|-ai                       [Required] : Service principal app id used to dynamically manage resource in your subscription
-  --app_key|-ak                      [Required] : Service principal app key used to dynamically manage resource in your subscription
+  --app_id|-ai                       [Required] : Service principal app id used to manage resources in your subscription
+  --app_key|-ak                      [Required] : Service principal app key used to manage resources in your subscription
   --subscription_id|-si              [Required] : Subscription Id
   --tenant_id|-ti                    [Required] : Tenant Id
   --user_name|-un                    [Required] : Admin user name for the Kubernetes cluster
