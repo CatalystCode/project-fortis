@@ -49,7 +49,8 @@ git clone https://github.com/CatalystCode/project-fortis.git
 cd project-fortis
 ```
 
-Then, you need to set up some services in Azure:
+Then, you need to set up some services in Azure by running the following Bash
+script, e.g. via the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about)):
 
 ```sh
 ./project-fortis-pipeline/localdeploy/fortis-deploy.sh \
