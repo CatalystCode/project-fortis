@@ -5,8 +5,7 @@ import java.util.{Date, Locale}
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
-import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.udfs.FortisUdfFunctions
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.TileUtils.DETAIL_ZOOM_DELTA
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.TileUtils.{DETAIL_ZOOM_DELTA, DoubleToLongConversionFactor}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations._
 
 object CassandraEventSchema {
@@ -52,7 +51,7 @@ object CassandraPopularPlaces {
       conjunctiontopic1 = kw._1,
       conjunctiontopic2 = kw._2,
       conjunctiontopic3 = kw._3,
-      avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * FortisUdfFunctions.DoubleToLongConversionFactor).toLong
+      avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * DoubleToLongConversionFactor).toLong
     )
   }
 }
@@ -129,7 +128,7 @@ object CassandraHeatmapTiles {
         conjunctiontopic3 = ct._3,
         externalsourceid = item.externalsourceid,
         mentioncount = item.computedfeatures.mentions,
-        avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * FortisUdfFunctions.DoubleToLongConversionFactor).toLong
+        avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * DoubleToLongConversionFactor).toLong
     )
   }
 }

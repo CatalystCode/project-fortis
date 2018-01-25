@@ -53,6 +53,7 @@ object TileUtils {
   final val ZOOM_LENGTH = sys.env.getOrElse("FORTIS_ZOOM_LENGTH", "8").toInt
   final val MIN_ZOOM = 8
   final val DETAIL_ZOOM_DELTA = 5
+  final val DoubleToLongConversionFactor = 1000
 
   def tile_id_from_lat_long(latitude: Double, longitude: Double, zoom: Int): TileId = {
     val row = row_from_latitude(latitude, zoom).toInt
