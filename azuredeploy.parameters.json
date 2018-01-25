@@ -42,10 +42,10 @@
             "value": "humanitarian"
         },
         "sshPublicKey": {
-            "value": "GEN-UNIQUE"
+            "value": ""
         },
         "mapboxAccessToken": {
-            "value": "GEN-UNIQUE"
+            "value": ""
         },
         "cognitiveServicesTextAnalyticsToken": {
             "value": ""
@@ -63,10 +63,10 @@
             "value": ""
         },
         "servicePrincipalAppId": {
-            "value": "GEN-UNIQUE"
+            "value": ""
         },
         "servicePrincipalAppKey": {
-            "value": "GEN-UNIQUE"
+            "value": ""
         }
     }
 }
