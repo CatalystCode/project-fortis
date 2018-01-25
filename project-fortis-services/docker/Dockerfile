@@ -40,9 +40,8 @@ ENV FORTIS_CASSANDRA_REPLICATION_FACTOR="3"
 ENV FORTIS_CASSANDRA_SCHEMA_URL="https://raw.githubusercontent.com/CatalystCode/project-fortis/master/project-fortis-pipeline/ops/storage-ddls/cassandra-setup.cql"
 
 # the tar.gz file at this url is used to populate the cassandra database with
-# initial test data; you never ever want to set this value in a production
-# deployment since it would pollute the deployment with test data -- this is
-# for developer convenience only
+# initial data; this is used for development setup to enable shared test data
+# and also for production to enable importing exported fortis sites
 # the archive at the url is expected to contain an import.cql file which may
 # reference other files in the archive, e.g. for cql `copy from` commands
 ENV FORTIS_CASSANDRA_SEED_DATA_URL=""

@@ -33,6 +33,7 @@ Arguments
   --cogtextsvctoken|-ctst            [Optional] : Cognitive Services Text access token
   --cogspeechsvctoken|-csst          [Optional] : Cognitive Services Speech access token
   --translationsvctoken|-tst         [Optional] : Cognitive Services Translation access token
+  --fortis_site_clone_url|-fcu       [Optional] : URL to exported Fortis site to clone
 EOF
 }
 
@@ -156,6 +157,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --translationsvctoken|-tst)
       translationsvctoken="$1"
+      shift
+      ;;
+    --fortis_site_clone_url|-fcu)
+      fortis_site_clone_url="$1"
       shift
       ;;
     *)
@@ -326,7 +331,8 @@ echo "Finished. Setting up cluster"
   "${cogvisionsvctoken}" \
   "${cogspeechsvctoken}" \
   "${cogtextsvctoken}" \
-  "${translationsvctoken}"
+  "${translationsvctoken}" \
+  "${fortis_site_clone_url}"
 
 # shellcheck disable=SC2181
 if [ $? -ne 0 ]; then

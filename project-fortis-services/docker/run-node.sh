@@ -5,7 +5,7 @@ has_cassandra_schema() {
 }
 
 has_seed_data() {
-  echo 'SELECT eventid FROM fortis.events LIMIT 100;' | /app/cqlsh | grep -q '(100 rows)'
+  echo 'SELECT * FROM fortis.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
 }
 
 # wait for cassandra to start

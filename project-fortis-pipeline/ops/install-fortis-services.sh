@@ -22,6 +22,7 @@ readonly cogvisionsvctoken="${19}"
 readonly cogspeechsvctoken="${20}"
 readonly cogtextsvctoken="${21}"
 readonly translationsvctoken="${22}"
+readonly fortis_site_clone_url="${23}"
 
 # setup
 mkdir -p "/tmp/fortis-services"
@@ -92,6 +93,8 @@ spec:
           value: ${cogspeechsvctoken}
         - name: COGNITIVE_VISION_SERVICE_TOKEN
           value: ${cogvisionsvctoken}
+        - name: FORTIS_CASSANDRA_SEED_DATA_URL
+          value: ${fortis_site_clone_url}
         image: cwolff/project_fortis_services
         name: project-fortis-services
         ports:

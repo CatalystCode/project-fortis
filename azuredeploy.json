@@ -163,6 +163,13 @@
             "defaultValue": "",
             "type": "securestring"
         },
+        "fortisSiteCloneUrl": {
+            "metadata": {
+                "description": "URL to exported Fortis site to clone"
+            },
+            "defaultValue": "",
+            "type": "string"
+        },
         "servicePrincipalAppId": {
             "metadata": {
                 "description": "Client ID (used by cloudprovider)"
@@ -563,7 +570,7 @@
                     "fileUris": [
                         "https://raw.githubusercontent.com/CatalystCode/project-fortis/master/project-fortis-pipeline/fortis-deploy.sh"
                     ],
-                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -pf \"', parameters('dnsNamePrefix'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -csst \"', parameters('cognitiveServicesBingSpeechToken'), '\" -tst \"', parameters('cognitiveServicesTextTranslationToken'), '\" -ctst \"', parameters('cognitiveServicesTextAnalyticsToken'), '\" -cvst \"', parameters('cognitiveServicesComputerVisionToken'), '\" -gc \"', variables('githubClonePath'), '\" -avms \"', parameters('agentVMSize'), '\"')]"
+                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -pf \"', parameters('dnsNamePrefix'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -csst \"', parameters('cognitiveServicesBingSpeechToken'), '\" -tst \"', parameters('cognitiveServicesTextTranslationToken'), '\" -ctst \"', parameters('cognitiveServicesTextAnalyticsToken'), '\" -cvst \"', parameters('cognitiveServicesComputerVisionToken'), '\" -gc \"', variables('githubClonePath'), '\" -avms \"', parameters('agentVMSize'), '\"')]"
                 }
             }
         }

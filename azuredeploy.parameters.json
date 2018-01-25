@@ -59,6 +59,9 @@
         "cognitiveServicesBingSpeechToken": {
             "value": ""
         },
+        "fortisSiteCloneUrl": {
+            "value": ""
+        },
         "servicePrincipalAppId": {
             "value": "GEN-UNIQUE"
         },
