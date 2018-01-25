@@ -61,7 +61,7 @@ services:
       - .env-secrets
 
   cassandra:
-    image: cassandra:3.11.0
+    image: erikschlegel/cassandra:v12
     ports:
       - 7000:7000
       - 7001:7001
