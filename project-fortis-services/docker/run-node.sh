@@ -50,6 +50,9 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
   mkdir -p /tmp/cassandra-seed-data
   cd /tmp/cassandra-seed-data
   wget -qO- "$FORTIS_CASSANDRA_SEED_DATA_URL" | tar xzf -
+  if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -f sitesettings.csv ]; then
+    sed -i "s/Fortis Dev,/$FORTIS_CASSANDRA_SITE_NAME,/g" sitesettings.csv
+  fi
   while ! has_seed_data; do
     /app/cqlsh < import.cql || sleep 20s
   done
