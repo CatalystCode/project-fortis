@@ -42,10 +42,10 @@
             "value": "humanitarian"
         },
         "sshPublicKey": {
-            "value": ""
+            "value": "CHANGE ME"
         },
         "mapboxAccessToken": {
-            "value": ""
+            "value": "CHANGE ME"
         },
         "cognitiveServicesTextAnalyticsToken": {
             "value": ""
@@ -63,10 +63,10 @@
             "value": ""
         },
         "servicePrincipalAppId": {
-            "value": ""
+            "value": "CHANGE ME"
         },
         "servicePrincipalAppKey": {
-            "value": ""
+            "value": "CHANGE ME"
         }
     }
 }
