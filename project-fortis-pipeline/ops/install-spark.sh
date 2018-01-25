@@ -19,6 +19,10 @@ readonly sb_queue_command="${16}"
 readonly checkpointfileshare="${17}"
 readonly k8spark_worker_count="${18}"
 readonly agent_vm_size="${19}"
+readonly cogvisionsvctoken="${20}"
+readonly cogspeechsvctoken="${21}"
+readonly cogtextsvctoken="${22}"
+readonly translationsvctoken="${23}"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
@@ -60,6 +64,10 @@ kubectl create configmap "${spark_config_map_name}" \
   --from-literal=FORTIS_SB_CONN_STR="${sb_conn_str}" \
   --from-literal=FORTIS_SB_CONFIG_QUEUE="${sb_queue_config}" \
   --from-literal=FORTIS_SB_COMMAND_QUEUE="${sb_queue_command}" \
+  --from-literal=COGNITIVE_TEXT_SERVICE_TOKEN="${cogtextsvctoken}" \
+  --from-literal=COGNITIVE_TRANSLATION_SERVICE_TOKEN="${translationsvctoken}" \
+  --from-literal=COGNITIVE_SPEECH_SERVICE_TOKEN="${cogspeechsvctoken}" \
+  --from-literal=COGNITIVE_VISION_SERVICE_TOKEN="${cogvisionsvctoken}" \
   --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
   --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
   --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"

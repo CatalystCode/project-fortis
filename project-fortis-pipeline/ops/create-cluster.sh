@@ -109,7 +109,11 @@ echo "Finished. Now installing Spark helm chart."
   "${sb_queue_command}" \
   "${checkpointfileshare}" \
   "${k8spark_worker_count}" \
-  "${agent_vm_size}"
+  "${agent_vm_size}" \
+  "${cogvisionsvctoken}" \
+  "${cogspeechsvctoken}" \
+  "${cogtextsvctoken}" \
+  "${translationsvctoken}"
 
 echo "Finished. Verifying deployment."
 ./verify-deployment.sh \
