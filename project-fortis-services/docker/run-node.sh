@@ -8,6 +8,10 @@ has_seed_data() {
   echo 'SELECT * FROM fortis.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
 }
 
+has_site() {
+  echo 'SELECT sitename FROM fortis.sitesettings;' | /app/cqlsh | grep -q "$FORTIS_CASSANDRA_SITE_NAME"
+}
+
 # wait for cassandra to start
 while ! /app/cqlsh; do
   echo "Cassandra not yet available, waiting..."
@@ -61,7 +65,8 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
 fi
 
 # set up site entry
-if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ]; then
+# todo: only do if site does not exist
+if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ] && ! has_site; then
   echo "Got Fortis site name and type, ingesting default site settings..."
   npm run createsite -- "$FORTIS_CASSANDRA_SITE_NAME" "$FORTIS_CASSANDRA_SITE_TYPE"
   echo "...done, Fortis default site is now ingested"
