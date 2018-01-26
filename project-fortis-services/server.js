@@ -65,5 +65,10 @@ function startServer() {
   server.listen(port, function () {});
 }
 
+function shutdownServer(error) {
+  console.error(error);
+  process.exit(1);
+}
+
 initializeAppInsights();
-initializeCassandra().then(startServer).catch(console.error);
+initializeCassandra().then(startServer).catch(shutdownServer);

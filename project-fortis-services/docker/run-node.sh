@@ -36,15 +36,15 @@ fi
 # set up users
 if [ -n "$FORTIS_CASSANDRA_USERS" ]; then
   echo "Got Fortis users, ingesting..."
-  npm run addusers -- 'user' "$FORTIS_CASSANDRA_USERS"
+  while ! npm run addusers -- 'user' "$FORTIS_CASSANDRA_USERS"; do sleep 20s; done
   echo "...done, Fortis users are now ingested"
 fi
 
 # set up admins
 if [ -n "$FORTIS_CASSANDRA_ADMINS" ]; then
   echo "Got Fortis admins, ingesting..."
-  npm run addusers -- 'user' "$FORTIS_CASSANDRA_ADMINS"
-  npm run addusers -- 'admin' "$FORTIS_CASSANDRA_ADMINS"
+  while ! npm run addusers -- 'user' "$FORTIS_CASSANDRA_ADMINS"; do sleep 20s; done
+  while ! npm run addusers -- 'admin' "$FORTIS_CASSANDRA_ADMINS"; do sleep 20s; done
   echo "...done, Fortis admins are now ingested"
 fi
 
@@ -65,41 +65,40 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
 fi
 
 # set up site entry
-# todo: only do if site does not exist
 if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ] && ! has_site; then
   echo "Got Fortis site name and type, ingesting default site settings..."
-  npm run createsite -- "$FORTIS_CASSANDRA_SITE_NAME" "$FORTIS_CASSANDRA_SITE_TYPE"
+  while ! npm run createsite -- "$FORTIS_CASSANDRA_SITE_NAME" "$FORTIS_CASSANDRA_SITE_TYPE"; do sleep 20s; done
   echo "...done, Fortis default site is now ingested"
 fi
 
 # set up cognitive services secrets
 if [ -n "$COGNITIVE_TRANSLATION_SERVICE_TOKEN" ]; then
   echo "Got Fortis text translation cognitive services secrets, ingesting..."
-  npm run ingestsetting -- "translationSvcToken" "translationsvctoken" "$COGNITIVE_TRANSLATION_SERVICE_TOKEN"
+  while ! npm run ingestsetting -- "translationSvcToken" "translationsvctoken" "$COGNITIVE_TRANSLATION_SERVICE_TOKEN"; do sleep 20s; done
   echo "...done, Fortis text translation cognitive services secrets are now ingested"
 fi
 if [ -n "$COGNITIVE_SPEECH_SERVICE_TOKEN" ]; then
   echo "Got Fortis speech transcription cognitive services secrets, ingesting..."
-  npm run ingestsetting -- "cogSpeechSvcToken" "cogspeechsvctoken" "$COGNITIVE_SPEECH_SERVICE_TOKEN"
+  while ! npm run ingestsetting -- "cogSpeechSvcToken" "cogspeechsvctoken" "$COGNITIVE_SPEECH_SERVICE_TOKEN"; do sleep 20s; done
   echo "...done, Fortis speech transcription cognitive services secrets are now ingested"
 fi
 if [ -n "$COGNITIVE_VISION_SERVICE_TOKEN" ]; then
   echo "Got Fortis image analysis cognitive services secrets, ingesting..."
-  npm run ingestsetting -- "cogVisionSvcToken" "cogvisionsvctoken" "$COGNITIVE_VISION_SERVICE_TOKEN"
+  while ! npm run ingestsetting -- "cogVisionSvcToken" "cogvisionsvctoken" "$COGNITIVE_VISION_SERVICE_TOKEN"; do sleep 20s; done
   echo "...done, Fortis image analysis cognitive services secrets are now ingested"
 fi
 if [ -n "$COGNITIVE_TEXT_SERVICE_TOKEN" ]; then
   echo "Got Fortis text analytics cognitive services secrets, ingesting..."
-  npm run ingestsetting -- "cogTextSvcToken" "cogtextsvctoken" "$COGNITIVE_TEXT_SERVICE_TOKEN"
+  while ! npm run ingestsetting -- "cogTextSvcToken" "cogtextsvctoken" "$COGNITIVE_TEXT_SERVICE_TOKEN"; do sleep 20s; done
   echo "...done, Fortis text analytics cognitive services secrets are now ingested"
 fi
 
 # set up mapbox credentials
 if [ -n "$MAPBOX_ACCESS_TOKEN" ]; then
   echo "Got MapBox token, ingesting..."
-  npm run ingestsetting -- "mapSvcToken" "mapsvctoken" "$MAPBOX_ACCESS_TOKEN"
+  while ! npm run ingestsetting -- "mapSvcToken" "mapsvctoken" "$MAPBOX_ACCESS_TOKEN"; do sleep 20s; done
   echo "...done, MapBox token is now ingested"
 fi
 
 # start node server
-PORT="80" npm start
+while ! PORT="80" npm start; do sleep 20s; done
