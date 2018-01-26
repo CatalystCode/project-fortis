@@ -16,6 +16,7 @@ module.exports = {
   addTrustedSources: mutations.addTrustedSources,
   removeTrustedSources: mutations.removeTrustedSources,
 
+  exportSite: queries.exportSite,
   users: queries.users,
   siteTerms: queries.siteTerms,
   sites: queries.sites,

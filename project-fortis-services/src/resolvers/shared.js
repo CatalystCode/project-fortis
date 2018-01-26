@@ -2,6 +2,7 @@
 
 const Promise = require('promise');
 const geotile = require('geotile');
+const tmp = require('tmp');
 const isObject = require('lodash/isObject');
 const json2csv = require('json2csv');
 const NodeCache = require('node-cache');
@@ -245,7 +246,20 @@ function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinut
   return csvExporter;
 }
 
+function createTempDir(options) {
+  return new Promise((resolve, reject) => {
+    tmp.dir(options, (err, path) => {
+      if (err) {
+        return reject(err);
+      } else {
+        return resolve(path);
+      }
+    });
+  });
+}
+
 module.exports = {
+  createTempDir,
   parseLimit,
   toPipelineKey,
   toConjunctionTopics,

@@ -64,7 +64,38 @@ function createFile(container, fileName, content, expiryMinutes) {
   });
 }
 
+/**
+ * @param {string} container
+ * @param {string} fileName
+ * @param {string} path
+ * @param {number} expiryMinutes
+ * @returns {Promise.<{url: string, expires: Date}>}
+ */
+function uploadFile(container, fileName, path, expiryMinutes) {
+  const client = azure.createBlobService(userFilesBlobAccountName, userFilesBlobAccountKey);
+
+  return new Promise((resolve, reject) => {
+    client.createContainerIfNotExists(container, (error) => {
+      if (error) return reject(error);
+
+      client.createBlockBlobFromLocalFile(container, fileName, path, (error) => {
+        if (error) return reject(error);
+
+        const expires = minutesFromNow(expiryMinutes);
+        const accessSignature = client.generateSharedAccessSignature(container, fileName, { AccessPolicy: { Expiry: expires, Permissions: READ } });
+        const url = client.getUrl(container, fileName, accessSignature, true);
+
+        resolve({
+          url,
+          expires
+        });
+      });
+    });
+  });
+}
+
 module.exports = {
+  uploadFile: trackDependency(uploadFile, 'BlobStorage', 'uploadFile'),
   createFile: trackDependency(createFile, 'BlobStorage', 'createFile'),
   fetchJson: trackDependency(fetchJson, 'BlobStorage', 'fetchJson')
 };

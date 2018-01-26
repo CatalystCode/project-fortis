@@ -2,6 +2,7 @@ const graphql = require('graphql');
 
 module.exports = graphql.buildSchema(`
   type Query {
+    exportSite: ExportedSite
     users: UserCollection
     sites: SiteCollection
     streams: StreamCollection
@@ -32,6 +33,12 @@ module.exports = graphql.buildSchema(`
     removeBlacklist(input: BlacklistTermDefintion!): BlacklistCollection
     addTrustedSources(input: SourceListInput): SourceCollection
     removeTrustedSources(input: SourceListInput): SourceCollection
+  }
+
+  type ExportedSite {
+    runTime: String
+    url: String!
+    expires: String!
   }
 
   type UserCollection {
