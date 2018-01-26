@@ -110,5 +110,7 @@ ADD docker/run-node.sh /app/server
 ADD docker/run-cqlsh.sh /app/cqlsh
 ADD . /app
 
+RUN npm run lint
+
 EXPOSE 80
 CMD "/app/server"
