@@ -146,8 +146,11 @@ export const AdminSettings = createReactClass({
   },
 
   render() {
+      if (!this.state.siteSettings.properties) {
+        return <div />;
+      }
+
       return (
-        this.state.siteSettings.properties ?
           <div className="row">
               <form ref="settingsForm">
                   <div className="col-lg-6">
@@ -227,7 +230,6 @@ export const AdminSettings = createReactClass({
                   </div>
               </form>
           </div>
-          : <div />
       );
   }
 });
