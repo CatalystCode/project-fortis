@@ -104,7 +104,10 @@ export const AdminSettings = createReactClass({
     } = this.props.siteSettings.properties;
 
     const {
-      name,
+      name
+    } = this.props.siteSettings;
+
+    const {
       title,
       logo,
       targetBbox,
@@ -121,8 +124,9 @@ export const AdminSettings = createReactClass({
     const languageArray = supportedLanguages.value.split(",");
     const languageJSON = `["${languageArray.join('","')}"]`;
     const bboxJSON = `[${targetBbox.value}]`;
+
     const site = {
-      name: name.value,
+      name: name,
       targetBbox: JSON.parse(bboxJSON),
       logo: logo.value,
       defaultLocation: defaultLocation,
