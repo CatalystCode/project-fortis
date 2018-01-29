@@ -39,7 +39,7 @@ export const AdminSettings = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
 
   contextTypes: {
-      router: PropTypes.object
+    router: PropTypes.object
   },
 
   getInitialState() {
@@ -61,9 +61,9 @@ export const AdminSettings = createReactClass({
   },
 
   componentDidMount() {
-      const { siteSettings } = this.props;
+    const { siteSettings } = this.props;
 
-      this.setState({ siteSettings });
+    this.setState({ siteSettings });
   },
 
   handleInputChange(event) {
