@@ -145,6 +145,19 @@ export const AdminSettings = createReactClass({
     this.getFlux().actions.ADMIN.save_settings(site);
   },
 
+  renderSaveButton() {
+    if (!this.state.isFormValid) {
+      return null;
+    }
+
+    return (
+      <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
+        <i className="fa fa-cloud-upload" aria-hidden="true"></i>
+        {this.state.saving ? "Saved Changes" : "Save Settings"}
+      </button>
+    );
+  },
+
   render() {
     if (!this.state.siteSettings.properties) {
       return <div />;
@@ -218,13 +231,7 @@ export const AdminSettings = createReactClass({
             </div>
             <div className="form-group">
               <p style={styles.settings.buttonRow}>
-              {
-                this.state.isFormValid ?
-                  <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
-                  <i className="fa fa-cloud-upload" aria-hidden="true"></i> {this.state.saving ? "Saved Changes" : "Save Settings"}
-                  </button>
-                : undefined
-              }
+                {this.renderSaveButton()}
               </p>
             </div>
           </div>
