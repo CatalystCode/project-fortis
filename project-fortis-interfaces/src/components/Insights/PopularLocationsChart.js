@@ -37,14 +37,13 @@ export default class PopularLocationsChart extends React.Component {
 
     popularLocations.forEach((location, index) => {
       const { name, mentions, bbox, placeid, centroid } = location;
-      const value = mentions;
+
       if (placeid === selectedWofId) {
         activeIndex = index;
       }
-      const color = constants.CHART_STYLE.COLORS[index];
-      colorCells.push(<Cell key={0} fill={color} />);
 
-      dataProvider.push(Object.assign({}, { value, name, bbox, placeid, centroid }));
+      colorCells.push(<Cell key={0} fill={constants.CHART_STYLE.COLORS[index]} />);
+      dataProvider.push({ value: mentions, name, bbox, placeid, centroid });
     });
 
     this.setState({ colorCells, dataProvider, activeIndex });
