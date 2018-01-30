@@ -1,4 +1,5 @@
 import React from 'react';
+import debounce from 'lodash/debounce';
 import { SERVICES } from '../../services/Dashboard';
 import '../../styles/Insights/ActivityFeed.css';
 import NoData from '../Graphics/NoData';
@@ -37,7 +38,6 @@ export default class ActivityFeed extends React.Component {
         this.setInfinitLoadAsComplete = this.setInfinitLoadAsComplete.bind(this);
         this.resetNewsFeed = this.resetNewsFeed.bind(this);
         this.sourceOnClickHandler = this.sourceOnClickHandler.bind(this);
-        this.searchSubmit = this.searchSubmit.bind(this);
         this.renderDataSourceTabs = this.renderDataSourceTabs.bind(this);
 
         this.state = {
@@ -185,12 +185,12 @@ export default class ActivityFeed extends React.Component {
         };
     }
 
-    searchSubmit(event) {
+    onSearchSubmitClick = () => {
         const searchValue = this.refs.filterTextInput.value;
-
-        event.preventDefault();
         this.setState({ searchValue });
     }
+
+    onSearchSubmitText = debounce(this.onSearchSubmitClick, 350);
 
     componentDidMount() {
         setTimeout(() => this.processNewsFeed(this.props), ActivityConsts.INFINITE_LOAD_DELAY_MS);
@@ -243,6 +243,15 @@ export default class ActivityFeed extends React.Component {
                     onChange={this.sourceOnClickHandler}>
                     {this.renderDataSourceTabs(styles.iconStyle)}
                 </Tabs>
+                {renderedElements.length || searchValue ?
+                <div className="input-group">
+                    <input ref="filterTextInput" type="text" placeholder="Filter News Feed .." className="form-control" onKeyDown={this.onSearchSubmitText} />
+                    <span className="input-group-btn">
+                        <button onClick={this.onSearchSubmitClick} className="btn btn-default">
+                            <i className="fa fa-search"></i>
+                        </button>
+                    </span>
+                </div> : null}
                 {renderedElements.length || isInfiniteLoading ?
                 <Infinite elementHeight={ActivityConsts.ELEMENT_ITEM_HEIGHT}
                     containerHeight={infiniteScrollHeight - ActivityConsts.NEWS_FEED_SEARCH_CONTAINER_HEIGHT}
@@ -274,15 +283,6 @@ export default class ActivityFeed extends React.Component {
                         })
                     }
                 </Infinite> : <NoData />}
-                {renderedElements.length ? <div className="panel-footer clearfix">
-                    <div className="input-group">
-                        <input ref="filterTextInput" type="text" placeholder="Filter News Feed .." className="form-control input-sm" />
-                        <span className="input-group-btn">
-                            <button onClick={this.searchSubmit} className="btn btn-default btn-sm"><i className="fa fa-search"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div> : null}
                 <DialogBox ref="dialogBox" {...this.props}></DialogBox>
             </div>
         );
