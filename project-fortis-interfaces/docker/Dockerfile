@@ -42,9 +42,9 @@ WORKDIR /app
 
 # add static files; the dynamic files in /app/src (JS and CSS) are provided via
 # a volume in the docker-compose.yml file so that we can hot-reload the code
-ADD public /app/public
 ADD package.json /app/package.json
 RUN npm install
+ADD public /app/public
 
 # note that this dockerfile does not expose port 80 since it wouldn't make sense
 # to run the webpack dev-server in production; for a production deployment,
