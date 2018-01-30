@@ -46,7 +46,7 @@ export const site = `fragment SiteView on SiteCollection {
   }
 }`;
 
-export const topics = `fragment TopicsView on TermCollection {
+export const topics = `fragment TopicsView on SiteTerms {
   edges {
     topicid
     name
