@@ -42,6 +42,7 @@ export default class TimeSeriesGraph extends React.Component {
                 dataKey={topic.name.toLowerCase()}
                 stroke={color}
                 fill={color}
+                isAnimationActive={false}
                 strokeWidth={3}
                 dot={false}
                 ticksCount={5} />
