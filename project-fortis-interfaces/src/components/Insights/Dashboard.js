@@ -15,6 +15,7 @@ import { hasChanged } from './shared';
 import 'react-grid-layout/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
 import HeatmapToggle from './HeatmapToggle';
+import CategoryPicker from './CategoryPicker';
 import ShareButton from './ShareButton';
 import LanguagePicker from './LanguagePicker';
 
@@ -42,6 +43,11 @@ export default class Dashboard extends React.Component {
     const rowInitialHeight = document.getElementById("leafletMap") || { clientHeight: 0 };
     const contentAreaHeight = document.getElementById("contentArea");
     this.setState({ contentRowHeight: rowInitialHeight.clientHeight, contentAreaHeight: contentAreaHeight.clientHeight, mounted: true });
+  }
+
+  onChangeCategory = (category) => {
+    window.location = `#/site/${category}`;
+    window.location.reload();
   }
 
   onChangeLanguage = (language) => {
@@ -246,6 +252,14 @@ export default class Dashboard extends React.Component {
               supportedLanguages={this.props.settings.supportedLanguages}
               language={this.props.language}
               onChangeLanguage={this.onChangeLanguage}
+            />
+          </div>
+          <div className="dashboard-action">
+            <CategoryPicker
+              tooltipPosition="top-center"
+              allCategories={this.props.allCategories}
+              category={this.props.category}
+              onChangeCategory={this.onChangeCategory}
             />
           </div>
           <div className="dashboard-action">

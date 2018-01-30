@@ -18,6 +18,7 @@ export const DashboardPage = createReactClass({
             fromDate, toDate, language, zoomLevel, settings, timespanType, enabledStreams,
             conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
             timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv, category,
+            allCategories,
             topSources, trustedSources, fullTermList, selectedplace } = this.getStateFromFlux();
 
     return { dataSource, maintopic, termFilters, bbox, enabledStreams,
@@ -25,6 +26,7 @@ export const DashboardPage = createReactClass({
              zoomLevel, settings, timespanType, heatmapTileIds, category,
              conjunctivetopics, timeSeriesGraphData, popularLocations, popularTerms,
              timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
+             allCategories,
              topSources, trustedSources, fullTermList, selectedplace };
   },
 
