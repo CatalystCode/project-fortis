@@ -60,15 +60,15 @@ export default class Dashboard extends React.Component {
     const defaultZoom = parseInt(this.props.settings.defaultZoomLevel, 10);
     const conjunctiveTermsLength = termFilters.size;
 
-    return Object.assign({}, { zoomLevel, dataSource, enabledStreams, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage,
-       termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language });
+    return { zoomLevel, dataSource, enabledStreams, selectedplace, conjunctiveTermsLength, defaultZoom, flux, maintopic, defaultLanguage,
+       termFilters, bbox, timespanType, externalsourceid, datetimeSelection, fromDate, toDate, language };
   }
 
   heatmapComponent() {
     return (
-      <div key={'heatmap'} className="heatmapContainer">
+      <div key="heatmap" className="heatmapContainer">
         <div>
-          <div id='leafletMap'></div>
+          <div id="leafletMap"></div>
           <HeatMap
             mapSvcToken={this.props.settings.mapSvcToken}
             targetBbox={this.props.settings.targetBbox}
@@ -99,7 +99,7 @@ export default class Dashboard extends React.Component {
     }
 
     return (
-      <div key={'newsfeed'}>
+      <div key="newsfeed">
         <div id="newsfeed-container">
           {bbox.length ?
             <ActivityFeed
@@ -121,7 +121,7 @@ export default class Dashboard extends React.Component {
     };
 
     return (
-      <div key={'locations'} className="doughnutChart">
+      <div key="locations" className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <PopularLocationsChart
             popularLocations={this.props.popularLocations}
@@ -138,7 +138,7 @@ export default class Dashboard extends React.Component {
     };
 
     return (
-      <div key={'topics'} className="doughnutChart">
+      <div key="topics" className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <TopicCloud
             allSiteTopics={this.props.fullTermList}
@@ -156,7 +156,7 @@ export default class Dashboard extends React.Component {
     };
 
     return (
-      <div key={'sources'} className="doughnutChart">
+      <div key="sources" className="doughnutChart">
         <GraphCard cardHeader={cardHeader}>
           <PopularSourcesChart
             topSources={this.props.topSources}
@@ -178,7 +178,7 @@ export default class Dashboard extends React.Component {
 
   timelineComponent() {
     return (
-      <div key={'timeline'}>
+      <div key="timeline">
           <TimeSeriesGraph
             allSiteTopics={this.props.fullTermList}
             refreshDashboardFunction={this.refreshDashboard}
@@ -193,7 +193,7 @@ export default class Dashboard extends React.Component {
     const { contentAreaHeight, contentRowHeight, watchlistResizedHeight, isHeatmapFullScreen } = this.state;
 
     return (
-      <div key={'watchlist'}>
+      <div key="watchlist">
         <GraphCard>
           <SentimentTreeview
             inputClassName={`form-control edgeFilterInput ${isHeatmapFullScreen ? 'small' : ''}`}
