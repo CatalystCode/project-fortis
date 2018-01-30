@@ -98,8 +98,8 @@ function fetchInitialChartDataCB(resultUnion, fromDate, toDate, timespanType, ca
         });
 }
 
-function fetchDashboardSiteDefinition(callback) {
-    AdminServices.getDashboardSiteDefinition(null, null, (error, response, body) =>
+function fetchDashboardSiteDefinition(category, callback) {
+    AdminServices.getDashboardSiteDefinition(null, category, (error, response, body) =>
         ResponseHandler(error, response, body, callback));
 }
 
@@ -130,7 +130,7 @@ const _methods = {
         seqAsync(
             callback => {
                 // Load the site settings
-                fetchDashboardSiteDefinition(callback);
+                fetchDashboardSiteDefinition(category, callback);
                 reportProgress();
             },
             (settings, callback) => {
