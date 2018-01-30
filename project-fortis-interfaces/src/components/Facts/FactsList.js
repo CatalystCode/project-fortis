@@ -56,7 +56,7 @@ export const FactsList = createReactClass({
     const { fromDate, toDate, maintopic } = this.props;
 
     if (nextProps.fromDate !== fromDate || nextProps.toDate !== toDate || nextProps.maintopic !== maintopic) {
-      this.loadFacts();
+      this.loadFacts(nextProps);
     }
   },
 
@@ -93,7 +93,7 @@ export const FactsList = createReactClass({
     );
   },
 
-  handleMainTopicChanged(maintopic, _, __, ___, ____) {
+  handleMainTopicChanged(maintopic) {
     if (maintopic !== this.props.maintopic) {
       const { timespanType, datetimeSelection, fromDate, toDate, bbox, zoomLevel, dataSource, termFilters, externalsourceid, place } = this.props;
       this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, null, place);
@@ -191,13 +191,15 @@ export const FactsList = createReactClass({
     });
   },
 
-  loadFacts() {
+  loadFacts(props) {
+    props = props || this.props;
+
     const { loading } = this.state;
     if (loading) {
       return;
     }
 
-    const { maintopic, fromDate, toDate } = this.props;
+    const { maintopic, fromDate, toDate } = props;
     if (!maintopic || !fromDate || !toDate) {
       return;
     }
