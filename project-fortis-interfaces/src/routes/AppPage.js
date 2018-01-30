@@ -221,10 +221,9 @@ export const AppPage = createReactClass({
         <div id="app">
           <Header
             id="header"
-            {...this.props.params}
+            category={this.props.params.category}
             title={this.state.title}
             logo={this.state.logo}
-            siteName={this.state.siteName}
             logoutCallback={this.adApplication ? this.adLogout : null}
             userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}
           />
