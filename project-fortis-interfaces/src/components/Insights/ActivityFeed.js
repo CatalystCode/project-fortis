@@ -31,14 +31,6 @@ function prettifyExternalSourceIds(elementsMutated, trustedSources) {
 export default class ActivityFeed extends React.Component {
     constructor(props) {
         super(props);
-        this.translateTerm = this.translateTerm.bind(this);
-        this.handleInfiniteLoad = this.handleInfiniteLoad.bind(this);
-        this.translateEvent = this.translateEvent.bind(this);
-        this.handleOpenDialog = this.handleOpenDialog.bind(this);
-        this.setInfinitLoadAsComplete = this.setInfinitLoadAsComplete.bind(this);
-        this.resetNewsFeed = this.resetNewsFeed.bind(this);
-        this.sourceOnClickHandler = this.sourceOnClickHandler.bind(this);
-        this.renderDataSourceTabs = this.renderDataSourceTabs.bind(this);
 
         this.state = {
             elements: [],
@@ -50,7 +42,7 @@ export default class ActivityFeed extends React.Component {
         };
     }
 
-    handleInfiniteLoad() {
+    handleInfiniteLoad = () => {
         const self = this;
         const isInfiniteLoading = true;
 
@@ -73,7 +65,7 @@ export default class ActivityFeed extends React.Component {
         });
     }
 
-    renderDataSourceTabs(iconStyle) {
+    renderDataSourceTabs = (iconStyle) => {
         let tabs = [];
         const { filteredSource } = this.state;
         const { dataSource, enabledStreams } = this.props;
@@ -104,7 +96,7 @@ export default class ActivityFeed extends React.Component {
         return tabs;
     }
 
-    translateEvent(eventId, translatedSentence) {
+    translateEvent = (eventId, translatedSentence) => {
         const targetElement = this.state.elements.findIndex(feature => feature.messageid === eventId);
         let elements = this.state.elements;
 
@@ -124,7 +116,7 @@ export default class ActivityFeed extends React.Component {
         return Object.assign({}, { coordinates, messageid, externalsourceid, summary, pipelinekey, eventtime, link, sentiment, edges, language, title });
     }
 
-    setInfinitLoadAsComplete(state){
+    setInfinitLoadAsComplete = (state) => {
         this.setState(Object.assign({}, state, { isInfiniteLoading: false }));
     }
 
@@ -169,12 +161,12 @@ export default class ActivityFeed extends React.Component {
         </div>;
     }
 
-    sourceOnClickHandler(filteredSource) {
+    sourceOnClickHandler = (filteredSource) => {
         this.setState(Object.assign({}, this.resetNewsFeed(), { filteredSource }));
         setTimeout(() => this.processNewsFeed(this.props), ActivityConsts.INFINITE_LOAD_DELAY_MS);
     }
 
-    resetNewsFeed() {
+    resetNewsFeed = () => {
         return {
             elements: [],
             filteredSource: null,
@@ -203,7 +195,7 @@ export default class ActivityFeed extends React.Component {
         }
     }
 
-    translateTerm(term) {
+    translateTerm = (term) => {
         const { allSiteTopics } = this.props;
         const edge = fetchTermFromMap(allSiteTopics, term);
 
@@ -288,7 +280,7 @@ export default class ActivityFeed extends React.Component {
         );
     }
 
-    handleOpenDialog(eventid) {
+    handleOpenDialog = (eventid) => {
         this.refs.dialogBox.open(eventid);
     }
 }
