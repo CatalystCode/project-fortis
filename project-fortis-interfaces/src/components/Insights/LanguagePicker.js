@@ -1,60 +1,27 @@
 import React from 'react';
-import Drawer from 'material-ui/Drawer';
 import ActionLanguage from 'material-ui/svg-icons/action/language';
-import IconButton from 'material-ui/IconButton';
-import MenuItem from 'material-ui/MenuItem';
 import { fullWhite } from 'material-ui/styles/colors';
+import DrawerActionsIconButton from './DrawerActionsIconButton';
 
 export default class LanguagePicker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false
-    };
-  }
-
-  changeLanguage = (language) => {
-    this.props.onChangeLanguage(language);
-    this.setState({ open: false });
-  }
-
-  handleDrawerToggle = () => {
-    this.setState({ open: !this.state.open });
-  }
-
-  handleDrawerChange = (open) => {
-    this.setState({ open });
-  }
-
-  renderMenuItems() {
-    return this.props.supportedLanguages.map(language =>
-      <MenuItem
-        key={language}
-        value={language}
-        primaryText={`Set language to ${language}`}
-        label={`Language: ${language}`}
-        onClick={() => this.changeLanguage(language)}
-      />
-    );
-  }
+  formatText = (language) => `Set language to '${language}'`;
+  formatLabel = (language) => `Language: ${language}`;
+  formatTooltip = (language) => `Current language: '${language}'. Click to change language`;
 
   render() {
-    const { language, tooltipPosition } = this.props;
-    const tooltip = `Current language: '${language}'. Click to change language`;
+    const { language, supportedLanguages, tooltipPosition, onChangeLanguage } = this.props;
 
     return (
-      <div>
-        <IconButton tooltip={tooltip} tooltipPosition={tooltipPosition} onClick={this.handleDrawerToggle}>
-          <ActionLanguage color={fullWhite} />
-        </IconButton>
-        <Drawer
-          docked={false}
-          width={200}
-          open={this.state.open}
-          onRequestChange={this.handleDrawerChange}>
-            {this.renderMenuItems()}
-        </Drawer>
-      </div>
+      <DrawerActionsIconButton
+        onClick={onChangeLanguage}
+        items={supportedLanguages}
+        item={language}
+        formatText={this.formatText}
+        formatLabel={this.formatLabel}
+        formatTooltip={this.formatTooltip}
+        icon={<ActionLanguage color={fullWhite} />}
+        tooltipPosition={tooltipPosition}
+      />
     );
   }
 }
