@@ -92,6 +92,7 @@ export default class DoughnutChart extends Component {
                     activeIndex={this.props.activeIndex}
                     data={this.props.data}
                     activeShape={this.renderActiveShape}
+                    isAnimationActive={false}
                     paddingAngle={0}
                     {...this.props}>
               {this.props.children}

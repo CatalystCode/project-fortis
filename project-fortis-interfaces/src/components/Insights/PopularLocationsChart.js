@@ -6,34 +6,22 @@ import constants from '../../actions/constants';
 import { hasChanged } from './shared';
 
 export default class PopularLocationsChart extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      activeIndex: -1,
-      dataProvider: [],
-      selectedWofId: null,
-      colorCells: []
-    };
-  }
-
-  handleClick = (data, activeIndex) => {
+  handleClick = (data) => {
     const { placeid, centroid, bbox, name } = data;
     const { dataSource, timespanType, termFilters, defaultZoom, datetimeSelection, maintopic, externalsourceid, fromDate, toDate } = this.props;
 
     const place = { placeid: placeid, placecentroid: centroid, name: name, placebbox: bbox };
 
     this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, defaultZoom, Array.from(termFilters), externalsourceid, null, place);
-
-    this.setState({ activeIndex: activeIndex, selectedWofId: placeid });
   }
 
-  refreshChart(props) {
-    const { popularLocations } = props;
-    const { selectedWofId } = this.state;
+  buildChart() {
+    const { popularLocations, selectedplace } = this.props;
+    const selectedWofId = selectedplace && selectedplace.placeid;
+
+    let activeIndex = -1;
     const colorCells = [];
     const dataProvider = [];
-    let activeIndex = -1;
 
     popularLocations.forEach((location, index) => {
       const { name, mentions, bbox, placeid, centroid } = location;
@@ -46,21 +34,18 @@ export default class PopularLocationsChart extends React.Component {
       dataProvider.push({ value: mentions, name, bbox, placeid, centroid });
     });
 
-    this.setState({ colorCells, dataProvider, activeIndex });
+    return { colorCells, dataProvider, activeIndex };
   }
 
-  componentDidMount() {
-    this.refreshChart(this.props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (hasChanged(this.props, nextProps)) {
-      this.refreshChart(nextProps);
-    }
+  shouldComponentUpdate(nextProps) {
+    return hasChanged(this.props, nextProps);
   }
 
   render() {
-    if (!this.state.colorCells || !this.state.colorCells.length) {
+    const { colorCells, activeIndex, dataProvider } = this.buildChart();
+    const { language } = this.props;
+
+    if (!colorCells || !colorCells.length) {
       return <NoData />;
     }
 
@@ -68,11 +53,11 @@ export default class PopularLocationsChart extends React.Component {
       <DoughnutChart
         handleClick={this.handleClick}
         fill={constants.CHART_STYLE.BG_FILL}
-        language={this.props.language}
-        data={this.state.dataProvider}
-        activeIndex={this.state.activeIndex}
+        language={language}
+        data={dataProvider}
+        activeIndex={activeIndex}
       >
-        {this.state.colorCells}
+        {colorCells}
       </DoughnutChart>
     );
   }
