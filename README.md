@@ -116,8 +116,10 @@ all the Docker services started, head over to the following URLs to play with
 the services:
 
 * Frontend
-  - http://localhost:8888/#/site/Fortis%20Dev/admin
-  - http://localhost:8888/#/site/Fortis%20Dev
+  - http://localhost:8888/#/site/mta/admin
+  - http://localhost:8888/#/site/mta
+  - http://localhost:8888/#/site/food/admin
+  - http://localhost:8888/#/site/food
 * Backend
   - http://localhost:8889/api/edges/graphiql
   - http://localhost:8889/api/messages/graphiql
