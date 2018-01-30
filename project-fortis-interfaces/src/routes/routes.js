@@ -8,9 +8,9 @@ import React from 'react';
 
 export const routes = (
   <Route path="/" component={AppPage} linkLabel="My App" icon="fa fa-share-alt-square fa">
-    <Route path="site/:siteKey(/share/:sharedViewState)" component={DashboardPage} />
-    <Route path="site/:siteKey/facts" component={FactsPage} />
-    <Route path="site/:siteKey/admin" component={AdminPage} />
+    <Route path="site/:category(/share/:sharedViewState)" component={DashboardPage} />
+    <Route path="site/:category/facts" component={FactsPage} />
+    <Route path="site/:category/admin" component={AdminPage} />
     <Route path="*" component={NotFoundPage} />
   </Route>
 );

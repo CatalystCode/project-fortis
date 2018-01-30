@@ -47,11 +47,11 @@ export function fragmentToArray(fragment) {
     return (fragment) ? fragment.split('+') : [];
 }
 
-export function changeFactsUrl(siteKey, selectedTags) {
-    let url = "/site/{0}/facts/".format(siteKey);
+export function changeFactsUrl(category, selectedTags) {
+    let url = "/site/{0}/facts/".format(category);
     if (selectedTags.length > 0) {
         const fragment = arrayToFragment(selectedTags);
-        url = "/site/{0}/facts/tags/{1}".format(siteKey, fragment.toLowerCase());
+        url = "/site/{0}/facts/tags/{1}".format(category, fragment.toLowerCase());
     }
     window.location.hash = url;
 }

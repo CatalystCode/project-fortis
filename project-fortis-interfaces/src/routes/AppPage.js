@@ -90,7 +90,7 @@ export const AppPage = createReactClass({
   },
 
   loadDefaultDashboard() {
-    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey);
+    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.category);
   },
 
   loadDashboardFromShareLink() {
@@ -107,11 +107,11 @@ export const AppPage = createReactClass({
     } = dataStore;
     const includeCsv = false;
 
-    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.siteKey, () => {
+    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.category, () => {
       this.getFlux().actions.DASHBOARD.reloadVisualizationState(
         fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
         bbox, zoomLevel, conjunctivetopics, externalsourceid, includeCsv, selectedplace, () => {
-          this.props.router.push(`/site/${this.props.params.siteKey}`);
+          this.props.router.push(`/site/${this.props.params.category}`);
         });
     });
   },
@@ -125,9 +125,9 @@ export const AppPage = createReactClass({
   },
 
   shouldRenderUnknownCategory() {
-    const { siteKey } = this.props.params;
+    const { category } = this.props.params;
     const { allCategories } = this.state;
-    return siteKey && allCategories && allCategories.length && allCategories.indexOf(siteKey) === -1;
+    return category && allCategories && allCategories.length && allCategories.indexOf(category) === -1;
   },
 
   shouldRenderError() {
@@ -192,7 +192,7 @@ export const AppPage = createReactClass({
 
   renderUnknownCategory() {
     const { allCategories } = this.state;
-    const { siteKey } = this.props.params;
+    const { category } = this.props.params;
 
     const categories = allCategories.length === 1
       ? first(allCategories)
@@ -200,7 +200,7 @@ export const AppPage = createReactClass({
 
     return (
       <div className="loadingPage">
-        <h1>The category <em>{siteKey}</em> does not exist; try <em>{categories}</em></h1>
+        <h1>The category <em>{category}</em> does not exist; try <em>{categories}</em></h1>
       </div>
     );
   },
@@ -209,7 +209,7 @@ export const AppPage = createReactClass({
     return (
       <div className="loadingPage">
         <h1>
-          Loading {this.props.params.siteKey} watcher... ({this.state.initialLoadStepsCompleted} out of {this.state.initialLoadStepsTotal} steps done)
+          Loading {this.props.params.category} watcher... ({this.state.initialLoadStepsCompleted} out of {this.state.initialLoadStepsTotal} steps done)
         </h1>
       </div>
     );
