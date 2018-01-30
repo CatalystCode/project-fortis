@@ -164,11 +164,17 @@ export const FactsList = createReactClass({
   },
 
   renderCardTitle(item) {
-    if (item.messageid.indexOf('Facebook') > -1 && item.messageid.indexOf('comment') > -1) {
-      return item.summary;
+    const { messageid, summary, title } = item;
+
+    if (messageid.indexOf('Facebook') > -1 && messageid.indexOf('comment') > -1) {
+      return summary;
     }
 
-    return item.title;
+    if (!title) {
+      return summary;
+    }
+
+    return title;
   },
 
   openItemDetails(item) {
