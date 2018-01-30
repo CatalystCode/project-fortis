@@ -1,4 +1,5 @@
 import React from 'react';
+import BrowserDetection from 'react-browser-detection';
 import createReactClass from 'create-react-class';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
@@ -149,11 +150,11 @@ export const AppPage = createReactClass({
 
   render() {
     if (this.shouldRenderLogin()) {
-      return this.renderLogin();
+      return this.browserDetectHandler(this.renderLogin);
     }
 
     if (this.shouldRenderUnknownCategory()) {
-      return this.renderUnknownCategory();
+      return this.browserDetectHandler(this.renderUnknownCategory);
     }
 
     if (this.shouldRenderError()) {
@@ -164,7 +165,25 @@ export const AppPage = createReactClass({
       return this.renderApp();
     }
 
-    return this.renderLoading();
+    return this.browserDetectHandler(this.renderLoading);
+  },
+
+  browserDetectHandler(renderRoute) {
+    const browserConfigs = {
+      chrome: () => renderRoute(),
+      firefox: () => renderRoute(),
+      default: () => (
+        <div className="loadingPage">
+          <h1>Your browser is not supported. Please try using Chrome or Firefox</h1>
+        </div>
+      )
+    }
+
+    return (
+      <BrowserDetection>
+        {browserConfigs}
+      </BrowserDetection>
+    )
   },
 
   renderLogin() {

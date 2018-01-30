@@ -67,6 +67,7 @@
     "react": "^15.6.2",
     "react-autosuggest": "^7.0.1",
     "react-bootstrap": "^0.31.3",
+    "react-browser-detection": "^1.0.4",
     "react-copy-to-clipboard": "^5.0.1",
     "react-data-grid": "^2.0.60",
     "react-data-grid-addons": "^2.0.60",
