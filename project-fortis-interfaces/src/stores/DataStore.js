@@ -54,6 +54,7 @@ export const DataStore = Fluxxor.createStore({
             termFilters: new Set(),
             heatmapTileIds: [],
             fullTermList: new Map(),
+            allCategories: [],
             error: null,
             authInfo: null,
             initialLoadStepsCompleted: 0,
@@ -119,6 +120,7 @@ export const DataStore = Fluxxor.createStore({
         this.dataStore.enabledStreams = dataSources;
         this.dataStore.dataSource = constants.DEFAULT_DATA_SOURCE;
         this.dataStore.fullTermList = makeMap(terms.edges, term=>term.name, term=>term);
+        this.dataStore.allCategories = terms.categories.map(category => category.name);
         this.dataStore.title = title;
         this.dataStore.fromDate = fromDate;
         this.dataStore.toDate = toDate;

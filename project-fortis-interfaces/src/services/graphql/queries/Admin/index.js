@@ -32,6 +32,9 @@ export const getPipelineTerms = `siteTerms(translationLanguage:$translationLangu
     name
     translatedname
   }
+  categories {
+    name
+  }
 }`;
 
 export const getPipelineStreams = `streams {

@@ -4,6 +4,7 @@ const Promise = require('promise');
 const geotile = require('geotile');
 const tmp = require('tmp');
 const isObject = require('lodash/isObject');
+const uniq = require('lodash/uniq');
 const json2csv = require('json2csv');
 const NodeCache = require('node-cache');
 const uuidv4 = require('uuid/v4');
@@ -48,11 +49,11 @@ function getTermsByCategory(translationLanguage, category, ignoreCache) {
       });
     }
 
-    getSiteTerms(translationLanguage, category)
+    getSiteTerms(translationLanguage)
       .then(watchlistTermsRsp => {
-        resolve({
-          edges: watchlistTermsRsp.edges.filter(term => termsFilter(term, category))
-        });
+        const edges = watchlistTermsRsp.edges.filter(term => termsFilter(term, category));
+        const categories = uniq(watchlistTermsRsp.edges.map(term => term.category)).map(category => ({ name: category }));
+        resolve({ edges, categories });
       }).catch(reject);
   });
 }
@@ -105,7 +106,7 @@ function getSiteDefinition() {
   });
 }
 
-function getSiteTerms(translationLanguage, category) {
+function getSiteTerms(translationLanguage) {
   return new Promise((resolve, reject) => {
     const termsQuery = 'SELECT topicid, topic, translations, lang_code, category FROM fortis.watchlist';
     cassandraConnector.executeQuery(termsQuery, [])
@@ -114,7 +115,7 @@ function getSiteTerms(translationLanguage, category) {
         setTermsCache(watchlistTerms);
 
         resolve({
-          edges: watchlistTerms.filter(term => termsFilter(term, category))
+          edges: watchlistTerms
         });
       }).catch(reject);
   });

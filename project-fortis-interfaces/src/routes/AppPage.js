@@ -3,6 +3,9 @@ import createReactClass from 'create-react-class';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
 import { UserAgentApplication, Logger } from 'msal';
+import initial from 'lodash/initial';
+import first from 'lodash/first';
+import last from 'lodash/last';
 
 import '../styles/Global.css';
 import Header from '../components/Header';
@@ -121,8 +124,10 @@ export const AppPage = createReactClass({
     return this.adApplication && (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token);
   },
 
-  shouldRenderUnknownSite() {
-    return this.state.siteName && this.props.params.siteKey && this.state.siteName !== this.props.params.siteKey;
+  shouldRenderUnknownCategory() {
+    const { siteKey } = this.props.params;
+    const { allCategories } = this.state;
+    return siteKey && allCategories && allCategories.length && allCategories.indexOf(siteKey) === -1;
   },
 
   shouldRenderError() {
@@ -147,8 +152,8 @@ export const AppPage = createReactClass({
       return this.renderLogin();
     }
 
-    if (this.shouldRenderUnknownSite()) {
-      return this.renderUnknownSite();
+    if (this.shouldRenderUnknownCategory()) {
+      return this.renderUnknownCategory();
     }
 
     if (this.shouldRenderError()) {
@@ -185,10 +190,17 @@ export const AppPage = createReactClass({
     );
   },
 
-  renderUnknownSite() {
+  renderUnknownCategory() {
+    const { allCategories } = this.state;
+    const { siteKey } = this.props.params;
+
+    const categories = allCategories.length === 1
+      ? first(allCategories)
+      : `${initial(allCategories).join(', ')} or ${last(allCategories)}`;
+
     return (
       <div className="loadingPage">
-        <h1>The site <em>{this.props.params.siteKey}</em> does not exist; try <em>{this.state.siteName}</em></h1>
+        <h1>The category <em>{siteKey}</em> does not exist; try <em>{categories}</em></h1>
       </div>
     );
   },

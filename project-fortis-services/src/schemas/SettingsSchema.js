@@ -7,7 +7,7 @@ module.exports = graphql.buildSchema(`
     sites: SiteCollection
     streams: StreamCollection
     trustedSources: SourceCollection
-    siteTerms(translationLanguage: String, category: String): TermCollection
+    siteTerms(translationLanguage: String, category: String): SiteTerms
     twitterAccounts: TwitterAccountCollection
     trustedTwitterAccounts(siteId: String!): TrustedTwitterAccountCollection
     facebookPages(siteId: String!): FacebookPageCollection
@@ -101,6 +101,16 @@ module.exports = graphql.buildSchema(`
 
   input MutatedTerms {
     edges: [Term]!
+  }
+
+  type SiteTerms {
+    runTime: String
+    edges: [SiteTerm]!
+    categories: [Category]!
+  }
+
+  type Category {
+    name: String!
   }
 
   type TermCollection {
