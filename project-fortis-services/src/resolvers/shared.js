@@ -6,12 +6,9 @@ const tmp = require('tmp');
 const isObject = require('lodash/isObject');
 const uniq = require('lodash/uniq');
 const json2csv = require('json2csv');
-const NodeCache = require('node-cache');
 const uuidv4 = require('uuid/v4');
 const { createFile } = require('../clients/storage/BlobStorageClient');
 const cassandraConnector = require('../clients/cassandra/CassandraConnector');
-
-const BlacklistPlaces = ['colombia'];
 
 const PlaceholderForSecret = 'secretHidden';
 
@@ -23,11 +20,6 @@ function termsFilter(term, categoryFilter) {
   }
 
   return true;
-}
-
-//todo: a temporary hack until we have the formal place blacklist filter in place
-function BlacklistPlaceList(){
-  return BlacklistPlaces;
 }
 
 function getTermsByCategory(translationLanguage, category) {
@@ -251,7 +243,6 @@ module.exports = {
   getSiteTerms,
   limitForInClause,
   getTermsByCategory,
-  BlacklistPlaceList,
   transformWatchlist,
   getSiteDefinition,
   fromTopicListToConjunctionTopics,

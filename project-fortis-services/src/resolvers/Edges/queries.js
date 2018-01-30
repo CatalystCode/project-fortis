@@ -4,13 +4,31 @@ const Promise = require('promise');
 const Long = require('cassandra-driver').types.Long;
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const featureServiceClient = require('../../clients/locations/FeatureServiceClient');
-const { tilesForBbox, BlacklistPlaceList, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
+const { tilesForBbox, withRunTime, getTermsByCategory, withCsvExporter, toConjunctionTopics, fromTopicListToConjunctionTopics } = require('../shared');
 const { requiresRole } = require('../../auth');
 const { makeSet, makeMap, aggregateBy } = require('../../utils/collections');
 const { trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 
-//todo: this is a temporary ugly hack until Nate adds the blacklist place feature
 const MaxFetchedRows = 1000;
+
+function getPlaceBlacklist() {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT conjunctivefilter, islocation FROM fortis.blacklist';
+
+    cassandraConnector.executeQuery(query, [])
+      .then(rows => {
+        const blacklistedPlaces = new Set();
+        rows.filter(row => row.islocation).forEach(row => {
+          if (row.conjunctivefilter.length > 1) {
+            console.warn(`Got place blacklist entry ${row.id} with more than one term, this is not supported.`);
+          }
+          const blacklistedPlace = row.conjunctivefilter[0];
+          blacklistedPlaces.add(blacklistedPlace && blacklistedPlace.toLowerCase());
+        });
+        resolve(blacklistedPlaces);
+      }).catch(reject);
+  });
+}
 
 function popularLocations(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
@@ -55,23 +73,30 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
       .then(rows => {
         const placeIds = Array.from(makeSet(rows, row => row.placeid));
 
-        if (placeIds.length) {
-          featureServiceClient.fetchById(placeIds, 'bbox,centroid')
-            .then(features => {
-              const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);
-              const edges = rows.map(row => ({
-                name: placeIdToFeature[row.placeid].name,
-                mentioncount: row.mentioncount,
-                layer: placeIdToFeature[row.placeid].layer,
-                placeid: row.placeid,
-                avgsentimentnumerator: row.avgsentimentnumerator,
-                centroid: placeIdToFeature[row.placeid].centroid,
-                bbox: placeIdToFeature[row.placeid].bbox
-              }))
-                .filter(row => row.layer && layerfilters.indexOf(row.layer) === -1);
+        if (!placeIds.length) {
+          return resolve({ edges: []});
+        }
 
-              resolve({
-                edges: aggregateBy(edges, row => `${row.name.toLowerCase()}`, row => ({
+        getPlaceBlacklist()
+          .then((blacklistedPlaces) => {
+            featureServiceClient.fetchById(placeIds, 'bbox,centroid')
+              .then(features => {
+                const placeIdToFeature = makeMap(features, feature => feature.id, feature => feature);
+
+                const rawEdges = rows
+                  .map(row => ({
+                    name: placeIdToFeature[row.placeid].name,
+                    mentioncount: row.mentioncount,
+                    layer: placeIdToFeature[row.placeid].layer,
+                    placeid: row.placeid,
+                    avgsentimentnumerator: row.avgsentimentnumerator,
+                    centroid: placeIdToFeature[row.placeid].centroid,
+                    bbox: placeIdToFeature[row.placeid].bbox
+                  }))
+                  .filter(row => row.layer && layerfilters.indexOf(row.layer) === -1)
+                  .filter(row => row.name && !blacklistedPlaces.has(row.name.toLowerCase()));
+
+                const edges = aggregateBy(rawEdges, row => `${row.name.toLowerCase()}`, row => ({
                   name: row.name,
                   coordinates: row.coordinates,
                   centroid: row.centroid,
@@ -81,14 +106,15 @@ function popularLocations(args, res) { // eslint-disable-line no-unused-vars
                   layer: row.layer,
                   avgsentimentnumerator: Long.ZERO
                 }))
-                  .filter(item=>BlacklistPlaceList().indexOf(item.name.toLowerCase()) === -1)
-                  .slice(0, responseSize)
-              });
-            })
-            .catch(reject);
-        } else {
-          resolve({ edges: [] });
-        }
+                  .slice(0, responseSize);
+
+                resolve({
+                  edges
+                });
+              })
+              .catch(reject);
+          })
+          .catch(reject);
       });
   });
 }
