@@ -16,7 +16,6 @@ const BlacklistPlaces = ['colombia'];
 const PlaceholderForSecret = 'secretHidden';
 
 const MINUTES = 60;
-const termsCache = new NodeCache( { stdTTL: 20 * MINUTES } );
 
 function termsFilter(term, categoryFilter) {
   if (categoryFilter) {
@@ -31,24 +30,8 @@ function BlacklistPlaceList(){
   return BlacklistPlaces;
 }
 
-function getTermsFromCache() {
-  return termsCache.get('terms');
-}
-
-function setTermsCache(terms) {
-  termsCache.set('terms', terms);
-}
-
-function getTermsByCategory(translationLanguage, category, ignoreCache) {
-  let watchlistTerms = getTermsFromCache();
-
+function getTermsByCategory(translationLanguage, category) {
   return new Promise((resolve, reject) => {
-    if (watchlistTerms && !ignoreCache) {
-      return resolve({
-        edges: watchlistTerms.filter(term => termsFilter(term, category))
-      });
-    }
-
     getSiteTerms(translationLanguage)
       .then(watchlistTermsRsp => {
         const edges = watchlistTermsRsp.edges.filter(term => termsFilter(term, category));
@@ -112,7 +95,6 @@ function getSiteTerms(translationLanguage) {
     cassandraConnector.executeQuery(termsQuery, [])
       .then(rows => {
         const watchlistTerms = rows.map(item => transformWatchlist(item, translationLanguage));
-        setTermsCache(watchlistTerms);
 
         resolve({
           edges: watchlistTerms
@@ -266,12 +248,9 @@ module.exports = {
   toConjunctionTopics,
   tilesForBbox,
   tilesForLocations,
-  termsFilter,
   getSiteTerms,
   limitForInClause,
-  getTermsFromCache,
   getTermsByCategory,
-  setTermsCache,
   BlacklistPlaceList,
   transformWatchlist,
   getSiteDefinition,

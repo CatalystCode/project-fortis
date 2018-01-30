@@ -44,9 +44,8 @@ function cassandraRowToUser(row) {
 function terms(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const { translationLanguage, category } = args;
-    const ignoreCache = true;
 
-    getTermsByCategory(translationLanguage, category, ignoreCache)
+    getTermsByCategory(translationLanguage, category)
       .then(resolve)
       .catch(error => {
         trackException(error);
