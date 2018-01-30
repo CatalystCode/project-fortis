@@ -19,7 +19,9 @@ export class Highlighter extends React.Component {
     highlightHtml(html) {
         const { highlightWords } = this.props;
 
-        highlightWords.forEach(({ word, className }) => {
+        const toHighlight = highlightWords.slice().sort((a, b) => a.word.length < b.word.length);
+
+        toHighlight.forEach(({ word, className }) => {
             html = html.replace(new RegExp(word, 'ig'), `<mark class="${className}">${word}</mark>`);
         });
 
