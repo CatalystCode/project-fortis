@@ -45,12 +45,6 @@ input.settings:out-of-range {
     background-repeat: no-repeat;
 }
 
-#map {
-    width: 100%;
-    height: 500px!important;
-    margin: 0;
-}
-
 .leaflet-select-control {
     background: #ffffff;
     padding: 5px;
