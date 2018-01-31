@@ -3,6 +3,7 @@ import createReactClass from 'create-react-class';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
 import { UserAgentApplication, Logger } from 'msal';
+import { changeCategory } from '../routes/routes';
 import initial from 'lodash/initial';
 import first from 'lodash/first';
 import last from 'lodash/last';
@@ -15,6 +16,47 @@ const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
 const AdScopes = ['openid'];
+
+class CategoryLink extends React.Component {
+  onClick = () => {
+    changeCategory(this.props.category);
+  }
+
+  render() {
+    return (
+      <em>
+        <a onClick={this.onClick}>
+          {this.props.category}
+        </a>
+      </em>
+    );
+  }
+}
+
+class JoinedList extends React.Component {
+  render() {
+    const { items, joinWord, joinToken } = this.props;
+
+    if (items.length === 0) {
+      return null;
+    }
+
+    if (items.length === 1) {
+      return first(items);
+    }
+
+    const joinedItems = [];
+    initial(items).forEach(item => {
+      joinedItems.push(item);
+      joinedItems.push(<span>{ joinToken } </span>);
+    });
+    joinedItems.pop();
+    joinedItems.push(<span> { joinWord } </span>);
+    joinedItems.push(last(items));
+
+    return <span>{ joinedItems }</span>;
+  }
+}
 
 export const AppPage = createReactClass({
   mixins: [FluxMixin, StoreWatchMixin],
@@ -194,13 +236,11 @@ export const AppPage = createReactClass({
     const { allCategories } = this.state;
     const { category } = this.props.params;
 
-    const categories = allCategories.length === 1
-      ? first(allCategories)
-      : `${initial(allCategories).join(', ')} or ${last(allCategories)}`;
-
     return (
       <div className="loadingPage">
-        <h1>The category <em>{category}</em> does not exist; try <em>{categories}</em></h1>
+        <h1>
+          The category <em>{category}</em> does not exist; try <JoinedList joinWord="or" joinToken="," items={allCategories.map(category => <CategoryLink category={category} />)} />
+        </h1>
       </div>
     );
   },

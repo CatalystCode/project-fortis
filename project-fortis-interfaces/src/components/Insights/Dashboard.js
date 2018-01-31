@@ -14,6 +14,7 @@ import { defaultLayout } from './Layouts';
 import { hasChanged } from './shared';
 import 'react-grid-layout/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
+import { changeCategory } from '../../routes/routes';
 import HeatmapToggle from './HeatmapToggle';
 import CategoryPicker from './CategoryPicker';
 import ShareButton from './ShareButton';
@@ -43,11 +44,6 @@ export default class Dashboard extends React.Component {
     const rowInitialHeight = document.getElementById("leafletMap") || { clientHeight: 0 };
     const contentAreaHeight = document.getElementById("contentArea");
     this.setState({ contentRowHeight: rowInitialHeight.clientHeight, contentAreaHeight: contentAreaHeight.clientHeight, mounted: true });
-  }
-
-  onChangeCategory = (category) => {
-    window.location = `#/site/${category}`;
-    window.location.reload();
   }
 
   onChangeLanguage = (language) => {
@@ -259,7 +255,7 @@ export default class Dashboard extends React.Component {
               tooltipPosition="top-center"
               allCategories={this.props.allCategories}
               category={this.props.category}
-              onChangeCategory={this.onChangeCategory}
+              onChangeCategory={changeCategory}
             />
           </div>
           <div className="dashboard-action">

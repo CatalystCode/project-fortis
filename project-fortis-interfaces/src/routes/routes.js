@@ -35,3 +35,8 @@ export const routes = (
     <Route path="*" component={NotFoundPage} />
   </Route>
 );
+
+export function changeCategory(category) {
+  window.location = `#/site/${category}`;
+  window.location.reload();
+}
