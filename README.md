@@ -147,6 +147,17 @@ following command to log into a CQL shell:
 docker-compose exec project_fortis_services /app/cqlsh
 ```
 
+#### Too many Twitter connections
+
+If you're getting an error from project-fortis-spark that there are too many
+simultaneous Twitter connections, please follow these steps:
+
+1. Create a new set of [Twitter credentials](https://apps.twitter.com/app/new).
+2. Make a copy of the [seed-data-twitter.tar.gz](https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/ops/storage-ddls/seed-data-twitter.tar.gz) archive, e.g. suffixing it with your name.
+3. Update the `streams.csv` file in your copy of the archive with your Twitter credentials.
+4. Commit and push your copy of the archive.
+5. Edit the `CASSANDRA_SEED_DATA_URL` variable in the `.env` file to point to your copy of the archive.
+
 ### Production deployment
 
 #### Prerequisites
