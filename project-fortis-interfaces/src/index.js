@@ -5,9 +5,11 @@ import {methods as AdminActions} from './actions/Admin';
 import {methods as FactsActions} from './actions/Facts';
 import Fluxxor from 'fluxxor';
 import React from 'react';
+import BrowserDetection from 'react-browser-detection';
 import {default as ReactDOM} from "react-dom";
 import { Router, hashHistory } from 'react-router';
 import {routes} from './routes/routes';
+import UnsupportedBrowserPage from './routes/UnsupportedBrowserPage';
 import constants from './actions/constants';
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -21,11 +23,19 @@ const stores = {
 const flux = new Fluxxor.Flux(stores, Object.assign({}, DashboardActions, AdminActions, FactsActions));
 
 const createElement = (Component, props) => {
-    props.flux = flux;
-    return <Component {...props} />
+  props.flux = flux;
+  return <Component {...props} />
 };
 
-ReactDOM.render((<Router history={hashHistory}
-                         createElement={createElement}
-                         routes={routes} />),
-                  document.getElementById('app'));
+const app = <Router history={hashHistory} createElement={createElement} routes={routes} />;
+
+ReactDOM.render(
+  <BrowserDetection>
+    {{
+      chrome: () => app,
+      firefox: () => app,
+      default: () => <UnsupportedBrowserPage />,
+    }}
+  </BrowserDetection>,
+  document.getElementById('app')
+);
