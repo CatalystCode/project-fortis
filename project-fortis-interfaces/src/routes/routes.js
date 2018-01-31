@@ -17,13 +17,13 @@ class AppPageWithBrowserDetection extends React.Component {
           <h1>Your browser is not supported. Please try using Chrome or Firefox</h1>
         </div>
       )
-    }
+    };
 
     return (
       <BrowserDetection>
         { browserConfigs }
       </BrowserDetection>
-    )
+    );
   }
 }
 
