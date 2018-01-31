@@ -22,20 +22,26 @@ const stores = {
 
 const flux = new Fluxxor.Flux(stores, Object.assign({}, DashboardActions, AdminActions, FactsActions));
 
-const createElement = (Component, props) => {
+function createElement(Component, props) {
   props.flux = flux;
   return <Component {...props} />
 };
 
-const app = <Router history={hashHistory} createElement={createElement} routes={routes} />;
+function renderApp() {
+  return <Router history={hashHistory} createElement={createElement} routes={routes} />;
+}
+
+function renderUnsupported() {
+  return <UnsupportedBrowserPage />;
+}
+
+const browserConfig = {
+  chrome: renderApp,
+  firefox: renderApp,
+  default: renderUnsupported
+};
 
 ReactDOM.render(
-  <BrowserDetection>
-    {{
-      chrome: () => app,
-      firefox: () => app,
-      default: () => <UnsupportedBrowserPage />,
-    }}
-  </BrowserDetection>,
+  <BrowserDetection>{ browserConfig }</BrowserDetection>,
   document.getElementById('app')
 );
