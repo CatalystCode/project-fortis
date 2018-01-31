@@ -16,6 +16,7 @@ import 'react-grid-layout/css/styles.css';
 import '../../styles/Insights/Dashboard.css';
 import { changeCategory } from '../../routes/routes';
 import HeatmapToggle from './HeatmapToggle';
+import MapBoundingReset from './MapBoundingReset';
 import CategoryPicker from './CategoryPicker';
 import ShareButton from './ShareButton';
 import LanguagePicker from './LanguagePicker';
@@ -54,6 +55,10 @@ export default class Dashboard extends React.Component {
     const newsfeedResizedHeight = 0;
     const watchlistResizedHeight = 0;
     this.setState({ newsfeedResizedHeight, watchlistResizedHeight, isHeatmapFullScreen: !this.state.isHeatmapFullScreen });
+  }
+
+  clickMapReset = () => {
+    this.refreshDashboard(false, this.props.settings.targetBbox);
   }
 
   filterLiterals() {
@@ -169,13 +174,16 @@ export default class Dashboard extends React.Component {
     );
   }
 
-  refreshDashboard = (includeCsv) => {
+  refreshDashboard = (includeCsv, replaceBbox) => {
     const { dataSource, timespanType, termFilters, datetimeSelection, zoomLevel, maintopic, bbox, fromDate, toDate, externalsourceid, selectedplace } = this.filterLiterals();
-    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, bbox, zoomLevel, Array.from(termFilters), externalsourceid, includeCsv, selectedplace);
+
+    replaceBbox = replaceBbox || bbox;
+
+    this.props.flux.actions.DASHBOARD.reloadVisualizationState(fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic, replaceBbox, zoomLevel, Array.from(termFilters), externalsourceid, includeCsv, selectedplace);
   }
 
   refreshDashboardWithCsv = () => {
-    this.refreshDashboard(true);
+    this.refreshDashboard(true, null);
   }
 
   timelineComponent() {
@@ -240,6 +248,12 @@ export default class Dashboard extends React.Component {
               ]}
               tooltipPosition="top-center"
               fetchCsvs={this.refreshDashboardWithCsv}
+            />
+          </div>
+          <div className="dashboard-action">
+            <MapBoundingReset
+              tooltipPosition="top-center"
+              onClick={this.clickMapReset}
             />
           </div>
           <div className="dashboard-action">

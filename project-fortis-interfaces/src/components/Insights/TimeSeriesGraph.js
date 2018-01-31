@@ -93,7 +93,7 @@ export default class TimeSeriesGraph extends React.Component {
   }
 
   resetTimeline = () => {
-    this.props.refreshDashboardFunction();
+    this.props.refreshDashboardFunction(false, null);
     this.setState({timelineHasBeenCustomized: false});
   }
 
