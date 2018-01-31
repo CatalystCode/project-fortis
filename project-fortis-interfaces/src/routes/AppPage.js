@@ -3,14 +3,13 @@ import createReactClass from 'create-react-class';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
 import { UserAgentApplication, Logger } from 'msal';
-import { changeCategory } from '../routes/routes';
 import initial from 'lodash/initial';
 import first from 'lodash/first';
 import last from 'lodash/last';
-
-import '../styles/Global.css';
 import Header from '../components/Header';
+import { changeCategory } from '../routes/routes';
 import { reactAppAdClientId, reactAppAdTokenStoreKey } from '../config';
+import '../styles/Global.css';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");

@@ -1,11 +1,11 @@
+import React from 'react';
+import BrowserDetection from 'react-browser-detection';
 import { Route } from 'react-router'
 import { AppPage } from './AppPage';
 import { DashboardPage } from './DashboardPage';
 import { FactsPage } from './FactsPage';
 import { AdminPage } from './AdminPage';
 import { NotFoundPage } from './NotFoundPage';
-import React from 'react';
-import BrowserDetection from 'react-browser-detection';
 
 class AppPageWithBrowserDetection extends React.Component {
   render() {
