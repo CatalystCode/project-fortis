@@ -25,6 +25,7 @@ matrix:
         NAME=project-fortis-pipeline
 
     - language: node_js
+      sudo: required
       node_js:
         - "9"
       cache:
@@ -32,6 +33,10 @@ matrix:
           project-fortis-services/node_modules
       script:
         project-fortis-services/travis/ci.sh
+      services:
+        - docker
+      after_success:
+        - project-fortis-services/travis/publish.sh
       env:
         NAME=project-fortis-services
 
