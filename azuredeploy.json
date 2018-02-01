@@ -581,14 +581,14 @@
                 },
                 "masterProfile": {
                     "count": "[parameters('acsMasterCount')]",
-                    "dnsPrefix": "[parameters('siteName')]"
+                    "dnsPrefix": "[concat(parameters('siteName'), 'acs')]"
                 },
                 "agentPoolProfiles": [
                     {
                         "name": "agentpools",
                         "count": "[parameters('acsAgentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
-                        "dnsPrefix": "[concat(parameters('siteName'),'agents')]"
+                        "dnsPrefix": "[concat(parameters('siteName'), 'agents')]"
                     }
                 ],
                 "linuxProfile": {
