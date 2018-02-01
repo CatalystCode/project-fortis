@@ -23,17 +23,15 @@ readonly cogvisionsvctoken="${20}"
 readonly cogspeechsvctoken="${21}"
 readonly cogtextsvctoken="${22}"
 readonly translationsvctoken="${23}"
+readonly latest_version="${24}"
 
 # setup
-if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
 cd charts || exit -2
 readonly spark_daemon_memory="1g"
 readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
-readonly latest_version="$(curl 'https://api.github.com/repos/CatalystCode/project-fortis/releases/latest' | jq -r '.tag_name')"
 readonly spark_config_map_name="spark-master-conf"
-readonly fortis_jar="fortis-${latest_version}.jar"
-readonly spark_command="spark-submit --conf \"spark.executor.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --conf \"spark.driver.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --deploy-mode cluster --driver-memory 2g --executor-memory 18g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/${fortis_jar}\""
+readonly spark_command="spark-submit --conf \"spark.executor.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --conf \"spark.driver.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --deploy-mode cluster --driver-memory 2g --executor-memory 18g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/fortis-${latest_version}.jar\""
 mkdir -p "/tmp/fortis-spark"
 readonly namespace_yaml="/tmp/fortis-spark/namespace.yaml"
 

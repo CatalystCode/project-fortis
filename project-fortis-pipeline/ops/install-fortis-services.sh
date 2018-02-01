@@ -29,6 +29,7 @@ readonly tls_certificate_b64="${26}"
 readonly tls_key_b64="${27}"
 readonly lets_encrypt_email="${28}"
 readonly lets_encrypt_api_endpoint="${29}"
+readonly latest_version="${30}"
 
 # setup
 mkdir -p "/tmp/fortis-services"
@@ -103,7 +104,7 @@ spec:
           value: ${cogvisionsvctoken}
         - name: FORTIS_CASSANDRA_SEED_DATA_URL
           value: ${fortis_site_clone_url}
-        image: cwolff/project_fortis_services
+        image: cwolff/project_fortis_services:${latest_version}
         name: project-fortis-services
         ports:
         - containerPort: 80

@@ -40,6 +40,9 @@ readonly sb_queue_config="configuration"
 readonly sb_queue_command="command"
 readonly mapbox_tile_layer_url="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}"
 
+if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
+readonly latest_version="$(curl -s 'https://api.github.com/repos/CatalystCode/project-fortis/releases/latest' | jq -r '.tag_name')"
+
 chmod -R 752 .
 
 echo "Waiting for Tiller pod to get ready"
@@ -85,7 +88,8 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${tls_certificate_b64}" \
   "${tls_key_b64}" \
   "${lets_encrypt_email}" \
-  "${lets_encrypt_api_endpoint}"
+  "${lets_encrypt_api_endpoint}" \
+  "${latest_version}"
 while :; do
   if [ "${endpoint_protection}" == "none" ]; then
     fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
@@ -138,7 +142,8 @@ echo "Finished. Now installing Spark helm chart."
   "${cogvisionsvctoken}" \
   "${cogspeechsvctoken}" \
   "${cogtextsvctoken}" \
-  "${translationsvctoken}"
+  "${translationsvctoken}" \
+  "${latest_version}"
 
 echo "Finished. Verifying deployment."
 if [ "${endpoint_protection}" == "none" ]; then
