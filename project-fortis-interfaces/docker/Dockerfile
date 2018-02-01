@@ -9,12 +9,6 @@ FROM node:6.12.0
 # on the docker-compose machine, not inside of the docker container
 ENV REACT_APP_SERVICE_HOST="http://localhost:8889"
 
-# setting up the feature service is a lengthy process so we provide a shared
-# instance for convenience; if you wish to run this service locally, please
-# follow the instructions at https://github.com/CatalystCode/featureService and
-# then update the value of this environment variable to http://localhost:3035
-ENV REACT_APP_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure.com"
-
 # active directory configuration
 # you can set up your own application via https://apps.dev.microsoft.com/
 # click "add platform" -> "web" -> make sure that "allow implicit flow" is

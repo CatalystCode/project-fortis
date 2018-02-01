@@ -47,6 +47,7 @@
     "fs-extra": "^5.0.0",
     "geotile": "^0.1.10",
     "graphql": "^0.7.2",
+    "http-proxy-middleware": "^0.17.4",
     "is-uuid": "^1.0.2",
     "json2csv": "^3.11.1",
     "lodash": "^4.17.4",

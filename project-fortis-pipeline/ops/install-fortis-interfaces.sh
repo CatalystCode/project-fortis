@@ -24,7 +24,6 @@ mv "$package_json" ./package.json
 
 # build the frontend
 REACT_APP_SERVICE_HOST="${graphql_service_host}" \
-REACT_APP_FEATURE_SERVICE_HOST="${feature_service_host}" \
 REACT_APP_AD_CLIENT_ID="${aad_client}" \
 REACT_APP_MAPBOX_TILE_LAYER_URL="${mapbox_tile_layer_url}" \
 npm run build

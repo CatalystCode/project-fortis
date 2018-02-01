@@ -9,14 +9,10 @@ const reactAppAdClientId = process.env.REACT_APP_AD_CLIENT_ID || '';
 const reactAppServiceHost = process.env.REACT_APP_SERVICE_HOST;
 if (!reactAppServiceHost) console.error('Service host is not defined!');
 
-const reactAppFeatureServiceHost = process.env.REACT_APP_FEATURE_SERVICE_HOST;
-if (!reactAppFeatureServiceHost) console.error('Feature service host is not defined!');
-
 module.exports = {
     reactAppMapboxTileLayerUrl,
     reactAppMapboxTileServerUrl,
     reactAppAdClientId,
     reactAppAdTokenStoreKey,
-    reactAppServiceHost,
-    reactAppFeatureServiceHost
+    reactAppServiceHost
 };

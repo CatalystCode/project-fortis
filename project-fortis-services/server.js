@@ -1,12 +1,12 @@
 'use strict';
 
-const {
-  port
-} = require('./config').server;
+const { port } = require('./config').server;
+const { fortisFeatureServiceHost } = require('./config').featureService;
 
 const http = require('http');
 const cors = require('cors');
 const express = require('express');
+const proxy = require('http-proxy-middleware');
 const bodyParser = require('body-parser');
 const graphqlHTTP = require('express-graphql');
 
@@ -31,9 +31,15 @@ const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-initializeAuth(app, '/api');
+
+app.use('/proxy/featureservice', proxy({
+  target: fortisFeatureServiceHost,
+  pathRewrite: { '^/proxy/featureservice': '' },
+}));
 
 app.get('/healthcheck', healthCheckHandler);
+
+initializeAuth(app, '/api');
 
 app.use('/api/messages', graphqlHTTP({
   schema: MessageSchema,
