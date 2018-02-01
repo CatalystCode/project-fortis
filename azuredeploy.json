@@ -91,27 +91,6 @@
                 "description": "The number of Cassandra nodes to create."
             }
         },
-        "activeDirectoryClientId": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Client Id for the Active Directory application to use for this deployment"
-            }
-        },
-        "fortisAdmins": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Email addresses of accounts to which admin-access should be granted in Fortis (separated by commas)"
-            }
-        },
-        "fortisUsers": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Email addresses of accounts to which user-access should be granted in Fortis (separated by commas)"
-            }
-        },
         "siteType": {
             "type": "string",
             "allowedValues": [
@@ -190,6 +169,27 @@
             ],
             "metadata": {
                 "description": "Endpoint security."
+            }
+        },
+        "activeDirectoryClientId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Client Id for the Active Directory application to use for this deployment"
+            }
+        },
+        "fortisAdmins": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Email addresses of accounts to which admin-access should be granted in Fortis (separated by commas)"
+            }
+        },
+        "fortisUsers": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Email addresses of accounts to which user-access should be granted in Fortis (separated by commas)"
             }
         },
         "ingressHostname": {

@@ -29,15 +29,6 @@
         "cassandraNodes": {
             "value": 5
         },
-        "activeDirectoryClientId": {
-            "value": ""
-        },
-        "fortisAdmins": {
-            "value": ""
-        },
-        "fortisUsers": {
-            "value": ""
-        },
         "siteType": {
             "value": "humanitarian"
         },
@@ -70,6 +61,15 @@
         },
         "endpointProtection": {
             "value": "none"
+        },
+        "activeDirectoryClientId": {
+            "value": ""
+        },
+        "fortisAdmins": {
+            "value": ""
+        },
+        "fortisUsers": {
+            "value": ""
         },
         "ingressHostname": {
             "value": ""
