@@ -116,7 +116,8 @@ echo "Finished. Now setting up fortis react frontend."
   "${fortis_interface_container}" \
   "${fortis_interface_host}" \
   "${aad_client}" \
-  "${mapbox_tile_layer_url}"
+  "${mapbox_tile_layer_url}" \
+  "${latest_version}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \

@@ -8,12 +8,18 @@ readonly blob_container_name="$5"
 readonly fortis_interface_host="$6"
 readonly aad_client="$7"
 readonly mapbox_tile_layer_url="$8"
+readonly latest_version="$9"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
 if ! (command -v npm >/dev/null); then curl -sL 'https://deb.nodesource.com/setup_6.x' | sudo -E bash -; sudo apt-get -qq install -y nodejs; fi
-cp -r /tmp/fortis-project/project-fortis-interfaces /tmp/fortis-interfaces
+
+mkdir -p /tmp/fortis-interfaces
 pushd /tmp/fortis-interfaces
+
+wget "https://github.com/CatalystCode/project-fortis/archive/${latest_version}.tar.gz"
+tar xf "${latest_version}.tar.gz" "project-fortis-${latest_version}/project-fortis-interfaces" --strip-components=2
+
 npm install
 
 # add site root to package.json so that the frontend build can include the
