@@ -249,7 +249,7 @@ azure_login() {
 }
 
 install_helm() {
-  curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+  curl -s 'https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get' > get_helm.sh
   chmod 700 get_helm.sh
   readonly helm_version="v2.5.1" 
   ./get_helm.sh -v "${helm_version}"
