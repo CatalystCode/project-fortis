@@ -89,7 +89,7 @@
         "letsEncryptEmail": {
             "value": ""
         },
-        "letsEncryptAPIEndpoint": {
+        "letsEncryptApiEndpoint": {
             "value": "https://acme-staging.api.letsencrypt.org/directory"
         }
     }
