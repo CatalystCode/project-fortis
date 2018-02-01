@@ -22,8 +22,14 @@ readonly cogspeechsvctoken="${19}"
 readonly cogtextsvctoken="${20}"
 readonly translationsvctoken="${21}"
 readonly fortis_site_clone_url="${22}"
+readonly endpoint_protection="${23}"
+readonly tls_hostname="${24}"
+readonly tls_certificate_b64="${25}"
+readonly tls_key_b64="${26}"
+readonly lets_encrypt_email="${27}"
+readonly lets_encrypt_api_endpoint="${28}"
 
-if [ -z "${aad_client}" ]; then readonly fortis_interface_protocol="http"; else readonly fortis_interface_protocol="https"; fi
+if [ -n "${aad_client}" ] || [ "${endpoint_protection}" != "none" ]; then readonly fortis_interface_protocol="https"; else readonly fortis_interface_protocol="http"; fi
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly fortis_interface_container="public"
@@ -73,12 +79,29 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${cogspeechsvctoken}" \
   "${cogtextsvctoken}" \
   "${translationsvctoken}" \
-  "${fortis_site_clone_url}"
+  "${fortis_site_clone_url}" \
+  "${endpoint_protection}" \
+  "${tls_hostname}" \
+  "${tls_certificate_b64}" \
+  "${tls_key_b64}" \
+  "${lets_encrypt_email}" \
+  "${lets_encrypt_api_endpoint}"
 while :; do
-  fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
+  if [ "${endpoint_protection}" == "none" ]; then
+    fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
+  else
+    fortis_service_ip="$(kubectl get svc/nginx-ingress-controller --namespace=nginx-ingress -o jsonpath='{..ip}')"
+  fi
   if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
 done
-readonly graphql_service_host="http://${fortis_service_ip}"
+if [ "${endpoint_protection}" == "none" ]; then
+  readonly graphql_service_host="http://${fortis_service_ip}"
+else
+  readonly graphql_service_host="https://${tls_hostname}"
+  if [ "${endpoint_protection}" == "tls_lets_encrypt" ]; then
+    readonly mx_record_entry="@.""${lets_encrypt_email#*@}"
+  fi
+fi
 
 echo "Finished. Now setting up fortis react frontend."
 ./install-fortis-interfaces.sh \
@@ -118,8 +141,27 @@ echo "Finished. Now installing Spark helm chart."
   "${translationsvctoken}"
 
 echo "Finished. Verifying deployment."
-./verify-deployment.sh \
-  "${graphql_service_host}"
+if [ "${endpoint_protection}" == "none" ]; then
+  ./verify-deployment.sh \
+    "${graphql_service_host}"
+else
+  # request a public ip in order to verify the cluster deployment
+  # we aren't testing the TLS ingress due to manual steps required to get
+  # that completely setup
+  kubectl expose deployment project-fortis-services \
+    --type "LoadBalancer" \
+    --name "project-fortis-services-verification-lb"
+  # wait for the verification endpoint to come up
+  while :; do
+    fortis_service_verification_ip="$(kubectl get svc project-fortis-services-verification-lb -o jsonpath='{..ip}')"
+    if [ -n "${fortis_service_verification_ip}" ]; then break; else echo "Waiting for project-fortis-services-verification IP"; sleep 5s; fi
+  done
+  echo "Got service IP: ${fortis_service_verification_ip}"
+  project_fortis_services_verification_endpoint="http://${fortis_service_verification_ip}"
+  echo "Endpoint: ${project_fortis_services_verification_endpoint}"
+  ./verify-deployment.sh \
+    "${project_fortis_services_verification_endpoint}"
+fi
 
 # shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
@@ -127,11 +169,23 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+if [ "${endpoint_protection}" != "none" ]; then
+  kubectl delete service project-fortis-services-verification-lb
+  # shellcheck disable=SC2181
+  if [ $? -ne 0 ]; then
+    echo "Unable to delete verification endpoint" >& 2
+    exit 1
+  fi
+fi
+
 echo "Finished. Finally, creating tags containing URLs for resources so that the user can find them later."
 ./create-tags.sh \
   "${k8resource_group}" \
   "${fortis_interface_host}" \
   "${site_name}" \
-  "${graphql_service_host}"
+  "${graphql_service_host}" \
+  "${tls_hostname}" \
+  "${fortis_service_ip}" \
+  "${mx_record_entry}"
 
 echo "All done :)"

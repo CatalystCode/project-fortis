@@ -2,6 +2,12 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "githubProjectParent": {
+            "value": "CatalystCode"
+        },
+        "githubProjectRelease": {
+            "value": "master"
+        },
         "siteName": {
             "value": "enter-your-fortis-site-name"
         },
@@ -67,6 +73,24 @@
         },
         "servicePrincipalAppKey": {
             "value": "CHANGE ME"
+        },
+        "endpointProtection": {
+            "value": "none"
+        },
+        "ingressHostname": {
+            "value": ""
+        },
+        "tlsCertificate": {
+            "value": ""
+        },
+        "tlsPrivateKey": {
+            "value": ""
+        },
+        "letsEncryptEmail": {
+            "value": ""
+        },
+        "letsEncryptAPIEndpoint": {
+            "value": "https://acme-staging.api.letsencrypt.org/directory"
         }
     }
 }

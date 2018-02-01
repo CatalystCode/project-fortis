@@ -17,6 +17,19 @@
 * You'll need a Mapbox access token. If you don't have one yet, [sign up](https://www.mapbox.com/signup/)
   to create a new token for free.
 
+* If you want to enable TLS support, you have one of two choices -- providing your own TLS certificate and private key or using Let's Encrypt.  These are shown in the wizard in the dropdown titled `Endpoint Protection`.  There are three choices `none`, `tls_provide_certificate`, and `tls_lets_encrypt`.  You will need to select one of those vaules.  If you select a value other than `none`, then the `Ingress Hostname` field is required -- this is the hostname that you will use to access services (and configure TLS for).
+
+  * For providing your own certificate, you select `tls_provide_certificate` from the `Endpoint Protection` drop down and will need:
+
+    1. A TLS certificate and private key which need to be `base64` encoded and pasted into the Fortis wizard, shown below.  Specifically, the `TLS Certificate` and `TLS Private Key` fields.
+    2. Access to your DNS server to point at the newly provisioned end point.  This hostname you will need is that defined in the `FORTIS_DNS_NAME` tag (see below) and it will need to be pointed at the `FORTIS_DNS_IP` address.  It should be noted that setting up a DNS A record will vary from provider to provider.
+
+  * For enabling Let's Encrypt support, you select `tls_lets_encrypt` from the `Endpoint Protection` dropdown and will need to provide the following:
+
+    1. The DNS name for inbound services.  This is the `Ingress Hostname` field.
+    2. An email address that Let's Encrypt can verify the address portion of, for instance, if the email is admin@example.com, Let's Encrypt will attempt to verify `example.com`.  This requires the configuration of either a DNS MX record or an A record.  How to do this will vary by DNS provider.  The value that Let's Encrypt will use is exposed in the `FORTIS_MX_RECORD` tag upon completion of deployment of Fortis.
+    3. The Let's Encrypt address to use to request the certificate.  Note that, the value defaults to the "staging server" for Let's Encrypt which helps for development.  Change this value to `https://acme-v01.api.letsencrypt.org/directory` in the case of a production deployment.
+
 ## Setting up a new Azure deployment
 
 Hit the deploy to Azure button below:
