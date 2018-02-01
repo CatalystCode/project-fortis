@@ -96,6 +96,12 @@ in the admin UI, but at the very least add your own email address as an admin
 so that you are able to access and configure your Fortis site after the
 deployment is complete.
 
+After your Fortis deployment is done, head back to the [AAD portal](https://apps.dev.microsoft.com/portal/register-app)
+and add the value of the `FORTIS_AAD_REDIRECT_URL` deployment tag as one of the
+`Redirect Urls` (see example in screenshot below).
+
+![Screenshot showing setup of Azure Active Directory v2.0 redirect URL](https://user-images.githubusercontent.com/1086421/35704384-4d5231b2-076d-11e8-82e1-465ac698c60a.png)
+
 ## Setting up a new Azure deployment
 
 Hit the deploy to Azure button below:
