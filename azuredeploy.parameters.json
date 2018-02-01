@@ -90,7 +90,7 @@
             "value": ""
         },
         "letsEncryptApiEndpoint": {
-            "value": "https://acme-staging.api.letsencrypt.org/directory"
+            "value": "https://acme-v01.api.letsencrypt.org/directory"
         }
     }
 }
