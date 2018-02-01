@@ -293,10 +293,13 @@ setup_k8_cluster() {
 }
 
 install_kubectl() {
-  kubectl_file="/usr/local/bin/kubectl"
-  sudo curl -L -s -o "${kubectl_file}" "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+  local kubectl_file="/usr/local/bin/kubectl"
+  local release="$(curl -s 'https://storage.googleapis.com/kubernetes-release/release/stable.txt')"
+
+  sudo curl -L -s -o "${kubectl_file}" "https://storage.googleapis.com/kubernetes-release/release/${release}/bin/linux/amd64/kubectl"
   sudo chmod +x "${kubectl_file}"
-  export KUBECONFIG=${kube_config_dest_file}
+
+  export KUBECONFIG="${kube_config_dest_file}"
 
   kubectl cluster-info
 }
