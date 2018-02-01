@@ -231,6 +231,10 @@
         },
         "letsEncryptAPIEndpoint": {
             "metadata": {
+                "allowedValues": [
+                    "https://acme-staging.api.letsencrypt.org/directory",
+                    "https://acme-v01.api.letsencrypt.org/directory"
+                ],
                 "description": "Let's Encrypt registration endpoint."
             },
             "type": "string"
