@@ -28,7 +28,6 @@ Arguments
   --gh_clone_release|-gr             [Required] : Github branch / release to clone
   --location|-lo                     [Required] : Container cluster location
   --site_type|-sty                   [Required] : Fortis Site Type
-  --prefix|-pf                       [Required] : Fortis Site Prefix
   --site_name|-sn                    [Required] : Fortis Site Name
   --eh_conn_str|-ec                  [Required] : Event Hub Connection String
   --sb_conn_str|-sb                  [Required] : Service Bus Connection String
@@ -131,10 +130,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --resource_group|-rg)
       resource_group="$1"
-      shift
-      ;;
-    --prefix|-pf)
-      prefix="$1"
       shift
       ;;
     --master_fqdn|-mf)
@@ -318,7 +313,6 @@ throw_if_empty --gh_clone_release "${gh_clone_release}"
 throw_if_empty --spark_worker_count "${spark_worker_count}"
 throw_if_empty --cassandra_node_count "${cassandra_node_count}"
 throw_if_empty --site_type "${site_type}"
-throw_if_empty --prefix "${prefix}"
 throw_if_empty --site_name "${site_name}"
 throw_if_empty --eh_conn_str "${eh_conn_str}"
 throw_if_empty --sb_conn_str "${sb_conn_str}"

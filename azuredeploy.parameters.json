@@ -23,9 +23,6 @@
         "agentVMSize": {
             "value": "Standard_L4s"
         },
-        "dnsNamePrefix": {
-            "value": "fortis"
-        },
         "adminUsername": {
             "value": "fortisadmin"
         },
