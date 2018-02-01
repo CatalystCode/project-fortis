@@ -170,9 +170,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ "${endpoint_protection}" != "none" ]; then
-  kubectl delete service project-fortis-services-verification-lb
-  # shellcheck disable=SC2181
-  if [ $? -ne 0 ]; then
+  if ! kubectl delete service project-fortis-services-verification-lb; then
     echo "Unable to delete verification endpoint" >& 2
     exit 1
   fi
