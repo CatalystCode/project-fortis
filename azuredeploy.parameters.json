@@ -23,9 +23,6 @@
         "agentVMSize": {
             "value": "Standard_L4s"
         },
-        "adminUsername": {
-            "value": "fortisadmin"
-        },
         "sparkWorkers": {
             "value": 6
         },

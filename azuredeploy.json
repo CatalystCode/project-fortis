@@ -79,13 +79,6 @@
                 "description": "The size of the Virtual Machine."
             }
         },
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "fortisadmin",
-            "metadata": {
-                "description": "User name for the Linux Virtual Machines."
-            }
-        },
         "sparkWorkers": {
             "type": "int",
             "metadata": {
@@ -238,12 +231,13 @@
         "storageAccountName": "[concat('fortis', uniquestring(resourceGroup().id))]",
         "premStorageSku": "Premium_LRS",
         "vmStorageAccountType": "Standard_LRS",
+        "adminUsername": "fortisadmin",
         "vmName": "FortisDeployVM",
         "OSDiskName": "osdiskforlinuxsimple",
         "applicationInsightServiceName": "[concat('FortisAppInsight-', parameters('siteName'))]",
         "kubernetesName": "[concat('containerservice-', resourceGroup().name)]",
         "orchestratorType": "Kubernetes",
-        "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+        "sshKeyPath": "[concat('/home/',variables('adminUsername'),'/.ssh/authorized_keys')]",
         "fortisEventHubName": "tadawebEHTopic",
         "deploymentVmSize": "Standard_D2_v2",
         "deploymentUbuntuOSVersion": "16.04.0-LTS",
@@ -513,7 +507,7 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
-                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminUsername": "[variables('adminUsername')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": "true",
                         "ssh": {
@@ -592,7 +586,7 @@
                     }
                 ],
                 "linuxProfile": {
-                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminUsername": "[variables('adminUsername')]",
                     "ssh": {
                         "publicKeys": [
                             {
@@ -622,7 +616,7 @@
                     "fileUris": [
                         "[variables('fortisDeployScriptFileUri')]"
                     ],
-                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', parameters('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -csst \"', parameters('cognitiveServicesBingSpeechToken'), '\" -tst \"', parameters('cognitiveServicesTextTranslationToken'), '\" -ctst \"', parameters('cognitiveServicesTextAnalyticsToken'), '\" -cvst \"', parameters('cognitiveServicesComputerVisionToken'), '\" -gc \"', variables('githubClonePath'), '\" -gr \"', parameters('githubProjectRelease'), '\" -avms \"', parameters('agentVMSize'), '\" -ep \"', parameters('endpointProtection'), '\" -ih \"', parameters('ingressHostname'), '\" -tc \"', parameters('tlsCertificate'), '\" -tk \"', parameters('tlsPrivateKey'), '\" -le \"', parameters('letsEncryptEmail'), '\" -lae \"', parameters('letsEncryptApiEndpoint'), '\"')]"
+                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', variables('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -csst \"', parameters('cognitiveServicesBingSpeechToken'), '\" -tst \"', parameters('cognitiveServicesTextTranslationToken'), '\" -ctst \"', parameters('cognitiveServicesTextAnalyticsToken'), '\" -cvst \"', parameters('cognitiveServicesComputerVisionToken'), '\" -gc \"', variables('githubClonePath'), '\" -gr \"', parameters('githubProjectRelease'), '\" -avms \"', parameters('agentVMSize'), '\" -ep \"', parameters('endpointProtection'), '\" -ih \"', parameters('ingressHostname'), '\" -tc \"', parameters('tlsCertificate'), '\" -tk \"', parameters('tlsPrivateKey'), '\" -le \"', parameters('letsEncryptEmail'), '\" -lae \"', parameters('letsEncryptApiEndpoint'), '\"')]"
                 }
             }
         }
