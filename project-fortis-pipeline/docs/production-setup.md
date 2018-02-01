@@ -70,6 +70,28 @@ For enabling Let's Encrypt support, you select `tls_lets_encrypt` from the
   development. Change this value to `https://acme-v01.api.letsencrypt.org/directory`
   in the case of a production deployment.
 
+### Login setup
+
+If you chose either of the two options to configure TLS above, you will be able
+to add login via Azure Active Directory v2.0 (AAD) to regulate access to your
+Fortis site. Note that setting up TLS is required in order to enable login!
+
+To configure AAD, first create a new AAD application [here](https://apps.dev.microsoft.com/portal/register-app).
+
+When deploying your Fortis site, copy the `Application Id` for your newly
+created AAD application into the `Active Directory Client Id` field on the
+Fortis deployment wizard.
+
+Additionally, the Fortis deployment wizard will present you with two additional
+fields: `Fortis Admins` and `Fortis Users`. Enter into these fields the email
+addresses for the people who should be granted access to your Fortis site,
+separated by commas.
+
+Note that you can manage access permissions after your Fortis site is set up,
+in the admin UI, but at the very least add your own email address as an admin
+so that you are able to access and configure your Fortis site after the
+deployment is complete.
+
 ## Setting up a new Azure deployment
 
 Hit the deploy to Azure button below:
