@@ -51,13 +51,23 @@ For enabling Let's Encrypt support, you select `tls_lets_encrypt` from the
   verify `example.com`. This requires the configuration of either a DNS MX
   record or an A record. How to do this will vary by DNS provider. The value
   that Let's Encrypt will use is exposed in the `FORTIS_MX_RECORD` tag upon
-  completion of deployment of Fortis. As an example, if you own the domain
-  `test.com` and you are setting up your Fortis site at `fortis.test.com`,
-  please ensure that the MX record for `fortis.test.com` is set to
-  `fortis.test.com` and that the A record for `fortis.test.com` contains the
-  value of the `FORTIS_DNS_IP` tag.
+  completion of deployment of Fortis.
 
 3. The Let's Encrypt address to use to request the certificate. Note that,
   the value defaults to the production server for Let's Encrypt. If you are a
   developer, change this value to `https://acme-staging.api.letsencrypt.org/directory`
   to speed up development.
+
+## Post-deployment steps
+
+After your Fortis deployment is finished, you'll have to add an A record and a
+MX record (if using LetsEncrypt) for the domain for which you configured TLS.
+
+As an example, if you own the domain `test.com`, have DNS managed via
+Cloudflare and you are setting up your Fortis site at `fortis3.test.com`,
+ensure that the MX record for `fortis3.test.com` is set to `fortis3.test.com`
+and that the A record for `fortis3.test.com` contains the value of the
+`FORTIS_DNS_IP` tag that you were shown after your Fortis deployment
+finished:
+
+![Cloudflare DNS setup](https://user-images.githubusercontent.com/1086421/35749803-c7548c68-0820-11e8-8b5d-e6ab71cb095d.png)
