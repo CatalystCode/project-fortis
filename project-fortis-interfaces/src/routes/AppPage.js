@@ -14,7 +14,7 @@ import '../styles/Global.css';
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("DataStore");
 
-const AdScopes = ['openid'];
+const AdScopes = ['openid', 'profile'];
 
 class CategoryLink extends React.Component {
   onClick = () => {

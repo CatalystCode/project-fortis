@@ -6,6 +6,8 @@ Setting up TLS is required in order to enable login.
 
 ## Pre-deployment steps
 
+### Creating a new AAD application
+
 To configure Azure Active Directory v2.0 (AAD) login, first create a new
 application in the [AAD portal](https://apps.dev.microsoft.com/portal/register-app),
 ensuring that the "Guided Setup" option is not checked.
@@ -16,6 +18,21 @@ Take note of the "Application Id" for your newly created AAD application since
 you will require this during the deployment of your Fortis site:
 
 ![Screenshot showing AAD Application Id field](https://user-images.githubusercontent.com/1086421/35748987-fb611736-081d-11e8-9c92-b270516160ec.png)
+
+### Configuring permissions
+
+Scroll down to the "Delegated Permissions" section and click "Add":
+
+![Screenshot showing AAD permissions addition button](https://user-images.githubusercontent.com/1086421/35750708-e8233f18-0823-11e8-97c4-850d45cbf152.png)
+
+In the modal, tick the following permissions and then hit "Ok": `email`,
+`offline_access`, `openid` and `profile`.
+
+![Screenshot showing AAD permissions choice dialog](https://user-images.githubusercontent.com/1086421/35750713-eb3f1686-0823-11e8-80c4-6911d9cb671b.png)
+
+Verify that the permissions section looks like this and then hit "Save":
+
+![Screenshot showing AAD permissions after being added](https://user-images.githubusercontent.com/1086421/35750716-edaf019c-0823-11e8-8cea-1802a676fb95.png)
 
 ## Deployment steps
 
