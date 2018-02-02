@@ -129,14 +129,14 @@ if [ -z "\$release_to_install" ]; then
   echo "Usage: \$0 <release_to_install>" >&2; exit 1
 fi
 
-${PWD}/install-fortis-interfaces.sh \
-  "${graphql_service_host}" \
-  "${storage_account_name}" \
-  "${storage_account_key}" \
-  "${fortis_interface_container}" \
-  "${fortis_interface_host}" \
-  "${aad_client}" \
-  "${mapbox_tile_layer_url}" \
+${PWD}/install-fortis-interfaces.sh \\
+  "${graphql_service_host}" \\
+  "${storage_account_name}" \\
+  "${storage_account_key}" \\
+  "${fortis_interface_container}" \\
+  "${fortis_interface_host}" \\
+  "${aad_client}" \\
+  "${mapbox_tile_layer_url}" \\
   "\${release_to_install}"
 EOF
 chown "${user_name}:${user_name}" "${interfaces_upgrade_script}"
