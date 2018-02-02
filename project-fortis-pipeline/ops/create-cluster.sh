@@ -129,6 +129,10 @@ if [ -z "\$release_to_install" ]; then
   echo "Usage: \$0 <release_to_install>" >&2; exit 1
 fi
 
+if curl -s "https://api.github.com/repos/CatalystCode/project-fortis/releases/tags/\${release_to_install}" -w '%{http_code}' | grep -q '^404$'; then
+  echo "Release \${release_to_install} does not exist" >&2; exit 2
+fi
+
 ${PWD}/install-fortis-interfaces.sh \\
   "${graphql_service_host}" \\
   "${storage_account_name}" \\
