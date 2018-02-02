@@ -1,6 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Chip from 'material-ui/Chip';
+import Snackbar from 'material-ui/Snackbar';
 import { PIPELINE_ALL } from '../../actions/constants';
 import { getHumanDate, UCWords } from '../../utils/Utils.js';
 import { methods } from '../../actions/Facts';
@@ -43,8 +44,9 @@ export const FactsList = createReactClass({
 
   getInitialState() {
     return {
-      facts: [],
+      facts: {},
       pageState: '',
+      snackbarMessage: '',
       loading: false,
     };
   },
@@ -57,21 +59,16 @@ export const FactsList = createReactClass({
     const { fromDate, toDate, maintopic } = this.props;
 
     if (nextProps.fromDate !== fromDate || nextProps.toDate !== toDate || nextProps.maintopic !== maintopic) {
-      this.loadFacts(nextProps);
+      this.setState(this.getInitialState(), () => this.loadFacts(nextProps));
     }
   },
 
   render() {
-    const { loading, facts } = this.state;
+    const { fullTermList } = this.props;
+    const { facts, snackbarMessage } = this.state;
 
-    let mainContent;
-    if (loading) {
-      mainContent = this.renderLoading();
-    } else if (facts && facts.length) {
-      mainContent = this.renderFacts(facts);
-    } else {
-      mainContent = this.renderNoFacts();
-    }
+    const factsToRender = this.sortByEventTime(Object.values(facts));
+    const mainContent = factsToRender && factsToRender.length ? this.renderFacts(factsToRender) : this.renderNoFacts();
 
     return (
       <div id="facts">
@@ -84,9 +81,14 @@ export const FactsList = createReactClass({
             dashboardRefreshFunc={this.handleMainTopicChanged}
             excludeLocations
             excludeSources
-            allSiteTopics={this.props.fullTermList}
+            allSiteTopics={fullTermList}
             className="form-control edgeFilterInput"
             {...this.props}
+          />
+          <Snackbar
+            open={!!snackbarMessage}
+            message={snackbarMessage}
+            autoHideDuration={3000}
           />
         </div>
         {mainContent}
@@ -195,7 +197,7 @@ export const FactsList = createReactClass({
   loadFacts(props) {
     props = props || this.props;
 
-    const { loading, pageState } = this.state;
+    const { loading, pageState, facts } = this.state;
     if (loading) {
       return;
     }
@@ -207,11 +209,22 @@ export const FactsList = createReactClass({
 
     const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
     methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, pageState, (err, data) => {
-      if (err) return console.error(`Error fetching facts: ${err}`);
+      if (err) {
+        this.setState({ loading: false, snackbarMessage: `Error fetching facts` });
+        return console.error(`Error fetching facts: ${err}`);
+      }
+
+      const newFacts = (data && data.facts && data.facts.features) || [];
+      const factsToAdd = newFacts.filter(fact => !facts[fact.properties.messageid]);
+      const updatedFacts = Object.assign({}, facts);
+      factsToAdd.forEach(fact => updatedFacts[fact.properties.messageid] = fact);
+
+      const newPageState = data && data.facts && data.facts.pageState;
 
       this.setState({
-        facts: this.sortByEventTime((data && data.facts && data.facts.features) || []),
-        pageState: data && data.facts && data.facts.pageState,
+        facts: updatedFacts,
+        pageState: newPageState,
+        snackbarMessage: `Loaded ${factsToAdd.length} new facts`,
         loading: false,
       });
     });
