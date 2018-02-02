@@ -39,7 +39,7 @@ export const FactsList = createReactClass({
   _cardWidth: 320,
   _cardHeight: 200,
   _gutter: 20,
-  _subtractedElements: ['.navbar', '#filters'],
+  _subtractedElements: ['.navbar', '.inputs-container'],
 
   getInitialState() {
     return {

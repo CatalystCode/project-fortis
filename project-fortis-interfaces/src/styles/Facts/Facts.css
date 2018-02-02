@@ -1,5 +1,4 @@
 .report {
-    background: white;
     min-height: 100%;
 }
 
@@ -11,7 +10,7 @@
 #facts .noResults,
 #facts .loadingPage,
 #facts .ReactListView > * {
-    background: #F3F3EC;
+    background: #30303d;
     margin: 0 auto;
 }
 
@@ -125,20 +124,12 @@
     white-space: nowrap;
 }
 
-.loadingPage {
-    position: absolute;
+#facts .loadingPage {
+    height: 80%;
     width: 100%;
-    height: 100%;
 }
 
-.loadingPage > * {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.loadingPage p {
+#facts .loadingPage p {
     color: #ccc;
 }
 
