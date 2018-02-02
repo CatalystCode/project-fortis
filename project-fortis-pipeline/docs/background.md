@@ -6,9 +6,6 @@ Project Fortis is a data ingestion, analysis and visualization pipeline. The
 Fortis pipeline collects social media conversations and postings from the public
 web and darknet data sources.
 
-Learn more about Fortis in our [Spark Summit talk](https://www.youtube.com/watch?v=FTrVO9toO0I) and in our
-[dashboard walkthrough (in Spanish)](http://aka.ms/fortis-colombia-demo).
-
 ![Overview of the Fortis project workflow](https://user-images.githubusercontent.com/1086421/35058654-a326c8e8-fb86-11e7-9dbb-f3e719aabf48.png)
 
 ## Monitoring
@@ -39,3 +36,10 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 - [Building a Custom Spark Connector for Near Real-Time Speech-to-Text Transcription](https://www.microsoft.com/developerblog/2017/11/01/building-a-custom-spark-connector-for-near-real-time-speech-to-text-transcription/)
 - [Geocoding Social Conversations with NLP and JavaScript](https://www.microsoft.com/developerblog/2017/06/06/geocoding-social-conversations-nlp-javascript/)
 - [Accelerating UN Humanitarian Aid Planning with GraphQL](https://www.microsoft.com/developerblog/2017/05/10/graphql-providing-context-into-global-crisiss-and-social-public-data-sources/)
+
+## Videos
+
+- [Dashboard walkthrough (in Spanish)](http://aka.ms/fortis-colombia-demo)
+- [KubeCon conference talk](https://www.youtube.com/watch?v=UywgL70FQ3s)
+- [Microsoft Build conference talk](https://www.youtube.com/watch?v=2shdR1R-EYk)
+- [Spark Summit conference talk](https://www.youtube.com/watch?v=FTrVO9toO0I)
