@@ -108,6 +108,36 @@ else
   fi
 fi
 
+echo "Finished. Now setting up fortis graphql service upgrade script."
+readonly services_upgrade_script="/home/${user_name}/upgrade-fortis-services.sh"
+cat > "${services_upgrade_script}" << EOF
+#!/usr/bin/env bash
+readonly release_to_install="\$1"
+
+if [ -z "\$release_to_install" ]; then
+  echo "Usage: \$0 <release_to_install>" >&2; exit 1
+fi
+
+if curl -s "https://api.github.com/repos/CatalystCode/project-fortis/releases/tags/\${release_to_install}" -w '%{http_code}' | grep -q '^404$'; then
+  echo "Release \${release_to_install} does not exist" >&2; exit 2
+fi
+
+install_dir="\$(mktemp -d /tmp/fortis-services-XXXXXX)"
+
+export KUBECONFIG="${KUBECONFIG}"
+
+kubectl get po --selector='io.kompose.service=project-fortis-services' -o json \\
+| jq -r '.items[] | .metadata.name' \\
+| while read pod; do
+  pod_spec="\${install_dir}/\${pod}.yaml"
+  kubectl get po "\${pod}" -o yaml > "\${pod_spec}"
+  sed -i "s|image: cwolff/project_fortis_services:.*$|image: cwolff/project_fortis_services:\${release_to_install}|g" "\${pod_spec}"
+  kubectl replace --force -f "\${pod_spec}"
+done
+EOF
+chown "${user_name}:${user_name}" "${services_upgrade_script}"
+chmod +x "${services_upgrade_script}"
+
 echo "Finished. Now setting up fortis react frontend."
 ./install-fortis-interfaces.sh \
   "${graphql_service_host}" \
