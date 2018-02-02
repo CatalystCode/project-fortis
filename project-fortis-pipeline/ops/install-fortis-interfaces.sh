@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
 readonly graphql_service_host="$1"
-readonly feature_service_host="$2"
-readonly blob_account_name="$3"
-readonly blob_account_key="$4"
-readonly blob_container_name="$5"
-readonly fortis_interface_host="$6"
-readonly aad_client="$7"
-readonly mapbox_tile_layer_url="$8"
-readonly latest_version="$9"
+readonly blob_account_name="$2"
+readonly blob_account_key="$3"
+readonly blob_container_name="$4"
+readonly fortis_interface_host="$5"
+readonly aad_client="$6"
+readonly mapbox_tile_layer_url="$7"
+readonly latest_version="$8"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi

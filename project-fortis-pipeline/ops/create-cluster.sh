@@ -110,7 +110,6 @@ fi
 echo "Finished. Now setting up fortis react frontend."
 ./install-fortis-interfaces.sh \
   "${graphql_service_host}" \
-  "${feature_service_host}" \
   "${storage_account_name}" \
   "${storage_account_key}" \
   "${fortis_interface_container}" \
