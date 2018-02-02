@@ -120,7 +120,8 @@ echo "Finished. Now setting up fortis react frontend."
   "${latest_version}"
 
 echo "Finished. Now setting up fortis react frontend upgrade script."
-cat > "/home/${user_name}/upgrade-interfaces.sh" << EOF
+readonly interfaces_upgrade_script="/home/${user_name}/upgrade-fortis-interfaces.sh"
+cat > "${interfaces_upgrade_script}" << EOF
 #!/usr/bin/env bash
 readonly release_to_install="\$1"
 
@@ -138,7 +139,8 @@ ${PWD}/install-fortis-interfaces.sh \
   "${mapbox_tile_layer_url}" \
   "\${release_to_install}"
 EOF
-chmod +x "/home/${user_name}/upgrade-fortis-interfaces.sh"
+chown "${user_name}:${user_name}" "${interfaces_upgrade_script}"
+chmod +x "${interfaces_upgrade_script}"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \
