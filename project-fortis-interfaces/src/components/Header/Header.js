@@ -49,26 +49,32 @@ class Header extends React.Component {
       <ul className="nav navbar-nav navbar-left">
         <li>{ this.renderDashboardLink() }</li>
         <li>{ this.renderFactsLink() }</li>
-        <li>{ this.renderAdminLink() }</li>
+        <li>{ this.renderSettingsLink() }</li>
       </ul>
     );
   }
 
   renderDashboardLink() {
+    const category = this.props.category;
+
     return (
-      <Link to={`/site/${this.props.category}/`} activeClassName="current">Dashboard</Link>
+      <Link to={category ? `/dashboard/${category}` : '/dashboard'} activeClassName="current">Dashboard</Link>
     );
   }
 
   renderFactsLink() {
+    const category = this.props.category;
+
     return (
-      <Link to={`/site/${this.props.category}/facts/`} activeClassName="current">Facts</Link>
+      <Link to={category ? `/facts/${category}` : '/facts'} activeClassName="current">Facts</Link>
     );
   }
 
-  renderAdminLink() {
+  renderSettingsLink() {
+    const category = this.props.category;
+
     return (
-      <Link to={`/site/${this.props.category}/admin/`} activeClassName="current">Settings</Link>
+      <Link to={category ? `/settings/${category}` : '/settings'} activeClassName="current">Settings</Link>
     );
   }
 

@@ -144,15 +144,16 @@ export const AppPage = createReactClass({
 
     const {
       fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
-      bbox, zoomLevel, conjunctivetopics, externalsourceid, selectedplace
+      bbox, zoomLevel, conjunctivetopics, externalsourceid, selectedplace,
+      category
     } = dataStore;
     const includeCsv = false;
 
-    this.getFlux().actions.DASHBOARD.initializeDashboard(this.props.params.category, () => {
+    this.getFlux().actions.DASHBOARD.initializeDashboard(category, () => {
       this.getFlux().actions.DASHBOARD.reloadVisualizationState(
         fromDate, toDate, datetimeSelection, timespanType, dataSource, maintopic,
         bbox, zoomLevel, conjunctivetopics, externalsourceid, includeCsv, selectedplace, () => {
-          this.props.router.push(`/site/${this.props.params.category}`);
+          this.props.router.push(category ? `/dashboard/${category}` : '/dashboard');
         });
     });
   },

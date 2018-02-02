@@ -8,14 +8,15 @@ import { NotFoundPage } from './NotFoundPage';
 
 export const routes = (
   <Route path="/" component={AppPage} linkLabel="My App" icon="fa fa-share-alt-square fa">
-    <Route path="site/:category(/share/:sharedViewState)" component={DashboardPage} />
-    <Route path="site/:category/facts" component={FactsPage} />
-    <Route path="site/:category/admin" component={AdminPage} />
+    <Route path="share/:sharedViewState" component={DashboardPage} />
+    <Route path="dashboard(/:category)" component={DashboardPage} />
+    <Route path="facts(/:category)" component={FactsPage} />
+    <Route path="settings(/:category)" component={AdminPage} />
     <Route path="*" component={NotFoundPage} />
   </Route>
 );
 
 export function changeCategory(category) {
-  window.location = `#/site/${category}`;
+  window.location = category ? `#/dashboard/${category}` : '#/dashboard';
   window.location.reload();
 }

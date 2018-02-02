@@ -86,10 +86,9 @@ all the Docker services started, head over to the following URLs to play with
 the services:
 
 * Frontend
-  - http://localhost:8888/#/site/mta/admin
-  - http://localhost:8888/#/site/mta
-  - http://localhost:8888/#/site/food/admin
-  - http://localhost:8888/#/site/food
+  - http://localhost:8888/#/dashboard
+  - http://localhost:8888/#/facts
+  - http://localhost:8888/#/settings
 * Backend
   - http://localhost:8889/api/edges/graphiql
   - http://localhost:8889/api/messages/graphiql

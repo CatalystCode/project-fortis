@@ -8,8 +8,8 @@ readonly dns_host_name="${5}"
 readonly dns_host_ip="${6}"
 readonly mx_record_entry="${7}"
 
-az group update --name "${k8resource_group}" --set tags.FORTIS_INTERFACE_URL="${fortis_interface_host}/index.html#/site/${site_name}"
-az group update --name "${k8resource_group}" --set tags.FORTIS_ADMIN_INTERFACE_URL="${fortis_interface_host}/index.html#/site/${site_name}/admin"
+az group update --name "${k8resource_group}" --set tags.FORTIS_INTERFACE_URL="${fortis_interface_host}/index.html#/dashboard"
+az group update --name "${k8resource_group}" --set tags.FORTIS_ADMIN_INTERFACE_URL="${fortis_interface_host}/index.html#/settings"
 az group update --name "${k8resource_group}" --set tags.FORTIS_AAD_REDIRECT_URL="${fortis_interface_host}/index.html"
 az group update --name "${k8resource_group}" --set tags.FORTIS_SERVICE_HOST="${graphql_service_host}"
 
