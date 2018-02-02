@@ -113,8 +113,12 @@ of the `FORTIS_AAD_REDIRECT_URL` deployment tag in the text field:
 
 ![Screenshot showing AAD app web platform redirect URL configuration](https://user-images.githubusercontent.com/1086421/35748374-d7df60a8-081b-11e8-960d-0416a1476f61.png)
 
-Scroll to the bottom of the page and hit "Save". Congratulations, your Fortis
-site is now protected via Azure Active Directory v2.0 log-in.
+Scroll to the bottom of the page and hit "Save":
+
+![Screenshot showing AAD app configuration save button](https://user-images.githubusercontent.com/1086421/35748614-9cbabc60-081c-11e8-805d-458f77fe29da.png)
+
+Congratulations, your Fortis site is now protected via Azure Active Directory
+v2.0 log-in.
 
 ## Setting up a new Azure deployment
 
