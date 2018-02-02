@@ -32,11 +32,11 @@ readonly lets_encrypt_api_endpoint="${29}"
 readonly latest_version="${30}"
 
 # setup
-mkdir -p "/tmp/fortis-services"
-readonly deployment_yaml="/tmp/fortis-services/kubernetes-deployment.yaml"
-readonly service_yaml="/tmp/fortis-services/kubernetes-service.yaml"
-readonly ingress_yaml="/tmp/fortis-services/nginx-ingress.yaml"
-readonly ingress_secret_yaml="/tmp/fortis-services/nginx-ingress-secret.yaml"
+readonly install_dir="$(mktemp -d /tmp/fortis-services-XXXXXX)"
+readonly deployment_yaml="${install_dir}/kubernetes-deployment.yaml"
+readonly service_yaml="${install_dir}/kubernetes-service.yaml"
+readonly ingress_yaml="${install_dir}/nginx-ingress.yaml"
+readonly ingress_secret_yaml="${install_dir}/nginx-ingress-secret.yaml"
 
 # deploy the service to the kubernetes cluster
 cat > "${deployment_yaml}" << EOF

@@ -13,8 +13,8 @@ readonly latest_version="$8"
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
 if ! (command -v npm >/dev/null); then curl -sL 'https://deb.nodesource.com/setup_6.x' | sudo -E bash -; sudo apt-get -qq install -y nodejs; fi
 
-mkdir -p /tmp/fortis-interfaces
-pushd /tmp/fortis-interfaces
+readonly install_dir="$(mktemp -d /tmp/fortis-interfaces-XXXXXX)"
+pushd "${install_dir}"
 
 wget "https://github.com/CatalystCode/project-fortis/archive/${latest_version}.tar.gz"
 tar xf "${latest_version}.tar.gz" "project-fortis-${latest_version}/project-fortis-interfaces" --strip-components=2
