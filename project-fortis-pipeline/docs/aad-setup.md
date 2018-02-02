@@ -15,7 +15,7 @@ ensuring that the "Guided Setup" option is not checked.
 Take note of the "Application Id" for your newly created AAD application since
 you will require this during the deployment of your Fortis site:
 
-![Screenshot showing AAD Application Id field](https://user-images.githubusercontent.com/1086421/35748848-76bccde0-081d-11e8-88d9-c945bd631853.png)
+![Screenshot showing AAD Application Id field](https://user-images.githubusercontent.com/1086421/35748987-fb611736-081d-11e8-9c92-b270516160ec.png)
 
 ## Deployment steps
 
