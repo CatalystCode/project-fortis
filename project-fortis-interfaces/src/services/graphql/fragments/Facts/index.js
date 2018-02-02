@@ -17,5 +17,6 @@ fragment FortisFactsView on FeatureCollection {
     }
     coordinates
   }
+  pageState
 }
 `.trim();

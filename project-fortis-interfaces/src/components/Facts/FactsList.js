@@ -44,6 +44,7 @@ export const FactsList = createReactClass({
   getInitialState() {
     return {
       facts: [],
+      pageState: '',
       loading: false,
     };
   },
@@ -194,7 +195,7 @@ export const FactsList = createReactClass({
   loadFacts(props) {
     props = props || this.props;
 
-    const { loading } = this.state;
+    const { loading, pageState } = this.state;
     if (loading) {
       return;
     }
@@ -205,11 +206,12 @@ export const FactsList = createReactClass({
     }
 
     const pipelinekeys = this.props.enabledStreams.get(PIPELINE_ALL).sourceValues;
-    methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, (err, data) => {
+    methods.FACTS.loadFacts(pipelinekeys, maintopic, fromDate, toDate, pageState, (err, data) => {
       if (err) return console.error(`Error fetching facts: ${err}`);
 
       this.setState({
         facts: this.sortByEventTime((data && data.facts && data.facts.features) || []),
+        pageState: data && data.facts && data.facts.pageState,
         loading: false,
       });
     });
