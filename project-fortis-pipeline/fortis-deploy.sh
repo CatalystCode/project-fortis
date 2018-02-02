@@ -411,7 +411,8 @@ echo "Finished. Setting up cluster"
   "${tls_certificate}" \
   "${tls_key}" \
   "${lets_encrypt_email}" \
-  "${lets_encrypt_api_endpoint}"
+  "${lets_encrypt_api_endpoint}" \
+  "${user_name}"
 
 # shellcheck disable=SC2181
 if [ $? -ne 0 ]; then

@@ -28,6 +28,7 @@ readonly tls_certificate_b64="${25}"
 readonly tls_key_b64="${26}"
 readonly lets_encrypt_email="${27}"
 readonly lets_encrypt_api_endpoint="${28}"
+readonly user_name="${29}"
 
 if [ -n "${aad_client}" ] || [ "${endpoint_protection}" != "none" ]; then readonly fortis_interface_protocol="https"; else readonly fortis_interface_protocol="http"; fi
 readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
@@ -117,6 +118,27 @@ echo "Finished. Now setting up fortis react frontend."
   "${aad_client}" \
   "${mapbox_tile_layer_url}" \
   "${latest_version}"
+
+echo "Finished. Now setting up fortis react frontend upgrade script."
+cat > "/home/${user_name}/upgrade-interfaces.sh" << EOF
+#!/usr/bin/env bash
+readonly release_to_install="\$1"
+
+if [ -z "\$release_to_install" ]; then
+  echo "Usage: \$0 <release_to_install>" >&2; exit 1
+fi
+
+${PWD}/install-fortis-interfaces.sh \
+  "${graphql_service_host}" \
+  "${storage_account_name}" \
+  "${storage_account_key}" \
+  "${fortis_interface_container}" \
+  "${fortis_interface_host}" \
+  "${aad_client}" \
+  "${mapbox_tile_layer_url}" \
+  "\${release_to_install}"
+EOF
+chmod +x "/home/${user_name}/upgrade-fortis-interfaces.sh"
 
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \
