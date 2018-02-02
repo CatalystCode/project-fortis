@@ -39,6 +39,7 @@ WORKDIR /app
 ADD package.json /app/package.json
 RUN npm install
 ADD public /app/public
+ADD docker/run-react.sh /app/server
 
 # note that this dockerfile does not expose port 80 since it wouldn't make sense
 # to run the webpack dev-server in production; for a production deployment,
@@ -49,6 +50,5 @@ ADD public /app/public
 EXPOSE 35729
 EXPOSE 3000
 ENV PORT="3000"
-ENV PATH="/app/node_modules/.bin:$PATH"
 
-CMD ["npm", "start"]
+CMD "/app/server"

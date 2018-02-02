@@ -88,7 +88,7 @@
     "request": "^2.83.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "devserver": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
     "depcheck": "depcheck",
