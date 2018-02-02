@@ -1,6 +1,12 @@
 # Upgrading
 Currently, components of the Fortis pipeline must be upgraded individually in order to migrate to a newer version. This document covers the upgrade process for each such component (WIP).
 
+## Frontend
+
+```sh
+ssh fortisadmin@YOUR_DEPLOY_VM_IP "sudo ~/upgrade-fortis-interfaces.sh RELEASE_TO_INSTALL"
+```
+
 ## Spark Job
 ### Description
 The [Spark job](github.com/CatalystCode/project-fortis-spark) provides data ingestion and realtime analytics processing for incoming events and is the source of all data exposed by Project Fortis.
