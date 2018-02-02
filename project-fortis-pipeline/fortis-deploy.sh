@@ -63,7 +63,7 @@ throw_if_tls_certificate_info_not_complete() {
   if [ -n "$hostname" ] && [ -n "$certificate" ] && [ -n "$key" ]; then
     return
   fi
-  echo  "endpoint_protection with value 'tls_provide_certificate' requires fields 'ingress_hostname', 'tls_certificate', 'tls_key' be fully filled out." 1>&2
+  echo "endpoint_protection with value 'tls_provide_certificate' requires fields 'ingress_hostname', 'tls_certificate', 'tls_key' be fully filled out." 1>&2
   print_usage
   exit -1
 }
@@ -75,7 +75,7 @@ throw_if_tls_lets_encrypt_info_not_complete() {
   if [[ -n "${hostname}" ]] && [[ -n "${email}" ]] && [[ -n "${endpoint}" ]]; then
     return
   fi
-  echo  "endpoint_protection with value 'tls_lets_encrypt' requires fields 'ingress_hostname', 'lets_encrypt_email', 'lets_encrypt_api_endpoint' be fully filled out." 1>&2
+  echo "endpoint_protection with value 'tls_lets_encrypt' requires fields 'ingress_hostname', 'lets_encrypt_email', 'lets_encrypt_api_endpoint' be fully filled out." 1>&2
   print_usage
   exit -1
 }
