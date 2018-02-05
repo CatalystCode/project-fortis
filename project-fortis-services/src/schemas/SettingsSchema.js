@@ -18,8 +18,8 @@ module.exports = graphql.buildSchema(`
   type Mutation {
     addUsers(input: UserListInput!): UserCollection,
     removeUsers(input: UserListInput!): UserCollection,
-    removeKeywords(input: MutatedTerms): TermCollection
-    addKeywords(input: MutatedTerms): TermCollection
+    removeKeywords(input: MutatedTerms): SiteTerms
+    addKeywords(input: MutatedTerms): SiteTerms
     removeSite(input: EditableSiteSettings!): Site
     editSite(input: EditableSiteSettings!): Site
     modifyStreams(input: StreamListInput!): StreamCollection
@@ -111,11 +111,6 @@ module.exports = graphql.buildSchema(`
 
   type Category {
     name: String!
-  }
-
-  type TermCollection {
-    runTime: String
-    edges: [SiteTerm]!
   }
 
   type SourceCollection {
