@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { Modal, Button } from 'react-bootstrap';
+import Modal from 'react-bootstrap/lib/Modal';
+import Button from 'react-bootstrap/lib/Button';
 import { AdminSettings } from './AdminSettings';
 import AdminWatchlist from './AdminWatchlist';
 import { CustomEventsEditor } from './CustomEventsEditor';

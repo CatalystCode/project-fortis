@@ -1,5 +1,6 @@
 import React from 'react';
-import { Glyphicon, Button } from 'react-bootstrap';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+import Button from 'react-bootstrap/lib/Button';
 
 const enableButtonStyle = {
   glyph: "ok",

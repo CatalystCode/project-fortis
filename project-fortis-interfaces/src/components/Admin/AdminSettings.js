@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import { Button, Glyphicon } from 'react-bootstrap';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+import Button from 'react-bootstrap/lib/Button';
 import Fluxxor from 'fluxxor';
 import '../../styles/Admin/Admin.css'
 import SiteExportButton from './SiteExportButton';

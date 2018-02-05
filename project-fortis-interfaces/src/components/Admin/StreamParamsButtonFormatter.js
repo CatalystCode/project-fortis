@@ -1,6 +1,8 @@
 import React from 'react';
 import { DataGrid } from './DataGrid';
-import { Glyphicon, Button, Modal } from 'react-bootstrap';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+import Button from 'react-bootstrap/lib/Button';
+import Modal from 'react-bootstrap/lib/Modal';
 import { getColumns } from './shared';
 
 class StreamParamsButtonFormatter extends React.Component {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Button, Glyphicon } from 'react-bootstrap';
+import Button from 'react-bootstrap/lib/Button';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import Snackbar from 'material-ui/Snackbar';
 import moment from 'moment';
 
