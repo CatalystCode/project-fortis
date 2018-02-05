@@ -1,5 +1,6 @@
 import Subheader from './Subheader';
 import React from 'react';
+import Button from 'react-bootstrap/lib/Button'
 import { Treebeard, decorators } from 'react-treebeard';
 import * as filters from './TreeFilter';
 import TypeaheadSearch from './TypeaheadSearch';
@@ -201,11 +202,10 @@ export default class SentimentTreeview extends React.Component {
             <div className="panel panel-selector">
                 <Subheader style={styles.subHeader}>
                     <span style={styles.titleSpan}>FILTERS</span>
-                    {
-                        this.props.termFilters.size > 0 ?
-                            <button type="button" onClick={this.clearTerms} className="btn btn-primary btn-sm">Clear Selections</button>
-                            : undefined
-                    }
+                    {this.props.termFilters.size > 0 &&
+                    <Button onClick={this.clearTerms} bsSize="sm" bsStyle="primary">
+                        Clear Selections
+                    </Button>}
                 </Subheader>
                 <div style={styles.searchBox}>
                     <TypeaheadSearch

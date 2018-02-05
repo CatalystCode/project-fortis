@@ -5,6 +5,8 @@ import '../../styles/Insights/ActivityFeed.css';
 import NoData from '../Graphics/NoData';
 import styles from '../../styles/Insights/ActivityFeed';
 import Infinite from 'react-infinite';
+import Button from 'react-bootstrap/lib/Button';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import CircularProgress from 'material-ui/CircularProgress';
 import FortisEvent from './FortisEvent';
@@ -239,9 +241,9 @@ export default class ActivityFeed extends React.Component {
         <div className="input-group">
           <input ref="filterTextInput" type="text" placeholder="Filter News Feed .." className="form-control" onKeyDown={this.onSearchSubmitText} />
           <span className="input-group-btn">
-            <button onClick={this.onSearchSubmitClick} className="btn btn-default">
-              <i className="fa fa-search"></i>
-            </button>
+            <Button onClick={this.onSearchSubmitClick}>
+              <Glyphicon glyph="search" />
+            </Button>
           </span>
         </div> : null}
         {renderedElements.length || isInfiniteLoading ?

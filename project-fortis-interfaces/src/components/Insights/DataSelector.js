@@ -3,6 +3,8 @@ import constants from '../../actions/constants';
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 import momentLocalizer from 'react-widgets/lib/localizers/moment';
 import SelectField from 'material-ui/SelectField';
+import Button from 'react-bootstrap/lib/Button';
+import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import MenuItem from 'material-ui/MenuItem';
 import moment from 'moment';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -131,9 +133,9 @@ export default class DataSelector extends React.Component {
                         time={showTimePicker}
                         {...monthSelectorProps} />
 
-                    <button id="cancel-button" type="button" className="btn btn-danger btn-sm" onClick={this.cancelDateTimePicker}>
-                        <span className="fa fa-times-circle-o" aria-hidden="true"></span>&nbsp;Cancel
-                    </button>
+                    <Button id="cancel-button" bsStyle="danger" bsSize="sm" onClick={this.cancelDateTimePicker}>
+                        <Glyphicon glyph="remove" /> Cancel
+                    </Button>
                 </div>
             );
         }

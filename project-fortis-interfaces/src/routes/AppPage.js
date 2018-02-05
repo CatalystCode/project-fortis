@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'react-bootstrap/lib/Button'
 import createReactClass from 'create-react-class';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Fluxxor from 'fluxxor';
@@ -212,7 +213,7 @@ export const AppPage = createReactClass({
   renderLogin() {
     return (
       <div className="loadingPage">
-        <a className="btn btn-primary" onClick={this.adLogin}>Click to log in.</a>
+        <Button bsStyle="primary" onClick={this.adLogin}>Click to log in.</Button>
       </div>
     );
   },
