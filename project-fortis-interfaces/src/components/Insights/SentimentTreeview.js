@@ -198,7 +198,7 @@ export default class SentimentTreeview extends React.Component {
       }
     };
 
-    const hasRelatedTerms = this.state && this.state.treeData && this.state.treeData.children && this.state.treeData.children.length;
+    const hasRelatedTerms = this.state && this.state.treeData && this.state.treeData.children && this.state.treeData.children.length > 0;
 
     let relatedTermsLabel;
     if (this.props.maintopic && hasRelatedTerms) {
