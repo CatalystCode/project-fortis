@@ -1,11 +1,13 @@
 import { SERVICES } from '../../services/Dashboard';
 import ReactDataGrid from 'react-data-grid';
 import React from 'react';
+import Button from 'react-bootstrap/lib/Button'
+import Glyphicon from 'react-bootstrap/lib/Glyphicon'
 import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import moment from 'moment';
 // eslint-disable-next-line
-import { guid } from '../../utils/Utils.js';
+import { guid, doNothing } from '../../utils/Utils.js';
 
 const { Toolbar, Data: { Selectors } } = require('react-data-grid-addons');
 const STATE_ACTIONS = {
@@ -415,10 +417,6 @@ export const DataGrid = createReactClass({
       else return false;
     },
 
-    showUploadChangesButton() {
-      return this.state.localAction && this.state.rows.length > 0 && this.state.selectedRowKeys.length > 0;
-    },
-
     render() {
         let rowText = this.state.selectedRowKeys.length === 1 ? 'row' : 'rows';
         let toolBarProps = {};
@@ -441,33 +439,32 @@ export const DataGrid = createReactClass({
             toolBarProps.onAddRow = this.handleAddRow;
         }
 
+        const showAddRemoveButtons = this.state.selectedRowKeys.length > 0 && this.state.localAction !== STATE_ACTIONS.SAVING && this.state.localAction !== STATE_ACTIONS.TRANSLATING;
+        const showTranslateButton = this.hasPhrasesToTranslate();
+
         return (
           <div>
-            {
-                this.showUploadChangesButton() ?
-                       <button style={styles.actionButton}
-                                onClick={this.handleSave}
-                                type="button"
-                                className={this.state.localAction === STATE_ACTIONS.MODIFIED || this.state.localAction === STATE_ACTIONS.SAVING || this.state.localAction === STATE_ACTIONS.TRANSLATED ? `btn btn-primary btn-sm` : `btn btn-success btn-sm`}
-                                disabled={this.state.localAction === STATE_ACTIONS.SAVING || this.state.localAction === STATE_ACTIONS.TRANSLATING || this.state.localAction === STATE_ACTIONS.TRANSLATING }>
-                             <i className="fa fa-cloud-upload" aria-hidden="true"></i> {saveButtonState}
-                       </button>
-                   : undefined
-            }
-            {
-                this.state.selectedRowKeys.length > 0 && this.state.localAction !== STATE_ACTIONS.SAVING ?
-                       <button style={styles.actionButton} onClick={this.removeSelectedRows} type="button" className="btn btn-danger btn-sm">
-                             <i className="fa fa-remove" aria-hidden="true"></i> Remove Selection(s)
-                       </button>
-                   : undefined
-            }
-            {
-              this.hasPhrasesToTranslate() ?
-                <button style={styles.actionButton} onClick={this.translateSelectedRows} type="button" className="btn btn-default btn-sm">
-                  <i className="fa fa-language" aria-hidden="true"></i> Translate Selection(s)
-                </button>
-              : undefined
-            }
+            <Button style={styles.actionButton}
+                    onClick={showAddRemoveButtons ? this.handleSave : doNothing}
+                    disabled={!showAddRemoveButtons}
+                    bsSize="sm"
+                    bsStyle="primary">
+                <Glyphicon glyph="save" /> {saveButtonState}
+            </Button>
+            <Button style={styles.actionButton}
+                    onClick={showAddRemoveButtons ? this.removeSelectedRows : doNothing}
+                    disabled={!showAddRemoveButtons}
+                    bsSize="sm"
+                    bsStyle="danger">
+                <Glyphicon glyph="trash" /> Remove Selection(s)
+            </Button>
+            <Button style={styles.actionButton}
+                    onClick={showTranslateButton ? this.translateSelectedRows : doNothing}
+                    disabled={!showTranslateButton}
+                    bsSize="sm"
+                    bsStyle="default">
+                <Glyphicon glyph="globe" /> Translate Selection(s)
+            </Button>
             <span style={styles.rowSelectionLabel}>{this.state.selectedRowKeys.length} {rowText} selected</span>
 
             <ReactDataGrid
