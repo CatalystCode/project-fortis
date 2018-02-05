@@ -194,6 +194,36 @@ echo "Finished. Now installing Spark helm chart."
   "${translationsvctoken}" \
   "${latest_version}"
 
+echo "Finished. Now setting up fortis spark job upgrade script."
+if ! (command -v yaml > /dev/null); then npm install --global yaml-cli; di
+
+readonly spark_upgrade_script="/home/${user_name}/upgrade-fortis-spark.sh"
+cat > "${spark_upgrade_script}" << EOF
+#!/usr/bin/env bash
+readonly release_to_install="\$1"
+
+if [ -z "\$release_to_install" ]; then
+  echo "Usage: \$0 <release_to_install>" >&2; exit 1
+fi
+
+if curl -s "https://api.github.com/repos/CatalystCode/project-fortis/releases/tags/\${release_to_install}" -w '%{http_code}' | grep -q '^404$'; then
+  echo "Release \${release_to_install} does not exist" >&2; exit 2
+fi
+
+export KUBECONFIG="${KUBECONFIG}"
+export HELM_HOME="${HELM_HOME}"
+
+new_spark_command="\$(yaml get <(helm get values spark-cluster) 'Master.SparkSubmitCommand' | sed "s|fortis-[0-9.]*jar|fortis-\${release_to_install}.jar|g")"
+
+helm upgrade \\
+  ${PWD}/charts/spark \\
+  --name spark-cluster \\
+  --namespace spark \\
+  --set Master.SparkSubmitCommand="\${new_spark_command}"
+EOF
+chown "${user_name}:${user_name}" "${spark_upgrade_script}"
+chmod +x "${spark_upgrade_script}"
+
 echo "Finished. Verifying deployment."
 if [ "${endpoint_protection}" == "none" ]; then
   ./verify-deployment.sh \
