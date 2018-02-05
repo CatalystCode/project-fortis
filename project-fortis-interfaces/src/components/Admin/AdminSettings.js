@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
+import { Button, Glyphicon } from 'react-bootstrap';
 import Fluxxor from 'fluxxor';
 import '../../styles/Admin/Admin.css'
 import SiteExportButton from './SiteExportButton';
+import { doNothing } from '../../utils/Utils';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
@@ -150,22 +152,12 @@ export const AdminSettings = createReactClass({
     this.getFlux().actions.ADMIN.save_settings(site);
   },
 
-  renderSaveButton() {
-    if (!this.state.isFormValid) {
-      return null;
-    }
-
-    return (
-      <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
-        <i className="fa fa-cloud-upload" aria-hidden="true"></i> {this.state.saving ? "Saved Changes" : "Save Settings"}
-      </button>
-    );
-  },
-
   render() {
     if (!this.state.siteSettings.properties) {
       return <div />;
     }
+
+    const { isFormValid, saving } = this.state;
 
     return (
       <div className="row">
@@ -235,7 +227,9 @@ export const AdminSettings = createReactClass({
             </div>
             <div className="form-group">
               <p style={styles.settings.buttonRow}>
-                {this.renderSaveButton()}
+                <Button onClick={isFormValid ? this.handleSaveSettings : doNothing} disabled={!isFormValid} bsStyle={saving ? 'success' : 'primary'} bsSize="sm">
+                  <Glyphicon glyph={saving ? 'floppy-saved' : 'floppy-disk'} /> {saving ? "Saved Changes" : "Save Settings"}
+                </Button>
                 <SiteExportButton size="sm" />
               </p>
             </div>
