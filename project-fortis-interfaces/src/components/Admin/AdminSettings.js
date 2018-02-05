@@ -156,8 +156,7 @@ export const AdminSettings = createReactClass({
 
     return (
       <button onClick={this.handleSaveSettings} type="button" className={!this.state.saving ? `btn btn-primary btn-sm addSiteButton` : `btn btn-success btn-sm addSiteButton`}>
-        <i className="fa fa-cloud-upload" aria-hidden="true"></i>
-        {this.state.saving ? "Saved Changes" : "Save Settings"}
+        <i className="fa fa-cloud-upload" aria-hidden="true"></i> {this.state.saving ? "Saved Changes" : "Save Settings"}
       </button>
     );
   },
