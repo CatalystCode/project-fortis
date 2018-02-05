@@ -32,8 +32,9 @@ readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
 readonly spark_config_map_name="spark-master-conf"
 readonly spark_command="spark-submit --conf \"spark.executor.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --conf \"spark.driver.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --deploy-mode cluster --driver-memory 2g --executor-memory 18g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/fortis-${latest_version}.jar\""
-mkdir -p "/tmp/fortis-spark"
-readonly namespace_yaml="/tmp/fortis-spark/namespace.yaml"
+
+readonly install_dir="$(mktemp -d /tmp/fortis-spark-XXXXXX)"
+readonly namespace_yaml="${install_dir}/namespace.yaml"
 
 # deploy the service to the kubernetes cluster
 cat > "${namespace_yaml}" << EOF
