@@ -113,6 +113,12 @@ export const SERVICES = {
         fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
+    exportSite(callback) {
+        const query = `query { exportSite { url, expires } }`;
+        const variables = {};
+        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
     publishCustomEvents(messages, callback) {
         const query = ` mutation PublishEvents($input: NewMessages!) {
                             events: publishEvents(input: $input)

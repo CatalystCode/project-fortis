@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Fluxxor from 'fluxxor';
 import '../../styles/Admin/Admin.css'
+import SiteExportButton from './SiteExportButton';
 
 const FluxMixin = Fluxxor.FluxMixin(React);
 const StoreWatchMixin = Fluxxor.StoreWatchMixin("AdminStore");
@@ -235,6 +236,7 @@ export const AdminSettings = createReactClass({
             <div className="form-group">
               <p style={styles.settings.buttonRow}>
                 {this.renderSaveButton()}
+                <SiteExportButton size="sm" />
               </p>
             </div>
           </div>
