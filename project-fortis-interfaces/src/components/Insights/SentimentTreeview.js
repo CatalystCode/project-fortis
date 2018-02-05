@@ -194,9 +194,16 @@ export default class SentimentTreeview extends React.Component {
             }
         };
 
-        const relatedTermsLabel = this.props.maintopic
-            ? 'Search for terms related to the main keyword. Click a term in the list below to set the main keyword to that term, or click a checkbox to add the term to the list of filters.'
-            : 'First select a main keyword in the input box above.';
+        const hasRelatedTerms = this.state && this.state.treeData && this.state.treeData.children && this.state.treeData.children.length;
+
+        let relatedTermsLabel;
+        if (this.props.maintopic && hasRelatedTerms) {
+            relatedTermsLabel = 'Search for terms related to the main keyword. Click a term in the list below to set the main keyword to that term, or click a checkbox to add the term to the list of filters.';
+        } else if (this.props.maintopic && !hasRelatedTerms) {
+            relatedTermsLabel = 'The selected term only appears on its own, no related terms available.';
+        } else {
+            relatedTermsLabel = 'First select a main keyword in the input box above.';
+        }
 
         return (
             <div className="panel panel-selector">
@@ -243,7 +250,7 @@ export default class SentimentTreeview extends React.Component {
                 <div style={styles.searchBox}>
                     <div className="input-group">
                         <input type="text"
-                            disabled={!this.props.maintopic}
+                            disabled={!this.props.maintopic || !hasRelatedTerms}
                             className={this.props.inputClassName}
                             placeholder={relatedTermsLabel}
                             title={relatedTermsLabel}
@@ -252,7 +259,7 @@ export default class SentimentTreeview extends React.Component {
                 </div>
                 <div className="list-group" data-scrollable="" style={treeviewStyle}>
                     {
-                        this.state && this.state.treeData && this.state.treeData.children ?
+                        hasRelatedTerms ?
                             <div style={styles.component}>
                                 <Treebeard animations={false}
                                     decorators={Object.assign({}, decorators, decoratorsOverride)}
