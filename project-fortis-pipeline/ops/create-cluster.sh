@@ -122,18 +122,9 @@ if curl -s "https://api.github.com/repos/CatalystCode/project-fortis/releases/ta
   echo "Release \${release_to_install} does not exist" >&2; exit 2
 fi
 
-install_dir="\$(mktemp -d /tmp/fortis-services-XXXXXX)"
-
 export KUBECONFIG="${KUBECONFIG}"
 
-kubectl get po --selector='io.kompose.service=project-fortis-services' -o json \\
-| jq -r '.items[] | .metadata.name' \\
-| while read pod; do
-  pod_spec="\${install_dir}/\${pod}.yaml"
-  kubectl get po "\${pod}" -o yaml > "\${pod_spec}"
-  sed -i "s|image: cwolff/project_fortis_services:.*$|image: cwolff/project_fortis_services:\${release_to_install}|g" "\${pod_spec}"
-  kubectl replace --force -f "\${pod_spec}"
-done
+kubectl set image 'deployment/project-fortis-services' "project-fortis-services=cwolff/project_fortis_services:\${release_to_install}"
 EOF
 chown "${user_name}:${user_name}" "${services_upgrade_script}"
 chmod +x "${services_upgrade_script}"

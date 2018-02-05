@@ -105,6 +105,7 @@ spec:
         - name: FORTIS_CASSANDRA_SEED_DATA_URL
           value: ${fortis_site_clone_url}
         image: cwolff/project_fortis_services:${latest_version}
+        imagePullPolicy: "Always"
         name: project-fortis-services
         ports:
         - containerPort: 80
