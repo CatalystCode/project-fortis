@@ -226,12 +226,12 @@ export const AdminSettings = createReactClass({
               <div className="validation"></div>
             </div>
             <div className="form-group">
-              <p style={styles.settings.buttonRow}>
+              <div style={styles.settings.buttonRow}>
                 <Button onClick={isFormValid ? this.handleSaveSettings : doNothing} disabled={!isFormValid} bsStyle={saving ? 'success' : 'primary'} bsSize="sm">
                   <Glyphicon glyph={saving ? 'floppy-saved' : 'floppy-disk'} /> {saving ? "Saved Changes" : "Save Settings"}
                 </Button>
                 <SiteExportButton size="sm" />
-              </p>
+              </div>
             </div>
           </div>
         </form>
