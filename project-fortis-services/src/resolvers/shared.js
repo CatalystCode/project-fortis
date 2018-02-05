@@ -210,6 +210,7 @@ function withCsvExporter(promiseFunc, exportPropertyName, container, expiryMinut
           createFile(container, formatCsvFilename(reportName), csvText, expiryMinutes)
             .then(csv => {
               returnValue.csv = csv;
+              returnValue.csv.expires = returnValue.csv.expires.toISOString();
               resolve(returnValue);
             })
             .catch(reject);

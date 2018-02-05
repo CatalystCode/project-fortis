@@ -254,6 +254,7 @@ function exportSite(args, res) { // eslint-disable-line no-unused-vars
         return fs.remove(workspace);
       })
       .then(() => {
+        archiveBlob.expires = archiveBlob.expires.toISOString();
         return resolve(archiveBlob);
       })
       .catch(reject);
