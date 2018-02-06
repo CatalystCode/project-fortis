@@ -254,12 +254,13 @@ azure_login() {
 }
 
 install_helm() {
-  curl -s 'https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get' > get_helm.sh
-  chmod 700 get_helm.sh
-  readonly helm_version="v2.5.1"
-  ./get_helm.sh -v "${helm_version}"
+  local helm_file="/usr/local/bin/helm"
+
+  sudo curl -Lso "${helm_file}" "https://fortiscentral.blob.core.windows.net/bin/helm"
+  sudo chmod +x "${helm_file}"
 
   export HELM_HOME="/home/${user_name}/"
+
   helm init
 }
 
@@ -299,9 +300,8 @@ setup_k8_cluster() {
 
 install_kubectl() {
   local kubectl_file="/usr/local/bin/kubectl"
-  release="$(curl -s 'https://storage.googleapis.com/kubernetes-release/release/stable.txt')"
 
-  sudo curl -L -s -o "${kubectl_file}" "https://storage.googleapis.com/kubernetes-release/release/${release}/bin/linux/amd64/kubectl"
+  sudo curl -Lso "${kubectl_file}" "https://fortiscentral.blob.core.windows.net/bin/kubectl"
   sudo chmod +x "${kubectl_file}"
 
   export KUBECONFIG="${kube_config_dest_file}"
