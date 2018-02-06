@@ -325,6 +325,17 @@ elif [ "${endpoint_protection}" == "tls_lets_encrypt" ]; then
   throw_if_tls_lets_encrypt_info_not_complete "${ingress_hostname}" "${lets_encrypt_email}" "${lets_encrypt_api_endpoint}"
 fi
 
+readonly script_args="$(printf '%q \\\n' "$@")"
+readonly script_path="$(readlink -f "$0")"
+readonly script_backup_path="/home/${user_name}/fortis-deploy.sh"
+(
+  echo "#!/usr/bin/env bash"
+  echo "${script_path} \\"
+  echo "${script_args%\\}"
+) > "${script_backup_path}"
+chown "${user_name}:${user_name}" "${script_backup_path}"
+chmod +x "${script_backup_path}"
+
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
 echo "Logging into Azure"
