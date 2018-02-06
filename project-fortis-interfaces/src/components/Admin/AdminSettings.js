@@ -88,13 +88,12 @@ export const AdminSettings = createReactClass({
   },
 
   isFormValid() {
-    const siteSettings = this.getSiteSettings();
-    const sitePropertyValues = Object.keys(siteSettings.properties);
+    return Object.keys(this.getSiteSettings().properties).every(this.isPropertySet);
+  },
 
-    sitePropertyValues.forEach(key => {
-      if (!sitePropertyValues[key]) return false;
-    });
-    return true;
+  isPropertySet(key) {
+    const value = String(this.getSiteSettings().properties[key]);
+    return value && value.length > 0;
   },
 
   getSiteSettings() {
