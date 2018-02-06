@@ -195,7 +195,7 @@ echo "Finished. Now installing Spark helm chart."
   "${latest_version}"
 
 echo "Finished. Now setting up fortis spark job upgrade script."
-if ! (command -v yaml > /dev/null); then npm install --global yaml-cli; di
+if ! (command -v yaml > /dev/null); then npm install --global yaml-cli; fi
 
 readonly spark_upgrade_script="/home/${user_name}/upgrade-fortis-spark.sh"
 cat > "${spark_upgrade_script}" << EOF
