@@ -2,6 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
 import java.util.UUID
 
+import com.datastax.driver.core.ConsistencyLevel
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.WriteConf
@@ -15,8 +16,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.dstream.DStream
 
-import scala.util.{Failure, Try}
-
+import scala.util.{Failure, Success, Try}
 import FortisTelemetry.{get => Log}
 
 object CassandraEventsSink extends Loggable {
@@ -78,15 +78,20 @@ object CassandraEventsSink extends Loggable {
     }
 
     def writeFortisEvents(events: RDD[Event]): Unit = {
+      val conf = WriteConf.fromSparkConf(events.sparkContext.getConf).copy(
+        ifNotExists = true,
+        consistencyLevel = ConsistencyLevel.ALL // Ensure write is consistent across all replicas
+      )
+
       Timer.time(Log.logDependency("sinks.cassandra", s"write.$TableEvent", _, _)) {
-        events.saveToCassandra(KeyspaceName, TableEvent, writeConf = new WriteConf(ifNotExists = true))
+        events.saveToCassandra(KeyspaceName, TableEvent, writeConf = conf)
       }
     }
 
     def withoutDuplicates(events: RDD[Event]): RDD[Event] = {
-      events.repartitionByCassandraReplica(KeyspaceName, TableEventBatches)
+      val eventsRepartitioned = events.repartitionByCassandraReplica(KeyspaceName, TableEventBatches)
 
-      events.joinWithCassandraTable(
+      eventsRepartitioned.joinWithCassandraTable(
         KeyspaceName,
         TableEventBatches,
         selectedColumns = SomeColumns("eventid", "batchid"),
@@ -118,6 +123,7 @@ object CassandraEventsSink extends Loggable {
         }
       } match {
         case Failure(ex) => logError(s"Failed performing offline aggregation $name", ex)
+        case Success(_) => // rejoice
       }
     }
   }

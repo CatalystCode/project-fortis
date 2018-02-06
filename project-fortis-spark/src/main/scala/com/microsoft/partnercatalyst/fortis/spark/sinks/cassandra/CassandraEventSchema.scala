@@ -36,9 +36,9 @@ object CassandraPopularPlaces {
     for {
       kw <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       location <- item.computedfeatures.places
-      periodType <- Utils.getCassandraPeriodTypes
       zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
       tileid = TileUtils.tile_id_from_lat_long(location.centroidlat, location.centroidlon, zoom)
+      periodType <- Utils.getCassandraPeriodTypes
     } yield PopularPlace(
       pipelinekey = item.pipelinekey,
       placeid = location.placeid,
@@ -115,9 +115,9 @@ object CassandraHeatmapTiles {
     for {
       ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
       place <- item.computedfeatures.places
-      periodType <- Utils.getCassandraPeriodTypes
       zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
       tileId = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
+      periodType <- Utils.getCassandraPeriodTypes
     } yield HeatmapTile(
         pipelinekey = item.pipelinekey,
         perioddate = Period(item.eventtime, periodType).startTime(),
