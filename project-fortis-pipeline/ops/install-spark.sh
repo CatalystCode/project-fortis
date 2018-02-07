@@ -24,6 +24,7 @@ readonly cogspeechsvctoken="${21}"
 readonly cogtextsvctoken="${22}"
 readonly translationsvctoken="${23}"
 readonly latest_version="${24}"
+readonly cassandra_port="${25}"
 
 # setup
 cd charts || exit -2
@@ -53,6 +54,7 @@ kubectl create -f "${namespace_yaml}"
 kubectl create configmap "${spark_config_map_name}" \
   --namespace spark \
   --from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" \
+  --from-literal=FORTIS_CASSANDRA_PORT="${cassandra_port}" \
   --from-literal=FORTIS_FEATURE_SERVICE_HOST="${feature_service_host}" \
   --from-literal=APPLICATION_INSIGHTS_IKEY="${app_insights_id}" \
   --from-literal=APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" \

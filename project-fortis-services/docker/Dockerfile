@@ -44,6 +44,7 @@ ENV FORTIS_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure.co
 # larger cluster (e.g. hosted in Azure), just override this variable with the
 # hostname of your cluster
 ENV FORTIS_CASSANDRA_HOST="localhost"
+ENV FORTIS_CASSANDRA_PORT="9042"
 ENV CASSANDRA_KEYSPACE="fortis"
 ENV FORTIS_CASSANDRA_USERNAME="cassandra"
 ENV FORTIS_CASSANDRA_PASSWORD="cassandra"

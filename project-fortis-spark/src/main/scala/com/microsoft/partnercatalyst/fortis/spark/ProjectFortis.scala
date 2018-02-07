@@ -28,6 +28,7 @@ object ProjectFortis extends App with Loggable {
       // Required
       featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase),
       cassandraHosts = envOrFail(Constants.Env.CassandraHost),
+      cassandraPorts = envOrFail(Constants.Env.CassandraPort),
       managementBusConnectionString = envOrFail(Constants.Env.ManagementBusConnectionString),
       managementBusConfigQueueName = envOrFail(Constants.Env.ManagementBusConfigQueueName),
       managementBusCommandQueueName = envOrFail(Constants.Env.ManagementBusCommandQueueName),

@@ -30,6 +30,7 @@ readonly tls_key_b64="${27}"
 readonly lets_encrypt_email="${28}"
 readonly lets_encrypt_api_endpoint="${29}"
 readonly latest_version="${30}"
+readonly cassandra_port="${31}"
 
 # setup
 readonly install_dir="$(mktemp -d /tmp/fortis-services-XXXXXX)"
@@ -60,6 +61,8 @@ spec:
       - env:
         - name: FORTIS_CASSANDRA_HOST
           value: ${cassandra_ip}
+        - name: FORTIS_CASSANDRA_PORT
+          value: ${cassandra_port}
         - name: APPINSIGHTS_INSTRUMENTATIONKEY
           value: ${app_insights_id}
         - name: FORTIS_FEATURE_SERVICE_HOST

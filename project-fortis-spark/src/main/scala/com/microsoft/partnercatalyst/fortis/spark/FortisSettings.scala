@@ -5,6 +5,7 @@ case class FortisSettings(
   featureServiceUrlBase: String,
   blobUrlBase: String,
   cassandraHosts: String,
+  cassandraPorts: String,
   managementBusConnectionString: String,
   managementBusConfigQueueName: String,
   managementBusCommandQueueName: String,

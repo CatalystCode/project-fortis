@@ -11,7 +11,9 @@ object CassandraConfig {
   private val CassandraPassword = "cassandra"//todo disable auth as we wont need it as C* will only be available internally in the cluster
 
   def init(conf: SparkConf, batchDuration: Duration, fortisSettings: FortisSettings): SparkConf = {
-    conf.setIfMissing("spark.cassandra.connection.host", fortisSettings.cassandraHosts)
+    conf
+      .setIfMissing("spark.cassandra.connection.host", fortisSettings.cassandraHosts)
+      .setIfMissing("spark.cassandra.connection.port", fortisSettings.cassandraPorts)
       .setIfMissing("spark.cassandra.auth.username", CassandraUsername)
       .setIfMissing("spark.cassandra.auth.password", CassandraPassword)
       .setIfMissing("spark.cassandra.connection.keep_alive_ms", envOrElse("CASSANDRA_KEEP_ALIVE_MS", (batchDuration.milliseconds * 2).toString))

@@ -50,6 +50,7 @@ object CassandraTest {
     val conf = new SparkConf()
       .setAppName(appName)
       .set("spark.cassandra.connection.host", envOrFail("FORTIS_CASSANDRA_HOST"))
+      .set("spark.cassandra.connection.port", envOrFail("FORTIS_CASSANDRA_PORT"))
       .setIfMissing("spark.cassandra.auth.username", envOrElse("FORTIS_CASSANDRA_USER", "cassandra"))
       .setIfMissing("spark.cassandra.auth.password", envOrElse("FORTIS_CASSANDRA_PASSWORD", "cassandra"))
       .set("spark.cassandra.input.consistency.level", "LOCAL_ONE")

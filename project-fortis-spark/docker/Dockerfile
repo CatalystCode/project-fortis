@@ -36,6 +36,7 @@ ENV FORTIS_CENTRAL_ASSETS_HOST="https://fortiscentral.blob.core.windows.net"
 # larger cluster (e.g. hosted in Azure), just override this variable with the
 # hostname of your cluster
 ENV FORTIS_CASSANDRA_HOST="localhost"
+ENV FORTIS_CASSANDRA_PORT="9042"
 ENV FORTIS_CASSANDRA_USERNAME="cassandra"
 ENV FORTIS_CASSANDRA_PASSWORD="cassandra"
 

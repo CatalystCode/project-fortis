@@ -58,6 +58,7 @@ while :; do
   cassandra_ip="$(kubectl --namespace=cassandra get svc cassandra-cluster-cassan-ext -o jsonpath='{..clusterIP}')"
   if [ -n "${cassandra_ip}" ]; then break; else echo "Waiting for Cassandra IP"; sleep 5s; fi
 done
+readonly cassandra_port="9042"
 
 echo "Finished. Now setting up fortis graphql service in kubernetes."
 ./install-fortis-services.sh \
@@ -90,7 +91,9 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${tls_key_b64}" \
   "${lets_encrypt_email}" \
   "${lets_encrypt_api_endpoint}" \
-  "${latest_version}"
+  "${latest_version}" \
+  "${cassandra_port}"
+
 while :; do
   if [ "${endpoint_protection}" == "none" ]; then
     fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
@@ -192,7 +195,8 @@ echo "Finished. Now installing Spark helm chart."
   "${cogspeechsvctoken}" \
   "${cogtextsvctoken}" \
   "${translationsvctoken}" \
-  "${latest_version}"
+  "${latest_version}" \
+  "${cassandra_port}"
 
 echo "Finished. Now setting up fortis spark job upgrade script."
 if ! (command -v yaml > /dev/null); then npm install --global yaml-cli; fi
