@@ -1,11 +1,15 @@
 FROM node:9.2.0
 
-RUN apt-get install -y --no-install-recommends wget ca-certificates \
- && wget -q http://www-eu.apache.org/dist/cassandra/3.11.0/apache-cassandra-3.11.0-bin.tar.gz \
- && tar xfz apache-cassandra-3.11.0-bin.tar.gz \
- && rm apache-cassandra-3.11.0-bin.tar.gz \
- && mv apache-cassandra-3.11.0 /opt/cassandra
+# install cassandra
+ENV CASSANDRA_HOME="/opt/cassandra"
+ARG CASSANDRA_VERSION="3.11.0"
+ARG CASSANDRA_ARTIFACT="apache-cassandra-${CASSANDRA_VERSION}"
+ARG CASSANDRA_URL="http://www-eu.apache.org/dist/cassandra/${CASSANDRA_VERSION}/${CASSANDRA_ARTIFACT}-bin.tar.gz"
+RUN apt-get -qq install -y --no-install-recommends wget ca-certificates && \
+    wget -qO - ${CASSANDRA_URL} | tar -xzC /opt && \
+    ln -s /opt/${CASSANDRA_ARTIFACT} ${CASSANDRA_HOME}
 
+# install graphql server
 WORKDIR /app
 ADD package.json /app/package.json
 RUN npm install
@@ -13,6 +17,7 @@ ADD src /app/src
 ADD server.js /app/server.js
 ADD config.js /app/config.js
 
+# install scripts
 ADD docker/run-node.sh /app/server
 ADD docker/run-cqlsh.sh /app/cqlsh
 CMD /app/server

@@ -43,5 +43,4 @@ if [ -n "$COGNITIVE_TEXT_SERVICE_TOKEN" ]; then
   wait_for_token "cogtextsvctoken"
 fi
 
-readonly spark_jar="$(find /app/target -name '*-assembly-0.0.0.jar' -exec readlink -f {} \; -quit)"
-spark-submit --driver-memory "${SPARK_DRIVER_MEMORY}" --class "${SPARK_MAINCLASS}" "${spark_jar}"
+spark-submit --driver-memory "${SPARK_DRIVER_MEMORY}" --class "${SPARK_MAINCLASS}" /app/job.jar
