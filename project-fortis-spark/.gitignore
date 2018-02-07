@@ -1,13 +1,3 @@
-# IntelliJ
-#
-.idea/
-
-# macOS
-.DS_Store
-
-# Simple Build Tool
-# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
-
 dist/*
 target/
 lib_managed/
@@ -17,7 +7,3 @@ project/plugins/project/
 .history
 .cache
 .lib/
-
-# Miscellaneous
-*.orig
-
