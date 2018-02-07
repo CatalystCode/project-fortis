@@ -40,7 +40,7 @@ function checkIfUserHasRole(user, role) {
   return new Promise((resolve, reject) => {
     const query = `
     SELECT identifier, role
-    FROM fortis.users
+    FROM settings.users
     WHERE identifier = ?
     AND role = ?
     `.trim();

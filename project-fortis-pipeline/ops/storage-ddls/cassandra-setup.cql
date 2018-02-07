@@ -14,12 +14,6 @@ DROP MATERIALIZED VIEW IF EXISTS fortis.populartopics;
 DROP MATERIALIZED VIEW IF EXISTS fortis.eventplacesbysource;
 DROP INDEX IF EXISTS fortis.events_fulltext_idx;
 
-DROP TABLE IF EXISTS fortis.users;
-DROP TABLE IF EXISTS fortis.watchlist;
-DROP TABLE IF EXISTS fortis.blacklist;
-DROP TABLE IF EXISTS fortis.sitesettings;
-DROP TABLE IF EXISTS fortis.streams;
-DROP TABLE IF EXISTS fortis.trustedsources;
 DROP TABLE IF EXISTS fortis.conjunctivetopics;
 DROP TABLE IF EXISTS fortis.computedtiles;
 DROP TABLE IF EXISTS fortis.heatmap;
@@ -66,73 +60,6 @@ CREATE TYPE fortis.features (
     entities frozen<list<fortis.computedentities>>,
     keywords frozen<list<text>>,
     places frozen<list<fortis.place>>
-);
-
-// *****************************************************************************
-// * Configuration tables
-// *****************************************************************************
-
-CREATE TABLE fortis.users(
-    identifier text,
-    role text,
-    PRIMARY KEY ((identifier, role))
-);
-
-CREATE TABLE fortis.watchlist(
-    topicid uuid,
-    topic text,
-    lang_code text,
-    translations map<text, text>,
-    category text,
-    insertiontime timestamp,
-    PRIMARY KEY ((topic, lang_code), category)
-);
-
-CREATE TABLE fortis.blacklist(
-    id uuid,
-    conjunctivefilter frozen<list<text>>,
-    islocation boolean,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE fortis.sitesettings(
-    sitename text,
-    geofence list<double>,
-    languages set<text>,
-    defaultlanguage text,
-    defaultzoom int,
-    featureservicenamespace text,
-    title text,
-    logo text,
-    mapsvctoken text,
-    translationsvctoken text,
-    cogspeechsvctoken text,
-    cogvisionsvctoken text,
-    cogtextsvctoken text,
-    insertiontime timestamp,
-    PRIMARY KEY (sitename)
-);
-
-CREATE TABLE fortis.streams (
-    streamid uuid,
-    pipelinekey text,
-    pipelinelabel text,
-    pipelineicon text,
-    streamfactory text,
-    params frozen<map<text, text>>,
-    enabled boolean,
-    PRIMARY KEY (pipelinekey, streamid)
-);
-
-CREATE TABLE fortis.trustedsources (
-   externalsourceid text,
-   sourcetype text,
-   pipelinekey text,
-   rank int,
-   displayname text,
-   reportingcategory text,
-   insertiontime timestamp,
-   PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
 );
 
 // *****************************************************************************

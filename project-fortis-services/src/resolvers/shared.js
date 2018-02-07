@@ -70,7 +70,7 @@ function transformWatchlist(item, translatedlanguage) {
 
 function getSiteDefinition() {
   return new Promise((resolve, reject) => {
-    cassandraConnector.executeQuery('SELECT * FROM fortis.sitesettings', [])
+    cassandraConnector.executeQuery('SELECT * FROM settings.sitesettings', [])
       .then(rows => {
         if (rows.length < 1) return reject('Could not find site with sitename');
         if (rows.length > 1) return reject(`Got more than one site (got ${rows.length}) with sitename`);
@@ -83,7 +83,7 @@ function getSiteDefinition() {
 
 function getSiteTerms(translationLanguage) {
   return new Promise((resolve, reject) => {
-    const termsQuery = 'SELECT topicid, topic, translations, lang_code, category FROM fortis.watchlist';
+    const termsQuery = 'SELECT topicid, topic, translations, lang_code, category FROM settings.watchlist';
     cassandraConnector.executeQuery(termsQuery, [])
       .then(rows => {
         const watchlistTerms = rows.map(item => transformWatchlist(item, translationLanguage));

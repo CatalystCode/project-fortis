@@ -20,7 +20,7 @@ const { requiresRole } = require('../../auth');
 
 function users(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    cassandraConnector.executeQuery('SELECT * FROM fortis.users', [])
+    cassandraConnector.executeQuery('SELECT * FROM settings.users', [])
       .then(rows => {
         const users = rows.map(cassandraRowToUser);
         resolve({
@@ -76,7 +76,7 @@ function sites(args, res) { // eslint-disable-line no-unused-vars
 
 function streams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    cassandraConnector.executeQuery('SELECT * FROM fortis.streams', [])
+    cassandraConnector.executeQuery('SELECT * FROM settings.streams', [])
       .then(rows => {
         const streams = rows.map(cassandraRowToStream);
         resolve({
@@ -92,7 +92,7 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
 
 function trustedSources(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM fortis.trustedsources';
+    const query = 'SELECT * FROM settings.trustedsources';
     const params = [];
 
     cassandraConnector.executeQuery(query, params)
@@ -154,7 +154,7 @@ function cassandraRowToTermFilter(row) {
 
 function termBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    const blacklistQuery = 'SELECT id, conjunctivefilter, islocation FROM fortis.blacklist';
+    const blacklistQuery = 'SELECT id, conjunctivefilter, islocation FROM settings.blacklist';
     cassandraConnector.executeQuery(blacklistQuery, [])
       .then(rows => {
         const filters = rows.map(cassandraRowToTermFilter);
@@ -179,11 +179,11 @@ function exportSite(args, res) { // eslint-disable-line no-unused-vars
   }
 
   function formatExportQuery(tableName) {
-    return `SELECT * FROM fortis.${tableName}`;
+    return `SELECT * FROM settings.${tableName}`;
   }
 
   function formatImportQuery(tableName) {
-    return `COPY fortis.${tableName} FROM '${tableName}.csv' WITH NULL='null';`;
+    return `COPY settings.${tableName} FROM '${tableName}.csv' WITH NULL='null';`;
   }
 
   return new Promise((resolve, reject) => {

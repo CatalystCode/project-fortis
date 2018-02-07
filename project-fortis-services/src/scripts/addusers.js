@@ -11,11 +11,11 @@ function addUsers(role, users) {
     if (!users || !users.length) return reject('users is not defined');
 
     const mutations = users.map(user => ({
-      query: 'INSERT INTO fortis.users(identifier, role) VALUES (?, ?) IF NOT EXISTS',
+      query: 'INSERT INTO settings.users(identifier, role) VALUES (?, ?) IF NOT EXISTS',
       params: [user, role]
     }));
     const queries = users.map(user => ({
-      query: 'SELECT * FROM fortis.users WHERE identifier = ? AND role = ?',
+      query: 'SELECT * FROM settings.users WHERE identifier = ? AND role = ?',
       params: [user, role]
     }));
 

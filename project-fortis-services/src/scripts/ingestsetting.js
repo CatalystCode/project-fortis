@@ -13,7 +13,7 @@ function ingestSetting(settingName, columnName, value) {
     if (!value) return reject('value is not defined');
 
     const query = `
-    UPDATE fortis.sitesettings
+    UPDATE settings.sitesettings
     SET ${columnName} = ?
     WHERE sitename = ?
     `;

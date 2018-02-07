@@ -49,7 +49,7 @@ function createInsertUserMutations(users) {
   const mutations = [];
   users.forEach(user => {
     mutations.push({
-      query: `INSERT INTO fortis.users (identifier, role) 
+      query: `INSERT INTO settings.users(identifier, role)
       VALUES (?, ?)`,
       params: [
         user.identifier,
@@ -69,12 +69,12 @@ function removeUsers(args, res) { // eslint-disable-line no-unused-vars
 
     const usersWithoutAdminRole = getAllUsersWithoutAdminRole(users);
     const missingAdminRoles = usersWithoutAdminRole.map(({identifier}) => ({identifier, role: 'admin'}));
-    const usersToRemove = removeCurrentUser(users.concat(missingAdminRoles), args, res);   
+    const usersToRemove = removeCurrentUser(users.concat(missingAdminRoles), args, res);
     const mutations = [];
     usersToRemove.forEach(user => {
       if (!isCurrentUser(args, res, user)) {
         mutations.push({
-          query: `DELETE FROM fortis.users 
+          query: `DELETE FROM settings.users
           WHERE identifier = ? AND role = ?`,
           params: [
             user.identifier,
@@ -114,7 +114,7 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
     getSiteDefinition()
       .then(({ site }) => {
         return cassandraConnector.executeBatchMutations([{
-          query: `UPDATE fortis.sitesettings
+          query: `UPDATE settings.sitesettings
           SET geofence = ?,
           defaultzoom = ?,
           logo = ?,
@@ -181,7 +181,7 @@ function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
     let mutations = [];
     args.input.sources.forEach(source => {
       mutations.push({
-        query: `INSERT INTO fortis.trustedsources (
+        query: `INSERT INTO settings.trustedsources (
           pipelinekey,
           externalsourceid,
           sourcetype,
@@ -222,7 +222,7 @@ function removeTrustedSources(args, res) { // eslint-disable-line no-unused-vars
     }
 
     const mutations = args.input.sources.map(source => ({
-      query: 'DELETE FROM fortis.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND sourcetype = ? AND rank = ?',
+      query: 'DELETE FROM settings.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND sourcetype = ? AND rank = ?',
       params: [source.pipelinekey, source.externalsourceid, source.sourcetype, source.rank]
     }));
 
@@ -247,7 +247,7 @@ function removeKeywords(args, res) { // eslint-disable-line no-unused-vars
     }
 
     const mutations = args.input.edges.map(edge => ({
-      query: 'DELETE FROM fortis.watchlist WHERE topic = ? AND lang_code = ?',
+      query: 'DELETE FROM settings.watchlist WHERE topic = ? AND lang_code = ?',
       params: [edge.name, edge.namelang]
     }));
 
@@ -286,7 +286,7 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
     args.input.edges.forEach(edge => {
       let params = paramEntryToMap(edge.translations);
       mutations.push({
-        query: `INSERT INTO fortis.watchlist (
+        query: `INSERT INTO settings.watchlist (
           topic,
           lang_code,
           category,
@@ -317,7 +317,7 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
 function removeSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     cassandraConnector.executeBatchMutations([{
-      query: 'DELETE FROM fortis.sitesettings WHERE sitename = ?;',
+      query: 'DELETE FROM settings.sitesettings WHERE sitename = ?;',
       params: [args.input.name]
     }])
       .then(() => {
@@ -353,7 +353,7 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
     streams.forEach(stream => {
       let params = paramEntryToMap(stream.params);
       mutations.push({
-        query: `UPDATE fortis.streams
+        query: `UPDATE settings.streams
         SET pipelinelabel = ?,
         pipelineicon = ?,
         streamfactory = ?,
@@ -398,7 +398,7 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
     termFilters.forEach(termFilter => {
       if (!termFilter.id) termFilter.id = uuid();
       mutations.push({
-        query: 'UPDATE fortis.blacklist SET conjunctivefilter = ?, islocation = ? WHERE id = ?',
+        query: 'UPDATE settings.blacklist SET conjunctivefilter = ?, islocation = ? WHERE id = ?',
         params: [termFilter.filteredTerms, termFilter.isLocation, termFilter.id]
       });
       filterRecords.push(termFilter);
@@ -422,7 +422,7 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
 
     const query = `
     DELETE
-    FROM fortis.blacklist
+    FROM settings.blacklist
     WHERE id IN ?
     `;
 

@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.dba
 
 object CassandraSchema {
-  val KeyspaceName = "fortis"
+  val KeyspaceName = "settings"
 
   object Table {
     val BlacklistName = "blacklist"

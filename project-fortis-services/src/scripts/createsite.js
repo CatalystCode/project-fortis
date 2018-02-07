@@ -21,7 +21,7 @@ function insertTopics(siteType) {
     blobStorageClient.fetchJson(uri)
       .then(response => {
         return response.map(topic => ({
-          query: `INSERT INTO fortis.watchlist (topicid, topic, lang_code, translations, insertiontime, category)
+          query: `INSERT INTO settings.watchlist (topicid, topic, lang_code, translations, insertiontime, category)
                 VALUES (?, ?, ?, ?, toTimestamp(now()), ?);`,
           params: [uuid(), topic.topic, topic.lang_code, topic.translations, topic.category || '']
         }));
@@ -49,7 +49,7 @@ function createSite(args) {
     if (!siteName || !siteName.length) return reject('siteName is not defined');
     if (!siteType || !siteType.length) return reject('siteType is not defined');
 
-    const siteQuery = 'SELECT * FROM fortis.sitesettings WHERE sitename = ?';
+    const siteQuery = 'SELECT * FROM settings.sitesettings WHERE sitename = ?';
     const siteQueryParams = [siteName];
 
     cassandraConnector.executeQuery(siteQuery, siteQueryParams)
@@ -62,7 +62,7 @@ function createSite(args) {
       })
       .then(() => {
         return cassandraConnector.executeBatchMutations([{
-          query: `INSERT INTO fortis.sitesettings (
+          query: `INSERT INTO settings.sitesettings (
           geofence,
           defaultzoom,
           logo,

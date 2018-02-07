@@ -13,7 +13,7 @@ const MaxFetchedRows = 1000;
 
 function getPlaceBlacklist() {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT conjunctivefilter, islocation FROM fortis.blacklist';
+    const query = 'SELECT conjunctivefilter, islocation FROM settings.blacklist';
 
     cassandraConnector.executeQuery(query, [])
       .then(rows => {

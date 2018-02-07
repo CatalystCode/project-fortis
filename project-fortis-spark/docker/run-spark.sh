@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 has_site() {
-  echo 'SELECT * FROM fortis.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
+  echo 'SELECT * FROM settings.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
+}
+
+get_token() {
+  echo "COPY settings.sitesettings($1) TO STDOUT;" | /app/cqlsh | tr -dC 'A-Za-z0-9'
 }
 
 wait_for_token() {
@@ -9,7 +13,7 @@ wait_for_token() {
   local value=""
 
   while :; do
-    value="$(echo "COPY fortis.sitesettings(${token}) TO STDOUT;" | /app/cqlsh | tr -dC 'A-Za-z0-9')"
+    value="$(get_token ${token})"
     if [ -n "${value}" ]; then break; else echo "Cognitive Services token ${token} not yet available, waiting..."; sleep 10s; fi
   done
   echo "...done, token ${token} is now available with value '${value}'"

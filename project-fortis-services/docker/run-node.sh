@@ -1,15 +1,29 @@
 #!/usr/bin/env sh
 
-has_cassandra_schema() {
-  echo 'DESCRIBE KEYSPACES;' | /app/cqlsh | grep -q 'fortis'
+has_keyspace() {
+  echo 'DESCRIBE KEYSPACES;' | /app/cqlsh | grep -q "$1"
 }
 
 has_seed_data() {
-  echo 'SELECT * FROM fortis.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
+  echo 'SELECT * FROM settings.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
 }
 
 has_site() {
-  echo 'SELECT sitename FROM fortis.sitesettings;' | /app/cqlsh | grep -q "$FORTIS_CASSANDRA_SITE_NAME"
+  echo 'SELECT sitename FROM settings.sitesettings;' | /app/cqlsh | grep -q "$FORTIS_CASSANDRA_SITE_NAME"
+}
+
+ingest_schema() {
+  local url="$1"
+  local keyspace="$2"
+  local cqlfile="$(mktemp -d /tmp/cassandra-schema-XXXXXX)/setup-$keyspace.cql"
+
+  echo "Got Fortis schema definition at $url, ingesting..."
+  wget -qO- "$url" > "$cqlfile"
+  sed -i "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" "$cqlfile"
+  while ! has_keyspace "$keyspace"; do
+    /app/cqlsh < "$cqlfile" || sleep 20s
+  done
+  echo "...done, Fortis schema definition is now ingested"
 }
 
 # wait for cassandra to start
@@ -20,17 +34,11 @@ done
 echo "...done, Cassandra is now available"
 
 # set up cassandra schema
-if [ -n "$FORTIS_CASSANDRA_SCHEMA_URL" ]; then
-  echo "Got Fortis schema definition at $FORTIS_CASSANDRA_SCHEMA_URL, ingesting..."
-  mkdir -p /tmp/cassandra-schema
-  cd /tmp/cassandra-schema
-  wget -qO- "$FORTIS_CASSANDRA_SCHEMA_URL" > setup.cql
-  sed -i "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" setup.cql
-  while ! has_cassandra_schema; do
-    /app/cqlsh < setup.cql || sleep 20s
-  done
-  cd -
-  echo "...done, Fortis schema definition is now ingested"
+if [ -n "$FORTIS_CASSANDRA_DATA_SCHEMA_URL" ]; then
+  ingest_schema "$FORTIS_CASSANDRA_DATA_SCHEMA_URL" "fortis"
+fi
+if [ -n "$FORTIS_CASSANDRA_SETTINGS_SCHEMA_URL" ]; then
+  ingest_schema "$FORTIS_CASSANDRA_SETTINGS_SCHEMA_URL" "settings"
 fi
 
 # set up users
