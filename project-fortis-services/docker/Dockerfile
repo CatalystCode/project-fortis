@@ -28,10 +28,10 @@ ENV FORTIS_FEATURE_SERVICE_HOST="http://fortis-features.eastus.cloudapp.azure.co
 # a one-node local cassandra is set up via docker-compose, if you wish to use a
 # larger cluster (e.g. hosted in Azure), just override this variable with the
 # hostname of your cluster
-ENV CASSANDRA_CONTACT_POINTS="localhost"
+ENV FORTIS_CASSANDRA_HOST="localhost"
 ENV CASSANDRA_KEYSPACE="fortis"
-ENV CASSANDRA_USERNAME="cassandra"
-ENV CASSANDRA_PASSWORD="cassandra"
+ENV FORTIS_CASSANDRA_USERNAME="cassandra"
+ENV FORTIS_CASSANDRA_PASSWORD="cassandra"
 ENV FORTIS_CASSANDRA_REPLICATION_FACTOR="3"
 
 # the cql file at this url is used to set up the initial schema for the

@@ -58,7 +58,7 @@ spec:
     spec:
       containers:
       - env:
-        - name: CASSANDRA_CONTACT_POINTS
+        - name: FORTIS_CASSANDRA_HOST
           value: ${cassandra_ip}
         - name: APPINSIGHTS_INSTRUMENTATIONKEY
           value: ${app_insights_id}

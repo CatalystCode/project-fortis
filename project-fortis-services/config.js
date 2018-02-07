@@ -25,9 +25,9 @@ module.exports = {
     coreConnectionsPerHostLocal: process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 3,
     coreConnectionsPerHostRemote: process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1,
     cassandraKeyspace: process.env.CASSANDRA_KEYSPACE,
-    cassandraContactPoints: process.env.CASSANDRA_CONTACT_POINTS,
-    cassandraUsername: process.env.CASSANDRA_USERNAME,
-    cassandraPassword: process.env.CASSANDRA_PASSWORD
+    cassandraContactPoints: process.env.FORTIS_CASSANDRA_HOST,
+    cassandraUsername: process.env.FORTIS_CASSANDRA_USERNAME,
+    cassandraPassword: process.env.FORTIS_CASSANDRA_PASSWORD
   },
   featureService: {
     fortisFeatureServiceHost: process.env.FORTIS_FEATURE_SERVICE_HOST,
