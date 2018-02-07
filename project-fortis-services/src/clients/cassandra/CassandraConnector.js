@@ -11,13 +11,12 @@ const loggingClient = require('../appinsights/LoggingClient');
 const {
   fetchSize, maxOperationsPerBatch, maxConcurrentBatches,
   coreConnectionsPerHostLocal, coreConnectionsPerHostRemote,
-  cassandraKeyspace, cassandraHost, cassandraPort,
+  cassandraHost, cassandraPort,
   cassandraPassword, cassandraUsername
 } = require('../../../config').cassandra;
 
 const options = {
   contactPoints: [cassandraHost],
-  keyspace: cassandraKeyspace,
   pooling: {
     coreConnectionsPerHost: {
       [distance.local]: coreConnectionsPerHostLocal,
@@ -170,7 +169,7 @@ function intialize() {
     executeQuery('select sitename from fortis.sitesettings limit 1', [])
       .then(() => {
         status.isInitialized = true;
-        console.log(`Established connection to cassandra keyspace ${cassandraKeyspace} at contact points ${cassandraHost}:${cassandraPort}`);
+        console.log(`Established connection to cassandra at contact points ${cassandraHost}:${cassandraPort}`);
         resolve();
       })
       .catch(reject);

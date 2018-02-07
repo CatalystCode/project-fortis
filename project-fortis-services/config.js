@@ -24,7 +24,6 @@ module.exports = {
     maxConcurrentBatches: process.env.MAX_CONCURRENT_BATCHES || 50,
     coreConnectionsPerHostLocal: process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 3,
     coreConnectionsPerHostRemote: process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1,
-    cassandraKeyspace: process.env.CASSANDRA_KEYSPACE,
     cassandraHost: process.env.FORTIS_CASSANDRA_HOST,
     cassandraPort: process.env.FORTIS_CASSANDRA_PORT,
     cassandraUsername: process.env.FORTIS_CASSANDRA_USERNAME,
