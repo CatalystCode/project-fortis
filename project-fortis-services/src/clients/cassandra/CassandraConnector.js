@@ -166,7 +166,7 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
  */
 function intialize() {
   return new Promise((resolve, reject) => {
-    executeQuery('select sitename from fortis.sitesettings limit 1', [])
+    executeQuery('SELECT sitename FROM fortis.sitesettings LIMIT 1', [])
       .then(() => {
         status.isInitialized = true;
         console.log(`Established connection to cassandra at contact points ${cassandraHost}:${cassandraPort}`);
