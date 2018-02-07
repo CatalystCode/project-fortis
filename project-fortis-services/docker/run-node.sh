@@ -101,4 +101,4 @@ if [ -n "$MAPBOX_ACCESS_TOKEN" ]; then
 fi
 
 # start node server
-while ! PORT="80" npm start; do sleep 20s; done
+while ! npm start; do sleep 20s; done

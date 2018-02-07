@@ -3,3 +3,4 @@ target/
 .idea/
 README.md
 .gitignore
+version.sbt

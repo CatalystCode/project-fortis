@@ -6,6 +6,21 @@ RUN apt-get install -y --no-install-recommends wget ca-certificates \
  && rm apache-cassandra-3.11.0-bin.tar.gz \
  && mv apache-cassandra-3.11.0 /opt/cassandra
 
+WORKDIR /app
+ADD package.json /app/package.json
+RUN npm install
+ADD src /app/src
+ADD server.js /app/server.js
+ADD config.js /app/config.js
+
+ADD docker/run-node.sh /app/server
+ADD docker/run-cqlsh.sh /app/cqlsh
+CMD /app/server
+
+# this is a production service so run it on the standard web port
+EXPOSE 80
+ENV PORT="80"
+
 # these settings need to be in sync with project-fortis-spark
 ENV PUBLISH_EVENTS_EVENTHUB_PATH="published-messages"
 ENV PUBLISH_EVENTS_EVENTHUB_PARTITION="\$Default"
@@ -13,11 +28,11 @@ ENV FORTIS_SB_CONFIG_QUEUE="configuration"
 ENV FORTIS_SB_COMMAND_QUEUE="command"
 
 # access keys for azure resources, these are created via the azure deployment
-ENV PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="..."
-ENV FORTIS_SB_CONN_STR="..."
-ENV USER_FILES_BLOB_ACCOUNT_NAME="..."
-ENV USER_FILES_BLOB_ACCOUNT_KEY="..."
-ENV APPINSIGHTS_INSTRUMENTATIONKEY="..."
+ENV PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING=""
+ENV FORTIS_SB_CONN_STR=""
+ENV USER_FILES_BLOB_ACCOUNT_NAME=""
+ENV USER_FILES_BLOB_ACCOUNT_KEY=""
+ENV APPINSIGHTS_INSTRUMENTATIONKEY=""
 
 # setting up the feature service is a lengthy process so we provide a shared
 # instance for convenience; if you wish to run this service locally, please
@@ -53,18 +68,15 @@ ENV FORTIS_CASSANDRA_SITE_NAME=""
 ENV FORTIS_CASSANDRA_SITE_TYPE=""
 
 # active directory configuration
-# you can set up your own application via https://apps.dev.microsoft.com/
-# click "add platform" -> "web" -> make sure that "allow implicit flow" is
-# checked (it's the default) and add in the "Redirect URLs" textbox both
-# http://localhost:8888 as well as http://localhost:3000 so that your app works
+# you can set up your own active directory application following the setps here:
+# https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/aad-setup.md
+# when setting up the application in the "Redirect URLs" configuration ensure to
+# add http://localhost:8888 and http://localhost:3000 so that your app works
 # via docker-compose but also if run stand-alone via npm start
-# next up ensure that the "User.Read" permission is added in the section
-# "Delegated Permissions" (it's the default); hit "Save" at the bottom of the
-# page and you're done
 # the log level determines how much information the passport-active-directory
 # module will output; 'info' is usually plenty to trouble-shoot issues
-ENV AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
-ENV AD_LOG_LEVEL='warn'
+ENV AD_CLIENT_ID=""
+ENV AD_LOG_LEVEL="warn"
 
 # mapbox credentials
 # you can create a new mapbox access token for free at https://www.mapbox.com/signup/
@@ -101,16 +113,3 @@ ENV COGNITIVE_SPEECH_SERVICE_TOKEN=""
 # the token will be persisted to cassandra on first load and is changable via
 # the admin settings UI afterwards
 ENV COGNITIVE_TRANSLATION_SERVICE_TOKEN=""
-
-WORKDIR /app
-ADD package.json /app/package.json
-RUN npm install
-
-ADD docker/run-node.sh /app/server
-ADD docker/run-cqlsh.sh /app/cqlsh
-ADD . /app
-
-RUN npm run lint
-
-EXPOSE 80
-CMD "/app/server"

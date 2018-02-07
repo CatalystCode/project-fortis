@@ -38,7 +38,6 @@ services:
       - FORTIS_CASSANDRA_ADMINS=${ADMINS}
       - FORTIS_CASSANDRA_REPLICATION_FACTOR=1
       - AD_CLIENT_ID=${AD_CLIENT_ID}
-      - AD_LOG_LEVEL=info
     env_file:
       - .env-secrets
 

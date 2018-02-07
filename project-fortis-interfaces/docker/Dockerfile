@@ -1,5 +1,23 @@
 FROM node:6.12.0
 
+# add static files; the dynamic files in /app/src (JS and CSS) are provided via
+# a volume in the docker-compose.yml file so that we can hot-reload the code
+WORKDIR /app
+ADD package.json /app/package.json
+RUN npm install
+ADD public /app/public
+ADD docker/run-react.sh /app/server
+CMD /app/server
+
+# note that this dockerfile does not expose port 80 since it wouldn't make sense
+# to run the webpack dev-server in production; for a production deployment,
+# follow the example in project-fortis-pipeline/ops/install-fortis-interfaces.sh
+# to create an optimized build and then upload the resulting assets to a static
+# file host such as azure blob storage; the ports exposed below are a websocket
+# port for hot-reloading and a http port for the webpack dev-server
+EXPOSE 35729 3000
+ENV PORT="3000"
+
 # a local deployment of the project-fortis-services is set up via docker-compose
 # if you wish to use a pre-existing service deployment, just override this
 # variable with the transport prefix, hostname, and port of your deployment
@@ -10,15 +28,14 @@ FROM node:6.12.0
 ENV REACT_APP_SERVICE_HOST="http://localhost:8889"
 
 # active directory configuration
-# you can set up your own application via https://apps.dev.microsoft.com/
-# click "add platform" -> "web" -> make sure that "allow implicit flow" is
-# checked (it's the default) and add in the "Redirect URLs" textbox both
-# http://localhost:8888 as well as http://localhost:3000 so that your app works
+# you can set up your own active directory application following the setps here:
+# https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/aad-setup.md
+# when setting up the application in the "Redirect URLs" configuration ensure to
+# add http://localhost:8888 and http://localhost:3000 so that your app works
 # via docker-compose but also if run stand-alone via npm start
-# next up ensure that the "User.Read" permission is added in the section
-# "Delegated Permissions" (it's the default); hit "Save" at the bottom of the
-# page and you're done
-ENV REACT_APP_AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
+# the log level determines how much information the passport-active-directory
+# module will output; 'info' is usually plenty to trouble-shoot issues
+ENV REACT_APP_AD_CLIENT_ID=""
 
 # mapbox configuration
 # the tile layer url defines the style of the map that will be used in the site
@@ -31,24 +48,3 @@ ENV REACT_APP_AD_CLIENT_ID="ee24b790-4962-4372-99f6-b452320d193d"
 # example when displaying the location of an event
 ENV REACT_APP_MAPBOX_TILE_LAYER_URL="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}"
 ENV REACT_APP_MAPBOX_TILE_SERVER_URL="https://api.mapbox.com/v4/mapbox.streets"
-
-WORKDIR /app
-
-# add static files; the dynamic files in /app/src (JS and CSS) are provided via
-# a volume in the docker-compose.yml file so that we can hot-reload the code
-ADD package.json /app/package.json
-RUN npm install
-ADD public /app/public
-ADD docker/run-react.sh /app/server
-
-# note that this dockerfile does not expose port 80 since it wouldn't make sense
-# to run the webpack dev-server in production; for a production deployment,
-# follow the example in project-fortis-pipeline/ops/install-fortis-interfaces.sh
-# to create an optimized build and then upload the resulting assets to a static
-# file host such as azure blob storage; the ports exposed below are a websocket
-# port for hot-reloading and a http port for the webpack dev-server
-EXPOSE 35729
-EXPOSE 3000
-ENV PORT="3000"
-
-CMD "/app/server"
