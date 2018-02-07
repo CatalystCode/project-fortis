@@ -19,6 +19,8 @@ class StreamsChangeListenerTestSpec extends FlatSpec with BeforeAndAfter {
     "https://blobhost",
     "cassandraHosts",
     "cassandraPorts",
+    "cassandra",
+    "cassandra",
     "managementBusConnectionString",
     "managementBusConfigQueueName",
     "managementBusCommandQueueName",
