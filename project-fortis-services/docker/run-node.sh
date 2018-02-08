@@ -17,13 +17,18 @@ ingest_schema() {
   local keyspace="$2"
   local cqlfile="$(mktemp -d /tmp/cassandra-schema-XXXXXX)/setup-$keyspace.cql"
 
-  echo "Got Fortis schema definition at $url, ingesting..."
-  wget -qO- "$url" > "$cqlfile"
+  if ! wget -qO- "$url" > "$cqlfile"; then
+    echo "No schema definition found at $url"
+    rm -rf "$(dirname "$cqlfile")"
+    return
+  fi
+
+  echo "Got schema definition at $url, ingesting..."
   sed -i "s@'replication_factor' *: *[0-9]\+@'replication_factor': $FORTIS_CASSANDRA_REPLICATION_FACTOR@g" "$cqlfile"
   while ! has_keyspace "$keyspace"; do
     /app/cqlsh < "$cqlfile" || sleep 20s
   done
-  echo "...done, Fortis schema definition is now ingested"
+  echo "...done, schema definition is now ingested"
 }
 
 # wait for cassandra to start
