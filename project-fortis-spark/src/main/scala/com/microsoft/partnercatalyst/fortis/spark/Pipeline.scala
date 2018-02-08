@@ -44,8 +44,8 @@ object Pipeline {
 
       // Copy TransformContext fields locally to avoid serializing everything to each task. In this way, each task's
       // serialization will only include the fields that it accesses (Spark's closure cleaner will remove the others)
-      val geofence = transformContext.siteSettings.geofence
-      val supportedLanguages = transformContext.siteSettings.languages
+      val geofence = transformContext.siteSettings.getGeofence()
+      val supportedLanguages = transformContext.siteSettings.getAllLanguages()
 
       val imageAnalyzer = transformContext.imageAnalyzer
       val sentimentDetectorAuth = transformContext.sentimentDetectorAuth

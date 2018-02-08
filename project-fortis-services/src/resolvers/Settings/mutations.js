@@ -115,11 +115,11 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
       .then(({ site }) => {
         return cassandraConnector.executeBatchMutations([{
           query: `UPDATE settings.sitesettings
-          SET geofence = ?,
+          SET geofence_json = ?,
           defaultzoom = ?,
           logo = ?,
           title = ?,
-          languages = ?,
+          languages_json = ?,
           defaultlanguage = ?,
           cogspeechsvctoken = ?,
           cogtextsvctoken = ?,
@@ -129,11 +129,11 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           translationsvctoken = ?
         WHERE sitename = ?`,
           params: [
-            args.input.targetBbox,
+            JSON.stringify(args.input.targetBbox || []),
             args.input.defaultZoomLevel,
             args.input.logo,
             args.input.title,
-            args.input.supportedLanguages,
+            JSON.stringify(Array.from(args.input.supportedLanguages || [])),
             args.input.defaultLanguage,
             args.input.cogSpeechSvcToken === PlaceholderForSecret ? site.properties.cogSpeechSvcToken : args.input.cogSpeechSvcToken,
             args.input.cogTextSvcToken === PlaceholderForSecret ? site.properties.cogTextSvcToken : args.input.cogTextSvcToken,
@@ -284,7 +284,7 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
 
     let mutations = [];
     args.input.edges.forEach(edge => {
-      let params = paramEntryToMap(edge.translations);
+      const params = paramEntryToMap(edge.translations);
       mutations.push({
         query: `INSERT INTO settings.watchlist (
           topic,
@@ -292,9 +292,9 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
           category,
           insertiontime,
           topicid,
-          translations
+          translations_json
         ) VALUES (?,?,?,dateof(now()),?,?)`,
-        params: [edge.name, edge.namelang, edge.category, edge.topicid, params]
+        params: [edge.name, edge.namelang, edge.category, edge.topicid, JSON.stringify(params || {})]
       });
     });
 
@@ -351,20 +351,20 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
 
     const mutations = [];
     streams.forEach(stream => {
-      let params = paramEntryToMap(stream.params);
+      const params = paramEntryToMap(stream.params);
       mutations.push({
         query: `UPDATE settings.streams
         SET pipelinelabel = ?,
         pipelineicon = ?,
         streamfactory = ?,
-        params = ?,
+        params_json = ?,
         enabled = ?
         WHERE streamid = ? AND pipelinekey = ?`,
         params: [
           stream.pipelineLabel,
           stream.pipelineIcon,
           stream.streamFactory,
-          params,
+          JSON.stringify(params || {}),
           stream.enabled,
           stream.streamId,
           stream.pipelineKey
@@ -398,8 +398,8 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
     termFilters.forEach(termFilter => {
       if (!termFilter.id) termFilter.id = uuid();
       mutations.push({
-        query: 'UPDATE settings.blacklist SET conjunctivefilter = ?, islocation = ? WHERE id = ?',
-        params: [termFilter.filteredTerms, termFilter.isLocation, termFilter.id]
+        query: 'UPDATE settings.blacklist SET conjunctivefilter_json = ?, islocation = ? WHERE id = ?',
+        params: [JSON.stringify(termFilter.filteredTerms || []), termFilter.isLocation, termFilter.id]
       });
       filterRecords.push(termFilter);
     });

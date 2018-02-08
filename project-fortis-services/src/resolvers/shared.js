@@ -34,21 +34,35 @@ function getTermsByCategory(translationLanguage, category) {
 }
 
 function cassandraRowToSite(row) {
-  // Please note that the following properties in the SiteProperties are NOT in Cassandra's sitessetings:
-  // storageConnectionString, featuresConnectionString, fbToken.
+  let geofence;
+  try {
+    geofence = row.geofence_json ? JSON.parse(row.geofence_json) : [];
+  } catch (err) {
+    console.error(`Unable to parse geofence '${row.geofence_json}' for site: ${err}`);
+    geofence = [];
+  }
+
+  let languages;
+  try {
+    languages = row.languages_json ? JSON.parse(row.languages_json) : [];
+  } catch (err) {
+    console.error(`Unable to parse languages '${row.languages_json}' for site: ${err}`);
+    languages = [];
+  }
+
   return {
     name: row.sitename,
     properties: {
-      targetBbox: row.geofence,
+      targetBbox: geofence,
       defaultZoomLevel: row.defaultzoom,
       logo: row.logo,
       title: row.title,
       translationSvcToken: row.translationsvctoken,
       mapSvcToken: row.mapsvctoken,
       featureservicenamespace: row.featureservicenamespace,
-      defaultLocation: row.geofence,
+      defaultLocation: geofence,
       defaultLanguage: row.defaultlanguage,
-      supportedLanguages: row.languages,
+      supportedLanguages: new Set(languages),
       cogSpeechSvcToken: row.cogspeechsvctoken,
       cogVisionSvcToken: row.cogvisionsvctoken,
       cogTextSvcToken: row.cogtextsvctoken
@@ -57,12 +71,21 @@ function cassandraRowToSite(row) {
 }
 
 function transformWatchlist(item, translatedlanguage) {
+  let translations;
+  try {
+    translations = item.translations_json ? JSON.parse(item.translations_json) : {};
+  } catch (err) {
+    console.error(`Unable to parse translations '${item.translations_json}' for watchlist item ${item.topicid}`);
+    translations = {};
+  }
+
   return {
     topicid: item.topicid,
     name: item.topic,
     category: item.category,
-    translatedname: item.lang_code !== (translatedlanguage || item.lang_code) ?
-      (item.translations || {})[translatedlanguage] || item.topic : item.topic,
+    translatedname: item.lang_code !== (translatedlanguage || item.lang_code)
+      ? translations[translatedlanguage] || item.topic
+      : item.topic,
     translatednamelang: translatedlanguage,
     namelang: item.lang_code
   };
@@ -83,7 +106,7 @@ function getSiteDefinition() {
 
 function getSiteTerms(translationLanguage) {
   return new Promise((resolve, reject) => {
-    const termsQuery = 'SELECT topicid, topic, translations, lang_code, category FROM settings.watchlist';
+    const termsQuery = 'SELECT topicid, topic, translations_json, lang_code, category FROM settings.watchlist';
     cassandraConnector.executeQuery(termsQuery, [])
       .then(rows => {
         const watchlistTerms = rows.map(item => transformWatchlist(item, translationLanguage));

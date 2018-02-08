@@ -26,9 +26,9 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
     configurationManager = Mockito.mock(classOf[ConfigurationManager])
     siteSettings = new SiteSettings(
       sitename = "Fortis",
-      geofence = Seq(1, 2, 3, 4),
+      geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = Some("en"),
-      languages = Seq("en", "es", "fr"),
+      languages_json = "[\"en\", \"es\", \"fr\"]",
       defaultzoom = 8,
       featureservicenamespace = Some("somenamespace"),
       title = "Fortis",
@@ -100,9 +100,9 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
   it should "return true when languages are absent but defaultlanguage is present" in {
     val noLanguageSiteSettings = new SiteSettings(
       sitename = "Fortis",
-      geofence = Seq(1, 2, 3, 4),
+      geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = Some("en"),
-      languages = Seq(),
+      languages_json = "[]",
       defaultzoom = 8,
       featureservicenamespace = Some("somenamespace"),
       title = "Fortis",
@@ -126,9 +126,9 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
   it should "return false when both languages and defaultlanguage are absent" in {
     val noLanguageSiteSettings = new SiteSettings(
       sitename = "Fortis",
-      geofence = Seq(1, 2, 3, 4),
+      geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = None,
-      languages = Seq(),
+      languages_json = "[]",
       defaultzoom = 8,
       featureservicenamespace = Some("somenamespace"),
       title = "Fortis",

@@ -41,7 +41,7 @@ ADD project /app/project
 ADD build.sbt /app/build.sbt
 RUN cd /app && \
     echo 'version := "0.0.0"' > version.sbt && \
-    FORTIS_INTEGRATION_TESTS="true" JAVA_OPTS="-Xmx2048M" sbt ++${SCALA_VERSION} assembly && \
+    FORTIS_INTEGRATION_TESTS="true" JAVA_OPTS="-Xmx4096M" sbt ++${SCALA_VERSION} assembly && \
     find /app/target -name '*-assembly-0.0.0.jar' -exec mv {} /app/job.jar \; -quit && \
     rm -rf /app/target && \
     rm -rf $HOME/.ivy2 && \

@@ -28,9 +28,9 @@ class HeatmapsOfflineAggregatorTestSpec  extends FlatSpec with BeforeAndAfter {
       aggregator = new HeatmapOfflineAggregator(configurationManager)
       siteSettings = new SiteSettings(
         sitename = "Fortis",
-        geofence = Seq(1, 2, 3, 4),
+        geofence_json = "[1, 2, 3, 4]",
         defaultlanguage = Some("en"),
-        languages = Seq("en", "es", "fr"),
+        languages_json = "[\"en\", \"es\", \"fr\"]",
         defaultzoom = 6,
         featureservicenamespace = Some("somenamespace"),
         title = "Fortis",

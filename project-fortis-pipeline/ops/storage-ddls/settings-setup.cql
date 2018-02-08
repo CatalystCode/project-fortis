@@ -29,7 +29,7 @@ CREATE TABLE settings.watchlist(
     topicid uuid,
     topic text,
     lang_code text,
-    translations map<text, text>,
+    translations_json text,
     category text,
     insertiontime timestamp,
     PRIMARY KEY ((topic, lang_code), category)
@@ -37,15 +37,15 @@ CREATE TABLE settings.watchlist(
 
 CREATE TABLE settings.blacklist(
     id uuid,
-    conjunctivefilter frozen<list<text>>,
+    conjunctivefilter_json text,
     islocation boolean,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE settings.sitesettings(
     sitename text,
-    geofence list<double>,
-    languages set<text>,
+    geofence_json text,
+    languages_json text,
     defaultlanguage text,
     defaultzoom int,
     featureservicenamespace text,
@@ -66,7 +66,7 @@ CREATE TABLE settings.streams (
     pipelinelabel text,
     pipelineicon text,
     streamfactory text,
-    params frozen<map<text, text>>,
+    params_json text,
     enabled boolean,
     PRIMARY KEY (pipelinekey, streamid)
 );

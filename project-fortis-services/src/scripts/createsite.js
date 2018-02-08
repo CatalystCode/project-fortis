@@ -21,9 +21,9 @@ function insertTopics(siteType) {
     blobStorageClient.fetchJson(uri)
       .then(response => {
         return response.map(topic => ({
-          query: `INSERT INTO settings.watchlist (topicid, topic, lang_code, translations, insertiontime, category)
+          query: `INSERT INTO settings.watchlist (topicid, topic, lang_code, translations_json, insertiontime, category)
                 VALUES (?, ?, ?, ?, toTimestamp(now()), ?);`,
-          params: [uuid(), topic.topic, topic.lang_code, topic.translations, topic.category || '']
+          params: [uuid(), topic.topic, topic.lang_code, JSON.stringify(topic.translations || {}), topic.category || '']
         }));
       })
       .then(response => {
@@ -63,23 +63,23 @@ function createSite(args) {
       .then(() => {
         return cassandraConnector.executeBatchMutations([{
           query: `INSERT INTO settings.sitesettings (
-          geofence,
+          geofence_json,
           defaultzoom,
           logo,
           title,
           sitename,
-          languages,
+          languages_json,
           defaultlanguage,
           featureservicenamespace,
           insertiontime
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, toTimestamp(now()))`,
           params: [
-            args.input.targetBbox,
+            JSON.stringify(args.input.targetBbox),
             args.input.defaultZoomLevel,
             args.input.logo,
             args.input.title,
             args.input.name,
-            args.input.supportedLanguages,
+            JSON.stringify(Array.from(args.input.supportedLanguages || [])),
             args.input.defaultLanguage,
             args.input.featureServiceNamespace,
           ]

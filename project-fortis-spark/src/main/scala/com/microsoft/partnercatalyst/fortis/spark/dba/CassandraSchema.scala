@@ -14,7 +14,7 @@ object CassandraSchema {
       pipelinekey: String,
       streamid: String,
       enabled: Option[Boolean],
-      params: Map[String, String],
+      params_json: String,
       pipelineicon: String,
       pipelinelabel: String,
       streamfactory: String

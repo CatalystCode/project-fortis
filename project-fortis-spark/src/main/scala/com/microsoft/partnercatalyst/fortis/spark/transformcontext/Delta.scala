@@ -53,7 +53,7 @@ private[transformcontext] object Delta {
     new Delta(
       siteSettings = siteSettings,
       locationsExtractorFactory = updatedField(
-        siteSettings.get.getGeofence() != transformContext.siteSettings.geofence
+        siteSettings.get.getGeofence() != transformContext.siteSettings.getGeofence()
         || siteSettings.get.featureservicenamespace != transformContext.siteSettings.featureservicenamespace,
         new LocationsExtractorFactory(
           new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace),

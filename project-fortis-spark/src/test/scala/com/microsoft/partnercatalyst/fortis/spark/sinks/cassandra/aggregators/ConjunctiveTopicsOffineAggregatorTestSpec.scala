@@ -29,9 +29,9 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     sc = new SparkContext(conf)
     siteSettings = new SiteSettings(
       sitename = "Fortis",
-      geofence = Seq(1, 2, 3, 4),
+      geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = Some("en"),
-      languages = Seq("en", "es", "fr"),
+      languages_json = "[\"en\", \"es\", \"fr\"]",
       defaultzoom = 8,
       featureservicenamespace = Some("somenamespace"),
       title = "Fortis",

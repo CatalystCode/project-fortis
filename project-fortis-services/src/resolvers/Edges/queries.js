@@ -13,18 +13,36 @@ const MaxFetchedRows = 1000;
 
 function getPlaceBlacklist() {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT conjunctivefilter, islocation FROM settings.blacklist';
+    const query = 'SELECT conjunctivefilter_json, islocation FROM settings.blacklist';
 
     cassandraConnector.executeQuery(query, [])
       .then(rows => {
         const blacklistedPlaces = new Set();
         rows.filter(row => row.islocation).forEach(row => {
-          if (row.conjunctivefilter.length > 1) {
+          if (!row.conjunctivefilter_json) {
+            return;
+          }
+
+          let blacklistedPlaces;
+          try {
+            blacklistedPlaces = JSON.parse(row.conjunctivefilter_json);
+          } catch (error) {
+            console.warn(`Got unparsable blacklist conjunctivefilter '${row.conjunctivefilter_json}' at entry ${row.id}`);
+            return;
+          }
+
+          if (blacklistedPlaces.length > 1) {
             console.warn(`Got place blacklist entry ${row.id} with more than one term, this is not supported.`);
           }
-          const blacklistedPlace = row.conjunctivefilter[0];
-          blacklistedPlaces.add(blacklistedPlace && blacklistedPlace.toLowerCase());
+
+          const blacklistedPlace = blacklistedPlaces[0];
+          if (!blacklistedPlace) {
+            return;
+          }
+
+          blacklistedPlaces.add(blacklistedPlace.toLowerCase());
         });
+
         resolve(blacklistedPlaces);
       }).catch(reject);
   });

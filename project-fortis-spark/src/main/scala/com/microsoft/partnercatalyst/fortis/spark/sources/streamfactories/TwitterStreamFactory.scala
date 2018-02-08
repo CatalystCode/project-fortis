@@ -116,12 +116,7 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
   }
 
   private[streamfactories] def addLanguages(query: FilterQuery, sparkContext: SparkContext, configurationManager: ConfigurationManager): Boolean = {
-    val defaultlanguage = configurationManager.fetchSiteSettings(sparkContext).defaultlanguage
-    val languages = configurationManager.fetchSiteSettings(sparkContext).languages
-    val allLanguages = defaultlanguage match {
-      case None => languages
-      case Some(language) => (Set(language) ++ languages.toSet).toSeq
-    }
+    val allLanguages = configurationManager.fetchSiteSettings(sparkContext).getAllLanguages()
 
     allLanguages.size match {
       case 0 => false
