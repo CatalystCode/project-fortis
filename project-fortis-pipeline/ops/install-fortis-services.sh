@@ -64,7 +64,7 @@ spec:
         - name: FORTIS_CASSANDRA_HOST
           value: ${cassandra_ip}
         - name: FORTIS_CASSANDRA_PORT
-          value: ${cassandra_port}
+          value: "${cassandra_port}"
         - name: FORTIS_CASSANDRA_USERNAME
           value: ${cassandra_username}
         - name: FORTIS_CASSANDRA_PASSWORD
