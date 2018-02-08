@@ -113,6 +113,10 @@ spec:
           value: ${cogvisionsvctoken}
         - name: FORTIS_CASSANDRA_SEED_DATA_URL
           value: ${fortis_site_clone_url}
+        - name: FORTIS_CASSANDRA_DATA_SCHEMA_URL
+          value: "https://raw.githubusercontent.com/CatalystCode/project-fortis/${latest_version}/project-fortis-pipeline/ops/storage-ddls/cassandra-setup.cql"
+        - name: FORTIS_CASSANDRA_SETTINGS_SCHEMA_URL
+          value: "https://raw.githubusercontent.com/CatalystCode/project-fortis/${latest_version}/project-fortis-pipeline/ops/storage-ddls/settings-setup.cql"
         image: cwolff/project_fortis_services:${latest_version}
         imagePullPolicy: "Always"
         name: project-fortis-services
