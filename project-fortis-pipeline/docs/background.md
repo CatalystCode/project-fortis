@@ -43,3 +43,15 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 - [KubeCon conference talk](https://www.youtube.com/watch?v=UywgL70FQ3s)
 - [Microsoft Build conference talk](https://www.youtube.com/watch?v=2shdR1R-EYk)
 - [Spark Summit conference talk](https://www.youtube.com/watch?v=FTrVO9toO0I)
+
+## Open Source
+
+We published several generally useful open source projects as part of the
+development of Fortis, including:
+
+- [Spark Streaming connector for Facebook](http://github.com/CatalystCode/streaming-facebook)
+- [Spark Streaming connector for Instagram](https://github.com/CatalystCode/streaming-instagram)
+- [Spark Streaming connector for Reddit](https://github.com/CatalystCode/streaming-reddit)
+- [Spark Streaming connector for Bing](https://github.com/CatalystCode/streaming-bing)
+- [Spark Streaming connector for RSS](https://github.com/CatalystCode/streaming-rss-html)
+- [Advanced filtering options for Twitter Spark Streaming connector](https://github.com/apache/bahir/pull/43)
