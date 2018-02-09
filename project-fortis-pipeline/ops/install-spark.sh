@@ -76,27 +76,35 @@ kubectl create configmap "${spark_config_map_name}" \
   --from-literal=PUBLISH_EVENTS_EVENTHUB_CONNECTION_STRING="${eh_conn_str}" \
   --from-literal=PUBLISH_EVENTS_EVENTHUB_PATH="${eh_path}" \
   --from-literal=PUBLISH_EVENTS_EVENTHUB_PARTITION="${eh_consumer_group}"
-helm install \
-  --set Worker.Replicas="${k8spark_worker_count}" \
-  --set Master.ImageTag="2.2" \
-  --set Worker.ImageTag="2.2" \
-  --set Worker.ConfigMapName="${spark_config_map_name}" \
-  --set Master.ConfigMapName="${spark_config_map_name}" \
-  --set Master.SparkSubmitCommand="${spark_command}" \
-  --set Worker.VmInstanceType="${agent_vm_size}" \
-  --set Worker.Resources.Requests.Cpu="1" \
-  --set Worker.Resources.Requests.Memory="10Gi" \
-  --set Worker.Resources.Limits.Cpu="2.8" \
-  --set Worker.Resources.Limits.Memory="20Gi" \
-  --set Master.Resources.Requests.Cpu="1" \
-  --set Master.Resources.Requests.Memory="3Gi" \
-  --set Master.Resources.Limits.Cpu="2" \
-  --set Master.Resources.Limits.Memory="5Gi" \
-  --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="20g" \
-  --set Worker.Environment[1].name="SPARK_WORKER_OPTS",Worker.Environment[1].value="-Dspark.worker.cleanup.enabled=true -Dspark.worker.cleanup.interval=1800 -Dspark.worker.cleanup.appDataTtl=3600" \
-  --namespace spark \
-  --name spark-cluster \
-  ./spark
+
+install_spark() {
+  helm install \
+    --set Worker.Replicas="${k8spark_worker_count}" \
+    --set Master.ImageTag="2.2" \
+    --set Worker.ImageTag="2.2" \
+    --set Worker.ConfigMapName="${spark_config_map_name}" \
+    --set Master.ConfigMapName="${spark_config_map_name}" \
+    --set Master.SparkSubmitCommand="${spark_command}" \
+    --set Worker.VmInstanceType="${agent_vm_size}" \
+    --set Worker.Resources.Requests.Cpu="1" \
+    --set Worker.Resources.Requests.Memory="10Gi" \
+    --set Worker.Resources.Limits.Cpu="2.8" \
+    --set Worker.Resources.Limits.Memory="20Gi" \
+    --set Master.Resources.Requests.Cpu="1" \
+    --set Master.Resources.Requests.Memory="3Gi" \
+    --set Master.Resources.Limits.Cpu="2" \
+    --set Master.Resources.Limits.Memory="5Gi" \
+    --set Worker.Environment[0].name="SPARK_WORKER_MEMORY",Worker.Environment[0].value="20g" \
+    --set Worker.Environment[1].name="SPARK_WORKER_OPTS",Worker.Environment[1].value="-Dspark.worker.cleanup.enabled=true -Dspark.worker.cleanup.interval=1800 -Dspark.worker.cleanup.appDataTtl=3600" \
+    --namespace spark \
+    --name spark-cluster \
+    ./spark
+}
+
+while ! install_spark; do
+  echo "Failed to set up spark helm chart, retrying"
+  sleep 30s
+done
 
 # cleanup
 cd ..
