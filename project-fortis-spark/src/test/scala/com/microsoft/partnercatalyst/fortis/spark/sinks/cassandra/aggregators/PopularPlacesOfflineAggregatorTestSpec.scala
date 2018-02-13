@@ -3,7 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 import java.util.{Date, UUID}
 
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.Period
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.rdd.RDD
@@ -27,7 +27,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     configurationManager = Mockito.mock(classOf[ConfigurationManager])
     aggregator = new PopularPlacesOfflineAggregator(configurationManager)
     sc = new SparkContext(conf)
-    siteSettings = new SiteSettings(
+    siteSettings = SiteSettings(
       sitename = "Fortis",
       geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = Some("en"),
@@ -86,7 +86,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     })
 
     val popularPlaces = aggregator.aggregate(eventsExploded).collect()
-    assert(popularPlaces.size == 135)
+    assert(popularPlaces.length == 135)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
@@ -189,7 +189,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     })
 
     val popularPlaces = aggregator.aggregate(eventsExploded).collect()
-    assert(popularPlaces.size == 180)
+    assert(popularPlaces.length == 180)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
@@ -292,7 +292,7 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     })
 
     val popularPlaces = aggregator.aggregate(eventsExploded).collect()
-    assert(popularPlaces.size == 225)
+    assert(popularPlaces.length == 225)
 
     val allall = popularPlaces.filter(topic=>topic.pipelinekey == "all" && topic.externalsourceid == "all" && topic.periodtype == "day" && topic.tilez == 8)
     assert(allall.toSet == Set(
