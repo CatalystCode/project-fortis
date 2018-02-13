@@ -16,13 +16,14 @@ module.exports = graphql.buildSchema(`
   }
 
   type Mutation {
-    addUsers(input: UserListInput!): UserCollection,
-    removeUsers(input: UserListInput!): UserCollection,
+    addUsers(input: UserListInput!): UserCollection
+    removeUsers(input: UserListInput!): UserCollection
     removeKeywords(input: MutatedTerms): SiteTerms
     addKeywords(input: MutatedTerms): SiteTerms
     removeSite(input: EditableSiteSettings!): Site
     editSite(input: EditableSiteSettings!): Site
     modifyStreams(input: StreamListInput!): StreamCollection
+    removeStreams(input: StreamListInput!): StreamCollection
     removeFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyFacebookPages(input: FacebookPageListInput!): FacebookPageCollection
     modifyTwitterAccounts(input: TwitterAccountDefintion!): TwitterAccountCollection

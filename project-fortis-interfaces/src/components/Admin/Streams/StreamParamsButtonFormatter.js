@@ -1,9 +1,12 @@
 import React from 'react';
-import { DataGrid } from './DataGrid';
+import { DataGrid } from '../DataGrid';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import Button from 'react-bootstrap/lib/Button';
 import Modal from 'react-bootstrap/lib/Modal';
-import { getColumns } from './shared';
+import { getColumns } from '../shared';
+import isArray from 'lodash/isArray';
+import isBoolean from 'lodash/isBoolean';
+import isString from 'lodash/isString';
 
 class StreamParamsButtonFormatter extends React.Component {
   constructor(props) {
@@ -13,22 +16,17 @@ class StreamParamsButtonFormatter extends React.Component {
       isShowDetailOn: false,
       params: []
     };
-
-    this.getStream = this.getStream.bind(this);
-    this.handleShowDetails = this.handleShowDetails.bind(this);
-    this.handleHideDetails = this.handleHideDetails.bind(this);
-    this.handleSave = this.handleSave.bind(this);
   }
 
-  handleSave() {
+  handleSave = () => {
     const stream = this.prepareStreamsForSave();
-    this.props.flux.actions.ADMIN.save_streams(stream);
+    this.props.flux.actions.ADMIN.save_stream(stream);
     this.handleHideDetails();
   }
 
-  prepareStreamsForSave() {
+  prepareStreamsForSave = () => {
     let stream = this.getStream();
-    if (typeof this.state.params === 'string') {
+    if (isString(this.state.params)) {
       stream.params = JSON.parse(this.state.params);
     } else {
       stream.params = this.state.params;
@@ -37,13 +35,14 @@ class StreamParamsButtonFormatter extends React.Component {
     return stream;
   }
 
-  handleShowDetails() {
+  handleShowDetails = () => {
     const stream = this.getStream();
-
     let params = stream.params;
-    if (typeof stream.params === 'string') {
+    if (isString(stream.params)) {
       params = JSON.parse(stream.params);
     }
+
+    this.convertParamValuesToString(params);
 
     this.setState({
       isShowDetailOn: true,
@@ -51,17 +50,27 @@ class StreamParamsButtonFormatter extends React.Component {
     });
   }
 
-  getStream() {
+  convertParamValuesToString = params => {
+    params.forEach(param => {
+      if (isBoolean(param.value)) {
+        param.value = param.value.toString();
+      } else if (isArray(param.value)) {
+        param.value = param.value.join(',');
+      }
+    });
+  }
+
+  getStream = () => {
     return this.props.dependentValues;
   }
 
-  handleHideDetails() {
+  handleHideDetails = () => {
     this.setState({
       isShowDetailOn: false
     });
   }
 
-  getStreamParamColumns() {
+  getStreamParamColumns = () => {
     const columnValues = [
       {key: "key", name: "key"},
       {editable: true, key: "value", name: "value"}
@@ -77,9 +86,7 @@ class StreamParamsButtonFormatter extends React.Component {
           <Glyphicon glyph="edit" /> Edit
         </Button>
         <Modal show={this.state.isShowDetailOn} onHide={this.handleHideDetails}>
-          <Modal.Header closeButton>
-            <Modal.Title>Parameters for {this.props.dependentValues.pipelineLabel}</Modal.Title>
-          </Modal.Header>
+          <Modal.Header closeButton />
           <Modal.Body>
             <DataGrid
               rowHeight={40}

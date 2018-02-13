@@ -61,3 +61,9 @@ export const saveStreams = `mutation SaveStreams($input: StreamListInput!) {
     ...StreamsView
   }
 }`;
+
+export const removeStreams = `mutation RemoveStreams($input: StreamListInput!) {
+  removeStreams(input: $input) {
+    ...StreamsView
+  }
+}`;

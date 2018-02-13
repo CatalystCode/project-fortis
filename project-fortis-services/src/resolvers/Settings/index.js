@@ -9,6 +9,7 @@ module.exports = {
   removeSite: mutations.removeSite,
   editSite: mutations.editSite,
   modifyStreams: mutations.modifyStreams,
+  removeStreams: mutations.removeStreams,
   modifyBlacklist: mutations.modifyBlacklist,
   removeBlacklist: mutations.removeBlacklist,
   removeKeywords: mutations.removeKeywords,

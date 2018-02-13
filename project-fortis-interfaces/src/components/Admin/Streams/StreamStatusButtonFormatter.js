@@ -25,16 +25,16 @@ class StreamStatusButtonFormatter extends React.Component {
     this.toggleState = this.toggleState.bind(this);
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     const state = this.getStreamState();
     this.initializeButtonStyle(state);
   }
 
-  getStreamState() {
+  getStreamState = () => {
     return this.props.dependentValues.enabled;
   }
 
-  initializeButtonStyle(state) {
+  initializeButtonStyle = state => {
     if (this.isStreamEnabled(state)) {
       this.addStyleToButton(enableButtonStyle);
     } else {
@@ -42,22 +42,22 @@ class StreamStatusButtonFormatter extends React.Component {
     }
   }
 
-  isStreamEnabled(state) {
+  isStreamEnabled = state => {
     return state;
   }
 
-  addStyleToButton(style) {
+  addStyleToButton = style => {
     this.setState({
       buttonStyle: style
     });
   }
 
-  toggleState() {
+  toggleState = () => {
     this.toggleButtonStyle();
     this.toggleStreamState();
   }
 
-  toggleButtonStyle() {
+  toggleButtonStyle = () => {
     const state = this.getStreamState();
     if (this.isStreamEnabled(state)) {
       this.addStyleToButton(disableButtonStyle);
@@ -66,33 +66,33 @@ class StreamStatusButtonFormatter extends React.Component {
     }
   }
 
-  toggleStreamState() {
+  toggleStreamState = () => {
     const oldState = this.getStreamState();
     const newState = this.getNewState(oldState);
     const streamWithNewState = this.getStreamWithNewState(newState)
     this.saveStreams(streamWithNewState);
   }
 
-  getNewState(oldState) {
+  getNewState = (oldState) => {
     return !oldState;
   }
 
-  getStreamWithNewState(newState) {
+  getStreamWithNewState = (newState) => {
     const stream = this.getStream();
     stream.enabled = newState;
     return stream;
   }
 
-  getStream() {
+  getStream = () => {
     return this.props.dependentValues;
   }
 
-  saveStreams(stream) {
+  saveStreams = stream => {
     stream = this.prepareStreamsForSave(stream);
-    this.props.flux.actions.ADMIN.save_streams(stream);
+    this.props.flux.actions.ADMIN.save_stream(stream);
   }
 
-  prepareStreamsForSave(stream) {
+  prepareStreamsForSave = stream => {
     if (typeof stream.params === 'string') {
       stream.params = JSON.parse(stream.params);
     }

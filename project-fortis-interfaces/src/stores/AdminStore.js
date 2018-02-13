@@ -2,8 +2,8 @@ import Fluxxor from 'fluxxor';
 import constants from '../actions/constants';
 // eslint-disable-next-line
 import ReactDataGridPlugins from 'react-data-grid-addons';
-import { StreamParamsButtonFormatter } from '../components/Admin/StreamParamsButtonFormatter';
-import { StreamStatusButtonFormatter } from '../components/Admin/StreamStatusButtonFormatter';
+import { StreamParamsButtonFormatter } from '../components/Admin/Streams/StreamParamsButtonFormatter';
+import { StreamStatusButtonFormatter } from '../components/Admin/Streams/StreamStatusButtonFormatter';
 
 // eslint-disable-next-line
 const Filters = window.ReactDataGridPlugins.Filters;

@@ -102,15 +102,21 @@ export const SERVICES = {
     },
 
     fetchStreams(callback) {
-        const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
-        const variables = {};
-        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+      const query = `${AdminFragments.streams}${AdminQueries.getStreams}`;
+      const variables = {};
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     saveStreams(streams, callback) {
-        const query = `${AdminFragments.streams}${AdminMutations.saveStreams}`;
-        const variables = { input: { streams } };
-        fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+      const query = `${AdminFragments.streams}${AdminMutations.saveStreams}`;
+      const variables = { input: { streams } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
+    },
+
+    removeStreams(streams, callback) {
+      const query = `${AdminFragments.streams}${AdminMutations.removeStreams}`;
+      const variables = { input: { streams } };
+      fetchGqlData(SETTINGS_ENDPOINT, { variables, query }, callback);
     },
 
     exportSite(callback) {

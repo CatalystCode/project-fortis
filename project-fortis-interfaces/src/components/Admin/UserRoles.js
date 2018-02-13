@@ -20,7 +20,7 @@ class UserRoles extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.props.flux.actions.ADMIN.load_users()
   }
 

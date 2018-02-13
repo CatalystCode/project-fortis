@@ -388,6 +388,32 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
+function removeStreams(args, res) { // eslint-disable-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    const streams = args && args.input && args.input.streams;
+    if (!streams || !streams.length) return reject('No streams to remove specified.');
+
+    const mutations = streams.map(stream => ({
+      query: `
+      DELETE
+      FROM settings.streams
+      WHERE pipelinekey = ? and streamid = ?`,
+      params: [stream.pipelineKey, stream.streamId]
+    }));
+
+    cassandraConnector.executeBatchMutations(mutations)
+      .then(_ => { // eslint-disable-line no-unused-vars
+        resolve({
+          streams
+        });
+      })
+      .catch(error => {
+        trackException(error);
+        reject(error);
+      });
+  });
+}
+
 function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const termFilters = args && args.input && args.input.filters;
@@ -448,6 +474,7 @@ module.exports = {
   removeUsers: requiresRole(trackEvent(removeUsers, 'removeUsers', loggingClient.removeUsersExtraProps(), loggingClient.usersExtraMetrics()), 'admin'),
   removeSite: requiresRole(trackEvent(removeSite, 'removeSite'), 'admin'),
   modifyStreams: requiresRole(trackEvent(withRunTime(modifyStreams), 'modifyStreams', loggingClient.modifyStreamsExtraProps(), loggingClient.streamsExtraMetrics()), 'admin'),
+  removeStreams: requiresRole(trackEvent(withRunTime(removeStreams), 'removeStreams', loggingClient.removeStreamsExtraProps(), loggingClient.streamsExtraMetrics()), 'admin'),
   removeKeywords: requiresRole(trackEvent(withRunTime(removeKeywords), 'removeKeywords', loggingClient.removeKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()), 'admin'),
   addKeywords: requiresRole(trackEvent(withRunTime(addKeywords), 'addKeywords', loggingClient.addKeywordsExtraProps(), loggingClient.keywordsExtraMetrics()), 'admin'),
   editSite: requiresRole(trackEvent(withRunTime(editSite), 'editSite'), 'admin'),

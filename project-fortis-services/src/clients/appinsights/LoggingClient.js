@@ -131,6 +131,14 @@ function modifyStreamsExtraProps() {
   });
 }
 
+function removeStreamsExtraProps() {
+  return () => ({
+    operation: 'remove',
+    table: 'streams',
+    success: 'true'
+  });
+}
+
 function streamsExtraMetrics() {
   return (graphqlResult) => {
     const totalRows = graphqlResult && graphqlResult.streams && graphqlResult.streams.length;
@@ -255,6 +263,7 @@ module.exports = {
   logNoTrustedSourcesToRemove,
   streamsExtraProps,
   modifyStreamsExtraProps,
+  removeStreamsExtraProps,
   streamsExtraMetrics,
   addTrustedSourcesExtraProps,
   removeTrustedSourcesExtraProps,
