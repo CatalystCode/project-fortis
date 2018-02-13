@@ -85,11 +85,6 @@ case class ComputedTile(
   conjunctiontopic3: String
 ) extends AggregationRecordTile with Serializable
 
-case class HeatmapEntry (
-  mentioncountagg: Long,
-  avgsentimentagg: Double
-)
-
 case class PopularTopicAggregate(
   override val perioddate: Long,
   override val externalsourceid: String,
@@ -113,18 +108,3 @@ case class ConjunctiveTopic(
   tilez: Int,
   topic: String
 ) extends Serializable
-
-case class Stream(
-  pipeline: String,
-  streamid: Long,
-  connector: String,
-  params: Map[String, String]
-)
-
-case class TrustedSource(
-  externalsourceid: String,
-  sourcetype: String,
-  pipelinekey: String,
-  rank: Int,
-  insertiontime: Long
-)
