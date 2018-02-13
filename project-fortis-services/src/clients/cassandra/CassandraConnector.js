@@ -49,7 +49,7 @@ function executeBatchMutations(mutations) {
   return new Promise((resolve, reject) => {
     if (!client) {
       loggingClient.logCassandraClientUndefined();
-      return reject('No Cassandra client defined');
+      return reject('No DB client available');
     }
 
     if (!mutations || !mutations.length) {
@@ -75,7 +75,8 @@ function executeBatchMutations(mutations) {
     (err) => {
       if (err) {
         trackException(err);
-        reject(err);
+        console.error(err);
+        reject('Error querying the DB');
       } else {
         resolve({numBatchMutations: chunkedMutations.length});
       }
@@ -93,7 +94,7 @@ function executeQuery(query, params, options) {
   return new Promise((resolve, reject) => {
     if (!client) {
       loggingClient.logCassandraClientUndefined();
-      return reject('No Cassandra client defined');
+      return reject('No DB client available');
     }
 
     try {
@@ -108,15 +109,17 @@ function executeQuery(query, params, options) {
         .on('error', err => {
           if (err) {
             loggingClient.logExecuteQueryError();
-            reject(err);
+            console.error(err);
+            return reject('Error querying the DB');
           }
         })
         .on('end', () => {
           resolve(rows);
         });
-    } catch (exception) {
-      trackException(exception);
-      reject(exception);
+    } catch (err) {
+      trackException(err);
+      console.error(err);
+      return reject('Error querying the DB');
     }
   });
 }
@@ -132,7 +135,7 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
   return new Promise((resolve, reject) => {
     if (!client) {
       loggingClient.logCassandraClientUndefined();
-      return reject('No Cassandra client defined');
+      return reject('No DB client available');
     }
 
     const DEFAULT_FETCH = 15;
@@ -152,9 +155,10 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
           rows: result.rows
         });
       })
-      .catch(error => {
-        trackException(error);
-        reject(error);
+      .catch(err => {
+        trackException(err);
+        console.error(err);
+        return reject('Error querying the DB');
       });
   });
 }
@@ -172,7 +176,11 @@ function intialize() {
         console.log(`Established connection to cassandra at contact points ${cassandraHost}:${cassandraPort}`);
         resolve();
       })
-      .catch(reject);
+      .catch(err => {
+        trackException(err);
+        console.error(err);
+        return reject('Error initializing DB');
+      });
   });
 }
 
