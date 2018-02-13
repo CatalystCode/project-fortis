@@ -91,7 +91,6 @@ module.exports = graphql.buildSchema(`
     summary: String,
     language: String,
     pipelinekey: String,
-    fullText: String,
     link: String,
     body: String
   }

@@ -12,7 +12,6 @@ DROP MATERIALIZED VIEW IF EXISTS fortis.eventbatches;
 DROP MATERIALIZED VIEW IF EXISTS fortis.popularsources;
 DROP MATERIALIZED VIEW IF EXISTS fortis.populartopics;
 DROP MATERIALIZED VIEW IF EXISTS fortis.eventplacesbysource;
-DROP INDEX IF EXISTS fortis.events_fulltext_idx;
 
 DROP TABLE IF EXISTS fortis.conjunctivetopics;
 DROP TABLE IF EXISTS fortis.computedtiles;
@@ -118,7 +117,6 @@ CREATE TABLE fortis.events(
     computedfeatures_json text,
     insertiontime timestamp,
     eventtime timestamp,
-    fulltext text, /* conjunction of title and body to enable querying of both at the same time */
     PRIMARY KEY (eventid)
 );
 
@@ -202,16 +200,3 @@ AS SELECT eventid, pipelinekey, eventtime,conjunctiontopic3,conjunctiontopic2,ti
      AND placeid IS NOT NULL
 PRIMARY KEY ((pipelinekey, conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, tilez), eventtime, eventid, tileid, placeid)
 WITH CLUSTERING ORDER BY (eventtime DESC);
-
-// *****************************************************************************
-// * Indices
-// *****************************************************************************
-
-CREATE CUSTOM INDEX ON fortis.events (fulltext) USING 'org.apache.cassandra.index.sasi.SASIIndex'
-WITH OPTIONS = {
-'mode': 'CONTAINS',
-'analyzer_class': 'org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer',
-'analyzed': 'true',
-'tokenization_enable_stemming': 'true',
-'tokenization_normalize_lowercase': 'true'
-};

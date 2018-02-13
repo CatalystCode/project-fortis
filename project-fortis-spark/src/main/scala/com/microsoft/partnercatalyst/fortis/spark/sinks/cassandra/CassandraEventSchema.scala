@@ -16,7 +16,6 @@ object CassandraEventSchema {
       computedfeatures_json = Utils.getFeaturesJson(item),
       eventtime = item.details.eventtime,
       batchid = batchid,
-      fulltext = s"[${Option(item.details.title).getOrElse("")}] - ${item.details.body}",
       eventlangcode = item.analysis.language.orNull,
       eventid = item.details.eventid,
       sourceeventid = item.details.sourceeventid,

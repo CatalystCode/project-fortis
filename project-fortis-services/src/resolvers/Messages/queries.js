@@ -49,7 +49,6 @@ function eventToFeature(row) {
       eventtime: row.eventtime.getTime(),
       sentiment: sentiment,
       title: row.title,
-      fullText: row.body,
       summary: row.summary || row.title,
       externalsourceid: row.externalsourceid,
       language: row.eventlangcode,
@@ -86,11 +85,6 @@ function queryEventsTable(eventIdResponse, args) {
     let eventsParams = [
       limitForInClause(eventIds)
     ];
-
-    if (args.fulltextTerm) {
-      eventsQuery += ' AND fulltext LIKE ?';
-      eventsParams.push(`%${args.fulltextTerm}%`);
-    }
 
     if (eventIdResponse.rows.length) {
       cassandraConnector.executeQuery(eventsQuery, eventsParams)

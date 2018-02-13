@@ -10,7 +10,6 @@ case class Event(
   insertiontime: Long,
   body: String,
   summary: String,
-  fulltext: String,
   imageurl: Option[String],
   batchid: String,
   externalsourceid: String,
