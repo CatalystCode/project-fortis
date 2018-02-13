@@ -344,7 +344,7 @@ function paramEntryToMap(paramEntry) {
 
 function modifyStream(stream) {
   return new Promise((resolve, reject) => {
-    const getStreamQuery = `SELECT * FROM settings.streams WHERE streamid = ? AND pipelinekey = ?`;
+    const getStreamQuery = 'SELECT * FROM settings.streams WHERE streamid = ? AND pipelinekey = ?';
     const getStreamParams = [stream.streamId, stream.pipelineKey];
 
     cassandraConnector.executeQuery(getStreamQuery, getStreamParams)
