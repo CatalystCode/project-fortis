@@ -16,9 +16,7 @@ object CassandraEventSchema {
       computedfeatures_json = Utils.getFeaturesJson(item),
       eventtime = item.details.eventtime,
       batchid = batchid,
-      topics = item.analysis.keywords.map(_.name.toLowerCase),
       fulltext = s"[${Option(item.details.title).getOrElse("")}] - ${item.details.body}",
-      placeids = item.analysis.locations.map(_.wofId),
       eventlangcode = item.analysis.language.orNull,
       eventid = item.details.eventid,
       sourceeventid = item.details.sourceeventid,
@@ -201,11 +199,14 @@ object Utils {
 
   def getFeaturesJson(item: FortisEvent): String = {
     //todo val genderCounts = item.analysis.genders.map(_.name).groupBy(identity).mapValues(t=>t.size.toLong)
-    val entityCounts = item.analysis.entities.map(_.name).groupBy(identity).mapValues(t=>t.size.toLong)
+    val entityCounts = item.analysis.entities.map(_.name).groupBy(identity).mapValues(t => t.size.toLong)
+    val places = item.analysis.locations.map(place => Place(placeid = place.wofId, centroidlat = place.latitude, centroidlon = place.longitude))
+    val keywords = item.analysis.keywords.map(_.name.toLowerCase)
+
     Features.asJson(Features(
       mentions = 1,
-      places = item.analysis.locations.map(place => Place(placeid = place.wofId, centroidlat = place.latitude, centroidlon = place.longitude)),
-      keywords = item.analysis.keywords.map(_.name),
+      places = places,
+      keywords = keywords,
       sentiment = Sentiment(neg_avg = getSentimentScore(item.analysis.sentiments)),
       entities = entityCounts.map(kv => Entities(
         name = kv._1,

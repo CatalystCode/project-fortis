@@ -118,8 +118,6 @@ CREATE TABLE fortis.events(
     computedfeatures_json text,
     insertiontime timestamp,
     eventtime timestamp,
-    topics frozen<set<text>>,
-    placeids frozen<set<text>>,
     fulltext text, /* conjunction of title and body to enable querying of both at the same time */
     PRIMARY KEY (eventid)
 );

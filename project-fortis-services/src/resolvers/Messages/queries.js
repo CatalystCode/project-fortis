@@ -33,11 +33,15 @@ function eventToFeature(row) {
     ? computedfeatures.sentiment.neg_avg
     : -1;
 
+  const keywords = computedfeatures.keywords != null && computedfeatures.keywords.length > 0
+    ? computedfeatures.keywords
+    : [];
+
   return {
     type: FeatureType,
     coordinates: places.map(place => [place.centroidlon, place.centroidlat]),
     properties: {
-      edges: row.topics,
+      edges: keywords,
       messageid: row.eventid,
       sourceeventid: row.sourceeventid,
       places: places.map(place => place.placeid),

@@ -30,8 +30,6 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq(),
-      placeids = Seq(),
       sourceurl = "",
       title = ""
     ))
@@ -65,8 +63,6 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq(),
-      placeids = Seq(),
       sourceurl = "",
       title = ""
     ), minZoom = 8)
@@ -106,8 +102,6 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq(),
-      placeids = Seq(),
       sourceurl = "",
       title = ""
     ), minZoom = 8)
@@ -146,8 +140,6 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq(),
-      placeids = Seq(),
       sourceurl = "",
       title = ""
     ), minZoom = 8)
@@ -175,8 +167,6 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq(),
-      placeids = Seq(),
       sourceurl = "",
       title = ""
     ), minZoom = 8)

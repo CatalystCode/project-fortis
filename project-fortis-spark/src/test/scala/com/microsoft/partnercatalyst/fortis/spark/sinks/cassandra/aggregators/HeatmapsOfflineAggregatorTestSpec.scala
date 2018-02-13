@@ -72,8 +72,6 @@ class HeatmapsOfflineAggregatorTestSpec  extends FlatSpec with BeforeAndAfter {
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "http://www.cancilleria.gov.co/newsroom/news/proximas-horas-llegara-pais-segundo-avion-colombianos-repatriados-puerto-rico",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       ),
@@ -98,8 +96,6 @@ class HeatmapsOfflineAggregatorTestSpec  extends FlatSpec with BeforeAndAfter {
           fulltext = "",
           batchid = UUID.randomUUID().toString,
           externalsourceid = "http://casanare.extra.com.co/rss.xml",
-          topics = Seq[String](),
-          placeids = Seq[String](),
           sourceurl = "",
           title = ""
         )))

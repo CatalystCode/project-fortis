@@ -71,8 +71,6 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq[String](),
-      placeids = Seq[String](),
       sourceurl = "",
       title = ""
     )))
@@ -126,8 +124,6 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
           fulltext = "",
           batchid = UUID.randomUUID().toString,
           externalsourceid = "HamillHimself",
-          topics = Seq[String](),
-          placeids = Seq[String](),
           sourceurl = "",
           title = ""
         ),
@@ -151,8 +147,6 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "carrieffisher",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       )
@@ -221,8 +215,6 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "HamillHimself",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       ),
@@ -246,8 +238,6 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "carrieffisher",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       )

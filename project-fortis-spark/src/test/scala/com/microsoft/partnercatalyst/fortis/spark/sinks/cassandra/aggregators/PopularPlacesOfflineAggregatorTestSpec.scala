@@ -71,8 +71,6 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       fulltext = "",
       batchid = UUID.randomUUID().toString,
       externalsourceid = "HamillHimself",
-      topics = Seq[String](),
-      placeids = Seq[String](),
       sourceurl = "",
       title = ""
     )))
@@ -148,8 +146,6 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "carrieffisher",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       ),
@@ -173,8 +169,6 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "HamillHimself",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       )
@@ -251,8 +245,6 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "carrieffisher",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       ),
@@ -276,8 +268,6 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
         fulltext = "",
         batchid = UUID.randomUUID().toString,
         externalsourceid = "HamillHimself",
-        topics = Seq[String](),
-        placeids = Seq[String](),
         sourceurl = "",
         title = ""
       )

@@ -14,8 +14,6 @@ case class Event(
   imageurl: Option[String],
   batchid: String,
   externalsourceid: String,
-  topics: Seq[String],
-  placeids: Seq[String],
   sourceurl: String,
   title: String
 ) extends Serializable
