@@ -10,8 +10,6 @@ const uuidv4 = require('uuid/v4');
 const { createFile } = require('../clients/storage/BlobStorageClient');
 const cassandraConnector = require('../clients/cassandra/CassandraConnector');
 
-const PlaceholderForSecret = 'secretHidden';
-
 const MINUTES = 60;
 
 function termsFilter(term, categoryFilter) {
@@ -271,6 +269,5 @@ module.exports = {
   getSiteDefinition,
   fromTopicListToConjunctionTopics,
   withCsvExporter,
-  PlaceholderForSecret,
   withRunTime
 };

@@ -6,11 +6,12 @@ const Promise = require('promise');
 const uuid = require('uuid/v4');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const streamingController = require('../../clients/streaming/StreamingController');
-const { PlaceholderForSecret, getSiteDefinition, withRunTime, limitForInClause } = require('../shared');
+const { getSiteDefinition, withRunTime, limitForInClause } = require('../shared');
 const { trackEvent, trackException } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { requiresRole } = require('../../auth');
 const { getUserFromArgs } = require('../../utils/request');
+const { cassandraRowToStream, isSecretUnchanged } = require('./shared');
 
 function isCurrentUser(args, res, user) {
   return getUserFromArgs(args, res) === user.identifier;
@@ -135,12 +136,12 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
             args.input.title,
             JSON.stringify(Array.from(args.input.supportedLanguages || [])),
             args.input.defaultLanguage,
-            args.input.cogSpeechSvcToken === PlaceholderForSecret ? site.properties.cogSpeechSvcToken : args.input.cogSpeechSvcToken,
-            args.input.cogTextSvcToken === PlaceholderForSecret ? site.properties.cogTextSvcToken : args.input.cogTextSvcToken,
-            args.input.cogVisionSvcToken === PlaceholderForSecret ? site.properties.cogVisionSvcToken : args.input.cogVisionSvcToken,
+            isSecretUnchanged(args.input.cogSpeechSvcToken) ? site.properties.cogSpeechSvcToken : args.input.cogSpeechSvcToken,
+            isSecretUnchanged(args.input.cogTextSvcToken) ? site.properties.cogTextSvcToken : args.input.cogTextSvcToken,
+            isSecretUnchanged(args.input.cogVisionSvcToken) ? site.properties.cogVisionSvcToken : args.input.cogVisionSvcToken,
             args.input.featureservicenamespace,
             args.input.mapSvcToken,
-            args.input.translationSvcToken === PlaceholderForSecret ? site.properties.translationSvcToken : args.input.translationSvcToken,
+            isSecretUnchanged(args.input.translationSvcToken) ? site.properties.translationSvcToken : args.input.translationSvcToken,
             args.input.name
           ]
         }]);
@@ -341,6 +342,49 @@ function paramEntryToMap(paramEntry) {
   return paramEntry.reduce((obj, item) => (obj[item.key] = item.value, obj), {});
 }
 
+function modifyStream(stream) {
+  return new Promise((resolve, reject) => {
+    const getStreamQuery = `SELECT * FROM settings.streams WHERE streamid = ? AND pipelinekey = ?`;
+    const getStreamParams = [stream.streamId, stream.pipelineKey];
+
+    cassandraConnector.executeQuery(getStreamQuery, getStreamParams)
+      .then(rows => {
+        const params = paramEntryToMap(stream.params);
+
+        if (rows.length > 0) {
+          const oldStreamParams = paramEntryToMap(cassandraRowToStream(rows[0]).params);
+          const unchangedSecrets = Object.keys(params).filter(key => isSecretUnchanged(params[key]));
+          unchangedSecrets.forEach(key => params[key] = oldStreamParams[key]);
+        }
+
+        const updateStreamMutation = `
+          UPDATE settings.streams
+          SET pipelinelabel = ?,
+          pipelineicon = ?,
+          streamfactory = ?,
+          params_json = ?,
+          enabled = ?
+          WHERE streamid = ?
+          AND pipelinekey = ?
+        `;
+
+        const updateStreamParams = [
+          stream.pipelineLabel,
+          stream.pipelineIcon,
+          stream.streamFactory,
+          JSON.stringify(params),
+          stream.enabled,
+          stream.streamId,
+          stream.pipelineKey
+        ];
+
+        cassandraConnector.executeBatchMutations([{query: updateStreamMutation, params: updateStreamParams}])
+          .then(resolve)
+          .catch(reject);
+      });
+  });
+}
+
 function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const streams = args && args.input && args.input.streams;
@@ -349,38 +393,9 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
       return reject('No streams specified');
     }
 
-    const mutations = [];
-    streams.forEach(stream => {
-      const params = paramEntryToMap(stream.params);
-      mutations.push({
-        query: `UPDATE settings.streams
-        SET pipelinelabel = ?,
-        pipelineicon = ?,
-        streamfactory = ?,
-        params_json = ?,
-        enabled = ?
-        WHERE streamid = ? AND pipelinekey = ?`,
-        params: [
-          stream.pipelineLabel,
-          stream.pipelineIcon,
-          stream.streamFactory,
-          JSON.stringify(params || {}),
-          stream.enabled,
-          stream.streamId,
-          stream.pipelineKey
-        ]
-      });
-    });
-
-    cassandraConnector.executeBatchMutations(mutations)
-      .then(() => {
-        streamingController.restartStreaming();
-      })
-      .then(() => {
-        resolve({
-          streams
-        });
-      })
+    Promise.all(streams.map(modifyStream))
+      .then(() => streamingController.restartStreaming())
+      .then(() => resolve({ streams }))
       .catch(error => {
         trackException(error);
         reject(error);

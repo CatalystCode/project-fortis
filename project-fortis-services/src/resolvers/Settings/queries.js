@@ -12,11 +12,12 @@ const isUUID = require('is-uuid').anyNonNil;
 const { basename } = require('path');
 const { createArrayCsvWriter } = require('csv-writer');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
-const { PlaceholderForSecret, withRunTime, getTermsByCategory, getSiteDefinition, createTempDir } = require('../shared');
+const { withRunTime, getTermsByCategory, getSiteDefinition, createTempDir } = require('../shared');
 const { trackException, trackEvent } = require('../../clients/appinsights/AppInsightsClient');
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { uploadFile } = require('../../clients/storage/BlobStorageClient');
 const { requiresRole } = require('../../auth');
+const { hideSecret, isSecretParam, cassandraRowToStream } = require('./shared');
 
 function users(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
@@ -54,12 +55,6 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-function hideSecret(obj, key) {
-  if (obj[key]) {
-    obj[key] = PlaceholderForSecret;
-  }
-}
-
 function sites(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     getSiteDefinition()
@@ -79,6 +74,15 @@ function streams(args, res) { // eslint-disable-line no-unused-vars
     cassandraConnector.executeQuery('SELECT * FROM settings.streams', [])
       .then(rows => {
         const streams = rows.map(cassandraRowToStream);
+
+        streams.forEach(stream => {
+          stream.params.forEach(param => {
+            if (isSecretParam(param.key)) {
+              hideSecret(param, 'value');
+            }
+          });
+        });
+
         resolve({
           streams
         });
@@ -106,30 +110,6 @@ function trustedSources(args, res) { // eslint-disable-line no-unused-vars
   });
 }
 
-function cassandraRowToStream(row) {
-  if (row.enabled == null) {
-    row.enabled = false;
-  }
-
-  let params;
-  try {
-    params = row.params_json ? JSON.parse(row.params_json) : {};
-  } catch (err) {
-    console.error(`Unable to parse params '${row.params_json}' for stream ${row.streamid}`);
-    params = {};
-  }
-
-  return {
-    streamId: row.streamid,
-    pipelineKey: row.pipelinekey,
-    pipelineLabel: row.pipelinelabel,
-    pipelineIcon: row.pipelineicon,
-    streamFactory: row.streamfactory,
-    params: paramsToParamsEntries(params),
-    enabled: row.enabled
-  };
-}
-
 function cassandraRowToSource(row) {
   return {
     rowKey: row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank,
@@ -140,19 +120,6 @@ function cassandraRowToSource(row) {
     rank: row.rank,
     reportingcategory: row.reportingcategory
   };
-}
-
-function paramsToParamsEntries(params) {
-  const paramsEntries = [];
-  for (const key of Object.keys(params)) {
-    let value = params[key];
-    let paramsEntry = {
-      key,
-      value
-    };
-    paramsEntries.push(paramsEntry);
-  }
-  return paramsEntries;
 }
 
 function cassandraRowToTermFilter(row) {
