@@ -12,13 +12,13 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
     val period = Period("day-2017-08-11")
     val keywords = CassandraConjunctiveTopics.flatMapKeywords(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
         keywords = Seq("europe", "humanitarian"),
         places = Seq(Place("abc123", 10.0, 20.0)),
         entities = Seq()
-      ),
+      )),
       eventtime = period.startTime(),
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
@@ -47,13 +47,13 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
     val period = Period("day-2017-08-11")
     val topics = CassandraConjunctiveTopics(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
         keywords = Seq("europe", "humanitarian"),
         places = Seq(Place("abc123", 10.0, 20.0)),
         entities = Seq()
-      ),
+      )),
       eventtime = period.startTime(),
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
@@ -88,13 +88,13 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
     val period = Period("day-2017-08-11")
     val topics = CassandraConjunctiveTopics(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
         keywords = Seq("europe"),
         places = Seq(Place("abc123", 10.0, 20.0)),
         entities = Seq()
-      ),
+      )),
       eventtime = period.startTime(),
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
@@ -128,13 +128,13 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
   it should "produce an empty sequence on empty places" in {
     val topics = CassandraConjunctiveTopics(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
         keywords = Seq("europe", "humanitarian"),
         places = Seq(),
         entities = Seq()
-      ),
+      )),
       eventtime = new Date().getTime,
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
@@ -157,13 +157,13 @@ class CassandraConjunctiveTopicsTestSpec extends FlatSpec {
   it should "produce an empty sequence on empty keywords" in {
     val topics = CassandraConjunctiveTopics(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
         keywords = Seq(),
         places = Seq(Place("abc123", 10.0, 20.0)),
         entities = Seq()
-      ),
+      )),
       eventtime = new Date().getTime,
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,

@@ -13,7 +13,7 @@ object CassandraEventSchema {
     Event(
       pipelinekey = item.details.pipelinekey,
       externalsourceid = item.details.externalsourceid,
-      computedfeatures = Utils.getFeatures(item),
+      computedfeatures_json = Utils.getFeaturesJson(item),
       eventtime = item.details.eventtime,
       batchid = batchid,
       topics = item.analysis.keywords.map(_.name.toLowerCase),
@@ -33,9 +33,11 @@ object CassandraEventSchema {
 
 object CassandraPopularPlaces {
   def apply(item: Event, minZoom: Int): Seq[PopularPlace] = {
+    val computedfeatures = Features.fromJson(item.computedfeatures_json)
+
     for {
-      kw <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
-      location <- item.computedfeatures.places
+      kw <- Utils.getConjunctiveTopics(Option(computedfeatures.keywords))
+      location <- computedfeatures.places
       zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
       tileid = TileUtils.tile_id_from_lat_long(location.centroidlat, location.centroidlon, zoom)
       periodType <- Utils.getCassandraPeriodTypes
@@ -47,11 +49,11 @@ object CassandraPopularPlaces {
       perioddate = Period(item.eventtime, periodType).startTime(),
       periodtype = periodType.periodTypeName,
       externalsourceid = item.externalsourceid,
-      mentioncount = item.computedfeatures.mentions,
+      mentioncount = computedfeatures.mentions,
       conjunctiontopic1 = kw._1,
       conjunctiontopic2 = kw._2,
       conjunctiontopic3 = kw._3,
-      avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * DoubleToLongConversionFactor).toLong
+      avgsentimentnumerator = (computedfeatures.sentiment.neg_avg * DoubleToLongConversionFactor).toLong
     )
   }
 }
@@ -59,7 +61,9 @@ object CassandraPopularPlaces {
 object CassandraConjunctiveTopics {
 
   def flatMapKeywords(item: Event): Seq[(String, String)] = {
-    val keywords = item.computedfeatures.keywords.distinct
+    val computedfeatures = Features.fromJson(item.computedfeatures_json)
+
+    val keywords = computedfeatures.keywords.distinct
     if (keywords.isEmpty)
       Seq()
     else
@@ -70,9 +74,10 @@ object CassandraConjunctiveTopics {
   }
 
   def apply(item: Event, minZoom: Int): Seq[ConjunctiveTopic] = {
+    val computedfeatures = Features.fromJson(item.computedfeatures_json)
     val keywordPairs = flatMapKeywords(item)
 
-    val tiles = TileUtils.tile_seq_from_places(item.computedfeatures.places, minZoom)
+    val tiles = TileUtils.tile_seq_from_places(computedfeatures.places, minZoom)
 
     for {
       kwPair <- keywordPairs
@@ -82,7 +87,7 @@ object CassandraConjunctiveTopics {
       topic = kwPair._1,
       conjunctivetopic = kwPair._2,
       externalsourceid = item.externalsourceid,
-      mentioncount = item.computedfeatures.mentions,
+      mentioncount = computedfeatures.mentions,
       perioddate = Period(item.eventtime, periodType).startTime(),
       periodtype = periodType.periodTypeName,
       pipelinekey = item.pipelinekey,
@@ -112,9 +117,11 @@ object CassandraTileBucket {
 
 object CassandraHeatmapTiles {
   def apply(item: Event, minZoom: Int): Seq[HeatmapTile] = {
+    val computedfeatures = Features.fromJson(item.computedfeatures_json)
+
     for {
-      ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
-      place <- item.computedfeatures.places
+      ct <- Utils.getConjunctiveTopics(Option(computedfeatures.keywords))
+      place <- computedfeatures.places
       zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
       tileId = TileUtils.tile_id_from_lat_long(place.centroidlat, place.centroidlon, zoom)
       periodType <- Utils.getCassandraPeriodTypes
@@ -129,17 +136,19 @@ object CassandraHeatmapTiles {
         conjunctiontopic2 = ct._2,
         conjunctiontopic3 = ct._3,
         externalsourceid = item.externalsourceid,
-        mentioncount = item.computedfeatures.mentions,
-        avgsentimentnumerator = (item.computedfeatures.sentiment.neg_avg * DoubleToLongConversionFactor).toLong
+        mentioncount = computedfeatures.mentions,
+        avgsentimentnumerator = (computedfeatures.sentiment.neg_avg * DoubleToLongConversionFactor).toLong
     )
   }
 }
 
 object CassandraEventPlacesSchema {
   def apply(item: Event, minZoom: Int): Seq[EventPlaces] = {
+    val computedfeatures = Features.fromJson(item.computedfeatures_json)
+
     for {
-      ct <- Utils.getConjunctiveTopics(Option(item.computedfeatures.keywords))
-      location <- item.computedfeatures.places
+      ct <- Utils.getConjunctiveTopics(Option(computedfeatures.keywords))
+      location <- computedfeatures.places
       zoom <- TileUtils.maxZoom(minZoom) to minZoom by -1
       tileid = TileUtils.tile_id_from_lat_long(location.centroidlat, location.centroidlon, zoom)
     } yield EventPlaces(
@@ -190,10 +199,10 @@ object Utils {
     }
   }
 
-  def getFeatures(item: FortisEvent): Features = {
+  def getFeaturesJson(item: FortisEvent): String = {
     //todo val genderCounts = item.analysis.genders.map(_.name).groupBy(identity).mapValues(t=>t.size.toLong)
     val entityCounts = item.analysis.entities.map(_.name).groupBy(identity).mapValues(t=>t.size.toLong)
-    Features(
+    Features.asJson(Features(
       mentions = 1,
       places = item.analysis.locations.map(place => Place(placeid = place.wofId, centroidlat = place.latitude, centroidlon = place.longitude)),
       keywords = item.analysis.keywords.map(_.name),
@@ -203,6 +212,10 @@ object Utils {
         count = kv._2,
         externalsource = "", // todo
         externalrefid = "" // todo
-      )).toList)
+      )).toList))
+  }
+
+  def getFeatures(item: Event): Features = {
+    Features.fromJson(item.computedfeatures_json)
   }
 }

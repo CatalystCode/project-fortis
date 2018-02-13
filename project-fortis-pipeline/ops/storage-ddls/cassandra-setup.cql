@@ -22,46 +22,6 @@ DROP TABLE IF EXISTS fortis.eventplaces;
 DROP TABLE IF EXISTS fortis.events;
 DROP TABLE IF EXISTS fortis.computedtrends;
 
-DROP TYPE IF EXISTS fortis.features;
-DROP TYPE IF EXISTS fortis.computedgender;
-DROP TYPE IF EXISTS fortis.sentiment;
-DROP TYPE IF EXISTS fortis.computedentities;
-DROP TYPE IF EXISTS fortis.place;
-
-// *****************************************************************************
-// * Types
-// *****************************************************************************
-
-CREATE TYPE fortis.computedgender (
-    male_mentions bigint,
-    female_mentions bigint
-);
-
-CREATE TYPE fortis.sentiment (
-    neg_avg double
-);
-
-CREATE TYPE fortis.computedentities (
-    name text,
-    externalsource text,
-    externalrefid text,
-    count bigint
-);
-
-CREATE TYPE fortis.place (
-    placeid text,
-    centroidlat double,
-    centroidlon double
-);
-
-CREATE TYPE fortis.features (
-    mentions bigint,
-    sentiment frozen<fortis.sentiment>,
-    entities frozen<list<fortis.computedentities>>,
-    keywords frozen<list<text>>,
-    places frozen<list<fortis.place>>
-);
-
 // *****************************************************************************
 // * Data tables
 // *****************************************************************************
@@ -155,7 +115,7 @@ CREATE TABLE fortis.events(
     body text,
     imageurl text,
     summary text,
-    computedfeatures frozen<fortis.features>,
+    computedfeatures_json text,
     insertiontime timestamp,
     eventtime timestamp,
     topics frozen<set<text>>,

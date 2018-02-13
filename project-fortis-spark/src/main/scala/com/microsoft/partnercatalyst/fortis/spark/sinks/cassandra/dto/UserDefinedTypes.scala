@@ -1,5 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto
 
+import net.liftweb.json
+
 case class Sentiment(neg_avg: Double) extends Serializable
 
 case class Gender(
@@ -27,3 +29,17 @@ case class Features(
   places: Seq[Place],
   entities: Seq[Entities]
 ) extends Serializable
+
+object Features {
+  def asJson(features: Features): String = {
+    implicit val formats = json.DefaultFormats
+
+    json.compactRender(json.Extraction.decompose(features))
+  }
+
+  def fromJson(features: String): Features = {
+    implicit val formats = json.DefaultFormats
+
+    json.parse(features).extract[Features]
+  }
+}

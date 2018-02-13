@@ -53,13 +53,13 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(0.5),
         keywords = Seq("europe"),
         places = Seq(Place("wof-101731037", 10.0, 20.0)),
         entities = Seq[Entities]()
-      ),
+      )),
       eventtime = period.startTime(),
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
@@ -130,13 +130,13 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     val events: RDD[Event] = sc.parallelize(Seq(
       Event(
         pipelinekey = "Twitter",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(0.7),
           keywords = Seq("europe"),
           places = Seq(Place("wof-907128885", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,
@@ -155,13 +155,13 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       ),
       Event(
         pipelinekey = "Twitter",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(0.5),
           keywords = Seq("europe"),
           places = Seq(Place("wof-907128885", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,
@@ -233,13 +233,13 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
     val events: RDD[Event] = sc.parallelize(Seq(
       Event(
         pipelinekey = "Twitter",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(0.7),
           keywords = Seq("europe"),
           places = Seq(Place("wof-907128885", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,
@@ -258,13 +258,13 @@ class PopularPlacesOfflineAggregatorTestSpec extends FlatSpec with BeforeAndAfte
       ),
       Event(
         pipelinekey = "facebook",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(0.5),
           keywords = Seq("europe"),
           places = Seq(Place("wof-907128885", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,

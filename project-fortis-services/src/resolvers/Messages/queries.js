@@ -13,17 +13,37 @@ const { requiresRole } = require('../../auth');
 function eventToFeature(row) {
   const FeatureType = 'MultiPoint';
 
+  let computedfeatures;
+  try {
+    computedfeatures = row.computedfeatures_json ? JSON.parse(row.computedfeatures_json) : {};
+  } catch (err) {
+    console.error(`Unable to parse computedfeatures '${row.computedfeatures_json}' on event ${row.eventid}`);
+    computedfeatures = {};
+  }
+
+  const places = computedfeatures.places != null && computedfeatures.places.length > 0
+    ? computedfeatures.places
+    : [];
+
+  const entities = computedfeatures.entities != null && computedfeatures.entities.length > 0
+    ? computedfeatures.entities
+    : [];
+
+  const sentiment = computedfeatures.sentiment != null && computedfeatures.sentiment.neg_avg != null
+    ? computedfeatures.sentiment.neg_avg
+    : -1;
+
   return {
     type: FeatureType,
-    coordinates: row.computedfeatures && row.computedfeatures.places.map(place => [place.centroidlon, place.centroidlat]),
+    coordinates: places.map(place => [place.centroidlon, place.centroidlat]),
     properties: {
       edges: row.topics,
       messageid: row.eventid,
       sourceeventid: row.sourceeventid,
-      places: row.computedfeatures && row.computedfeatures.places.map(place => place.placeid),
-      entities: row.computedfeatures && row.computedfeatures.entities ? row.computedfeatures.entities.map(entity => entity.name) : [],
+      places: places.map(place => place.placeid),
+      entities: entities.map(entity => entity.name),
       eventtime: row.eventtime.getTime(),
-      sentiment: row.computedfeatures && row.computedfeatures.sentiment ? row.computedfeatures.sentiment.neg_avg : -1,
+      sentiment: sentiment,
       title: row.title,
       fullText: row.body,
       summary: row.summary || row.title,

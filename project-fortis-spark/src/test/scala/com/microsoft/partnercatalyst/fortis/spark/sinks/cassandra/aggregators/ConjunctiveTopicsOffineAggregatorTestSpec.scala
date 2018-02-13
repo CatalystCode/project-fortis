@@ -53,13 +53,13 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     val period = Period("day-2017-08-11")
     val events: RDD[Event] = sc.parallelize(Seq(Event(
       pipelinekey = "Twitter",
-      computedfeatures = Features(
+      computedfeatures_json = Features.asJson(Features(
         mentions = 1,
         sentiment = Sentiment(1.0),
         keywords = Seq("europe"),
         places = Seq(Place("abc123", 10.0, 20.0)),
         entities = Seq[Entities]()
-      ),
+      )),
       eventtime = period.startTime(),
       eventlangcode = "en",
       eventid = UUID.randomUUID().toString,
@@ -108,13 +108,13 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     val events: RDD[Event] = sc.parallelize(Seq(
         Event(
           pipelinekey = "Twitter",
-          computedfeatures = Features(
+          computedfeatures_json = Features.asJson(Features(
             mentions = 1,
             sentiment = Sentiment(1.0),
             keywords = Seq("europe"),
             places = Seq(Place("abc123", 10.0, 20.0)),
             entities = Seq[Entities]()
-          ),
+          )),
           eventtime = period.startTime(),
           eventlangcode = "en",
           eventid = UUID.randomUUID().toString,
@@ -133,13 +133,13 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
         ),
       Event(
         pipelinekey = "Twitter",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(1.0),
           keywords = Seq("europe"),
           places = Seq(Place("abc123", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,
@@ -203,13 +203,13 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
     val events: RDD[Event] = sc.parallelize(Seq(
       Event(
         pipelinekey = "facebook",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(1.0),
           keywords = Seq("europe"),
           places = Seq(Place("abc123", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,
@@ -228,13 +228,13 @@ class ConjunctiveTopicsOffineAggregatorTestSpec extends FlatSpec with BeforeAndA
       ),
       Event(
         pipelinekey = "Twitter",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(1.0),
           keywords = Seq("europe"),
           places = Seq(Place("abc123", 10.0, 20.0)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = UUID.randomUUID().toString,

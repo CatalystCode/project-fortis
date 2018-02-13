@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto
 
 case class Event(
   pipelinekey: String,
-  computedfeatures: Features,
+  computedfeatures_json: String,
   eventtime: Long,
   eventlangcode: String,
   eventid: String,

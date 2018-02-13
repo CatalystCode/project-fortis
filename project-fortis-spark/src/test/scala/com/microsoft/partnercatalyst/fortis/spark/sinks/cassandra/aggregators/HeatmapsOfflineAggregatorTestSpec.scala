@@ -52,7 +52,7 @@ class HeatmapsOfflineAggregatorTestSpec  extends FlatSpec with BeforeAndAfter {
       val period = Period("day-2017-08-11")
       val events: RDD[Event] = sc.parallelize(Seq(Event(
         pipelinekey = "RSS",
-        computedfeatures = Features(
+        computedfeatures_json = Features.asJson(Features(
           mentions = 1,
           sentiment = Sentiment(1.0),
           keywords = Seq("colombia", "fuerza aerea", "herido", "huracan", "verdad"),
@@ -60,7 +60,7 @@ class HeatmapsOfflineAggregatorTestSpec  extends FlatSpec with BeforeAndAfter {
                        Place("divipola-76823100000000", 4.60785, -76.07739),
                        Place("divipola-52001", 1.05578, -77.19551)),
           entities = Seq[Entities]()
-        ),
+        )),
         eventtime = period.startTime(),
         eventlangcode = "en",
         eventid = "http://www.cancilleria.gov.co/rss.xml",
@@ -79,14 +79,14 @@ class HeatmapsOfflineAggregatorTestSpec  extends FlatSpec with BeforeAndAfter {
       ),
         Event(
           pipelinekey = "RSS",
-          computedfeatures = Features(
+          computedfeatures_json = Features.asJson(Features(
             mentions = 1,
             sentiment = Sentiment(1.0),
             keywords = Seq("eln", "herido", "combate"),
             places = Seq(Place("divipola-27", 5.94302, -76.94238),
                          Place("divipola-27372100000000", 7.10349, -77.76281)),
             entities = Seq[Entities]()
-          ),
+          )),
           eventtime = period.startTime(),
           eventlangcode = "en",
           eventid = " RSS.http://casanare.extra.com.co/noticias/judicial/traslado-aeromedico-para-guerrillero-del-eln-herido-en-comba-353329",
