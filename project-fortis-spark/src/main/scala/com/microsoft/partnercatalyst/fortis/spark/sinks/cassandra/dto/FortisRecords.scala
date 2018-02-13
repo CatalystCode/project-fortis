@@ -57,33 +57,33 @@ case class PopularPlace(
 ) extends Serializable
 
 case class HeatmapTile(
-                         override val externalsourceid: String,
-                         override val perioddate: Long,
-                         override val periodtype: String,
-                         override val pipelinekey: String,
-                         override val mentioncount: Long,
-                         override val avgsentimentnumerator: Long,
-                         override val tilez: Int,
-                         override val tileid: String,
-                         heatmaptileid: String,
-                         conjunctiontopic1: String,
-                         conjunctiontopic2: String,
-                         conjunctiontopic3: String
+  override val externalsourceid: String,
+  override val perioddate: Long,
+  override val periodtype: String,
+  override val pipelinekey: String,
+  override val mentioncount: Long,
+  override val avgsentimentnumerator: Long,
+  override val tilez: Int,
+  override val tileid: String,
+  heatmaptileid: String,
+  conjunctiontopic1: String,
+  conjunctiontopic2: String,
+  conjunctiontopic3: String
 ) extends AggregationRecordTile with Serializable
 
 case class ComputedTile(
-                        override val externalsourceid: String,
-                        override val perioddate: Long,
-                        override val periodtype: String,
-                        override val pipelinekey: String,
-                        override val mentioncount: Long,
-                        override val avgsentimentnumerator: Long,
-                        override val tilez: Int,
-                        override val tileid: String,
-                        conjunctiontopic1: String,
-                        conjunctiontopic2: String,
-                        conjunctiontopic3: String
-                      ) extends AggregationRecordTile with Serializable
+  override val externalsourceid: String,
+  override val perioddate: Long,
+  override val periodtype: String,
+  override val pipelinekey: String,
+  override val mentioncount: Long,
+  override val avgsentimentnumerator: Long,
+  override val tilez: Int,
+  override val tileid: String,
+  conjunctiontopic1: String,
+  conjunctiontopic2: String,
+  conjunctiontopic3: String
+) extends AggregationRecordTile with Serializable
 
 case class HeatmapEntry (
   mentioncountagg: Long,
