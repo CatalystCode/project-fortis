@@ -66,19 +66,19 @@ object StreamsChangeListener {
     }
 
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      System.err.println(s"Service Bus message received $message.")
+      Log.logInfo(s"Service Bus message received $message.")
 
       if (message.getEnqueuedTimeUtc.isBefore(this.initializedAt)) {
-        System.err.println(s"Service Bus message ignored since it predates listener initialization.")
+        Log.logInfo(s"Service Bus message ignored since it predates listener initialization.")
         return CompletableFuture.completedFuture(null)
       }
 
       this.scheduledTask match {
         case Some(task) =>
-          System.err.println(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.sscShutdownDelayMillis} milliseconds from now.")
+          Log.logInfo(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.sscShutdownDelayMillis} milliseconds from now.")
           task.cancel(false)
         case None =>
-          System.err.println(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.sscShutdownDelayMillis} milliseconds.")
+          Log.logInfo(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.sscShutdownDelayMillis} milliseconds.")
       }
 
       this.currentContext match {
@@ -89,7 +89,7 @@ object StreamsChangeListener {
             TimeUnit.MILLISECONDS
           ))
         case None =>
-          System.err.println(s"No streaming context set; Nothing to stop.")
+          Log.logInfo(s"No streaming context set; Nothing to stop.")
       }
 
       CompletableFuture.completedFuture(null)
@@ -99,17 +99,17 @@ object StreamsChangeListener {
   private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ScheduledExecutorService) extends Runnable {
     override def run(): Unit = {
       StreamsChangeListener.suggestedExitCode = 10
-      System.err.println(s"Requesting streaming context stop now.")
+      Log.logInfo(s"Requesting streaming context stop now.")
       val timeoutTask = scheduler.schedule(new TimeoutRunnable(), 30L, TimeUnit.SECONDS)
       try {
         ssc.stop(stopSparkContext = true, stopGracefully = false)
         timeoutTask.cancel(false)
-        System.err.println(s"Streaming context stop complete; Cleaning up...")
+        Log.logInfo(s"Streaming context stop complete; Cleaning up...")
         if (!settings.progressDir.isEmpty) {
           Path(settings.progressDir).deleteRecursively()
         }
       } catch {
-        case NonFatal(e) => e.printStackTrace(System.err)
+        case NonFatal(e) => Log.logError("Error stopping streaming context", e)
       }
     }
   }

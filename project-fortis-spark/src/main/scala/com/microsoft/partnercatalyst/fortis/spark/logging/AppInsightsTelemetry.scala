@@ -13,37 +13,56 @@ class AppInsightsTelemetry extends FortisTelemetry {
 
   def logInfo(trace: String): Unit = logTrace(trace, SeverityLevel.Information)
 
-  def logError(trace: String, exception: Throwable): Unit = {
-    val stackTrace = if (exception != null) {
-      val stringWriter = new StringWriter()
-      exception.printStackTrace(new PrintWriter(stringWriter))
-      stringWriter.toString
-    } else {
-      ""
+  def logError(trace: String, exception: Throwable): Unit = logTrace(trace, SeverityLevel.Error, Option(exception))
+
+  private def logTrace(trace: String, level: SeverityLevel, exception: Option[Throwable]=None): Unit = {
+    try {
+      val message = exception match {
+        case Some(error) =>
+          val stringWriter = new StringWriter()
+          error.printStackTrace(new PrintWriter(stringWriter))
+          val stackTrace = stringWriter.toString
+          s"$trace\n$stackTrace"
+        case None =>
+          trace
+      }
+
+      System.err.println(s"[$level] $message")
+
+      client.trackTrace(message, level)
+      client.flush()
+    } catch {
+      case exception: Exception =>
+        System.err.println(s"Unable to send trace $trace to AppInsights")
+        exception.printStackTrace(System.err)
     }
-
-    logTrace(s"$trace\n$stackTrace", SeverityLevel.Error)
-  }
-
-  private def logTrace(trace: String, level: SeverityLevel): Unit = {
-    System.err.println(s"[$level] $trace")
-    client.trackTrace(trace, level)
-    client.flush()
   }
 
   def logEvent(name: String, properties: Map[String, String]=Map(), metrics: Map[String, Double]=Map()): Unit = {
-    val appInsightsProperties = new util.HashMap[String, String](properties.size)
-    properties.foreach(kv => appInsightsProperties.put(kv._1, kv._2))
+    try {
+      val appInsightsProperties = new util.HashMap[String, String](properties.size)
+      properties.foreach(kv => appInsightsProperties.put(kv._1, kv._2))
 
-    val appInsightsMetrics = new util.HashMap[String, java.lang.Double](metrics.size)
-    metrics.foreach(kv => appInsightsMetrics.put(kv._1, kv._2))
+      val appInsightsMetrics = new util.HashMap[String, java.lang.Double](metrics.size)
+      metrics.foreach(kv => appInsightsMetrics.put(kv._1, kv._2))
 
-    client.trackEvent(name, appInsightsProperties, appInsightsMetrics)
-    client.flush()
+      client.trackEvent(name, appInsightsProperties, appInsightsMetrics)
+      client.flush()
+    } catch {
+      case exception: Exception =>
+        System.err.println(s"Unable to send event $name to AppInsights")
+        exception.printStackTrace(System.err)
+    }
   }
 
   def logDependency(name: String, method: String, success: Boolean, durationInMs: Long): Unit = {
-    client.trackDependency(name, method, new Duration(durationInMs), success)
-    client.flush()
+    try {
+      client.trackDependency(name, method, new Duration(durationInMs), success)
+      client.flush()
+    } catch {
+      case exception: Exception =>
+        System.err.println(s"Unable to send dependency $name to AppInsights")
+        exception.printStackTrace(System.err)
+    }
   }
 }
