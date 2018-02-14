@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.entities.EntityRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.TextNormalizer
@@ -9,7 +8,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.language.TextNormal
 class PlaceRecognizer(
   modelsProvider: ZipModelsProvider,
   language: Option[String]
-) extends Serializable with Loggable {
+) extends Serializable {
 
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 

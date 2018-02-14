@@ -5,13 +5,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 import com.github.catalystcode.fortis.spark.streaming.html.HTMLPage
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 @SerialVersionUID(100L)
-class HTMLAnalyzer extends Analyzer[HTMLPage] with Serializable with AnalysisDefaults.EnableAll[HTMLPage] with Loggable {
+class HTMLAnalyzer extends Analyzer[HTMLPage] with Serializable with AnalysisDefaults.EnableAll[HTMLPage] {
 
   override def toSchema(item: HTMLPage, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[HTMLPage] = {
     val document = Jsoup.parse(item.html)
@@ -46,7 +45,7 @@ class HTMLAnalyzer extends Analyzer[HTMLPage] with Serializable with AnalysisDef
       }
       new Date().getTime
     } catch {
-      case e: Exception => new Date().getTime
+      case _: Exception => new Date().getTime
     }
   }
 

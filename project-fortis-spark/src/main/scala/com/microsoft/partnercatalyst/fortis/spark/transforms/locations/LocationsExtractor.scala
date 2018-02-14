@@ -1,8 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.Location
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 @SerialVersionUID(100L)
 class LocationsExtractor private[locations](
@@ -11,7 +11,7 @@ class LocationsExtractor private[locations](
   placeRecognizer: Option[PlaceRecognizer] = None,
   locationLimit: Int = Int.MaxValue,
   ngrams: Int = 3
-) extends Serializable with Loggable {
+) extends Serializable {
 
   def analyze(text: String): Iterable[Location] = {
     if (text.isEmpty) {
@@ -39,7 +39,7 @@ class LocationsExtractor private[locations](
 
     // TODO: ngrams will be very expensive on large text. Limit text or use summary only?
     if (candidatePlaces.isEmpty && (placeRecognizer.isEmpty || !placeRecognizer.get.isValid)) {
-      logDebug("Falling back to ngrams approach")
+      Log.logDebug("Falling back to ngrams approach")
       candidatePlaces = StringUtils.ngrams(text, ngrams).groupBy(str => str).mapValues(_.length).toSeq
     }
 

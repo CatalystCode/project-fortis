@@ -8,7 +8,7 @@ import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.WriteConf
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
-import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable, Timer}
+import com.microsoft.partnercatalyst.fortis.spark.logging.Timer
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
 import org.apache.spark.SparkContext
@@ -17,9 +17,9 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.dstream.DStream
 
 import scala.util.{Failure, Success, Try}
-import FortisTelemetry.{get => Log}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
-object CassandraEventsSink extends Loggable {
+object CassandraEventsSink {
   private val KeyspaceName = "fortis"
   private val TableEvent = "events"
   private val TableEventPlaces = "eventplaces"
@@ -122,7 +122,7 @@ object CassandraEventsSink extends Loggable {
           aggregator.aggregateAndSave(eventsExploded, KeyspaceName)
         }
       } match {
-        case Failure(ex) => logError(s"Failed performing offline aggregation $name", ex)
+        case Failure(ex) => Log.logError(s"Failed performing offline aggregation $name", ex)
         case Success(_) => // rejoice
       }
     }

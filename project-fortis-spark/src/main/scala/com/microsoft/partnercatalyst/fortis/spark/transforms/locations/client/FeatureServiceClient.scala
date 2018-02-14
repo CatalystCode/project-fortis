@@ -3,15 +3,15 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 import java.lang.System.currentTimeMillis
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.Geofence
-import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
-class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extends Serializable with Loggable {
+class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extends Serializable {
   def bbox(geofence: Geofence, layers: Seq[String] = List()): Iterable[FeatureServiceFeature] = {
     unpack(fetchBboxResponse(geofence, layers), "bbox")
   }
@@ -30,7 +30,7 @@ class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extend
       case Success(domainObject) =>
         domainObject
       case Failure(err) =>
-        logError(s"Error fetching feature service $endpointName", err)
+        Log.logError(s"Error fetching feature service $endpointName", err)
         List()
     }
   }
@@ -75,7 +75,7 @@ class FeatureServiceClient(apiUrlBase: String, namespace: Option[String]) extend
   private def fetchResponse(url: String): Try[String] = {
     val startTime = currentTimeMillis()
     val response = Try(Source.fromURL(url)("UTF-8").mkString)
-    FortisTelemetry.get.logDependency("transforms.locations", "callFeatureService", response.isSuccess, currentTimeMillis() - startTime)
+    Log.logDependency("transforms.locations", "callFeatureService", response.isSuccess, currentTimeMillis() - startTime)
     response
   }
 }

@@ -1,7 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories.TwitterStreamFactory._
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.SparkContext
@@ -12,10 +11,11 @@ import org.apache.spark.streaming.twitter.TwitterUtils
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 import twitter4j.{FilterQuery, Status}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.collection.mutable
 
-class TwitterStreamFactory(configurationManager: ConfigurationManager) extends StreamFactoryBase[Status] with Loggable {
+class TwitterStreamFactory(configurationManager: ConfigurationManager) extends StreamFactoryBase[Status] {
 
   private[streamfactories] var twitterMaxTermCount = sys.env.getOrElse("FORTIS_TWITTER_MAX_TERM_COUNT", 400.toString).toInt
 
@@ -42,20 +42,20 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
     if (params.getOrElse("watchlistFilteringEnabled", "true").toString.toBoolean) {
       val keywordsAdded = appendWatchlist(query, ssc.sparkContext, configurationManager)
       if (!keywordsAdded) {
-        logInfo(s"No keywords used for Twitter consumerKey $consumerKey. Returning empty stream.")
+        Log.logInfo(s"No keywords used for Twitter consumerKey $consumerKey. Returning empty stream.")
         return ssc.queueStream(new mutable.Queue[RDD[Status]])
       }
     }
 
     val languagesAdded = addLanguages(query, ssc.sparkContext, configurationManager)
     if (!languagesAdded) {
-      logInfo(s"No languages set for Twitter consumerKey $consumerKey. Returning empty stream.")
+      Log.logInfo(s"No languages set for Twitter consumerKey $consumerKey. Returning empty stream.")
       return ssc.queueStream(new mutable.Queue[RDD[Status]])
     }
 
     val usersAdded = addUsers(query, params)
     if (!usersAdded) {
-      logInfo(s"No users set for Twitter consumerKey $consumerKey")
+      Log.logInfo(s"No users set for Twitter consumerKey $consumerKey")
     }
 
     val stream = TwitterUtils.createFilteredStream(
@@ -90,7 +90,7 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
     }
 
     val watchlist = configurationManager.fetchWatchlist(sparkContext)
-    val sortedTerms = watchlist.values.flatMap(v=>v).toList.sorted
+    val sortedTerms = watchlist.values.flatten.toList.sorted
 
     val terms = sortedTerms.drop(watchlistCurrentOffsetValue)
     if (terms.isEmpty) return false
@@ -120,10 +120,9 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
 
     allLanguages.size match {
       case 0 => false
-      case _ => {
+      case _ =>
         query.language(allLanguages:_*)
         true
-      }
     }
   }
 

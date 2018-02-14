@@ -5,8 +5,8 @@ import java.util.concurrent._
 
 import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import org.apache.spark.streaming.StreamingContext
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.reflect.io.Path
 import scala.util.control.NonFatal
@@ -24,23 +24,20 @@ object StreamsChangeListener {
 
   private[spark] def ensureMessageHandlerIsInitialized(ssc: StreamingContext, settings: FortisSettings): Unit = {
     this.messageHandler match {
-      case Some(handler) => {
+      case Some(handler) =>
         handler.currentContext = Some(ssc)
-      }
-      case None => {
+      case None =>
         val handler = new CommandMessageHandler(settings)
         handler.currentContext = Some(ssc)
         messageHandler = Some(handler)
-      }
     }
   }
 
-  private[spark] def ensureQueueClientIsInitialized(ssc: StreamingContext, settings: FortisSettings) = {
+  private[spark] def ensureQueueClientIsInitialized(ssc: StreamingContext, settings: FortisSettings): Unit = {
     this.queueClient match {
-      case Some(client) => {
+      case Some(_) =>
         // Do nothing.
-      }
-      case None => {
+      case None =>
         val client = new QueueClient(
           new ConnectionStringBuilder(settings.managementBusConnectionString, settings.managementBusCommandQueueName),
           ReceiveMode.PeekLock
@@ -54,11 +51,10 @@ object StreamsChangeListener {
           )
         )
         queueClient = Some(client)
-      }
     }
   }
 
-  private[spark] class CommandMessageHandler(settings: FortisSettings) extends IMessageHandler with Loggable {
+  private[spark] class CommandMessageHandler(settings: FortisSettings) extends IMessageHandler {
 
     private val initializedAt = Instant.now()
     private val scheduler = Executors.newScheduledThreadPool(2)
@@ -66,11 +62,11 @@ object StreamsChangeListener {
     var currentContext: Option[StreamingContext] = None
 
     override def notifyException(exception: Throwable, phase: ExceptionPhase): Unit = {
-      logError("Service Bus client threw error while processing message.", exception)
+      Log.logError("Service Bus client threw error while processing message.", exception)
     }
 
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      System.err.println(s"Service Bus message received ${message}.")
+      System.err.println(s"Service Bus message received $message.")
 
       if (message.getEnqueuedTimeUtc.isBefore(this.initializedAt)) {
         System.err.println(s"Service Bus message ignored since it predates listener initialization.")
@@ -78,33 +74,29 @@ object StreamsChangeListener {
       }
 
       this.scheduledTask match {
-        case Some(task) => {
+        case Some(task) =>
           System.err.println(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.sscShutdownDelayMillis} milliseconds from now.")
           task.cancel(false)
-        }
-        case None => {
+        case None =>
           System.err.println(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.sscShutdownDelayMillis} milliseconds.")
-        }
       }
 
       this.currentContext match {
-        case Some(context) => {
+        case Some(context) =>
           this.scheduledTask = Some(this.scheduler.schedule(
             new ContextStopRunnable(settings, context, scheduler),
             settings.sscShutdownDelayMillis,
             TimeUnit.MILLISECONDS
           ))
-        }
-        case None => {
+        case None =>
           System.err.println(s"No streaming context set; Nothing to stop.")
-        }
       }
 
       CompletableFuture.completedFuture(null)
     }
   }
 
-  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ScheduledExecutorService) extends Runnable with Loggable {
+  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ScheduledExecutorService) extends Runnable {
     override def run(): Unit = {
       StreamsChangeListener.suggestedExitCode = 10
       System.err.println(s"Requesting streaming context stop now.")

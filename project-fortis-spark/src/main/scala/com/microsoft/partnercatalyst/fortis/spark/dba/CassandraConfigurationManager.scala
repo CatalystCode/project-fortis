@@ -1,18 +1,19 @@
 package com.microsoft.partnercatalyst.fortis.spark.dba
+
 import java.util.concurrent.ConcurrentHashMap
 
 import com.datastax.spark.connector._
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedItem, SiteSettings}
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import net.liftweb.json
 import org.apache.spark.SparkContext
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}
 
 @SerialVersionUID(100L)
-class CassandraConfigurationManager extends ConfigurationManager with Serializable with Loggable {
+class CassandraConfigurationManager extends ConfigurationManager with Serializable {
   // Note: trusted sources are cached for the lifetime of the configuration manager since in order to update them,
   // streaming must be restarted (and hence the configuration manager would be replaced).
   private lazy val connectorToTrustedSources = new ConcurrentHashMap[String, Seq[String]]()
@@ -37,7 +38,9 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
       val trustedSources = connectorToTrustedSources.computeIfAbsent(pipeline, (fetchTrustedSources _).asJava)
 
       val params = Try(json.parse(stream.params_json).extract[Map[String, String]]) match {
-        case Failure(_) => Map[String, String]()
+        case Failure(ex) =>
+          Log.logError("Failed to parse params_json", ex)
+          Map[String, String]()
         case Success(map) => map
       }
 
@@ -55,7 +58,7 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
       case Some(row) => row
       case None =>
         val ex = new Exception(s"Table '${CassandraSchema.Table.SiteSettingsName}' must have at least 1 entry.")
-        logFatalError(ex.getMessage, ex)
+        Log.logError(ex.getMessage, ex)
         throw ex
     }
   }
@@ -70,7 +73,9 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
           case None => Map[String, String]()
           case Some(jsonString) if jsonString.equals("") => Map[String, String]()
           case Some(jsonString) => Try(json.parse(jsonString).extract[Map[String, String]]) match {
-            case Failure(_) => Map[String, String]()
+            case Failure(ex) =>
+              Log.logError("Failed to parse translations_json", ex)
+              Map[String, String]()
             case Success(map) => map
         }}).toList
 
@@ -92,7 +97,9 @@ class CassandraConfigurationManager extends ConfigurationManager with Serializab
           case None => List[String]()
           case Some(jsonString) if jsonString.equals("") => List[String]()
           case Some(jsonString) => Try(json.parse(jsonString).extract[List[String]]) match {
-            case Failure(_) => List[String]()
+            case Failure(ex) =>
+              Log.logError("Failed to parse conjunctivefilter_json", ex)
+              List[String]()
             case Success(list) => list
         }}).toSet
 

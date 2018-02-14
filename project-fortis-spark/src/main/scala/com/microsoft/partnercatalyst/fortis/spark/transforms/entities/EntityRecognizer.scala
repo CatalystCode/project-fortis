@@ -3,10 +3,10 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.entities
 import java.io.{IOError, IOException}
 import java.lang.System.currentTimeMillis
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.{Entity, Term}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
@@ -15,7 +15,7 @@ import scala.util.{Failure, Success, Try}
 class EntityRecognizer(
   modelsProvider: ZipModelsProvider,
   language: Option[String]
-) extends Serializable with Loggable {
+) extends Serializable {
 
   def extractTerms(text: String): List[Term] = {
     if (!isValid) {
@@ -24,7 +24,7 @@ class EntityRecognizer(
 
     Try(modelsProvider.ensureModelsAreDownloaded(language.get)) match {
       case Failure(ex) =>
-        logError(s"Unable to load models for language $language", ex)
+        Log.logError(s"Unable to load models for language $language", ex)
         List()
 
       case Success(resourcesDirectory) =>
@@ -43,10 +43,10 @@ class EntityRecognizer(
       terms = kaf.getTerms.toList
     } catch {
       case ex @ (_ : NullPointerException | _ : IOError | _ : IOException) =>
-        logError(s"Unable to extract terms for language $language", ex)
+        Log.logError(s"Unable to extract terms for language $language", ex)
     }
 
-    FortisTelemetry.get.logDependency("transforms.entities", "extractTerms", success = terms != null, currentTimeMillis() - startTime)
+    Log.logDependency("transforms.entities", "extractTerms", success = terms != null, currentTimeMillis() - startTime)
     terms
   }
 
@@ -57,7 +57,7 @@ class EntityRecognizer(
 
     Try(modelsProvider.ensureModelsAreDownloaded(language.get)) match {
       case Failure(ex) =>
-        logError(s"Unable to load models for language $language", ex)
+        Log.logError(s"Unable to load models for language $language", ex)
         List()
 
       case Success(resourcesDirectory) =>
@@ -79,10 +79,10 @@ class EntityRecognizer(
       entities = kaf.getEntities.toList
     } catch {
       case ex @ (_ : NullPointerException | _ : IOError | _ : IOException) =>
-        logError(s"Unable to extract entities for language $language", ex)
+        Log.logError(s"Unable to extract entities for language $language", ex)
     }
 
-    FortisTelemetry.get.logDependency("transforms.entities", "extractEntities", success = entities != null, currentTimeMillis() - startTime)
+    Log.logDependency("transforms.entities", "extractEntities", success = entities != null, currentTimeMillis() - startTime)
     entities
   }
 }

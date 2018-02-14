@@ -1,12 +1,35 @@
 package com.microsoft.partnercatalyst.fortis.spark.logging
 
+import java.io.{PrintWriter, StringWriter}
 import java.util
 
-import com.microsoft.applicationinsights.telemetry.Duration
+import com.microsoft.applicationinsights.telemetry.{Duration, SeverityLevel}
 import com.microsoft.applicationinsights.{TelemetryClient, TelemetryConfiguration}
 
 class AppInsightsTelemetry extends FortisTelemetry {
   private val client: TelemetryClient = new TelemetryClient(TelemetryConfiguration.createDefault())
+
+  def logDebug(trace: String): Unit = logTrace(trace, SeverityLevel.Verbose)
+
+  def logInfo(trace: String): Unit = logTrace(trace, SeverityLevel.Information)
+
+  def logError(trace: String, exception: Throwable): Unit = {
+    val stackTrace = if (exception != null) {
+      val stringWriter = new StringWriter()
+      exception.printStackTrace(new PrintWriter(stringWriter))
+      stringWriter.toString
+    } else {
+      ""
+    }
+
+    logTrace(s"$trace\n$stackTrace", SeverityLevel.Error)
+  }
+
+  private def logTrace(trace: String, level: SeverityLevel): Unit = {
+    System.err.println(s"[$level] $trace")
+    client.trackTrace(trace, level)
+    client.flush()
+  }
 
   def logEvent(name: String, properties: Map[String, String]=Map(), metrics: Map[String, Double]=Map()): Unit = {
     val appInsightsProperties = new util.HashMap[String, String](properties.size)

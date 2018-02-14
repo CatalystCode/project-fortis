@@ -6,7 +6,7 @@ import java.net.URL
 import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.{FortisTelemetry, Loggable}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import net.lingala.zip4j.core.ZipFile
 
 import scala.collection.JavaConversions._
@@ -16,7 +16,7 @@ import scala.util.{Failure, Success, Try}
 @SerialVersionUID(100L)
 class ZipModelsProvider(
   modelsUrlFromLanguage: String => String
-) extends Serializable with Loggable {
+) extends Serializable {
 
   @transient private lazy val modelDirectories = new ConcurrentHashMap[String, String]
 
@@ -24,14 +24,14 @@ class ZipModelsProvider(
     val startTime = currentTimeMillis()
     val previouslyDownloadedPath = modelDirectories.getOrElse(language, "")
     if (hasModelFiles(previouslyDownloadedPath, language)) {
-      FortisTelemetry.get.logDependency("transforms.models", "ensureModelsAreDownloaded", success = true, currentTimeMillis() - startTime)
-      logDebug(s"Using previously downloaded model files from $previouslyDownloadedPath")
+      Log.logDependency("transforms.models", "ensureModelsAreDownloaded", success = true, currentTimeMillis() - startTime)
+      Log.logDebug(s"Using previously downloaded model files from $previouslyDownloadedPath")
       return previouslyDownloadedPath
     }
 
     val remotePath = modelsUrlFromLanguage(language)
     if ((!remotePath.startsWith("http://") && !remotePath.startsWith("https://")) || !remotePath.endsWith(".zip")) {
-      FortisTelemetry.get.logDependency("transforms.models", "ensureModelsAreDownloaded", success = false, currentTimeMillis() - startTime)
+      Log.logDependency("transforms.models", "ensureModelsAreDownloaded", success = false, currentTimeMillis() - startTime)
       throw new FileNotFoundException(s"Unable to process $remotePath, should be http(s) link to zip file")
     }
 
@@ -39,26 +39,26 @@ class ZipModelsProvider(
       case Success(path) =>
         path
       case Failure(ex) =>
-        FortisTelemetry.get.logDependency("transforms.models", "ensureModelsAreDownloaded", success = false, currentTimeMillis() - startTime)
+        Log.logDependency("transforms.models", "ensureModelsAreDownloaded", success = false, currentTimeMillis() - startTime)
         throw ex
     }
 
     if (!hasModelFiles(localDir, language)) {
-      FortisTelemetry.get.logDependency("transforms.models", "ensureModelsAreDownloaded", success = false, currentTimeMillis() - startTime)
+      Log.logDependency("transforms.models", "ensureModelsAreDownloaded", success = false, currentTimeMillis() - startTime)
       throw new FileNotFoundException(s"No models for language $language in $remotePath")
     }
 
     modelDirectories.putIfAbsent(language, localDir)
-    FortisTelemetry.get.logDependency("transforms.models", "ensureModelsAreDownloaded", success = true, currentTimeMillis() - startTime)
+    Log.logDependency("transforms.models", "ensureModelsAreDownloaded", success = true, currentTimeMillis() - startTime)
     localDir
   }
 
   private def downloadModels(remotePath: String): String = {
     val localFile = Files.createTempFile(getClass.getSimpleName, ".zip").toAbsolutePath.toString
     val localDir = Files.createTempDirectory(getClass.getSimpleName).toAbsolutePath.toString
-    logDebug(s"Starting to download models from $remotePath to $localFile")
+    Log.logDebug(s"Starting to download models from $remotePath to $localFile")
     val exitCode = (new URL(remotePath) #> new File(localFile)).!
-    logDebug(s"Finished downloading models from $remotePath to $localFile")
+    Log.logDebug(s"Finished downloading models from $remotePath to $localFile")
     if (exitCode != 0) {
       throw new FileNotFoundException(s"Unable to download models from $remotePath")
     }

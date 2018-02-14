@@ -6,9 +6,9 @@ import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ComputedT
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraTileBucket}
 import org.apache.spark.rdd.RDD
 import com.datastax.spark.connector._
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
-class HeatmapOfflineAggregator(configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] with Loggable {
+class HeatmapOfflineAggregator(configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] {
   override def aggregate(events: RDD[Event]): RDD[HeatmapTile] = {
     val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
     val tiles = events.flatMap(CassandraHeatmapTiles(_, siteSettings.defaultzoom))
@@ -80,7 +80,7 @@ class HeatmapOfflineAggregator(configurationManager: ConfigurationManager) exten
           aggregateAndSaveTileBuckets(tiles, keyspace)
         } catch {
           case e: Exception =>
-            logError(s"Failed to write aggregate tiles to keyspace $keyspace", e)
+            Log.logError(s"Failed to write aggregate tiles to keyspace $keyspace", e)
         }
     }
 

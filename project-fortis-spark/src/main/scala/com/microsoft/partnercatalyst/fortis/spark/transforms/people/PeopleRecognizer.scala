@@ -1,6 +1,5 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.people
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.entities.EntityRecognizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER.entityIsPerson
@@ -9,7 +8,7 @@ import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER.entityIs
 class PeopleRecognizer(
   modelsProvider: ZipModelsProvider,
   language: Option[String]
-) extends Serializable with Loggable {
+) extends Serializable {
 
   @volatile private lazy val entityRecognizer = createEntityRecognizer()
 

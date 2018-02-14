@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.util.{Failure, Success, Try}
 
@@ -23,10 +23,10 @@ class SentimentDetector(
     detectors.get.view.map(detector => {
       Try(detector.detectSentiment(text)) match {
         case Success(Some(sentimentScore)) =>
-          logDebug(s"Computed sentiment via ${detector.getClass}")
+          Log.logDebug(s"Computed sentiment via ${detector.getClass}")
           Some(sentimentScore)
         case Success(None) | Failure(_) =>
-          logDebug(s"Unable to compute sentiment via ${detector.getClass}")
+          Log.logDebug(s"Unable to compute sentiment via ${detector.getClass}")
           None
       }
     })
@@ -46,6 +46,6 @@ object SentimentDetector extends Enumeration {
   val Negative: Double = 0.0
 }
 
-trait DetectsSentiment extends Serializable with Loggable {
+trait DetectsSentiment extends Serializable {
   def detectSentiment(text: String): Option[Double]
 }

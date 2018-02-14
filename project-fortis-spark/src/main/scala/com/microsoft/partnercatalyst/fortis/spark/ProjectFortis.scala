@@ -2,7 +2,6 @@ package com.microsoft.partnercatalyst.fortis.spark
 
 import com.microsoft.partnercatalyst.fortis.spark.analyzer._
 import com.microsoft.partnercatalyst.fortis.spark.dba.CassandraConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.logging.{AppInsights, Loggable}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraConfig, CassandraEventsSink}
 import com.microsoft.partnercatalyst.fortis.spark.sources.StreamProviderFactory
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
@@ -10,11 +9,12 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Properties.{envOrElse, envOrNone}
 
-object ProjectFortis extends App with Loggable {
+object ProjectFortis extends App {
   private implicit val fortisSettings: FortisSettings = {
     def envOrFail(name: String): String = {
       envOrNone(name) match {
@@ -45,9 +45,6 @@ object ProjectFortis extends App with Loggable {
       maxLocationsPerEvent = envOrElse(Constants.Env.MaxLocationsPerEvent, Constants.maxLocationsPerEventDefault.toString).toInt
     )
   }
-
-  // TODO: logging configuration should be done in log4j config file
-  AppInsights.init(fortisSettings.appInsightsKey)
 
   Logger.getLogger("org").setLevel(Level.ERROR)
   Logger.getLogger("akka").setLevel(Level.ERROR)
@@ -111,17 +108,17 @@ object ProjectFortis extends App with Loggable {
   }
 
   // Main starts here
-  logInfo("Creating streaming context.")
+  Log.logInfo("Creating streaming context.")
   val ssc = createStreamingContext()
 
   while (!attachToContext(ssc)) {
-    logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.sscInitRetryAfterMillis} milliseconds.")
+    Log.logInfo(s"No actions attached to streaming context; retrying in ${fortisSettings.sscInitRetryAfterMillis} milliseconds.")
     Thread.sleep(fortisSettings.sscInitRetryAfterMillis)
   }
-  logInfo("Starting streaming context.")
+  Log.logInfo("Starting streaming context.")
   StreamsChangeListener(ssc, fortisSettings)
   ssc.start()
   ssc.awaitTermination()
-  logInfo(s"Streaming context stopped. Exiting with exit code ${StreamsChangeListener.suggestedExitCode}...")
+  Log.logInfo(s"Streaming context stopped. Exiting with exit code ${StreamsChangeListener.suggestedExitCode}...")
   sys.exit(StreamsChangeListener.suggestedExitCode)
 }

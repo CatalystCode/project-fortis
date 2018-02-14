@@ -3,14 +3,14 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer
 import java.net.URL
 
 import com.github.catalystcode.fortis.spark.streaming.rss.RSSEntry
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 @SerialVersionUID(100L)
-class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] with Loggable {
+class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] {
 
   override def toSchema(item: RSSEntry, locationFetcher: LocationFetcher, imageAnalyzer: ImageAnalyzer): ExtendedDetails[RSSEntry] = {
     val body = getBody(item)
@@ -42,10 +42,9 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
   private[analyzer] def getSourceUrlFromItem(item: RSSEntry): Option[String] = {
     getSourceUrl(item.uri) match {
       case Some(url) => Some(url)
-      case _ => {
+      case _ =>
         if (item.links == null || item.links.isEmpty) None
         else getSourceUrl(item.links.head.href)
-      }
     }
   }
 
@@ -65,13 +64,12 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
     try {
       fetchDocument(item.uri)
     } catch {
-      case e: Exception => {
+      case _: Exception =>
         if (item.links != null && item.links.nonEmpty) {
           fetchDocument(item.links.head.href)
         } else {
           None
         }
-      }
     }
   }
 
@@ -79,10 +77,9 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
     try {
       Some(Jsoup.parse(new URL(url), 10*1000))
     } catch {
-      case e: Exception => {
-        logError(s"Unable to fetch from RSS entry URL: ${url}", e)
+      case e: Exception =>
+        Log.logError(s"Unable to fetch from RSS entry URL: $url", e)
         None
-      }
     }
   }
 
@@ -94,7 +91,7 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
   }
 
   private[analyzer] def readLinkedDocument(item: RSSEntry): Option[String] = {
-    return fetchDocument(item) match {
+    fetchDocument(item) match {
       case Some(document) => try {
         Some(document.body().text())
       } catch {
@@ -112,9 +109,8 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
     try {
       Some(Jsoup.parse(item.description.value).text())
     } catch {
-      case e: Exception => {
+      case _: Exception =>
         Some(item.description.value)
-      }
     }
   }
 
@@ -126,9 +122,8 @@ class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Seria
     try {
       Jsoup.parse(item.title).text()
     } catch {
-      case e: Exception => {
+      case _: Exception =>
         ""
-      }
     }
   }
 

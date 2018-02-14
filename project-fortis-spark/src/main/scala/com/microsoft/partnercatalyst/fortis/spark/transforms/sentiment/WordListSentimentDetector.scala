@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{Negative, Neutral, Positive}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.io.Source
 
@@ -26,7 +27,7 @@ class WordListSentimentDetector(
       computeSentimentScore(numPositiveWords, numNegativeWords)
     } catch {
       case ex @ (_ : IOException | _ : IOError) =>
-        logError(s"Unable to extract sentiment for language $language", ex)
+        Log.logError(s"Unable to extract sentiment for language $language", ex)
         None
     }
   }
@@ -57,7 +58,7 @@ class WordListSentimentDetector(
       case Some(words) =>
         words
       case None =>
-        logDebug(s"Loading positive/negative words from $path")
+        Log.logDebug(s"Loading positive/negative words from $path")
         val words = Source.fromFile(path).getLines().map(_.trim).filter(!_.isEmpty).map(_.toLowerCase).toSet
         wordsCache.putIfAbsent(path, words)
         words

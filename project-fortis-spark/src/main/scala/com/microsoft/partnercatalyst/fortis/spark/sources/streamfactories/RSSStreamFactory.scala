@@ -1,13 +1,12 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import com.github.catalystcode.fortis.spark.streaming.rss._
-import com.microsoft.partnercatalyst.fortis.spark.logging.Loggable
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 
-class RSSStreamFactory extends StreamFactoryBase[RSSEntry] with Loggable {
+class RSSStreamFactory extends StreamFactoryBase[RSSEntry] {
 
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
     connectorConfig.name.equalsIgnoreCase("RSS")
