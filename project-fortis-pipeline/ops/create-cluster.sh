@@ -234,6 +234,18 @@ EOF
 chown "${user_name}:${user_name}" "${spark_upgrade_script}"
 chmod +x "${spark_upgrade_script}"
 
+echo "Finished. Now setting up wrapper upgrade script."
+readonly upgrade_script="/home/${user_name}/upgrade-fortis.sh"
+cat > "${upgrade_script}" << EOF
+#!/usr/bin/env bash
+
+${interfaces_upgrade_script} "\$1"
+${services_upgrade_script} "\$1"
+${spark_upgrade_script} "\$1"
+EOF
+chown "${user_name}:${user_name}" "${upgrade_script}"
+chmod +x "${upgrade_script}"
+
 echo "Finished. Verifying deployment."
 if [ "${endpoint_protection}" == "none" ]; then
   ./verify-deployment.sh \
