@@ -7,13 +7,14 @@ import { tileFromTileId } from 'geotile';
 import { hasChanged } from '../shared';
 import '../../../styles/Insights/HeatMap.css';
 import 'leaflet/dist/leaflet.css';
+import isEqual from 'lodash/isEqual';
 
 export default class HeatMap extends React.Component {
   constructor(props) {
     super(props);
     const { defaultZoom, targetBbox, bbox } = props;
 
-    const bounds = bbox.length && bbox.length === 4 ? [[bbox[1], bbox[0]], [bbox[3], bbox[2]]] : [];
+    const bounds = this.getMapBounds(bbox);
     this.onViewportChanged = this.onViewportChanged.bind(this);
     this.updateBounds = this.asyncInvokeDashboardRefresh.bind(this);
     this.changeMapBoundsWithTile = this.changeMapBoundsWithTile.bind(this);
@@ -75,9 +76,13 @@ export default class HeatMap extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { placeid, defaultZoom } = this.state;
+    const { targetBbox } = this.props;
 
     if (hasChanged(this.props, nextProps) && nextProps.selectedplace.placeid && placeid !== nextProps.selectedplace.placeid) {
       this.moveMapToNewLocation(nextProps, defaultZoom);
+    }
+    else if (hasChanged(this.props, nextProps) && nextProps.bbox && isEqual(nextProps.bbox, targetBbox)) {
+      this.moveMapToBoundingBox(targetBbox);
     }
   }
 
@@ -85,6 +90,16 @@ export default class HeatMap extends React.Component {
     const { selectedplace } = props;
     this.refs.map.leafletElement.setView(selectedplace.placecentroid, zoom);
     this.setState({ placeid: selectedplace.placeid });
+  }
+
+  getMapBounds(bbox) {
+    return bbox.length && bbox.length === 4 ? [[bbox[1], bbox[0]], [bbox[3], bbox[2]]] : [];
+  }
+
+  moveMapToBoundingBox(bbox) {
+    const bounds = this.getMapBounds(bbox);
+    this.refs.map.leafletElement.fitBounds(bounds);
+    this.setState({ bounds: bounds });
   }
 
   changeMapBoundsWithTile(tileid){
