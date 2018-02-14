@@ -226,8 +226,8 @@ export HELM_HOME="${HELM_HOME}"
 new_spark_command="\$(yaml get <(helm get values spark-cluster) 'Master.SparkSubmitCommand' | sed "s|fortis-[0-9.]*jar|fortis-\${release_to_install}.jar|g")"
 
 helm upgrade \\
+  spark-cluster \\
   ${PWD}/charts/spark \\
-  --name spark-cluster \\
   --namespace spark \\
   --set Master.SparkSubmitCommand="\${new_spark_command}"
 EOF
