@@ -3,10 +3,10 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 import java.io.{File, IOError, IOException}
 import java.util.concurrent.ConcurrentHashMap
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.Tokenizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment.SentimentDetector.{Negative, Neutral, Positive}
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.io.Source
 

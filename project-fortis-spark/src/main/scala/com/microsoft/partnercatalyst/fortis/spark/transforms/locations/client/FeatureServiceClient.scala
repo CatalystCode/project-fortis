@@ -3,9 +3,9 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client
 import java.lang.System.currentTimeMillis
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.Geofence
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.{FeatureServiceFeature, FeatureServiceResponse}
 import net.liftweb.json
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}

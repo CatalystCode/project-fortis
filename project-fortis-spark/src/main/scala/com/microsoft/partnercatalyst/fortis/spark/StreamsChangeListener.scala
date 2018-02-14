@@ -5,8 +5,8 @@ import java.util.concurrent._
 
 import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
-import org.apache.spark.streaming.StreamingContext
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
+import org.apache.spark.streaming.StreamingContext
 
 import scala.reflect.io.Path
 import scala.util.control.NonFatal

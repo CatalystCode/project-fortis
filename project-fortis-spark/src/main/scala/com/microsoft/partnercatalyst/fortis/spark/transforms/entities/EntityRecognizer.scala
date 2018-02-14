@@ -3,10 +3,10 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.entities
 import java.io.{IOError, IOException}
 import java.lang.System.currentTimeMillis
 
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.nlp.OpeNER
 import ixa.kaflib.{Entity, Term}
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}

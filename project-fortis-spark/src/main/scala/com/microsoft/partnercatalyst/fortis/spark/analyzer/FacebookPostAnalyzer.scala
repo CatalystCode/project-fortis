@@ -1,8 +1,9 @@
 package com.microsoft.partnercatalyst.fortis.spark.analyzer
 
+import java.util.Date
+
 import com.github.catalystcode.fortis.spark.streaming.facebook.dto.FacebookPost
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
-import java.util.Date
 
 import scala.util.Try
 

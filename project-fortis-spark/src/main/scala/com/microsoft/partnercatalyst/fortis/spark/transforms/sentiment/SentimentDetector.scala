@@ -1,7 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
-import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
 
 import scala.util.{Failure, Success, Try}
 

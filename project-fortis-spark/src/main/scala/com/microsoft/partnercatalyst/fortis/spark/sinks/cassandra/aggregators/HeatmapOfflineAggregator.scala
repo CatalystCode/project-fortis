@@ -1,12 +1,12 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators
 
+import com.datastax.spark.connector._
 import com.datastax.spark.connector.writer.SqlRowWriter
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ComputedTile, Event, HeatmapTile}
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.{CassandraHeatmapTiles, CassandraTileBucket}
 import org.apache.spark.rdd.RDD
-import com.datastax.spark.connector._
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 class HeatmapOfflineAggregator(configurationManager: ConfigurationManager) extends OfflineAggregator[HeatmapTile] {
   override def aggregate(events: RDD[Event]): RDD[HeatmapTile] = {

@@ -4,10 +4,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 import com.datastax.spark.connector._
 import com.microsoft.partnercatalyst.fortis.spark.dto.{BlacklistedItem, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import net.liftweb.json
 import org.apache.spark.SparkContext
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.compat.java8.FunctionConverters._
 import scala.util.{Failure, Success, Try}

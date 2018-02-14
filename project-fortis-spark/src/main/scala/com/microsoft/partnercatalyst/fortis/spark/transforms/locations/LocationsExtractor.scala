@@ -1,8 +1,8 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.Location
-import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
+import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 
 @SerialVersionUID(100L)
 class LocationsExtractor private[locations](

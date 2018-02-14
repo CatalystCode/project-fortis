@@ -1,6 +1,7 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories.TwitterStreamFactory._
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.ConnectorConfig
 import org.apache.spark.SparkContext
@@ -11,7 +12,6 @@ import org.apache.spark.streaming.twitter.TwitterUtils
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 import twitter4j.{FilterQuery, Status}
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.collection.mutable
 

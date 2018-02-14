@@ -1,10 +1,10 @@
 package com.microsoft.partnercatalyst.fortis.spark.transforms.locations
 
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, Location}
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.TextNormalizer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature.toLocation
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 import scala.collection.mutable
 

@@ -3,11 +3,11 @@ package com.microsoft.partnercatalyst.fortis.spark.analyzer
 import java.net.URL
 
 import com.github.catalystcode.fortis.spark.streaming.rss.RSSEntry
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.ImageAnalyzer
 import com.microsoft.partnercatalyst.fortis.spark.transforms.language.LanguageDetector
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 @SerialVersionUID(100L)
 class RSSAnalyzer(defaultLanguage: String) extends Analyzer[RSSEntry] with Serializable with AnalysisDefaults.EnableAll[RSSEntry] {

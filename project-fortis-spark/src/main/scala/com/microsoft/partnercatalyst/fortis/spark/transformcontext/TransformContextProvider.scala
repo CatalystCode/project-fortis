@@ -8,8 +8,8 @@ import com.microsoft.azure.servicebus._
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import org.apache.spark.SparkContext
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
+import org.apache.spark.SparkContext
 
 @SerialVersionUID(100L)
 class TransformContextProvider(configManager: ConfigurationManager, featureServiceClientUrlBase: String)

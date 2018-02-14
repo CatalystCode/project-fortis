@@ -8,6 +8,7 @@ import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.writer.WriteConf
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.FortisEvent
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.logging.Timer
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.aggregators._
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto._
@@ -17,7 +18,6 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.dstream.DStream
 
 import scala.util.{Failure, Success, Try}
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 
 object CassandraEventsSink {
   private val KeyspaceName = "fortis"
