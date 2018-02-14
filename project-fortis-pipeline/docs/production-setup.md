@@ -166,3 +166,21 @@ Manage streams by providing parameters like api keys, secrets, etc. needed to co
 | Status              | Values are either `enabled` or `disabled`. If a stream is disabled, no events will be collected on that stream in the pipeline. |
 | Pipeline Key        | Key associated with a pipeline. |
 | Params              | Parameters used in different trusted sources like `twitter`, `facebook` etc. For example, for a `twitter` stream, parameters you might have would be `consumer key`, `consumer secret`, `access token key`, `access token secret`. These are formatted as key value pairs. |
+
+## Updating your Fortis deployment
+
+As new releases of Fortis get published, you may want to update your deployment
+to take advantage of the newest features and improvements. To install a new
+version of Fortis, you will have to execute the following command in a Bash
+terminal such as the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about):
+
+```sh
+ssh fortisadmin@YOUR_DEPLOY_VM_IP "sudo ~/upgrade-fortis.sh RELEASE_TO_INSTALL"
+```
+
+The value for `YOUR_DEPLOY_VM_IP` can be found in the resource group into which
+you originally deployed your Fortis site. Look for the resource named `fortisDeployPublicIP`
+and copy its IP address.
+
+The value for `RELEASE_TO_INSTALL` is the version of Fortis to which you wish to
+update. A full list of all supported versions can be found on our [Github releases page](https://github.com/CatalystCode/project-fortis/releases).
