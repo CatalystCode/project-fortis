@@ -15,6 +15,7 @@ const {
 function insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     if (!siteType || !siteType.length) return reject('insertTopics: siteType is not defined');
+    if (siteType === 'none') return resolve({ numTopicsInserted: 0});
 
     const uri = `${fortisCentralAssetsHost}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
     let mutations = [];

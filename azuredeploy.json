@@ -94,6 +94,7 @@
         "siteType": {
             "type": "string",
             "allowedValues": [
+                "none",
                 "humanitarian",
                 "health"
             ],

@@ -30,7 +30,7 @@
             "value": 5
         },
         "siteType": {
-            "value": "humanitarian"
+            "value": "none"
         },
         "sshPublicKey": {
             "value": "CHANGE ME"
