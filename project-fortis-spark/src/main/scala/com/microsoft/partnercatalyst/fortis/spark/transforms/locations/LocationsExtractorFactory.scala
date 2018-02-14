@@ -26,19 +26,15 @@ class LocationsExtractorFactory(
       val newLocation = toLocation(feature)
       val oldLocation = map.get(locationName).orNull
       if (oldLocation == null) {
-        Log.logDebug(s"Got new location for name $locationName: ${newLocation.wofId}")
         map(locationName) = newLocation
         languages.foreach(language=>{
           map(TextNormalizer(locationName, language)) = newLocation
         })
       } else if (newLocation < oldLocation) {
-        Log.logDebug(s"Discarding location ${oldLocation.wofId} for name $locationName as we now have more granular location ${newLocation.wofId}")
         map(locationName) = newLocation
         languages.foreach(language=>{
           map(TextNormalizer(locationName, language)) = newLocation
         })
-      } else {
-        Log.logDebug(s"Ignoring location ${newLocation.wofId} for name $locationName since we already have more granular location ${oldLocation.wofId}")
       }
     })
 
