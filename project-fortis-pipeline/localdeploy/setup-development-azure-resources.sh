@@ -16,16 +16,16 @@ readonly outputParserScriptPath="$scriptDirectory/parse-output.py"
 readonly parametersFilePath="$(mktemp)"
 readonly deployOutputFilePath="$(mktemp)"
 
-cleanup() { rm -f "${parametersFilePath}" "${deployOutputFilePath}"; }
+cleanup() { rm -f "$parametersFilePath" "$deployOutputFilePath"; }
 trap cleanup EXIT
 
 # initialize parameters specified from command line
 
 while getopts ":i:l:o:" arg; do
-  case "${arg}" in
-    i) subscriptionId="${OPTARG}" ;;
-    l) resourceGroupLocation="${OPTARG}" ;;
-    o) outputFile="${OPTARG}" ;;
+  case "$arg" in
+    i) subscriptionId="$OPTARG" ;;
+    l) resourceGroupLocation="$OPTARG" ;;
+    o) outputFile="$OPTARG" ;;
   esac
 done
 shift $((OPTIND-1))
@@ -52,9 +52,9 @@ az group create --name "$resourceGroupName" --location "$resourceGroupLocation" 
 
 # start deployment
 
-sed "s@\"value\": \"fortis@\"value\": \"${personalIdentifier}fortis@g" "$parametersTemplatePath" > "${parametersFilePath}"
+sed "s@\"value\": \"fortis@\"value\": \"${personalIdentifier}fortis@g" "$parametersTemplatePath" > "$parametersFilePath"
 
-az group deployment create --name "$deploymentName" --resource-group "$resourceGroupName" --template-file "$templateFilePath" --parameters "$parametersFilePath" | tee "${deployOutputFilePath}"
+az group deployment create --name "$deploymentName" --resource-group "$resourceGroupName" --template-file "$templateFilePath" --parameters "$parametersFilePath" | tee "$deployOutputFilePath"
 
 # set up postgres
 
@@ -73,10 +73,10 @@ az postgres server create \
 
 # save environment variables
 
-echo "FORTIS_RESOURCE_GROUP_NAME=${resourceGroupName}" | tee "${outputFile}"
+echo "FORTIS_RESOURCE_GROUP_NAME=$resourceGroupName" | tee "$outputFile"
 
-echo "FEATURES_DB_USER=$postgresUser@$postgresName" | tee --append "${outputFile}"
-echo "FEATURES_DB_HOST=$postgresName.postgres.database.azure.com" | tee --append "${outputFile}"
-echo "FEATURES_DB_PASSWORD=$postgresPassword" | tee --append "${outputFile}"
+echo "FEATURES_DB_USER=$postgresUser@$postgresName" | tee --append "$outputFile"
+echo "FEATURES_DB_HOST=$postgresName.postgres.database.azure.com" | tee --append "$outputFile"
+echo "FEATURES_DB_PASSWORD=$postgresPassword" | tee --append "$outputFile"
 
-python "$outputParserScriptPath" "${deployOutputFilePath}" | tee --append "${outputFile}"
+python "$outputParserScriptPath" "$deployOutputFilePath" | tee --append "$outputFile"
