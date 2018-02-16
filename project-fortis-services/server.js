@@ -32,14 +32,14 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
-app.use('/proxy/featureservice', proxy({
-  target: fortisFeatureServiceHost,
-  pathRewrite: { '^/proxy/featureservice': '' },
-}));
-
 app.get('/healthcheck', healthCheckHandler);
 
 initializeAuth(app, '/api');
+
+app.use('/api/featureservice', proxy({
+  target: fortisFeatureServiceHost,
+  pathRewrite: { '^/api/featureservice': '' },
+}));
 
 app.use('/api/messages', graphqlHTTP({
   schema: MessageSchema,
