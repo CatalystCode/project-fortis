@@ -1,6 +1,7 @@
 # Fortis development setup
 
 [![Travis CI status](https://api.travis-ci.org/CatalystCode/project-fortis.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis)
+[![Docker Pulls for project-fortis-services](https://img.shields.io/docker/pulls/cwolff/project_fortis_services.svg)](https://hub.docker.com/r/cwolff/project_fortis_services/)
 
 ## One-time setup
 
