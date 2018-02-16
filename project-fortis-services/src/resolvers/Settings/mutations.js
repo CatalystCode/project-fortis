@@ -4,6 +4,7 @@ const groupBy = require('lodash/groupBy');
 const differenceBy = require('lodash/differenceBy');
 const Promise = require('promise');
 const uuid = require('uuid/v4');
+const isEqual = require('lodash/isEqual');
 const cassandraConnector = require('../../clients/cassandra/CassandraConnector');
 const streamingController = require('../../clients/streaming/StreamingController');
 const { getSiteDefinition, withRunTime, limitForInClause } = require('../shared');
@@ -12,6 +13,7 @@ const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { requiresRole } = require('../../auth');
 const { getUserFromArgs } = require('../../utils/request');
 const { cassandraRowToStream, isSecretUnchanged } = require('./shared');
+const { tilesForBbox } = require('../shared');
 
 function isCurrentUser(args, res, user) {
   return getUserFromArgs(args, res) === user.identifier;
@@ -107,6 +109,20 @@ function getAllUsersWithoutAdminRole(users) {
   return differenceBy(usersGroupedByRole.user, usersGroupedByRole.admin, 'identifier');
 }
 
+function isBboxValid(oldProperties, newProperties) {
+  const oldBbox = oldProperties.targetBbox;
+  const oldZoom = oldProperties.defaultZoomLevel;
+  const newBbox = newProperties.targetBbox;
+  const newZoom = newProperties.defaultZoomLevel;
+
+  if (isEqual(oldBbox, newBbox) && oldZoom === newZoom) {
+    return true;
+  }
+
+  const newBboxTiles = tilesForBbox(newBbox, newZoom);
+  return newBboxTiles && newBboxTiles.length > 0;
+}
+
 function editSite(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     const siteName = args && args.input && args.input.name;
@@ -114,6 +130,10 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
 
     getSiteDefinition()
       .then(({ site }) => {
+        if (!isBboxValid(site.properties, args.input)) {
+          return reject(`No tiles found for bounding box and zoom, please chose a different bounding box.`);
+        }
+
         return cassandraConnector.executeBatchMutations([{
           query: `UPDATE settings.sitesettings
           SET geofence_json = ?,

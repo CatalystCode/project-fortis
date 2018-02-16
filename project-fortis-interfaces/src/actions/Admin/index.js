@@ -39,9 +39,7 @@ const _methods = {
       if (graphqlResponse && !error) {
         self.dispatch(constants.ADMIN.RESTART_PIPELINE, { response: graphqlResponse.restartPipeline });
       } else {
-        const action = 'failed';
-        console.error(`Failed to restart pipeline`);
-        self.dispatch(constants.ADMIN.RESTART_PIPELINE, {action});
+        self.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
   },
@@ -54,8 +52,7 @@ const _methods = {
         addIdsToUsersForGrid(users);
         self.dispatch(constants.ADMIN.LOAD_USERS, { response: users });
       } else {
-        console.error(`[${error}] occured while loading users.`);
-        self.dispatch(constants.ADMIN.LOAD_FAIL, { action: 'failed' });
+        self.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
   },
@@ -69,8 +66,7 @@ const _methods = {
         const usersAfterSave = usersBeforeSave.concat(usersAdded).filter(user => user.identifier !== "" || user.role !== "");
         this.dispatch(constants.ADMIN.LOAD_USERS, {action: 'saved', response: usersAfterSave});
       } else {
-        console.error(`[${error}] occured while processing user save request.`);
-        this.dispatch(constants.ADMIN.LOAD_FAIL, {action: 'failed'});
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
   },
@@ -87,8 +83,7 @@ const _methods = {
         this.dispatch(constants.ADMIN.LOAD_USERS, {action: 'saved', response: usersAfterRemove});
         callback(null, usersAfterRemove);
       } else {
-        console.error(`[${error}] occured while processing user save request.`);
-        this.dispatch(constants.ADMIN.LOAD_FAIL, {action: 'failed'});
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
         callback(error, null);
       }
     }));
@@ -101,8 +96,7 @@ const _methods = {
         prepareBlacklistForGrid(blacklist);
         this.dispatch(constants.ADMIN.LOAD_BLACKLIST, { response: blacklist });
       } else {
-        console.error(`[${error}] occured while loading blacklist.`);
-        this.dispatch(constants.ADMIN.LOAD_BLACKLIST, { action: 'failed' });
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
   },
@@ -116,8 +110,7 @@ const _methods = {
         prepareBlacklistForGrid(blacklistAfterSave);
         this.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action: 'saved', response: blacklistAfterSave});
       } else {
-        console.error(`[${error}] occured while processing blacklist request.`);
-        this.dispatch(constants.ADMIN.LOAD_FAIL, { action: 'failed'});
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
   },
@@ -132,8 +125,7 @@ const _methods = {
         const blacklistAfterRemove = getListAfterRemove(blacklistBeforeRemove, blacklistRemoved, 'id');
         this.dispatch(constants.ADMIN.LOAD_BLACKLIST, {action: 'saved', response: blacklistAfterRemove});
       } else {
-        console.error(`[${error}] occured while processing blacklist request`);
-        this.dispatch(constants.ADMIN.LOAD_FAIL, { action: 'failed' });
+        this.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
   },
@@ -177,7 +169,7 @@ const _methods = {
 
           this.dispatch(constants.ADMIN.LOAD_STREAMS, { action: 'saved', response: streamsListed });
         } else {
-          this.dispatch(constants.ADMIN.LOAD_FAIL, { error: `[${error}]: Error, could not load streams for admin page.` });
+          this.dispatch(constants.ADMIN.LOAD_FAIL, { error: 'Error, could not load streams for admin page.' });
         }
       }));
     },
@@ -190,7 +182,7 @@ const _methods = {
           const streamsAfterRemove = getListAfterRemove(streamsBeforeRemove, streamsRemoved, ['pipelineKey', 'streamId']);
           this.dispatch(constants.ADMIN.LOAD_STREAMS, { action: 'saved', response: streamsAfterRemove });
         } else {
-          this.dispatch(constants.ADMIN.LOAD_FAIL, { error: `[${error}]: Error, could not load streams for admin page.` });
+          this.dispatch(constants.ADMIN.LOAD_FAIL, { error: 'Could not load streams for admin page.' });
         }
       }));
     },
@@ -201,7 +193,7 @@ const _methods = {
             if (graphqlResponse && !error) {
                 self.dispatch(constants.ADMIN.LOAD_SITE_SETTINGS, graphqlResponse.sites.site);
             } else {
-                console.error(`[${error}] occured while processing message request`);
+                self.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
             }
         }));
     },
@@ -218,7 +210,7 @@ const _methods = {
           const action = 'saved';
           self.dispatch(constants.ADMIN.SAVE_SITE_SETTINGS, {settings: settings, action: action});
         } else {
-          console.error(`[${error}] occured while processing message request`);
+          self.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
         }
       }));
     },
@@ -325,9 +317,7 @@ const _methods = {
             if (graphqlResponse && !error) {
                 self.dispatch(constants.ADMIN.PUBLISHED_EVENTS, {action});
             }else{
-                action = 'failed';
-                console.error(`[${error}] occured while processing message request`);
-                self.dispatch(constants.ADMIN.PUBLISHED_EVENTS, {action});
+                self.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
             }
         }));
     }

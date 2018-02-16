@@ -196,6 +196,7 @@ export const AdminStore = Fluxxor.createStore({
 
     handleLoadPayloadFail(payload) {
         this.dataStore.error = payload.error;
+        this.emit("change");
     }
 
 });

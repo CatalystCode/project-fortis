@@ -1,5 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import Snackbar from 'material-ui/Snackbar';
 import Admin from '../components/Admin/Admin';
 import '../styles/Admin/Admin.css';
 import Fluxxor from 'fluxxor';
@@ -56,6 +57,19 @@ export const AdminPage = createReactClass({
     });
   },
 
+  renderError() {
+    const error = this.getStateFromFlux().adminStoreState.error || '';
+
+    return (
+      <Snackbar
+        open={!!error}
+        message={error}
+        autoHideDuration={10000}
+        bodyStyle={{height: `${Math.ceil(error.length / 80) * 48}px`}}
+      />
+    );
+  },
+
   render() {
     return (
       <div>
@@ -65,6 +79,7 @@ export const AdminPage = createReactClass({
             </div>
           : undefined
         }
+        {this.renderError()}
       </div>
     )
   }
