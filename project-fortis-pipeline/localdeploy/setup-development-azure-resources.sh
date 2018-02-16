@@ -36,9 +36,10 @@ if [ -z "$subscriptionId" ]; then echo "Subscription ID not provided" >&2; usage
 if [ -z "$resourceGroupLocation" ]; then echo "Resource group location not provided" >&2; usage; fi
 if [ -z "$outputFile" ]; then echo "Output file location not provided" >&2; usage; fi
 
-readonly personalIdentifier="$(echo "${USER}" | tr -dC 'a-zA-Z')${RANDOM:0:2}"
-readonly resourceGroupName="fortisdev${personalIdentifier}${resourceGroupLocation}"
-readonly deploymentName="fortisdeployment${personalIdentifier}${resourceGroupLocation}"
+readonly userName="$(echo "${USER}" | tr -dC 'a-zA-Z')"
+readonly personalIdentifier="$userName${RANDOM:0:2}"
+readonly resourceGroupName="fortisdev$personalIdentifier$resourceGroupLocation"
+readonly deploymentName="fortisdeployment$personalIdentifier$resourceGroupLocation"
 
 # login to azure using your credentials
 
@@ -55,7 +56,27 @@ sed "s@\"value\": \"fortis@\"value\": \"${personalIdentifier}fortis@g" "$paramet
 
 az group deployment create --name "$deploymentName" --resource-group "$resourceGroupName" --template-file "$templateFilePath" --parameters "$parametersFilePath" | tee "${deployOutputFilePath}"
 
+# set up postgres
+
+readonly postgresName="pgsql$personalIdentifier"
+readonly postgresUser="$userName"
+readonly postgresPassword="$(< /dev/urandom tr -dc '_A-Z-a-z-0-9' | head -c32)"
+
+az postgres server create \
+  --name="$postgresName" \
+  --admin-user="$postgresUser" \
+  --admin-password="$postgresPassword" \
+  --resource-group="$resourceGroupName" \
+  --location="$resourceGroupLocation" \
+  --compute-units="400" \
+  --performance-tier="Standard"
+
 # save environment variables
 
 echo "FORTIS_RESOURCE_GROUP_NAME=${resourceGroupName}" | tee "${outputFile}"
+
+echo "FEATURES_DB_USER=$postgresUser@$postgresName" | tee --append "${outputFile}"
+echo "FEATURES_DB_HOST=$postgresName.postgres.database.azure.com" | tee --append "${outputFile}"
+echo "FEATURES_DB_PASSWORD=$postgresPassword" | tee --append "${outputFile}"
+
 python "$outputParserScriptPath" "${deployOutputFilePath}" | tee --append "${outputFile}"

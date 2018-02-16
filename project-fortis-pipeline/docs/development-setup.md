@@ -32,6 +32,17 @@ development setup will leverage. All the services are stored inside of a single
 resource group whose name is stored under the `FORTIS_RESOURCE_GROUP_NAME` key
 in the secrets file.
 
+After running the script above, find the Azure Databases for PostgreSQL resource
+in your resource group (name of the resource starts with `pgsql`):
+
+![Screenshot showing Azure Databases for PostgreSQL in developer resource group](https://user-images.githubusercontent.com/1086421/36319126-f4238c68-130f-11e8-80ce-f5b0e3d28979.png)
+
+Click on the resource and go to the `Connection Security` tab. Add a rule that
+enables clients to connect to the database as shown in the screenshot below and
+save.
+
+![Screenshot showing Azure Databases for PostgreSQL firewall configuration](https://user-images.githubusercontent.com/1086421/36319236-46d08358-1310-11e8-95d4-78af792defe6.png)
+
 ### Generating Mapbox access token
 
 Next, you need to create a Mapbox access token. If you don't have one yet, you
@@ -81,9 +92,12 @@ Now you can start the full Fortis pipeline with one command:
 docker-compose up --build
 ```
 
-This will start all the Docker services and gather logs in the terminal. After
-all the Docker services started, head over to the following URLs to play with
-the services:
+This will start all the Docker services and gather logs in the terminal. Note
+that the first time you run this command, it will take upwards of 90 minutes to
+start since your personal feature service database is getting populated.
+
+After all the Docker services started, head over to the following URLs to play
+with the services:
 
 * Frontend
   - http://localhost:8888/#/dashboard
@@ -96,6 +110,8 @@ the services:
   - http://localhost:8889/api/tiles/graphiql
 * Spark
   - http://localhost:7777/jobs/
+* Feature service:
+  - http://localhost:9090/features/name/paris
 
 After making changes, you can re-build and re-start the affected services using:
 

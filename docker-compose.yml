@@ -29,7 +29,9 @@ services:
       - ${PROJECT_FORTIS_SERVICES_PORT}:80
     links:
       - cassandra:cassandra
+      - featureservice:featureservice
     environment:
+      - FORTIS_FEATURE_SERVICE_HOST=http://featureservice
       - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
       - FORTIS_CASSANDRA_PORT=${CASSANDRA_PORT}
       - FORTIS_CASSANDRA_SEED_DATA_URL=${CASSANDRA_SEED_DATA_URL}
@@ -53,11 +55,20 @@ services:
       - ${PROJECT_FORTIS_SPARK_WORKER_UI_PORT}:8081
     links:
       - cassandra:cassandra
+      - featureservice:featureservice
     depends_on:
       - project_fortis_services
     environment:
+      - FORTIS_FEATURE_SERVICE_HOST=http://featureservice
       - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
       - FORTIS_CASSANDRA_PORT=${CASSANDRA_PORT}
+    env_file:
+      - .env-secrets
+
+  featureservice:
+    image: cwolff/featureservice:1.0.0
+    ports:
+      - ${FEATURE_SERVICE_PORT}:80
     env_file:
       - .env-secrets
 
