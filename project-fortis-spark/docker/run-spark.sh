@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+log() {
+  echo "[$(date)] $1"
+}
+
 has_site() {
   echo 'SELECT * FROM settings.sitesettings;' | /app/cqlsh | grep -q '(1 rows)'
 }
@@ -14,24 +18,24 @@ wait_for_token() {
 
   while :; do
     value="$(get_token ${token})"
-    if [ -n "${value}" ]; then break; else echo "Cognitive Services token ${token} not yet available, waiting..."; sleep 10s; fi
+    if [ -n "${value}" ]; then break; else log "Cognitive Services token ${token} not yet available, waiting..."; sleep 10s; fi
   done
-  echo "...done, token ${token} is now available with value '${value}'"
+  log "...done, token ${token} is now available with value '${value}'"
 }
 
 # wait for cassandra to start
 while ! /app/cqlsh; do
-  echo "Cassandra not yet available, waiting..."
+  log "Cassandra not yet available, waiting..."
   sleep 10s
 done
-echo "...done, Cassandra is now available"
+log "...done, Cassandra is now available"
 
 # wait for cassandra site to be defined
 while ! has_site; do
-  echo "Cassandra site is not yet set up, waiting..."
+  log "Cassandra site is not yet set up, waiting..."
   sleep 10s
 done
-echo "...done, Cassandra site is now set up"
+log "...done, Cassandra site is now set up"
 
 # wait for cognitive services secrets if preconfigured
 if [ -n "$COGNITIVE_TRANSLATION_SERVICE_TOKEN" ]; then
@@ -49,9 +53,9 @@ fi
 
 # wait for featureservice
 while ! wget -qO- "$FORTIS_FEATURE_SERVICE_HOST/features/name/paris" > /dev/null; do
-  echo "featureService not yet available, waiting..."
+  log "featureService not yet available, waiting..."
   sleep 30s
 done
-echo "...done, featureService is now available"
+log "...done, featureService is now available"
 
 spark-submit --driver-memory "${SPARK_DRIVER_MEMORY}" --class "${SPARK_MAINCLASS}" /app/job.jar
