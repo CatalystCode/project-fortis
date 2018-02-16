@@ -17,17 +17,17 @@ readonly deployment_yaml="${install_dir}/kubernetes-deployment.yaml"
 readonly service_yaml="${install_dir}/kubernetes-service.yaml"
 
 az postgres server create \
-  --name="$featuresdb_name" \
-  --admin-user="$user_name" \
-  --admin-password="$dbpassword" \
-  --resource-group="$k8resource_group" \
-  --location="$k8location" \
-  --compute-units="$dbcompute" \
-  --performance-tier="$dbtier"
+  --name="${featuresdb_name}" \
+  --admin-user="${user_name}" \
+  --admin-password="${dbpassword}" \
+  --resource-group="${k8resource_group}" \
+  --location="${k8location}" \
+  --compute-units="${dbcompute}" \
+  --performance-tier="${dbtier}"
 
 az postgres server firewall-rule create \
-  --server-name="$featuresdb_name" \
-  --resource-group="$k8resource_group" \
+  --server-name="${featuresdb_name}" \
+  --resource-group="${k8resource_group}" \
   --start-ip-address="0.0.0.0" \
   --end-ip-address="255.255.255.255" \
   --name="AllowAll"
