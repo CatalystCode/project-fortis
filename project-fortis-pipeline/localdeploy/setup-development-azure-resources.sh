@@ -9,7 +9,7 @@ declare subscriptionId=""
 declare resourceGroupLocation=""
 declare outputFile=""
 
-readonly scriptDirectory="$(readlink -f "$(dirname "$0")")"
+readonly scriptDirectory="$(dirname "$0")"
 readonly templateFilePath="$scriptDirectory/template.json"
 readonly parametersTemplatePath="$scriptDirectory/parameters.json"
 readonly outputParserScriptPath="$scriptDirectory/parse-output.py"
