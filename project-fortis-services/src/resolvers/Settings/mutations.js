@@ -131,7 +131,7 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
     getSiteDefinition()
       .then(({ site }) => {
         if (!isBboxValid(site.properties, args.input)) {
-          return reject(`No tiles found for bounding box and zoom, please chose a different bounding box.`);
+          return reject('No tiles found for bounding box and zoom, please chose a different bounding box.');
         }
 
         return cassandraConnector.executeBatchMutations([{
