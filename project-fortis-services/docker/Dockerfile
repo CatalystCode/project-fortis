@@ -40,12 +40,13 @@ ENV USER_FILES_BLOB_ACCOUNT_KEY=""
 ENV APPINSIGHTS_INSTRUMENTATIONKEY=""
 
 # deployment of https://github.com/CatalystCode/featureService
-ENV FORTIS_FEATURE_SERVICE_HOST="http://localhost:9090"
+# a local instance backed by Azure PostgreSQL DB gets set up via docker-compose
+ENV FORTIS_FEATURE_SERVICE_HOST="http://featureservice"
 
 # a one-node local cassandra is set up via docker-compose, if you wish to use a
 # larger cluster (e.g. hosted in Azure), just override this variable with the
 # hostname of your cluster
-ENV FORTIS_CASSANDRA_HOST="localhost"
+ENV FORTIS_CASSANDRA_HOST="cassandra"
 ENV FORTIS_CASSANDRA_PORT="9042"
 ENV FORTIS_CASSANDRA_USERNAME="cassandra"
 ENV FORTIS_CASSANDRA_PASSWORD="cassandra"
