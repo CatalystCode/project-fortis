@@ -71,6 +71,13 @@ az postgres server create \
   --compute-units="400" \
   --performance-tier="Standard"
 
+az postgres server firewall-rule create \
+  --server-name="$postgresName" \
+  --resource-group="$resourceGroupName" \
+  --start-ip-address="0.0.0.0" \
+  --end-ip-address="255.255.255.255" \
+  --name="AllowAll"
+
 # save environment variables
 
 echo "FORTIS_RESOURCE_GROUP_NAME=$resourceGroupName" | tee "$outputFile"

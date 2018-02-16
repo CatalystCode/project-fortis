@@ -26,22 +26,11 @@ script (e.g. via the [Windows Subsystem for Linux](https://docs.microsoft.com/en
 ```
 
 This script will deploy to Azure a number of services used by Fortis, such as
-ServiceBus, EventHubs, Cognitive Services, and so forth. The secrets to access
-these services are stored in a `.env-secrets` file which the rest of the
-development setup will leverage. All the services are stored inside of a single
-resource group whose name is stored under the `FORTIS_RESOURCE_GROUP_NAME` key
-in the secrets file.
-
-After running the script above, find the Azure Databases for PostgreSQL resource
-in your resource group (name of the resource starts with `pgsql`):
-
-![Screenshot showing Azure Databases for PostgreSQL in developer resource group](https://user-images.githubusercontent.com/1086421/36319126-f4238c68-130f-11e8-80ce-f5b0e3d28979.png)
-
-Click on the resource and go to the `Connection Security` tab. Add a rule that
-enables clients to connect to the database as shown in the screenshot below and
-save.
-
-![Screenshot showing Azure Databases for PostgreSQL firewall configuration](https://user-images.githubusercontent.com/1086421/36319236-46d08358-1310-11e8-95d4-78af792defe6.png)
+ServiceBus, EventHubs, Cognitive Services, PostgreSQL, and so forth. The secrets
+to access these services are stored in a `.env-secrets` file which the rest of
+the development setup will leverage. All the services are stored inside of a
+single resource group whose name is stored under the
+`FORTIS_RESOURCE_GROUP_NAME` key in the secrets file.
 
 ### Generating Mapbox access token
 

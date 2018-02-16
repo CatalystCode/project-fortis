@@ -25,6 +25,13 @@ az postgres server create \
   --compute-units="$dbcompute" \
   --performance-tier="$dbtier"
 
+az postgres server firewall-rule create \
+  --server-name="$featuresdb_name" \
+  --resource-group="$k8resource_group" \
+  --start-ip-address="0.0.0.0" \
+  --end-ip-address="255.255.255.255" \
+  --name="AllowAll"
+
 # deploy the featureService to the kubernetes cluster, with internal-only IP
 cat > "${namespace_yaml}" << EOF
 {
