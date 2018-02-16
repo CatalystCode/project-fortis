@@ -10,21 +10,11 @@ free [here](https://azure.microsoft.com/en-us/free/).
 ### Azure service principal
 
 You'll need an Azure service principal. You can follow these [instructions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
-if you need to generate a new service principal. During the Azure deployment,
-the `Application ID` will be used for the `Service Principal App ID` field
-and the `Authentication Key` will be used for the `Service Principal App Key`.
+if you need to generate a new service principal.
 
-### SSH key
+When creating an azure active directory application and assigning the application to a role make sure that you have an `Owner` or `User Access Admin Role`, otherwise you will not be able to assign a role to the application.
 
-Generate an SSH key pair following
-[these](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/)
-instructions. The contents from the generated `MyKey.pub` file will be used
-for the `SSH Public Key` field in the Azure deployment.
-
-### Mapbox access token
-
-You'll need a Mapbox access token. If you don't have one yet, [sign up](https://www.mapbox.com/signup/)
-to create a new token for free.
+During the Azure deployment, the `Application Id` will be used for the `Service Principal App Id` field and the `Authentication Key` will be used for the `Service Principal App Key`.
 
 ### TLS setup
 
@@ -35,9 +25,7 @@ setting up TLS can be found [here](./tls-setup.md).
 
 ### Login setup
 
-If you chose either of the two options to configure TLS described above, you
-will be able to add login via Azure Active Directory v2.0 to regulate access to
-your Fortis site following these [instructions](./aad-setup.md).
+If you chose either of the two options to configure TLS described above, you will be able to add login via Azure Active Directory v2.0 to regulate access to your Fortis site following these [instructions](./aad-setup.md).
 
 ## Setting up a new Azure deployment
 
@@ -45,7 +33,7 @@ Hit the deploy to Azure button below:
 
 [![Deploy to Azure](http://azuredeploy.net/deploybutton.svg)](https://deploy.azure.com/?repository=https://github.com/catalystcode/project-fortis/tree/master?ptmpl=azuredeploy.parameters.json)
 
-Fill in the wizard that comes up:
+[Fill in the wizard](./azure-deploy-parameters.md) that comes up:
 
 ![Screenshot of ARM wizard](https://user-images.githubusercontent.com/7635865/27882830-e785819c-6193-11e7-9b27-5fc452f23b1a.png)
 
