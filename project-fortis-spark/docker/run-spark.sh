@@ -47,4 +47,11 @@ if [ -n "$COGNITIVE_TEXT_SERVICE_TOKEN" ]; then
   wait_for_token "cogtextsvctoken"
 fi
 
+# wait for featureservice
+while ! wget -qO- "$FORTIS_FEATURE_SERVICE_HOST/features/name/paris" > /dev/null; do
+  echo "featureService not yet available, waiting..."
+  sleep 30s
+done
+echo "...done, featureService is now available"
+
 spark-submit --driver-memory "${SPARK_DRIVER_MEMORY}" --class "${SPARK_MAINCLASS}" /app/job.jar

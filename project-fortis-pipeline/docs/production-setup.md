@@ -57,6 +57,15 @@ Once the deployment has finished, click on the `Manage your resources`
 
 ![Screenshot of ARM template after successful deployment with highlight of management link to access the newly created resource group](https://user-images.githubusercontent.com/1086421/33331326-4437a7fe-d42f-11e7-8b4a-19b968b4705b.png)
 
+Click on the `Overview` tab in the Azure Portal and find the Azure Databases for
+PostgreSQL resource set up during the deployment. The resource's name will start
+with `pgsql`.
+
+Click on the resource and enable clients to connect to the database as shown
+in the screenshot below:
+
+![Screenshot showing Azure Databases for PostgreSQL firewall configuration](https://user-images.githubusercontent.com/1086421/36278106-c1fd7fe6-1260-11e8-8a22-8311b19f83c7.png)
+
 Now click on the `Tags` tab in the Azure Portal (highlighted below) and find the
 `FORTIS_ADMIN_INTERFACE_URL` (also highlighted below).
 

@@ -31,7 +31,6 @@ readonly lets_encrypt_api_endpoint="${28}"
 readonly user_name="${29}"
 
 if [ -n "${aad_client}" ] || [ "${endpoint_protection}" != "none" ]; then readonly fortis_interface_protocol="https"; else readonly fortis_interface_protocol="http"; fi
-readonly feature_service_host="http://fortis-features.eastus.cloudapp.azure.com"
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly fortis_interface_container="public"
 readonly fortis_interface_host="${fortis_interface_protocol}://${storage_account_name}.blob.core.windows.net/${fortis_interface_container}"
@@ -40,13 +39,26 @@ readonly eh_consumer_group="\$Default"
 readonly sb_queue_config="configuration"
 readonly sb_queue_command="command"
 readonly mapbox_tile_layer_url="https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v10/tiles/256/{z}/{x}/{y}"
+readonly featuresdb_name="pgsql${storage_account_name}"
 
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
 readonly latest_version="$(curl -s 'https://api.github.com/repos/CatalystCode/project-fortis/releases/latest' | jq -r '.tag_name')"
 
 chmod -R 752 .
 
-echo "Waiting for Tiller pod to get ready"
+echo "Installing featureService in kubernetes"
+./install-featureservice.sh \
+  "${featuresdb_name}" \
+  "${k8resource_group}" \
+  "${k8location}" \
+  "${user_name}"
+while :; do
+  feature_service_ip="$(kubectl get svc featureservice -n featureservice -o jsonpath='{..clusterIP}')"
+  if [ -n "${feature_service_ip}" ]; then break; else echo "Waiting for featureService IP"; sleep 5s; fi
+done
+readonly feature_service_host="http://${feature_service_ip}"
+
+echo "Finished. Waiting for Tiller pod to get ready"
 while ! (kubectl get po --namespace kube-system | grep -i 'tiller' | grep -i 'running' | grep -i '1/1'); do
   echo "Waiting for Tiller pod"
   sleep 10s

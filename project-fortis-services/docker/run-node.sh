@@ -113,5 +113,12 @@ if [ -n "$MAPBOX_ACCESS_TOKEN" ]; then
   echo "...done, MapBox token is now ingested"
 fi
 
+# wait for featureservice
+while ! wget -qO- "$FORTIS_FEATURE_SERVICE_HOST/features/name/paris" > /dev/null; do
+  echo "featureService not yet available, waiting..."
+  sleep 30s
+done
+echo "...done, featureService is now available"
+
 # start node server
 while ! npm start; do sleep 20s; done
