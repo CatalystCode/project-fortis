@@ -6,7 +6,7 @@ readonly k8location="$3"
 readonly user_name="$4"
 
 readonly dbpassword="$(< /dev/urandom tr -dc '_A-Z-a-z-0-9' | head -c32)"
-readonly dbversion="1.0.0"
+readonly dbversion="1.0.1"
 readonly dbtier="Standard"
 readonly dbcompute="400"
 
