@@ -2,7 +2,7 @@
 
 const Promise = require('promise');
 const cassandra = require('cassandra-driver');
-const distance = cassandra.types.distance;
+const { distance, consistencies } = cassandra.types;
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
 const { trackDependency, trackException } = require('../appinsights/AppInsightsClient');
@@ -59,9 +59,14 @@ function executeBatchMutations(mutations) {
 
     let chunkedMutations = chunk(mutations, maxOperationsPerBatch);
 
+    const options = {
+      consistency: consistencies.localQuorum,
+      prepare: true
+    };
+
     asyncEachLimit(chunkedMutations, maxConcurrentBatches, (chunk, asyncCallback) => {
       try {
-        client.batch(chunk, { prepare: true }, (err) => {
+        client.batch(chunk, options, (err) => {
           if (err) {
             asyncCallback(err);
           } else {
@@ -87,10 +92,13 @@ function executeBatchMutations(mutations) {
 /**
  * @param {string} query
  * @param {string[]} params
- * @param {{fetchSize: int}} [options]
+ * @param {{fetchSize: int, consistency: int}} [options]
  * @returns {Promise.<object[]>}
  */
 function executeQuery(query, params, options) {
+  if (!options) options = {};
+  if (!options.consistency) options.consistency = consistencies.localQuorum;
+
   return new Promise((resolve, reject) => {
     if (!client) {
       loggingClient.logCassandraClientUndefined();
@@ -141,6 +149,7 @@ function executeQueryWithPageState(query, params, pageState, fetchSize) {
     const DEFAULT_FETCH = 15;
 
     let options = {
+      consistency: consistencies.localQuorum,
       fetchSize: fetchSize > 0 ? fetchSize : DEFAULT_FETCH
     };
 

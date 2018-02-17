@@ -1,5 +1,6 @@
 package com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra
 
+import com.datastax.driver.core.ConsistencyLevel
 import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.Duration
@@ -13,6 +14,7 @@ object CassandraConfig {
       .setIfMissing("spark.cassandra.connection.port", fortisSettings.cassandraPorts)
       .setIfMissing("spark.cassandra.auth.username", fortisSettings.cassandraUsername)
       .setIfMissing("spark.cassandra.auth.password", fortisSettings.cassandraPassword)
+      .setIfMissing("spark.cassandra.input.consistency.level", ConsistencyLevel.LOCAL_QUORUM.toString)
       .setIfMissing("spark.cassandra.connection.keep_alive_ms", envOrElse("CASSANDRA_KEEP_ALIVE_MS", (batchDuration.milliseconds * 2).toString))
       .setIfMissing("spark.cassandra.connection.factory", "com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.FortisConnectionFactory")
       .set("spark.cassandra.output.batch.size.bytes", "5120")
