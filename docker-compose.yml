@@ -11,7 +11,7 @@ services:
       - ${PROJECT_FORTIS_INTERFACES_PORT}:3000
       - 35729:35729
     environment:
-      - REACT_APP_SERVICE_HOST=${PROJECT_FORTIS_SERVICES_HOST}
+      - REACT_APP_SERVICE_HOST=http://localhost:${PROJECT_FORTIS_SERVICES_PORT}
       - REACT_APP_AD_CLIENT_ID=${AD_CLIENT_ID}
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
@@ -32,11 +32,11 @@ services:
       - featureservice:featureservice
     environment:
       - FORTIS_FEATURE_SERVICE_HOST=http://featureservice
-      - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
-      - FORTIS_CASSANDRA_PORT=${CASSANDRA_PORT}
+      - FORTIS_CASSANDRA_HOST=cassandra
+      - FORTIS_CASSANDRA_PORT=9042
       - FORTIS_CASSANDRA_SEED_DATA_URL=${CASSANDRA_SEED_DATA_URL}
-      - FORTIS_CASSANDRA_SITE_NAME=${CASSANDRA_SITE_NAME}
-      - FORTIS_CASSANDRA_SITE_TYPE=${CASSANDRA_SITE_TYPE}
+      - FORTIS_CASSANDRA_SITE_NAME=Fortis Dev
+      - FORTIS_CASSANDRA_SITE_TYPE=none
       - FORTIS_CASSANDRA_USERS=${USERS}
       - FORTIS_CASSANDRA_ADMINS=${ADMINS}
       - FORTIS_CASSANDRA_REPLICATION_FACTOR=1
@@ -60,8 +60,8 @@ services:
       - project_fortis_services
     environment:
       - FORTIS_FEATURE_SERVICE_HOST=http://featureservice
-      - FORTIS_CASSANDRA_HOST=${CASSANDRA_HOST}
-      - FORTIS_CASSANDRA_PORT=${CASSANDRA_PORT}
+      - FORTIS_CASSANDRA_HOST=cassandra
+      - FORTIS_CASSANDRA_PORT=9042
     env_file:
       - .env-secrets
 
