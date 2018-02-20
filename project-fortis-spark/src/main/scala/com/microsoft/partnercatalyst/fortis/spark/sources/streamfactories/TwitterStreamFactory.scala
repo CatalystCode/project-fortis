@@ -97,7 +97,7 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
 
     val maxTerms = twitterMaxTermCount
     val updatedWatchlistCurrentOffsetValue = watchlistCurrentOffsetValue + maxTerms
-    val selectedTerms = terms.take(maxTerms)
+    val selectedTerms = terms.filter(_.getBytes("UTF-8").length < 60).take(maxTerms)
     query.track(selectedTerms:_*)
 
     sparkContext.setLocalProperty(watchlistCurrentOffsetKey, updatedWatchlistCurrentOffsetValue.toString)
