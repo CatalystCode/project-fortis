@@ -8,16 +8,12 @@ const cassandraConnector = require('../clients/cassandra/CassandraConnector');
 const streamingController = require('../clients/streaming/StreamingController');
 const blobStorageClient = require('../clients/storage/BlobStorageClient');
 
-const {
-  fortisCentralAssetsHost
-} = require('../../config').storage;
-
 function insertTopics(siteType) {
   return new Promise((resolve, reject) => {
     if (!siteType || !siteType.length) return reject('insertTopics: siteType is not defined');
     if (siteType === 'none') return resolve({ numTopicsInserted: 0});
 
-    const uri = `${fortisCentralAssetsHost}/settings/siteTypes/${siteType}/topics/defaultTopics.json`;
+    const uri = `https://raw.githubusercontent.com/CatalystCode/project-fortis/master/project-fortis-pipeline/ops/config/defaultTopics/${siteType}.json`;
     let mutations = [];
     blobStorageClient.fetchJson(uri)
       .then(response => {
