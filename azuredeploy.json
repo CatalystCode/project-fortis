@@ -114,34 +114,6 @@
             },
             "type": "securestring"
         },
-        "cognitiveServicesTextAnalyticsToken": {
-            "metadata": {
-                "description": "Cognitive Services Text Analytics access token"
-            },
-            "defaultValue": "",
-            "type": "securestring"
-        },
-        "cognitiveServicesTextTranslationToken": {
-            "metadata": {
-                "description": "Cognitive Services Text Translation access token"
-            },
-            "defaultValue": "",
-            "type": "securestring"
-        },
-        "cognitiveServicesComputerVisionToken": {
-            "metadata": {
-                "description": "Cognitive Services Computer Vision access token"
-            },
-            "defaultValue": "",
-            "type": "securestring"
-        },
-        "cognitiveServicesBingSpeechToken": {
-            "metadata": {
-                "description": "Cognitive Services Bing Speech access token"
-            },
-            "defaultValue": "",
-            "type": "securestring"
-        },
         "fortisSiteCloneUrl": {
             "metadata": {
                 "description": "URL to exported Fortis site to clone"
@@ -617,7 +589,7 @@
                     "fileUris": [
                         "[variables('fortisDeployScriptFileUri')]"
                     ],
-                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', variables('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -csst \"', parameters('cognitiveServicesBingSpeechToken'), '\" -tst \"', parameters('cognitiveServicesTextTranslationToken'), '\" -ctst \"', parameters('cognitiveServicesTextAnalyticsToken'), '\" -cvst \"', parameters('cognitiveServicesComputerVisionToken'), '\" -gc \"', variables('githubClonePath'), '\" -gr \"', parameters('githubProjectRelease'), '\" -avms \"', parameters('agentVMSize'), '\" -ep \"', parameters('endpointProtection'), '\" -ih \"', parameters('ingressHostname'), '\" -tc \"', parameters('tlsCertificate'), '\" -tk \"', parameters('tlsPrivateKey'), '\" -le \"', parameters('letsEncryptEmail'), '\" -lae \"', parameters('letsEncryptApiEndpoint'), '\"')]"
+                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', variables('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -gc \"', variables('githubClonePath'), '\" -gr \"', parameters('githubProjectRelease'), '\" -avms \"', parameters('agentVMSize'), '\" -ep \"', parameters('endpointProtection'), '\" -ih \"', parameters('ingressHostname'), '\" -tc \"', parameters('tlsCertificate'), '\" -tk \"', parameters('tlsPrivateKey'), '\" -le \"', parameters('letsEncryptEmail'), '\" -lae \"', parameters('letsEncryptApiEndpoint'), '\"')]"
                 }
             }
         }

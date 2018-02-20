@@ -12,7 +12,7 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get =
 import org.apache.spark.SparkContext
 
 @SerialVersionUID(100L)
-class TransformContextProvider(configManager: ConfigurationManager, featureServiceClientUrlBase: String)
+class TransformContextProvider(configManager: ConfigurationManager, featureServiceClientUrlBase: String, cognitiveUrlBase: String)
   (implicit settings: FortisSettings) extends Serializable
 {
   private val deltaChannel: SynchronousQueue[Delta] = new SynchronousQueue[Delta]()
@@ -56,7 +56,7 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
           val langToWatchlist = configManager.fetchWatchlist(sparkContext)
           val blacklist = configManager.fetchBlacklist(sparkContext)
 
-          val delta = Delta(TransformContext(), featureServiceClientUrlBase, Some(siteSettings), Some(langToWatchlist), Some(blacklist))
+          val delta = Delta(TransformContext(), featureServiceClientUrlBase, cognitiveUrlBase, Some(siteSettings), Some(langToWatchlist), Some(blacklist))
 
           updateTransformContextAndBroadcast(delta, sparkContext)
           startQueueClient(sparkContext)
@@ -135,15 +135,15 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
             case "settings" =>
               val siteSettings = configManager.fetchSiteSettings(sparkContext)
               Log.logDependency("pipeline.settings", "transformcontext.messageHandler", success = true, durationInMs = 0)
-              Delta(transformContext, featureServiceClientUrlBase, siteSettings = Some(siteSettings))
+              Delta(transformContext, featureServiceClientUrlBase, cognitiveUrlBase, siteSettings = Some(siteSettings))
             case "watchlist" =>
               val langToWatchlist = configManager.fetchWatchlist(sparkContext)
               Log.logDependency("pipeline.settings", "transformcontext.messageHandler", success = true, durationInMs = 0)
-              Delta(transformContext, featureServiceClientUrlBase, langToWatchlist = Some(langToWatchlist))
+              Delta(transformContext, featureServiceClientUrlBase, cognitiveUrlBase, langToWatchlist = Some(langToWatchlist))
             case "blacklist" =>
               val blacklist = configManager.fetchBlacklist(sparkContext)
               Log.logDependency("pipeline.settings", "transformcontext.messageHandler", success = true, durationInMs = 0)
-              Delta(transformContext, featureServiceClientUrlBase, blacklist = Some(blacklist))
+              Delta(transformContext, featureServiceClientUrlBase, cognitiveUrlBase, blacklist = Some(blacklist))
 
             case unknown =>
               Log.logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")

@@ -30,6 +30,7 @@ private[transformcontext] object Delta {
   def apply(
     transformContext: TransformContext,
     featureServiceClientUrlBase: String,
+    cognitiveUrlBase: String,
     siteSettings: Option[SiteSettings] = None,
     langToWatchlist: Option[Map[String, Seq[String]]] = None,
     blacklist: Option[Seq[BlacklistedItem]] = None)(implicit settings: FortisSettings): Delta =
@@ -66,12 +67,12 @@ private[transformcontext] object Delta {
         siteSettings.get.cogvisionsvctoken != transformContext.siteSettings.cogvisionsvctoken
         || siteSettings.get.featureservicenamespace != transformContext.siteSettings.featureservicenamespace,
         new ImageAnalyzer(
-          ImageAnalysisAuth(siteSettings.get.cogvisionsvctoken),
+          ImageAnalysisAuth(siteSettings.get.cogvisionsvctoken, cognitiveUrlBase),
           new FeatureServiceClient(featureServiceClientUrlBase, siteSettings.get.featureservicenamespace))
       ),
       sentimentDetectorAuth = updatedField(
         siteSettings.get.cogtextsvctoken != transformContext.siteSettings.cogtextsvctoken,
-        SentimentDetectorAuth(siteSettings.get.cogtextsvctoken)
+        SentimentDetectorAuth(siteSettings.get.cogtextsvctoken, cognitiveUrlBase)
       ),
       langToKeywordExtractor = langToWatchlist.map(
         m => m.transform((lang, terms)=>new LuceneKeywordExtractor(lang, terms, settings.maxKeywordsPerEvent))

@@ -4,7 +4,7 @@ import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, Location, Tag}
 import com.microsoft.partnercatalyst.fortis.spark.transforms.image.dto.JsonImageLandmark
 import org.scalatest.FlatSpec
 
-class TestImageAnalyzer(cognitiveServicesResponse: String) extends ImageAnalyzer(ImageAnalysisAuth("key"), null) {
+class TestImageAnalyzer(cognitiveServicesResponse: String) extends ImageAnalyzer(ImageAnalysisAuth("key", "host"), null) {
   override protected def callCognitiveServices(requestBody: String): String = cognitiveServicesResponse
   override def buildRequestBody(imageUrl: String): String = super.buildRequestBody(imageUrl)
   override def landmarksToLocations(landmarks: Iterable[JsonImageLandmark]): Iterable[Location] = landmarks.map(x => Location(x.name, name = x.name, layer = "", latitude = -1, longitude = -1, confidence = Some(x.confidence)))

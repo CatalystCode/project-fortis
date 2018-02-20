@@ -27,6 +27,7 @@ object ProjectFortis extends App {
     FortisSettings(
       // Required
       featureServiceUrlBase = envOrFail(Constants.Env.FeatureServiceUrlBase),
+      cognitiveUrlBase = s"https://${envOrFail(Constants.Env.Location).replace(" ", "").toLowerCase}.api.cognitive.microsoft.com",
       cassandraHosts = envOrFail(Constants.Env.CassandraHost),
       cassandraPorts = envOrFail(Constants.Env.CassandraPort),
       cassandraUsername = envOrFail(Constants.Env.CassandraUsername),
@@ -77,7 +78,7 @@ object ProjectFortis extends App {
   private def attachToContext(ssc:StreamingContext): Boolean = {
     val configManager = new CassandraConfigurationManager
     val streamProvider = StreamProviderFactory.create(configManager)
-    val transformContextProvider = new TransformContextProvider(configManager, fortisSettings.featureServiceUrlBase)
+    val transformContextProvider = new TransformContextProvider(configManager, fortisSettings.featureServiceUrlBase, fortisSettings.cognitiveUrlBase)
 
     def pipeline[T: TypeTag](name: String, analyzer: Analyzer[T]) =
       Pipeline(name, analyzer, ssc, streamProvider, transformContextProvider, configManager)

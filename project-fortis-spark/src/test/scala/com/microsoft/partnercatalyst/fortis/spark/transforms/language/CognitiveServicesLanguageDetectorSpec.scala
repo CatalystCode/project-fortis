@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.language
 
 import org.scalatest.FlatSpec
 
-class TestCognitiveServicesLanguageDetector(cognitiveServicesResponse: String) extends CognitiveServicesLanguageDetector(CognitiveServicesLanguageDetectorAuth("key")) {
+class TestCognitiveServicesLanguageDetector(cognitiveServicesResponse: String) extends CognitiveServicesLanguageDetector(CognitiveServicesLanguageDetectorAuth("key", "host")) {
   protected override def callCognitiveServices(request: String): String = cognitiveServicesResponse
   override def buildRequestBody(text: String, textId: String): String = super.buildRequestBody(text, textId)
 }

@@ -27,6 +27,7 @@ readonly latest_version="${24}"
 readonly cassandra_port="${25}"
 readonly cassandra_username="${26}"
 readonly cassandra_password="${27}"
+readonly k8location="${28}"
 
 # setup
 cd charts || exit -2
@@ -55,6 +56,7 @@ EOF
 kubectl create -f "${namespace_yaml}"
 kubectl create configmap "${spark_config_map_name}" \
   --namespace spark \
+  --from-literal=FORTIS_RESOURCE_GROUP_LOCATION="${k8location}" \
   --from-literal=FORTIS_CASSANDRA_HOST="${cassandra_host}" \
   --from-literal=FORTIS_CASSANDRA_PORT="${cassandra_port}" \
   --from-literal=FORTIS_CASSANDRA_USERNAME="${cassandra_username}" \

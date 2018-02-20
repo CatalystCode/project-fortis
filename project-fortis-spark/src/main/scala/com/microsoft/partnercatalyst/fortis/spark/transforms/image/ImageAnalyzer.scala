@@ -7,10 +7,9 @@ import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.client.FeatureServiceClient
 import com.microsoft.partnercatalyst.fortis.spark.transforms.locations.dto.FeatureServiceFeature.toLocation
 import net.liftweb.json
-
 import scalaj.http.Http
 
-case class ImageAnalysisAuth(key: String, apiUrlBase: String = "https://westus.api.cognitive.microsoft.com")
+case class ImageAnalysisAuth(key: String, apiUrlBase: String)
 
 @SerialVersionUID(100L)
 class ImageAnalyzer(auth: ImageAnalysisAuth, featureServiceClient: FeatureServiceClient) extends Serializable {

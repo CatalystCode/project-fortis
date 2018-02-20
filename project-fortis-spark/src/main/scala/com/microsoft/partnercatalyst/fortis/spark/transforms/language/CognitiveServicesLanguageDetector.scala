@@ -4,10 +4,9 @@ import java.lang.System.currentTimeMillis
 
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
 import net.liftweb.json
-
 import scalaj.http.Http
 
-case class CognitiveServicesLanguageDetectorAuth(key: String, apiUrlBase: String = "https://westus.api.cognitive.microsoft.com")
+case class CognitiveServicesLanguageDetectorAuth(key: String, apiUrlBase: String)
 
 @SerialVersionUID(100L)
 class CognitiveServicesLanguageDetector(

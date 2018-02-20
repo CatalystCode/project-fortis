@@ -16,6 +16,7 @@ class StreamsChangeListenerTestSpec extends FlatSpec with BeforeAndAfter {
   val settings = FortisSettings(
     "/tmp/test_fortis_progress_dir_" + UUID.randomUUID(),
     "https://featurehost",
+    "https://cognitivehost",
     "https://blobhost",
     "cassandraHosts",
     "cassandraPorts",

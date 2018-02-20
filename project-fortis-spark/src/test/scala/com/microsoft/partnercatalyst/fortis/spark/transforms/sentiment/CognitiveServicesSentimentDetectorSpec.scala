@@ -2,7 +2,7 @@ package com.microsoft.partnercatalyst.fortis.spark.transforms.sentiment
 
 import org.scalatest.FlatSpec
 
-class TestCognitiveServicesSentimentDetector(cognitiveServicesResponse: String, language: String) extends CognitiveServicesSentimentDetector(language, SentimentDetectorAuth("key")) {
+class TestCognitiveServicesSentimentDetector(cognitiveServicesResponse: String, language: String) extends CognitiveServicesSentimentDetector(language, SentimentDetectorAuth("key", "host")) {
   protected override def callCognitiveServices(request: String): String = cognitiveServicesResponse
   override def buildRequestBody(text: String, textId: String): String = super.buildRequestBody(text, textId)
 }

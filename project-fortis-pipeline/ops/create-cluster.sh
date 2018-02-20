@@ -214,7 +214,8 @@ echo "Finished. Now installing Spark helm chart."
   "${latest_version}" \
   "${cassandra_port}" \
   "${cassandra_username}" \
-  "${cassandra_password}"
+  "${cassandra_password}" \
+  "${k8location}"
 
 echo "Finished. Now setting up fortis spark job upgrade script."
 if ! (command -v yaml > /dev/null); then npm install --global yaml-cli; fi

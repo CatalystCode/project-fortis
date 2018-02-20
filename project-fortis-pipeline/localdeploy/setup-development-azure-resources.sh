@@ -81,6 +81,7 @@ az postgres server firewall-rule create \
 # save environment variables
 
 echo "FORTIS_RESOURCE_GROUP_NAME=$resourceGroupName" | tee "$outputFile"
+echo "FORTIS_RESOURCE_GROUP_LOCATION=$resourceGroupLocation" | tee --append "$outputFile"
 
 echo "FEATURES_DB_USER=$postgresUser@$postgresName" | tee --append "$outputFile"
 echo "FEATURES_DB_HOST=$postgresName.postgres.database.azure.com" | tee --append "$outputFile"

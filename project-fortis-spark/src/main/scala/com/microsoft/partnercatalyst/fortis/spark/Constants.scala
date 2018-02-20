@@ -20,6 +20,7 @@ object Constants {
     val BlobUrlBase = "FORTIS_CENTRAL_ASSETS_HOST"
     val CassandraHost = "FORTIS_CASSANDRA_HOST"
     val CassandraPort = "FORTIS_CASSANDRA_PORT"
+    val Location = "FORTIS_RESOURCE_GROUP_LOCATION"
     val CassandraUsername = "FORTIS_CASSANDRA_USERNAME"
     val CassandraPassword = "FORTIS_CASSANDRA_PASSWORD"
     val ManagementBusConnectionString = "FORTIS_SB_CONN_STR"

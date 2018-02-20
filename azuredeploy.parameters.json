@@ -38,18 +38,6 @@
         "mapboxAccessToken": {
             "value": "CHANGE ME"
         },
-        "cognitiveServicesTextAnalyticsToken": {
-            "value": ""
-        },
-        "cognitiveServicesTextTranslationToken": {
-            "value": ""
-        },
-        "cognitiveServicesComputerVisionToken": {
-            "value": ""
-        },
-        "cognitiveServicesBingSpeechToken": {
-            "value": ""
-        },
         "fortisSiteCloneUrl": {
             "value": ""
         },

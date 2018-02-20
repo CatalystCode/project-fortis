@@ -3,6 +3,7 @@ package com.microsoft.partnercatalyst.fortis.spark
 case class FortisSettings(
   progressDir: String,
   featureServiceUrlBase: String,
+  cognitiveUrlBase: String,
   blobUrlBase: String,
   cassandraHosts: String,
   cassandraPorts: String,
