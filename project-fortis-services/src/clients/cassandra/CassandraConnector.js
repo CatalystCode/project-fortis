@@ -26,6 +26,10 @@ const options = {
   protocolOptions: {
     port: cassandraPort,
   },
+  socketOptions: {
+    connectTimeout: 10000, // milliseconds
+    readTimeout: 60000 // milliseconds
+  },
   queryOptions: {
     autoPage: true,
     prepare: true,
