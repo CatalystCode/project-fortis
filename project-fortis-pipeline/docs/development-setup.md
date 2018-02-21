@@ -134,3 +134,15 @@ simultaneous Twitter connections, please follow these steps:
 3. Update the `streams.csv` file in your copy of the archive with your Twitter credentials.
 4. Commit and push your copy of the archive.
 5. Edit the `CASSANDRA_SEED_DATA_URL` variable in the `.env` file to point to your copy of the archive.
+
+### Could not find a required file during docker-compose up
+
+If you see an error with one of the Docker containers that relies on a mounted
+volume (e.g., the React frontend) that specific files can't be found like shown
+in the screenshot below, it is likely that your password has recently changed
+and you have to re-share your mount drive with Docker following these steps:
+open the Docker settings, go to the "Shared Drives" tab, uncheck the shared
+drive, click apply, check the shared drive, click apply again and enter your new
+password. The next time you run the Docker container the error will be fixed.
+
+![Screenshot showing docker-compose up mount error](https://user-images.githubusercontent.com/1086421/36483688-d673ff08-16e4-11e8-9677-1a59e118806a.png)
