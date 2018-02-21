@@ -135,6 +135,24 @@ simultaneous Twitter connections, please follow these steps:
 4. Commit and push your copy of the archive.
 5. Edit the `CASSANDRA_SEED_DATA_URL` variable in the `.env` file to point to your copy of the archive.
 
+### Twitter HTTP 401 error
+
+If the Twitter connector is giving you a HTTP 401 error (as the own shown in the
+snippet below), it is likely that your Docker container's clock got slightly
+skewed which leads Twitter to reject the timestamps in the API requests. To
+resolve this, restart your computer.
+
+```
+project_fortis_spark_1       | <html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>\n<title>Error 401 Unauthorized</title>
+project_fortis_spark_1       | </head>
+project_fortis_spark_1       | <body>
+project_fortis_spark_1       | <h2>HTTP ERROR: 401</h2>
+project_fortis_spark_1       | <p>Problem accessing '/1.1/statuses/filter.json'. Reason:
+project_fortis_spark_1       | <pre>    Unauthorized</pre>
+project_fortis_spark_1       | </body>
+project_fortis_spark_1       | </html>
+```
+
 ### Could not find a required file during docker-compose up
 
 If you see an error with one of the Docker containers that relies on a mounted
