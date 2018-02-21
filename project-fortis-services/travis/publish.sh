@@ -27,9 +27,12 @@ pull_previous_image() {
   local x="${semver[0]}"
   local y="${semver[1]}"
   local z="${semver[2]}"
+  local vprev="${DOCKER_USERNAME}/project_fortis_services:${x}.${y}.$((z-1))"
+  local vnext="${DOCKER_USERNAME}/project_fortis_services:${TRAVIS_TAG}"
 
   if [ "$z" -gt 0 ]; then
-    docker pull "${DOCKER_USERNAME}/project_fortis_services:${x}.${y}.$((z-1))"
+    docker pull "${vprev}"
+    docker image tag "${vprev}" "${vnext}"
   fi
 }
 
