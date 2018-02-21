@@ -22,20 +22,6 @@ install_docker() {
   sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 }
 
-pull_previous_image() {
-  local semver=(${TRAVIS_TAG//./ })
-  local x="${semver[0]}"
-  local y="${semver[1]}"
-  local z="${semver[2]}"
-  local vprev="${DOCKER_USERNAME}/project_fortis_services:${x}.${y}.$((z-1))"
-  local vnext="${DOCKER_USERNAME}/project_fortis_services:${TRAVIS_TAG}"
-
-  if [ "$z" -gt 0 ]; then
-    docker pull "${vprev}"
-    docker image tag "${vprev}" "${vnext}"
-  fi
-}
-
 create_image() {
   touch .env-secrets
   BUILD_TAG="${TRAVIS_TAG}" docker-compose build project_fortis_services
@@ -49,7 +35,6 @@ publish_image() {
 pushd "$(dirname $0)/../.."
 
 check_preconditions
-pull_previous_image
 install_docker
 create_image
 publish_image

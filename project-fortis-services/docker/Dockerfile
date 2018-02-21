@@ -4,7 +4,7 @@ FROM node:9.2.0
 ENV CASSANDRA_HOME="/opt/cassandra"
 ARG CASSANDRA_VERSION="3.11.0"
 ARG CASSANDRA_ARTIFACT="apache-cassandra-${CASSANDRA_VERSION}"
-ARG CASSANDRA_URL="http://www-eu.apache.org/dist/cassandra/${CASSANDRA_VERSION}/${CASSANDRA_ARTIFACT}-bin.tar.gz"
+ARG CASSANDRA_URL="http://archive.apache.org/dist/cassandra/${CASSANDRA_VERSION}/${CASSANDRA_ARTIFACT}-bin.tar.gz"
 RUN apt-get -qq install -y --no-install-recommends wget ca-certificates && \
     wget -qO - ${CASSANDRA_URL} | tar -xzC /opt && \
     ln -s /opt/${CASSANDRA_ARTIFACT} ${CASSANDRA_HOME}
