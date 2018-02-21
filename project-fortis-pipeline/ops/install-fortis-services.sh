@@ -41,9 +41,7 @@ readonly deployment_yaml="${install_dir}/kubernetes-deployment.yaml"
 readonly service_yaml="${install_dir}/kubernetes-service.yaml"
 readonly ingress_yaml="${install_dir}/nginx-ingress.yaml"
 readonly ingress_secret_yaml="${install_dir}/nginx-ingress-secret.yaml"
-
-replication_factor="$((k8cassandra_node_count/2))"
-if [ "${replication_factor}" -eq 0 ]; then replication_factor="1"; fi
+readonly replication_factor="$((k8cassandra_node_count/2+1))"
 
 # deploy the service to the kubernetes cluster
 cat > "${deployment_yaml}" << EOF
