@@ -66,7 +66,7 @@ if [ -n "$FORTIS_CASSANDRA_ADMINS" ]; then
 fi
 
 # set up cassandra seed data
-if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
+if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ] && ! has_seed_data; then
   log "Got Fortis sample data at $FORTIS_CASSANDRA_SEED_DATA_URL, ingesting..."
   mkdir -p /tmp/cassandra-seed-data
   cd /tmp/cassandra-seed-data
@@ -79,10 +79,9 @@ if [ -n "$FORTIS_CASSANDRA_SEED_DATA_URL" ]; then
   done
   cd -
   log "...done, Fortis sample data is now ingested"
-fi
 
 # set up site entry
-if [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ] && ! has_site; then
+elif [ -n "$FORTIS_CASSANDRA_SITE_NAME" ] && [ -n "$FORTIS_CASSANDRA_SITE_TYPE" ] && ! has_site; then
   log "Got Fortis site name and type, ingesting default site settings..."
   while ! npm run createsite -- "$FORTIS_CASSANDRA_SITE_NAME" "$FORTIS_CASSANDRA_SITE_TYPE"; do sleep 20s; done
   log "...done, Fortis default site is now ingested"
