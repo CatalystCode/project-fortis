@@ -164,3 +164,23 @@ drive, click apply, check the shared drive, click apply again and enter your new
 password. The next time you run the Docker container the error will be fixed.
 
 ![Screenshot showing docker-compose up mount error](https://user-images.githubusercontent.com/1086421/36483688-d673ff08-16e4-11e8-9677-1a59e118806a.png)
+
+### Debugging production deployment issues
+
+If you need to debug any issues with the Fortis ARM template deployment script,
+SSH into the FortisDeployVM.
+
+You can now inspect the deployment script's outputs via the following commands:
+
+```sh
+sudo less /var/lib/waagent/custom-script/download/0/stdout
+
+sudo less /var/lib/waagent/custom-script/download/0/stderr
+```
+
+You can inspect the arguments that were given to the deployment script with the
+following command:
+
+```sh
+sudo less "$(sudo find /tmp/fortis-deploy-* -name 'fortis-deploy.sh' -print -quit)"
+```

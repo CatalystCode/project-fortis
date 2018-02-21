@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-#
-# if you need to debug any issues with this script, ssh into the FortisDeployVM
-# and then inspect the script's outputs via:
-#
-#   sudo less +F /var/lib/waagent/custom-script/download/0/stdout
-#   sudo less +F /var/lib/waagent/custom-script/download/0/stderr
-#
 
 readonly script_args="$(printf '%q \\\n' "$@")"
 readonly script_path="$(readlink -f "$0")"
