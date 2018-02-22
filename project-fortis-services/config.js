@@ -19,12 +19,12 @@ module.exports = {
     publishEventsEventhubPartition: process.env.PUBLISH_EVENTS_EVENTHUB_PARTITION
   },
   cassandra: {
-    fetchSize: process.env.FETCH_SIZE || 1000,
-    maxConcurrentQueries: process.env.MAX_CONCURRENT_QUERIES || 50,
-    maxOperationsPerBatch: process.env.MAX_OPERATIONS_PER_BATCH || 10,
-    maxConcurrentBatches: process.env.MAX_CONCURRENT_BATCHES || 50,
-    coreConnectionsPerHostLocal: process.env.CORE_CONNECTIONS_PER_HOST_LOCAL || 3,
-    coreConnectionsPerHostRemote: process.env.CORE_CONNECTIONS_PER_HOST_REMOTE || 1,
+    fetchSize: process.env.FORTIS_CASSANDRA_FETCH_SIZE || 1000,
+    maxConcurrentQueries: process.env.FORTIS_CASSANDRA_MAX_CONCURRENT_QUERIES || 50,
+    maxOperationsPerBatch: process.env.FORTIS_CASSANDRA_MAX_OPERATIONS_PER_BATCH || 10,
+    maxConcurrentBatches: process.env.FORTIS_CASSANDRA_MAX_CONCURRENT_BATCHES || 50,
+    coreConnectionsPerHostLocal: process.env.FORTIS_CASSANDRA_CORE_CONNECTIONS_PER_HOST_LOCAL || 3,
+    coreConnectionsPerHostRemote: process.env.FORTIS_CASSANDRA_CORE_CONNECTIONS_PER_HOST_REMOTE || 1,
     cassandraHost: process.env.FORTIS_CASSANDRA_HOST,
     cassandraPort: process.env.FORTIS_CASSANDRA_PORT,
     cassandraUsername: process.env.FORTIS_CASSANDRA_USERNAME,
