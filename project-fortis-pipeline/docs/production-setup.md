@@ -7,25 +7,23 @@
 First and foremost, you'll need an Azure subscription. You can create one for
 free [here](https://azure.microsoft.com/en-us/free/).
 
-### Azure service principal
+### Secure your Fortis site with TLS
 
-You'll need an Azure service principal. You can follow these [instructions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal)
-if you need to generate a new service principal.
+To enable TLS and secure your Fortis site, you have two choices:
 
-When creating an azure active directory application and assigning the application to a role make sure that you have an `Owner` or `User Access Admin Role`, otherwise you will not be able to assign a role to the application.
+1. Provide your own TLS certificate and private key
+2. Generate a free certificate with LetsEncrypt
 
-During the Azure deployment, the `Application Id` will be used for the `Service Principal App Id` field and the `Authentication Key` will be used for the `Service Principal App Key`.
+#### Required Deployment Parameters for TLS
 
-### TLS setup
+* `Endpoint Protection` set to `tls_provide_certificate` or `tls_lets_encrypt`
+* [`Active Directory Client Id`](./aad-setup.md) from `Azure Active Directory v2.0`
+* `Ingress Hostname`
+* `TLS Certificate` if not using LetsEncrypt
+* `TLS Private Key` if not using LetsEncrypt
+* `Lets Encrypt Email` if using LetsEncrypt
 
-If you want to enable TLS to secure your Fortis site, you have two choices:
-either providing your own TLS certificate and private key, or automatically
-having the service generate a free certificate for you. More detail on
-setting up TLS can be found [here](./tls-setup.md).
-
-### Login setup
-
-If you chose either of the two options to configure TLS described above, you will be able to add login via Azure Active Directory v2.0 to regulate access to your Fortis site following these [instructions](./aad-setup.md).
+More details on TLS setup can be found [here](./tls-setup.md).
 
 ## Setting up a new Azure deployment
 
@@ -40,7 +38,9 @@ Hit the deploy to Azure button below:
 Now grab a large cup of coffee as the deployment can take north of an hour to
 complete.
 
-Once the deployment has finished, click on the `Manage your resources`
+## Post Deployment
+
+If you set up TLS, remember to do the [TLS post deployment steps](https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/tls-setup.md#post-deployment-steps) and [AAD post deployment steps](https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/aad-setup.md#post-deployment-steps) before viewing your site. Then, click on the `Manage your resources`
 (highlighted below).
 
 ![Screenshot of ARM template after successful deployment with highlight of management link to access the newly created resource group](https://user-images.githubusercontent.com/1086421/33331326-4437a7fe-d42f-11e7-8b4a-19b968b4705b.png)
@@ -54,6 +54,8 @@ Point your browser to the admin interface URL. Once the Fortis admin portal
 loads, you can now finalize the setup of your Fortis deployment using the portal:
 
 ![Screenshot showing the Fortis admin interface](https://user-images.githubusercontent.com/1086421/33331562-e9e589be-d42f-11e7-870c-6b758ec2141a.png)
+
+If you configured TLS and get `AADSTS70005: response_type 'id_token' is not enabled for the application`, make sure you completed all the post deployment steps properly.
 
 Once you've completed all the admin configuration (see below for details), your
 deployment is ready to be used.
@@ -76,9 +78,10 @@ Manage service tokens and set up how the site should be displayed.
 | Default Language    | The admin site will be displayed in this language. |
 | Feature Service     | The feature service namespace. The namespace should be `wof` for whole-world places based on open street maps or `divipola` for detailed Colombia places. More documentation on the feature service [here](https://github.com/CatalystCode/featureService).  |
 | Translation Services Token | Needed for real-time text translation. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api).  |
-| Cognitive Speech Services Token | Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/custom-speech-service/).  |
-| Cognitive Vision Services Token | Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/custom-vision-service/)  |
-| Cognitive Text Services Token | Used for sentiment analysis. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/) |
+| Cognitive Services Text Analytics Token | [Obtain a token through these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-signup). | Optional |
+| Cognitive Services Text Translataion Token | [Obtain a token through these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-text-how-to-signup). | Optional |
+| Cognitive Services Computer Vision Token | To obtain a key, follow [these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-signup), but instead search for `computer vision ai` when creating the resource. | Optional |
+| Cognitive Services Bing Speech Token | To obtain a key, follow [these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-signup), but instead search for `bing speech api` when creating the resource. | Optional |
 
 ### Watchlist
 

@@ -70,4 +70,14 @@ and that the A record for `fortis3.test.com` contains the value of the
 `FORTIS_DNS_IP` tag that you were shown after your Fortis deployment
 finished:
 
+### Cloudflare
 ![Cloudflare DNS setup](https://user-images.githubusercontent.com/1086421/35749803-c7548c68-0820-11e8-8b5d-e6ab71cb095d.png)
+
+### Namecheap
+
+**Note:** Any record changes may take up to 30 minutes to take effect.
+
+Guide on setting up the [MX record in namecheap](https://www.namecheap.com/support/knowledgebase/article.aspx/322/2237/how-can-i-set-up-mx-records-required-for-mail-service)
+
+![namecheap_a_record](https://user-images.githubusercontent.com/7232635/36557201-9d95ce18-17d5-11e8-9072-f790f378a012.JPG)
+![namecheap_mx_record](https://user-images.githubusercontent.com/7232635/36557143-6403a792-17d5-11e8-8cd0-63603add58a2.JPG)
