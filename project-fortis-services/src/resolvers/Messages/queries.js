@@ -75,33 +75,36 @@ function fetchPlacesById(feature) { // eslint-disable-line no-unused-vars
 
 function queryEventsTable(eventIdResponse, args) {
   return new Promise((resolve, reject) => {
-    const eventIds = makeSet(eventIdResponse.rows, row => row.eventid);
-    let eventsQuery = `
-    SELECT *
-    FROM fortis.events
-    WHERE eventid IN ?
-    `.trim();
-
-    let eventsParams = [
-      limitForInClause(eventIds)
-    ];
-
-    if (eventIdResponse.rows.length) {
-      cassandraConnector.executeQuery(eventsQuery, eventsParams)
-        .then(rows => {
-          const sortedEvents = rows.sort((a, b)=>moment.utc(b.eventtime.getTime()).diff(moment.utc(a.eventtime.getTime())));
-
-          resolve({
-            type: 'FeatureCollection',
-            features: sortedEvents.map(eventToFeature),
-            bbox: args.bbox,
-            pageState: eventIdResponse.pageState
-          });
-        })
-        .catch(reject);
-    } else {
-      resolve({ type: 'FeatureCollection', features: [] });
+    if (!eventIdResponse.rows.length) {
+      return resolve({ type: 'FeatureCollection', features: [] });
     }
+
+    const eventIds = makeSet(eventIdResponse.rows, row => row.eventid);
+
+    const eventsQueries = Array.from(eventIds).map(eventId => ({
+      query: `
+        SELECT *
+        FROM fortis.events
+        WHERE eventid = ?
+        `.trim(),
+
+      params: [
+        eventId
+      ]
+    }));
+
+    cassandraConnector.executeQueries(eventsQueries)
+      .then(rows => {
+        const sortedEvents = rows.sort((a, b)=>moment.utc(b.eventtime.getTime()).diff(moment.utc(a.eventtime.getTime())));
+
+        resolve({
+          type: 'FeatureCollection',
+          features: sortedEvents.map(eventToFeature),
+          bbox: args.bbox,
+          pageState: eventIdResponse.pageState
+        });
+      })
+      .catch(reject);
   });
 }
 
@@ -155,27 +158,29 @@ function byEdges(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
     if (!args || !args.filteredEdges || !args.filteredEdges.length) return reject('No edges by which to filter specified');
 
-    const tagsQuery = `
-    SELECT eventid
-    FROM fortis.eventtopics
-    WHERE topic IN ?
-    AND pipelinekey = ?
-    AND externalsourceid = ?
-    AND eventtime <= ?
-    AND eventtime >= ?
-    LIMIT ?
-    `.trim();
+    const tagsQueries = toConjunctionTopics(args.mainTerm, args.filteredEdges).filter(topic => !!topic).map(topic => ({
+      query: `
+        SELECT eventid
+        FROM fortis.eventtopics
+        WHERE topic = ?
+        AND pipelinekey = ?
+        AND externalsourceid = ?
+        AND eventtime <= ?
+        AND eventtime >= ?
+        LIMIT ?
+        `.trim(),
 
-    const tagsParams = [
-      limitForInClause(toConjunctionTopics(args.mainTerm, args.filteredEdges).filter(topic => !!topic)),
-      toPipelineKey(args.sourceFilter),
-      'all',
-      args.toDate,
-      args.fromDate,
-      parseLimit(args.limit)
-    ];
+      params: [
+        topic,
+        toPipelineKey(args.sourceFilter),
+        'all',
+        args.toDate,
+        args.fromDate,
+        parseLimit(args.limit)
+      ]
+    }));
 
-    cassandraConnector.executeQuery(tagsQuery, tagsParams)
+    cassandraConnector.executeQueries(tagsQueries)
       .then(rows => {
         return queryEventsTable(rows, args);
       })

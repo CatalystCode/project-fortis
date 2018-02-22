@@ -38,6 +38,7 @@
     "azure-event-hubs": "0.0.8",
     "azure-sb": "^0.10.4",
     "azure-storage": "^1.3.2",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.15.0",
     "cassandra-driver": "^3.2.2",
     "cors": "^2.8.4",

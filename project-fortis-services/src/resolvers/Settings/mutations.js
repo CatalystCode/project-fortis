@@ -479,19 +479,19 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
     const termFilters = args && args.input && args.input.filters;
     if (!termFilters || !termFilters.length) return reject('No blacklists to remove specified.');
 
-    const termIds = termFilters.map(termFilter => termFilter.id);
+    const queries = termFilters.map(termFilter => ({
+      query: `
+        DELETE
+        FROM settings.blacklist
+        WHERE id = ?
+        `,
 
-    const query = `
-    DELETE
-    FROM settings.blacklist
-    WHERE id IN ?
-    `;
+      params: [
+        termFilter.id
+      ]
+    }));
 
-    const params = [
-      limitForInClause(termIds)
-    ];
-
-    cassandraConnector.executeQuery(query, params)
+    cassandraConnector.executeQueries(queries)
       .then(() => {
         streamingController.notifyBlacklistUpdate();
       })

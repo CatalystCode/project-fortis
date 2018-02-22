@@ -1,7 +1,9 @@
 'use strict';
 
 const Promise = require('promise');
+const PromiseMap = require('bluebird').map;
 const cassandra = require('cassandra-driver');
+const flatten = require('lodash/flatten');
 const { distance, consistencies } = cassandra.types;
 const asyncEachLimit = require('async/eachLimit');
 const chunk = require('lodash/chunk');
@@ -9,7 +11,7 @@ const { trackDependency, trackException } = require('../appinsights/AppInsightsC
 const loggingClient = require('../appinsights/LoggingClient');
 
 const {
-  fetchSize, maxOperationsPerBatch, maxConcurrentBatches,
+  fetchSize, maxOperationsPerBatch, maxConcurrentBatches, maxConcurrentQueries,
   coreConnectionsPerHostLocal, coreConnectionsPerHostRemote,
   cassandraHost, cassandraPort,
   cassandraPassword, cassandraUsername
@@ -137,6 +139,28 @@ function executeQuery(query, params, options) {
 }
 
 /**
+ * @param {Array<{query: string, params: Array<string|map>}>} queries
+ * @param {{fetchSize: int, consistency: int}} [options]
+ * @returns {Promise.<object[]>}
+ */
+function executeQueries(queries, options) {
+  const results = [];
+  queries.forEach(() => results.push([]));
+
+  const runSingleQuery = trackDependency(executeQuery, 'Cassandra', 'executeQueries');
+
+  function makeQuery(query, i) {
+    return runSingleQuery(query.query, query.params, options)
+      .then(rows => {
+        results[i] = rows;
+      });
+  }
+
+  return PromiseMap(queries, makeQuery, { concurrency: maxConcurrentQueries })
+    .then(() => flatten(results));
+}
+
+/**
  * @param {string} query
  * @param {string[]} params
  * @param {int} fetchSize
@@ -199,6 +223,7 @@ function intialize() {
 
 module.exports = {
   status,
+  executeQueries,
   initialize: trackDependency(intialize, 'Cassandra', 'initialize'),
   executeBatchMutations: trackDependency(executeBatchMutations, 'Cassandra', 'executeBatchMutations'),
   executeQueryWithPageState: trackDependency(executeQueryWithPageState, 'Cassandra', 'executeQueryWithPageState'),

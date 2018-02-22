@@ -155,34 +155,36 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
       return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
     }
 
-    const query = `
-    SELECT conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, perioddate, mentioncount, avgsentimentnumerator, tileid
-    FROM fortis.computedtiles
-    WHERE periodtype = ?
-    AND conjunctiontopic1 IN ?
-    AND conjunctiontopic2 = ?
-    AND conjunctiontopic3 = ?
-    AND pipelinekey IN ?
-    AND externalsourceid = ?
-    AND tilez = ?
-    AND perioddate <= ?
-    AND perioddate >= ?
-    AND tileid IN ?
-    `.trim();
+    const queries = maintopics.map(maintopic => ({
+      query: `
+        SELECT conjunctiontopic1, conjunctiontopic2, conjunctiontopic3, perioddate, mentioncount, avgsentimentnumerator, tileid
+        FROM fortis.computedtiles
+        WHERE periodtype = ?
+        AND conjunctiontopic1 = ?
+        AND conjunctiontopic2 = ?
+        AND conjunctiontopic3 = ?
+        AND pipelinekey IN ?
+        AND externalsourceid = ?
+        AND tilez = ?
+        AND perioddate <= ?
+        AND perioddate >= ?
+        AND tileid IN ?
+        `.trim(),
 
-    const params = [
-      args.periodType,
-      maintopics,
-      ...fromTopicListToConjunctionTopics(conjunctivetopics, MaxConjunctiveTopicsAllowed),
-      args.pipelinekeys,
-      args.externalsourceid,
-      args.zoomLevel,
-      args.toDate,
-      args.fromDate,
-      tiles
-    ];
+      params: [
+        args.periodType,
+        maintopic,
+        ...fromTopicListToConjunctionTopics(conjunctivetopics, MaxConjunctiveTopicsAllowed),
+        args.pipelinekeys,
+        args.externalsourceid,
+        args.zoomLevel,
+        args.toDate,
+        args.fromDate,
+        tiles
+      ]
+    }))
 
-    return cassandraConnector.executeQuery(query, params)
+    return cassandraConnector.executeQueries(queries)
       .then(rows => {
         const labels = Array.from(makeSet(rows, row => row.conjunctiontopic1.toLowerCase())).map(row => ({ name: row.toLowerCase() }));
         const tiles = Array.from(makeSet(rows, row => row.tileid)).map(row => row);
@@ -240,36 +242,38 @@ function topTerms(args, res) { // eslint-disable-line no-unused-vars
           return reject(`No tiles found for bounding box ${args.bbox.join(',')} and zoom ${args.zoomLevel}`);
         }
 
-        const query = `
-          SELECT mentioncount, conjunctiontopic1, avgsentimentnumerator
-          FROM fortis.populartopics
-          WHERE periodtype = ?
-          AND pipelinekey IN ?
-          AND externalsourceid = ?
-          AND tilez = ?
-          AND perioddate <= ?
-          AND perioddate >= ?
-          AND tileid IN ?
-          AND conjunctiontopic1 IN ?
-          AND conjunctiontopic2 = ''
-          AND conjunctiontopic3 = ''
-          LIMIT ?
-          `.trim();
+        const queries = terms.edges.map(item => ({
+          query: `
+            SELECT mentioncount, conjunctiontopic1, avgsentimentnumerator
+            FROM fortis.populartopics
+            WHERE periodtype = ?
+            AND pipelinekey IN ?
+            AND externalsourceid = ?
+            AND tilez = ?
+            AND perioddate <= ?
+            AND perioddate >= ?
+            AND tileid IN ?
+            AND conjunctiontopic1 = ?
+            AND conjunctiontopic2 = ''
+            AND conjunctiontopic3 = ''
+            LIMIT ?
+            `.trim(),
 
-        //todo: figure out why node driver timezone conversion is filtering out a majority of records
-        const params = [
-          args.periodType,
-          args.pipelinekeys,
-          args.externalsourceid,
-          args.zoomLevel,
-          args.toDate,
-          args.fromDate,
-          tiles,
-          terms.edges.map(item => item.name),
-          MaxFetchedRows
-        ];
+          //todo: figure out why node driver timezone conversion is filtering out a majority of records
+          params: [
+            args.periodType,
+            args.pipelinekeys,
+            args.externalsourceid,
+            args.zoomLevel,
+            args.toDate,
+            args.fromDate,
+            tiles,
+            item.name,
+            MaxFetchedRows
+          ],
+        }));
 
-        return cassandraConnector.executeQuery(query, params, { fetchSize })
+        return cassandraConnector.executeQueries(queries, { fetchSize })
           .then(rows =>
             resolve({
               edges: aggregateBy(rows, row => `${row.conjunctiontopic1}`, row => ({
