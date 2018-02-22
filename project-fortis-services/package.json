@@ -64,6 +64,7 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
+    "depcheck": "^0.6.8",
     "eslint": "^4.13.1",
     "eslint-plugin-require-path-exists": "^1.1.7"
   },
@@ -71,6 +72,7 @@
     "createsite": "node src/scripts/createsite.js",
     "addusers": "node src/scripts/addusers.js",
     "ingestsetting": "node src/scripts/ingestsetting.js",
+    "depcheck": "depcheck",
     "lint": "eslint --max-warnings=0 src *.js"
   },
   "generator-swaggerize": {

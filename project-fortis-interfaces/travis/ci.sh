@@ -4,9 +4,20 @@ set -e
 
 pushd "$(dirname $0)/.."
 
-if [ ! -d node_modules ]; then npm install; fi
+err=0
 
-npm run lint
-npm run depcheck | grep 'No depcheck issue'
+if [ ! -d node_modules ]; then
+  npm install
+fi
+
+if ! npm run lint; then
+  err=1
+fi
+
+if npm run depcheck | grep -q '^Unused dependencies$'; then
+  err=2
+fi
 
 popd
+
+exit "$err"
