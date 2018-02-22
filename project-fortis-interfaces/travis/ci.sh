@@ -4,7 +4,7 @@ set -e
 
 pushd "$(dirname $0)/.."
 
-npm install
+if [ ! -d node_modules ]; then npm install; fi
 
 npm run lint
 npm run depcheck | grep 'No depcheck issue'

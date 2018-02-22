@@ -4,7 +4,8 @@ set -e
 
 pushd "$(dirname $0)/.."
 
-npm install
+if [ ! -d node_modules ]; then npm install; fi
+
 npm run lint
 
 popd
