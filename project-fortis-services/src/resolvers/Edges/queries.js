@@ -182,7 +182,7 @@ function timeSeries(args, res) { // eslint-disable-line no-unused-vars
         args.fromDate,
         tiles
       ]
-    }))
+    }));
 
     return cassandraConnector.executeQueries(queries)
       .then(rows => {
