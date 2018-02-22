@@ -43,10 +43,10 @@ done
 log "...done, Cassandra is now available"
 
 # set up cassandra schema
-if [ -n "$FORTIS_CASSANDRA_DATA_SCHEMA_URL" ]; then
+if [ -n "$FORTIS_CASSANDRA_DATA_SCHEMA_URL" ] && ! has_keyspace "fortis"; then
   ingest_schema "$FORTIS_CASSANDRA_DATA_SCHEMA_URL" "fortis"
 fi
-if [ -n "$FORTIS_CASSANDRA_SETTINGS_SCHEMA_URL" ]; then
+if [ -n "$FORTIS_CASSANDRA_SETTINGS_SCHEMA_URL" ] && ! has_keyspace "settings"; then
   ingest_schema "$FORTIS_CASSANDRA_SETTINGS_SCHEMA_URL" "settings"
 fi
 
