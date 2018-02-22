@@ -184,3 +184,39 @@ following command:
 ```sh
 sudo less "$(sudo find /tmp/fortis-deploy-* -name 'fortis-deploy.sh' -print -quit)"
 ```
+
+### Debugging production Spark issues
+
+You can use the Spark UI to debug issues with the Fortis data ingestion pipeline
+running in the Kubernetes cluster. The Spark UI is not publicly accessible by
+default for security reasons so you need to follow a few steps before you can
+access it.
+
+First, SSH into the FortisDeployVM and request a public IP for the Spark UI:
+
+```sh
+kubectl expose svc spark-master -n spark --name spark-public --target-port=7077 --target-port=8080 --type LoadBalancer
+```
+
+Now wait for the public IP to become available. This should take less than five
+minutes. You can use the following script to alert you once the UI is ready:
+
+```sh
+while :; do
+  spark_ui_ip="$(kubectl get svc -n spark spark-public -o jsonpath='{..ip}')"
+  if [ -z "$spark_ui_ip" ]; then
+    sleep 20s
+  else
+    break
+  fi
+done
+
+echo "Spark UI is now available: http://$spark_ui_ip:7077"
+```
+
+Once you're done with the UI, remember to delete its public IP to prevent access
+to the UI.
+
+```sh
+kubectl delete svc -n spark spark-public
+```
