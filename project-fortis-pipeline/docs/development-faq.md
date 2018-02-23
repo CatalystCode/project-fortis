@@ -105,3 +105,20 @@ to the UI.
 ```sh
 kubectl delete svc -n spark spark-public
 ```
+
+## I need to set up a production site for a given list of keywords/etc.
+
+In order to spin up a Fortis deployment that comes pre-configured with a given
+set of watchlist terms, streams, site settings, etc. you can leverage the site
+import functionality during the deployment, via the `Fortis Site Clone Url` box
+in the Fortis deployment wizard.
+
+The site clone URL should point to a tar.gz archive that contains a definition
+of your site's settings. Specifically, the archive should contain some CSV files
+such as watchlist.csv, sitesettings.csv, streams.csv as well as an import.cql
+file that imports these CSV files via the `COPY table FROM csvfile` command. At
+deployment time, the Fortis setup will execute the import.cql script and like
+that pre-populate your Fortis site.
+
+There are several examples of tar.gz files to bootstrap sites in the [seed-data](https://github.com/CatalystCode/project-fortis/tree/master/project-fortis-pipeline/localdeploy/seed-data)
+directory which you can use as a template.
