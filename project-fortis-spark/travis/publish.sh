@@ -2,22 +2,16 @@
 
 set -euo pipefail
 
-readonly tag="${TRAVIS_TAG}"
-readonly blobaccount="${DEPLOY_BLOB_ACCOUNT_NAME}"
-readonly blobkey="${DEPLOY_BLOB_ACCOUNT_KEY}"
-readonly blobcontainer="${DEPLOY_BLOB_CONTAINER}"
-readonly blobname="fortis-${tag}.jar"
-
 log() {
   echo "$@" >&2
 }
 
 check_preconditions() {
-  if [ -z "${tag}" ]; then
+  if [ -z "${TRAVIS_TAG}" ]; then
     log "Build is not a tag, skipping publish"
     exit 0
   fi
-  if [ -z "${blobaccount}" ] || [ -z "${blobkey}" ] || [ -z "${blobcontainer}" ]; then
+  if [ -z "${DEPLOY_BLOB_ACCOUNT_NAME}" ] || [ -z "${DEPLOY_BLOB_ACCOUNT_KEY}" ] || [ -z "${DEPLOY_BLOB_CONTAINER}" ]; then
     log "Azure blob connection is not set, unable to publish builds"
     exit 1
   fi
@@ -37,6 +31,7 @@ create_fat_jar() {
 
 publish_fat_jar() {
   local fatjar="$(find target -name 'project-fortis-spark-assembly-*.jar' -print -quit)"
+
   if [ -z "${fatjar}" ] || [ ! -f "${fatjar}" ]; then
     log "Unable to locate fat jar"
     exit 1
@@ -45,11 +40,11 @@ publish_fat_jar() {
   AZURE_NON_INTERACTIVE_MODE=1 \
   azure storage blob upload \
   --quiet \
-  --account-name "${blobaccount}" \
-  --account-key "${blobkey}" \
+  --account-name "${DEPLOY_BLOB_ACCOUNT_NAME}" \
+  --account-key "${DEPLOY_BLOB_ACCOUNT_KEY}" \
   --file "${fatjar}" \
-  --container "${blobcontainer}" \
-  --blob "${blobname}"
+  --container "${DEPLOY_BLOB_CONTAINER}" \
+  --blob "fortis-${TRAVIS_TAG}.jar"
 }
 
 pushd "$(dirname $0)/.."
