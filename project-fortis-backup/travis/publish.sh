@@ -17,11 +17,6 @@ check_preconditions() {
   fi
 }
 
-install_docker() {
-  sudo apt-get update
-  sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-}
-
 create_image() {
   touch .env-secrets
   BUILD_TAG="${TRAVIS_TAG}" docker-compose build project_fortis_backup
@@ -35,7 +30,6 @@ publish_image() {
 pushd "$(dirname "$0")/../.."
 
 check_preconditions
-install_docker
 create_image
 publish_image
 

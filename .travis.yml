@@ -4,11 +4,12 @@ matrix:
     - language: bash
       sudo: required
       addons:
-      apt:
-        sources:
-          - debian-sid
-        packages:
-          - shellcheck
+        apt:
+          sources:
+            - debian-sid
+          packages:
+            - shellcheck
+            - docker-ce
       script:
         - project-fortis-backup/travis/ci.sh
       services:
@@ -52,6 +53,12 @@ matrix:
         project-fortis-services/travis/ci.sh
       services:
         - docker
+      addons:
+        apt:
+          sources:
+            - debian-sid
+          packages:
+            - docker-ce
       after_success:
         - project-fortis-services/travis/publish.sh
       env:
