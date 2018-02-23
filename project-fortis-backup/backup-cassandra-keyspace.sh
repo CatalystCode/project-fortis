@@ -53,7 +53,7 @@ prepare_resources() {
 }
 
 export_tables() {
-  list_tables | while read table_name; do
+  list_tables | while read -r table_name; do
     export_table "${table_name}"
   done
 }
