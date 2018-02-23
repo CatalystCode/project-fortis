@@ -9,6 +9,15 @@ following command to log into a CQL shell:
 docker-compose exec project_fortis_services /app/cqlsh
 ```
 
+## I'm developing locally and rows keeps persisting in my Cassandra database?
+
+Volumes (such as Cassandra table data) will stick around between rebuilds. To
+perform a clean (discarding table data etc.), use:
+
+```sh
+docker-compose down
+```
+
 ## I'm getting an error from Twitter about "too many connections"?
 
 If you're getting an error from project-fortis-spark that there are too many
