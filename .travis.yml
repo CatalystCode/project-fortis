@@ -14,8 +14,12 @@ matrix:
         - project-fortis-backup/travis/ci.sh
       services:
         - docker
-      after_success:
-        - project-fortis-backup/travis/publish.sh
+      deploy:
+        - provider: script
+          script: project-fortis-backup/travis/publish.sh
+          on:
+            repo: CatalystCode/project-fortis
+            tags: true
       env:
         NAME=project-fortis-backup
 
@@ -59,8 +63,12 @@ matrix:
             - debian-sid
           packages:
             - docker-ce
-      after_success:
-        - project-fortis-services/travis/publish.sh
+      deploy:
+        - provider: script
+          script: project-fortis-services/travis/publish.sh
+          on:
+            repo: CatalystCode/project-fortis
+            tags: true
       env:
         NAME=project-fortis-services
 
@@ -71,7 +79,11 @@ matrix:
       sudo: required
       script:
         - project-fortis-spark/travis/ci.sh
-      after_success:
-        - project-fortis-spark/travis/publish.sh
+      deploy:
+        - provider: script
+          script: project-fortis-spark/travis/publish.sh
+          on:
+            repo: CatalystCode/project-fortis
+            tags: true
       env:
         NAME=project-fortis-spark
