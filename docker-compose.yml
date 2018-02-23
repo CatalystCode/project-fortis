@@ -65,6 +65,19 @@ services:
     env_file:
       - .env-secrets
 
+  project_fortis_backup:
+    image: cwolff/project_fortis_backup:${BUILD_TAG}
+    build:
+      context: project-fortis-backup
+      dockerfile: docker/Dockerfile
+    links:
+      - cassandra:cassandra
+    environment:
+      - FORTIS_CASSANDRA_HOST=cassandra
+      - FORTIS_CASSANDRA_PORT=9042
+    env_file:
+      - .env-secrets
+
   featureservice:
     image: cwolff/featureservice:1.0.1
     ports:

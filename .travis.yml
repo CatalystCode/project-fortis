@@ -1,6 +1,23 @@
 matrix:
   include:
 
+    - language: bash
+      sudo: required
+      addons:
+      apt:
+        sources:
+          - debian-sid
+        packages:
+          - shellcheck
+      script:
+        - project-fortis-backup/travis/ci.sh
+      services:
+        - docker
+      after_success:
+        - project-fortis-backup/travis/publish.sh
+      env:
+        NAME=project-fortis-backup
+
     - language: node_js
       node_js:
         - "6"
