@@ -5,7 +5,7 @@ import java.util.Locale
 import com.microsoft.partnercatalyst.fortis.spark.analyzer.{Analyzer, ExtendedFortisEvent}
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.dto.{Analysis, FortisEvent}
-import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry
+import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
 import com.microsoft.partnercatalyst.fortis.spark.sources.streamprovider.StreamProvider
 import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextProvider
 import com.microsoft.partnercatalyst.fortis.spark.transforms.ZipModelsProvider
@@ -30,6 +30,8 @@ object Pipeline {
     configurationManager: ConfigurationManager
   )(implicit settings: FortisSettings): Option[DStream[FortisEvent]] = {
     val configs = configurationManager.fetchConnectorConfigs(ssc.sparkContext, name)
+    Log.logDebug(s"Got connector configs [${configs.mkString(",")}] for pipeline $name")
+
     val sourceStream = streamProvider.buildStream[T](ssc, configs, ignoreUnsupportedConfigs = true)
 
     val entityModelsProvider = new ZipModelsProvider(language => s"${settings.blobUrlBase}/opener/opener-$language.zip")
@@ -154,7 +156,7 @@ object Pipeline {
       }
 
       def logFilter(isFiltered: Boolean, filterName: String) = {
-        FortisTelemetry.get.logEvent(s"pipeline.filters.$filterName", Map("isFiltered" -> isFiltered.toString))
+        Log.logEvent(s"pipeline.filters.$filterName", Map("isFiltered" -> isFiltered.toString))
         isFiltered
       }
 
