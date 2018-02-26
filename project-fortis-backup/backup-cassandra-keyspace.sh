@@ -71,7 +71,19 @@ upload_backups() {
   log "...done, backups are now uploaded"
 }
 
+delete_old_backups() {
+  log "Deleting old backups..."
+  az storage blob delete-batch \
+    --account-name="${USER_FILES_BLOB_ACCOUNT_NAME}" \
+    --account-key="${USER_FILES_BLOB_ACCOUNT_KEY}" \
+    --source="${BACKUP_CONTAINER_NAME}" \
+    --delete-snapshots="include" \
+    --pattern="${BACKUP_CONTAINER_NAME}/$(date --utc --date="${BACKUP_DELETE_LOOKBACK}" '+%Y/%m/%d')/*"
+  log "...done, old backups are now deleted"
+}
+
 check_preconditions
 prepare_resources
 export_tables
 upload_backups
+delete_old_backups
