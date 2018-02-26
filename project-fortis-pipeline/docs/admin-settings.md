@@ -1,6 +1,22 @@
 # Configuring your Fortis site
 
-Project Fortis comes with an admin page with which you can edit site configurations and also provide details on how events should be monitored and processed. Through the admin site, you will be able to configure site settings, blacklist terms, whitelist terms (watchlist), streams (twitter, facebook, etc.), monitored places, and trusted sources.
+Fortis comes with an admin page with which you can edit site configurations
+and also provide details on how events should be monitored and processed.
+
+Through the admin site, you will be able to configure amonst others:
+- General settings about your deployment in the "Site Settings" tab
+- Blacklist terms and whitelist terms in the "Watchlist" tab.
+- Data sources to watch like Twitter, Facebook, Bing, etc in the "Streams" tab.
+
+After setting up a new Fortis site, at the very least you should configure the
+following to start monitoring events:
+
+- A bounding box on the "Site Settings" tab; Fortis will only ingest events that
+  fall inside of the geographical area that you specify on this tab.
+- One or more keywords on the "Watchlist" tab; Fortis will only ingest events
+  that match any of the keywords you specify on this tab.
+- One or more data sources on the "Streams" tab; Fortis will only ingest events
+  sourced from the data sources that you specify on this tab.
 
 ## Site Settings
 
