@@ -62,19 +62,22 @@ The following list explains the settings managed on this site in more detail:
   your custom location sources into the [featureService](http://github.com/CatalystCode/featureService)
   used by Fortis.
 
-- **MapBox token:** Access token for MapBox, the service used to render the
-  map on the Fortis dashboard. A token can be created for [free](https://www.mapbox.com/signup/).
+- **MapBox token:** Free access token for [MapBox](https://www.mapbox.com/signup/),
+  the service used to render the map on the Fortis dashboard. This access key
+  is provided during the initial Fortis deployment.
 
-- **Translation Services Token:** Needed for real-time text translation. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api).
+- **Translation Services Token:** Needed for [text translation](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api).
+  This access key is set up automatically during the initial Fortis deployment.
 
-- **Cognitive Services Speech Services Token:** Needed for real-time audio
-  ingestion and analysis. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/speech/).
+- **Cognitive Services Speech Services Token:** Needed for [real-time audio](https://azure.microsoft.com/en-us/services/cognitive-services/speech/)
+  ingestion and analysis. This access key is set up automatically during the
+  initial Fortis deployment.
 
-- **Cognitive Vision Services Token:** Needed for image ingestion and analysis.
-  Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/).
+- **Cognitive Vision Services Token:** Needed for [image analysis](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/).
+  This access key is set up automatically during the initial Fortis deployment.
 
-- **Cognitive Text Services Token:** Neded for sentiment analysis. Get a token
-  [here](https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/).
+- **Cognitive Text Services Token:** Neded for [sentiment analysis](https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/).
+  This access key is set up automatically during the initial Fortis deployment.
 
 ## Watchlist
 
