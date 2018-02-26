@@ -31,20 +31,50 @@ should be ingested.
 Additionally, you can also use this page to update the credentials for third
 party APIs leveraged by Fortis, such as MapBox and Cognitive Services.
 
-| Value               | Description          |
-| ------------------- | ------------- |
-| Site Name           | Used as part of the admin url.  |
-| Site Title          | Displayed on the navigation bar.|
-| Bounding Box        | By default follows `Who's on First (WOF)`. The format of the WOF bounding box is: `maxY,minX,minY,maxX`. |
-| Header Logo Banner  | Image path of banner.  |
-| Supported Languages | A comma delimited string with languages formatted as language codes like `en` or `ar`. The admin site can translate to any of the supported languages. For a list of all `supported languages`, you can make a call to [`/GetLanguagesForTranslate`](http://docs.microsofttranslator.com/text-translate.html#!/default/get_GetLanguagesForTranslate), which will return a list of language codes supported by the [Translation Service](http://docs.microsofttranslator.com/text-translate.html).
-| Default Language    | The admin site will be displayed in this language. |
-| Feature Service     | The feature service namespace. The namespace should be `wof` for whole-world places based on open street maps or `divipola` for detailed Colombia places. More documentation on the feature service [here](https://github.com/CatalystCode/featureService).  |
-| Translation Services Token | Needed for real-time text translation. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api).  |
-| Cognitive Services Text Analytics Token | [Obtain a token through these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-signup). | Optional |
-| Cognitive Services Text Translataion Token | [Obtain a token through these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-text-how-to-signup). | Optional |
-| Cognitive Services Computer Vision Token | To obtain a key, follow [these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-signup), but instead search for `computer vision ai` when creating the resource. | Optional |
-| Cognitive Services Bing Speech Token | To obtain a key, follow [these instructions](https://docs.microsoft.com/en-us/azure/cognitive-services/text-analytics/how-tos/text-analytics-how-to-signup), but instead search for `bing speech api` when creating the resource. | Optional |
+The following list explains the settings managed on this site in more detail:
+
+- **Site Name:** Unique identifier for your site. Can't be changed.
+
+- **Site Title:** For branding, name of the site displayed on the navigation
+  bar.
+
+- **Bounding Box:** The geographical area that Fortis will monitor. The format of
+  the bounding box is: `maxY,minX,minY,maxX`. You can use the [bounding box tool](http://boundingbox.klokantech.com/)
+  to find the appropriate coordinates for your geographical area.
+
+- **Header Logo Banner:** For branding, link to an image that will be
+  displayed next to the site title on the navigation bar.
+
+- **Supported Languages:** A list of the [ISO 639-1 language codes](https://www.loc.gov/standards/iso639-2/php/code_list.php)
+  for all the locales for which you'd like to monitor events in your site.
+  Entries are separated by commas, e.g. `en,ar` for Ensligh and Arabic.
+
+- **Default Language:** The default language of events to display on the
+  dashboard. You can switch to any of the non-default languages from the action
+  buttons toolbar at the bottom of the dasboard UI.
+
+- **Feature Service Namespace:** This specifies the granularity of locations
+  that your Fortis site will monitor. Currently supported values are:
+  - `wof` to monitor places in the entire world, based on Open Street Maps.
+  - `divipola` for detailed Colombia places.
+  For most deployments, `wof` is the right choice. If you have more specific
+  location needs, please reach out so that we can work together to integrate
+  your custom location sources into the [featureService](http://github.com/CatalystCode/featureService)
+  used by Fortis.
+
+- **MapBox token:** Access token for MapBox, the service used to render the
+  map on the Fortis dashboard. A token can be created for [free](https://www.mapbox.com/signup/).
+
+- **Translation Services Token:** Needed for real-time text translation. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api).
+
+- **Cognitive Services Speech Services Token:** Needed for real-time audio
+  ingestion and analysis. Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/speech/).
+
+- **Cognitive Vision Services Token:** Needed for image ingestion and analysis.
+  Get a token [here](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/).
+
+- **Cognitive Text Services Token:** Neded for sentiment analysis. Get a token
+  [here](https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/).
 
 ## Watchlist
 
@@ -59,15 +89,16 @@ to a particular category.
 Keywords can be single words such as `election` or phrases such as `election results`.
 Fortis will only monitor events that match any of the keywords verbatim.
 
-Note that currently keywords are limited to 60 bytes in length due to
-limitations in the Twitter API. The UI will automatically warn you if you add
-keywords that are too long.
+The following list explains the settings managed on this site in more detail:
 
-| Column Name         | Description   |
-| ------------------- | ------------- |
-| Category            | Categories are used to classify different keywords into logical groups. |
-| name                | Keyword in the site's default language. |
-| name_{language}     | Keyword translated to the site's supported language. |
+- **Category:** Used to group keywords for separate display on the dashboard.
+
+- **name:** The keyword to monitor. Note that currently keywords are limited to
+  60 bytes in length due to limitations in the Twitter API. The UI will warn you
+  if you add keywords that are too long.
+
+- **name_{language}:** Keyword translated into other languages, used to monitor
+  multi-lingual areas.
 
 ### Adding Keywords with Excel then translating them to a supported language
 
@@ -90,6 +121,20 @@ To get keyword translations in a supported languages, check the rows you would
 like translations for and then press the button `translate selection(s)`. This
 will leverage the [Translator Text API](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api/)
 to automatically localize the keywords.
+
+## Users
+
+On this page, you can manage access to your Fortis site. There are currently two
+levels of access: `admin` and `user`. Users can only log into the site and view
+the dashboard. Admins can additionally chage the settings for the site.
+
+The following list explains the settings managed on this site in more detail:
+
+- **Identity:** The canonical email address of the users who have access to the
+  site. Any Azure Active Directory v2 enabled email provider can be used,
+  including Outlook, GMail, and so forth.
+
+- **Role:** The level of access that the user should have, `admin` or `user`.
 
 ## Event Import
 
@@ -137,10 +182,16 @@ control over the events that get filtered out. For example, adding a
 blacklist entry lik `Trump, Obama, election` will only filter out events that
 mention each of these three terms at least once.
 
-| Column Name         | Description   |
-| ------------------- | ------------- |
-| Blacklisted Terms   | Enter a grouping of keywords for a blacklist as a comma delimited string. |
-| Is Location | A boolean specifying whether the blacklist should only be only applied to a particular location. |
+The following list explains the settings managed on this site in more detail:
+
+- **Blacklisted Terms:** A comma delimited list of one or more keywords that if
+  co-occurring in an event's text will lead that event to be excluded from
+  your Fortis site.
+
+- **Is Location:** If set to true, the blacklist will look at the event's
+  locations instead of its text to determine whether the event should be
+  excluded. For example, you can use this to exclude all events from a
+  particular city, town or region.
 
 ## Streams
 
@@ -156,8 +207,13 @@ For example, if you defined a Twitter stream but later decide that you no longer
 wish to monitor Twitter, you can set the stream to disabled on this page and
 Fortis will no longer ingest events from Twitter going forward.
 
-| Column Name         | Description   |
-| ------------------- | ------------- |
-| Status              | Values are either `enabled` or `disabled`. If a stream is disabled, no events will be collected on that stream in the pipeline. |
-| Pipeline Key        | Key associated with a pipeline. |
-| Params              | Parameters used in different trusted sources like `twitter`, `facebook` etc. For example, for a `twitter` stream, parameters you might have would be `consumer key`, `consumer secret`, `access token key`, `access token secret`. These are formatted as key value pairs. |
+The following list explains the settings managed on this site in more detail:
+
+- **Type:** The type of stream that your Fortis site is listening to, such as
+  `Twitter`, `Facebook`, `Bing`, and so forth.
+
+- **Status:** Whether or not the stream is active or suspended. Fortis will only
+  ingest events from active streams.
+
+- **Edit:** Open the editor to modify the stream, for example to update API
+  access credentials.
