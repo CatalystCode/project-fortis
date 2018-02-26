@@ -9,7 +9,7 @@ import org.apache.spark.streaming.dstream.DStream
 class HTMLStreamFactory extends StreamFactoryBase[HTMLPage] {
 
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name.equalsIgnoreCase("HTML")
+    "HTML".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[HTMLPage] = {

@@ -8,7 +8,7 @@ import org.apache.spark.streaming.dstream.DStream
 
 class FacebookCommentStreamFactory extends StreamFactoryBase[FacebookComment] {
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == "FacebookComment"
+    "FacebookComment".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[FacebookComment] = {

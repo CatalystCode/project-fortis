@@ -9,7 +9,7 @@ import org.apache.spark.streaming.dstream.DStream
 class RSSStreamFactory extends StreamFactoryBase[RSSEntry] {
 
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name.equalsIgnoreCase("RSS")
+    "RSS".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[RSSEntry] = {

@@ -20,7 +20,7 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
   private[streamfactories] var twitterMaxTermCount = sys.env.getOrElse("FORTIS_TWITTER_MAX_TERM_COUNT", 400.toString).toInt
 
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == "Twitter"
+    "Twitter".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[Status] = {

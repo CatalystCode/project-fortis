@@ -7,7 +7,7 @@ import org.apache.spark.streaming.dstream.DStream
 
 class RadioStreamFactory extends StreamFactoryBase[RadioTranscription]{
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == "Radio"
+    "Radio".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[RadioTranscription] = {

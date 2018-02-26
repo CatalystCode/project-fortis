@@ -8,7 +8,7 @@ import org.apache.spark.streaming.dstream.DStream
 
 class RedditStreamFactory extends StreamFactoryBase[RedditObject] {
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == "RedditObject"
+    "RedditObject".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[RedditObject] = {

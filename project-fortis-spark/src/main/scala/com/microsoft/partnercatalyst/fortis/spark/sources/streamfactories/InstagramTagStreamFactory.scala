@@ -8,7 +8,7 @@ import org.apache.spark.streaming.dstream.DStream
 
 class InstagramTagStreamFactory extends StreamFactoryBase[InstagramItem]{
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == "InstagramTag"
+    "InstagramTag".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[InstagramItem] = {

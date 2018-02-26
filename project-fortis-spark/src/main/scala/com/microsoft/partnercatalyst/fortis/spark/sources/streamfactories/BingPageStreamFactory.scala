@@ -8,7 +8,7 @@ import org.apache.spark.streaming.dstream.DStream
 
 class BingPageStreamFactory extends StreamFactoryBase[BingPost]{
   override protected def canHandle(connectorConfig: ConnectorConfig): Boolean = {
-    connectorConfig.name == "BingPage"
+    "BingPage".equalsIgnoreCase(connectorConfig.name)
   }
 
   override protected def buildStream(ssc: StreamingContext, connectorConfig: ConnectorConfig): DStream[BingPost] = {
