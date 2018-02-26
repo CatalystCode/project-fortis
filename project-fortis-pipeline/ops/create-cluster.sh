@@ -33,6 +33,7 @@ readonly user_name="${29}"
 if [ -n "${aad_client}" ] || [ "${endpoint_protection}" != "none" ]; then readonly fortis_interface_protocol="https"; else readonly fortis_interface_protocol="http"; fi
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly fortis_interface_container="public"
+readonly fortis_backup_container="backups"
 readonly fortis_interface_host="${fortis_interface_protocol}://${storage_account_name}.blob.core.windows.net/${fortis_interface_container}"
 readonly eh_path="published-messages"
 readonly eh_consumer_group="\$Default"
@@ -187,6 +188,38 @@ EOF
 chown "${user_name}:${user_name}" "${interfaces_upgrade_script}"
 chmod +x "${interfaces_upgrade_script}"
 
+echo "Finished. Now installing fortis backup scripts."
+./install-fortis-backup.sh \
+  "${cassandra_ip}" \
+  "${cassandra_port}" \
+  "${cassandra_username}" \
+  "${cassandra_password}" \
+  "${storage_account_name}" \
+  "${storage_account_key}" \
+  "${fortis_backup_container}" \
+  "${latest_version}"
+
+echo "Finished. Now setting up fortis backup upgrade script."
+readonly backup_upgrade_script="/home/${user_name}/upgrade-fortis-backup.sh"
+cat > "${backup_upgrade_script}" << EOF
+#!/usr/bin/env bash
+readonly release_to_install="\$1"
+
+if [ -z "\$release_to_install" ]; then
+  echo "Usage: \$0 <release_to_install>" >&2; exit 1
+fi
+
+if curl -s "https://api.github.com/repos/CatalystCode/project-fortis/releases/tags/\${release_to_install}" -w '%{http_code}' | grep -q '^404$'; then
+  echo "Release \${release_to_install} does not exist" >&2; exit 2
+fi
+
+export KUBECONFIG="${KUBECONFIG}"
+
+kubectl set image 'deployment/project-fortis-backup' "project-fortis-backup=cwolff/project_fortis_backup:\${release_to_install}"
+EOF
+chown "${user_name}:${user_name}" "${backup_upgrade_script}"
+chmod +x "${backup_upgrade_script}"
+
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \
   "${cassandra_ip}" \
@@ -255,6 +288,7 @@ cat > "${upgrade_script}" << EOF
 
 ${interfaces_upgrade_script} "\$1"
 ${services_upgrade_script} "\$1"
+${backup_upgrade_script} "\$1"
 ${spark_upgrade_script} "\$1"
 EOF
 chown "${user_name}:${user_name}" "${upgrade_script}"

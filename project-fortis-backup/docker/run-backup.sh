@@ -1,3 +1,6 @@
 #!/usr/bin/env sh
 
-/app/backup-cassandra-keyspace.sh settings
+while :; do
+  sleep 60m
+  /app/backup-cassandra-keyspace.sh settings
+done
