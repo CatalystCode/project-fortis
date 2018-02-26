@@ -1,12 +1,14 @@
 # Configuring your Fortis site
 
-Fortis comes with an admin page with which you can edit site configurations
+Fortis comes with a settings page with which you can edit site configurations
 and also provide details on how events should be monitored and processed.
 
-Through the admin site, you will be able to configure amonst others:
+Through the settings page, you will be able to configure amonst others:
 - General settings about your deployment in the "Site Settings" tab
 - Blacklist terms and whitelist terms in the "Watchlist" tab.
 - Data sources to watch like Twitter, Facebook, Bing, etc in the "Streams" tab.
+
+A full description of all the settings follows in the sections below.
 
 ## Required settings
 
@@ -22,7 +24,12 @@ following to start monitoring events:
 
 ## Site Settings
 
-Manage service tokens and set up how the site should be displayed.
+On this page, you can manage general configuration items for the site such as
+the geographical area that your site monitors and the languages of events that
+should be ingested.
+
+Additionally, you can also use this page to update the credentials for third
+party APIs leveraged by Fortis, such as MapBox and Cognitive Services.
 
 | Value               | Description          |
 | ------------------- | ------------- |
@@ -41,7 +48,20 @@ Manage service tokens and set up how the site should be displayed.
 
 ## Watchlist
 
-Manage keywords you would like to monitor. Keywords belong to different categories, which you will define in `watchlist` settings.
+On this page, you can manage the keywords you would like your Fortis site to
+monitor. Fortis will only ingest and display events that match at least one
+of the keywords you configure on this page.
+
+Keywords can be grouped into different categories. You can either display
+events matching all keywords on the dashboard or only the events pertaining
+to a particular category.
+
+Keywords can be single words such as `election` or phrases such as `election results`.
+Fortis will only monitor events that match any of the keywords verbatim.
+
+Note that currently keywords are limited to 60 bytes in length due to
+limitations in the Twitter API. The UI will automatically warn you if you add
+keywords that are too long.
 
 | Column Name         | Description   |
 | ------------------- | ------------- |
@@ -49,9 +69,11 @@ Manage keywords you would like to monitor. Keywords belong to different categori
 | name                | Keyword in the site's default language. |
 | name_{language}     | Keyword translated to the site's supported language. |
 
-### Adding Keywords with Excel then Translating them to a Supported Language
+### Adding Keywords with Excel then translating them to a supported language
 
-To add keywords quickly, you can copy keyword categories and keywords from `excel`, then paste them into the corresponding columns of the watchlist table. To get keyword translations in a supported languages, check the rows you would like translations for and then press the button `translate selection(s)`.
+To add keywords quickly, you can copy keyword categories and keywords from
+`excel`, then paste them into the corresponding columns of the watchlist
+table.
 
 For example, in Excel you may have:
 
@@ -60,6 +82,14 @@ For example, in Excel you may have:
 | armed conflict      | ammo          |
 | armed conflict      | gun           |
 | health              | medicine      |
+
+Copying the cell values and pasting them on the "Watchlist" settings tab will
+automatically populate the page for you.
+
+To get keyword translations in a supported languages, check the rows you would
+like translations for and then press the button `translate selection(s)`. This
+will leverage the [Translator Text API](https://azure.microsoft.com/en-us/services/cognitive-services/translator-text-api/)
+to automatically localize the keywords.
 
 ## Event Import
 
@@ -97,16 +127,34 @@ A table of all supported `trusted sources` with their associated `pipeline keys`
 
 ## Blacklisted Terms
 
-Manage keywords to blacklist in the pipeline. For example, if you have `Trump, Obama, election` in your blacklist, then events containing one or more of these keywords will be filtered in the pipeline and will not be displayed on the ui.
+On this page, you can manage keywords to blacklist in the pipeline.
+
+You can blacklist individual terms such as `election` to filter from your
+pipeline all the events that mention this term at least once.
+
+You can also blacklist co-occurrences of terms to get more fine-grained
+control over the events that get filtered out. For example, adding a
+blacklist entry lik `Trump, Obama, election` will only filter out events that
+mention each of these three terms at least once.
 
 | Column Name         | Description   |
 | ------------------- | ------------- |
-| Blacklisted Terms   | Enter a grouping of keywords for a blacklist as a comma delimited string: Trump, Obama, election. |
+| Blacklisted Terms   | Enter a grouping of keywords for a blacklist as a comma delimited string. |
 | Is Location | A boolean specifying whether the blacklist should only be only applied to a particular location. |
 
 ## Streams
 
-Manage streams by providing parameters like api keys, secrets, etc. needed to connect to trusted sources. For example, suppose you defined a few facebook pages and and twitter users as trusted sources. If you decided not to monitor twitter anymore, you could disable the twitter stream. Also, suppose you got a new api key for facebook, you can update the key here.
+On this page, you can manage the data sources to which your Fortis site listens.
+
+For each data source, you'll have to provide parameters like API keys, secrets,
+configuration parameters and so forth. The stream creation wizard will guide you
+to correctly configure the data sources. If you need to update these parameters
+in the future, you can edit them on this page.
+
+You can also use this page to manage the life-cycle of the data sources.
+For example, if you defined a Twitter stream but later decide that you no longer
+wish to monitor Twitter, you can set the stream to disabled on this page and
+Fortis will no longer ingest events from Twitter going forward.
 
 | Column Name         | Description   |
 | ------------------- | ------------- |
