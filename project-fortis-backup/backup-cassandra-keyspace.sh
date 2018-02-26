@@ -54,17 +54,21 @@ prepare_resources() {
 
 export_tables() {
   list_tables | while read -r table_name; do
+    log "Exporting table ${table_name}..."
     export_table "${table_name}"
+    log "...done, table ${table_name} is now exported"
   done
 }
 
 upload_backups() {
+  log "Uploading backups..."
   az storage blob upload-batch \
     --account-name="${USER_FILES_BLOB_ACCOUNT_NAME}" \
     --account-key="${USER_FILES_BLOB_ACCOUNT_KEY}" \
     --destination="${BACKUP_CONTAINER_NAME}" \
     --source="${export_root}" \
     --no-progress
+  log "...done, backups are now uploaded"
 }
 
 check_preconditions
