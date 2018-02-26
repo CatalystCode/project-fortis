@@ -22,79 +22,30 @@ case class EventBatchEntry(
   pipelinekey: String
 ) extends Serializable
 
-case class EventPlaces(
-  pipelinekey: String,
-  insertiontime: Long,
-  eventid: String,
-  centroidlat: Double,
-  centroidlon: Double,
-  tileid: String,
-  tilez: Int,
-  conjunctiontopic1: String,
-  conjunctiontopic2: String,
-  conjunctiontopic3: String,
+case class TileRow(
   externalsourceid: String,
-  eventtime: Long,
-  placeid: String
-) extends Serializable
-
-case class PopularPlace(
-  avgsentimentnumerator: Long,
-  conjunctiontopic1: String,
-  conjunctiontopic2: String,
-  conjunctiontopic3: String,
-  externalsourceid: String,
-  mentioncount: Long,
-  tileid: String,
-  tilez: Int,
   perioddate: Long,
   periodtype: String,
   pipelinekey: String,
-  placeid: String = ""
+  mentioncount: Long,
+  avgsentimentnumerator: Long,
+  tilez: Int,
+  tileid: String,
+  heatmaptileid: String,
+  centroidlat: Double,
+  centroidlon: Double,
+  conjunctiontopic1: String,
+  conjunctiontopic2: String,
+  conjunctiontopic3: String,
+  eventtime: Long,
+  placeid: String,
+  eventid: String,
+  insertiontime: Long
 ) extends Serializable
 
-case class HeatmapTile(
-  override val externalsourceid: String,
-  override val perioddate: Long,
-  override val periodtype: String,
-  override val pipelinekey: String,
-  override val mentioncount: Long,
-  override val avgsentimentnumerator: Long,
-  override val tilez: Int,
-  override val tileid: String,
-  heatmaptileid: String,
-  conjunctiontopic1: String,
-  conjunctiontopic2: String,
-  conjunctiontopic3: String
-) extends AggregationRecordTile with Serializable
-
-case class ComputedTile(
-  override val externalsourceid: String,
-  override val perioddate: Long,
-  override val periodtype: String,
-  override val pipelinekey: String,
-  override val mentioncount: Long,
-  override val avgsentimentnumerator: Long,
-  override val tilez: Int,
-  override val tileid: String,
-  conjunctiontopic1: String,
-  conjunctiontopic2: String,
-  conjunctiontopic3: String
-) extends AggregationRecordTile with Serializable
-
-case class PopularTopicAggregate(
-  override val perioddate: Long,
-  override val externalsourceid: String,
-  override val periodtype: String,
-  override val pipelinekey: String,
-  override val mentioncount: Long,
-  override val avgsentimentnumerator: Long,
-  override val tileid: String,
-  override val tilez: Int,
-  topic: String
-) extends AggregationRecordTile with Serializable
 
 case class ConjunctiveTopic(
+  eventid: String,
   conjunctivetopic: String,
   externalsourceid: String,
   mentioncount: Long,

@@ -4,9 +4,9 @@ CREATE KEYSPACE settings WITH replication = {
     'replication_factor': 3
 };
 
-// *****************************************************************************
-// * Down migration
-// *****************************************************************************
+-- *****************************************************************************
+-- * Down migration
+-- *****************************************************************************
 
 DROP TABLE IF EXISTS settings.users;
 DROP TABLE IF EXISTS settings.watchlist;
@@ -15,9 +15,9 @@ DROP TABLE IF EXISTS settings.sitesettings;
 DROP TABLE IF EXISTS settings.streams;
 DROP TABLE IF EXISTS settings.trustedsources;
 
-// *****************************************************************************
-// * Configuration tables
-// *****************************************************************************
+-- *****************************************************************************
+-- * Configuration tables
+-- *****************************************************************************
 
 CREATE TABLE settings.users(
     identifier text,

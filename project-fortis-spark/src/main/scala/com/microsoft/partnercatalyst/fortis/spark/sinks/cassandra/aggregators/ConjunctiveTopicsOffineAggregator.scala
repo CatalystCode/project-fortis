@@ -6,33 +6,26 @@ import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraConjunctiveTopics
 import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.dto.{ConjunctiveTopic, Event}
 import org.apache.spark.rdd.RDD
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.Constants._
+import com.microsoft.partnercatalyst.fortis.spark.sinks.cassandra.CassandraExtensions._
 
-class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManager) extends OfflineAggregator[ConjunctiveTopic] {
-
-  override def aggregate(events: RDD[Event]): RDD[ConjunctiveTopic] = {
-    val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
-    val conjunctiveTopics = events.flatMap(CassandraConjunctiveTopics(_, siteSettings.defaultzoom))
-
-    conjunctiveTopics.keyBy(r=>{(
-      r.pipelinekey, r.externalsourceid,
-      r.periodtype, r.perioddate,
-      r.topic, r.conjunctivetopic,
-      r.tileid, r.tilez
-    )}).reduceByKey((a,b)=>{
-      a.copy(mentioncount = a.mentioncount+b.mentioncount)
-    }).values
-  }
-
-  override def aggregateAndSave(events: RDD[Event], keyspace: String): Unit = {
+class ConjunctiveTopicsOffineAggregator(configurationManager: ConfigurationManager) extends (RDD[Event] => Unit) {
+  override def apply(events: RDD[Event]): Unit = {
     val topics = aggregate(events).cache()
     topics.count() match {
       case 0 => return
       case _ =>
         implicit val rowWriter: SqlRowWriter.Factory.type = SqlRowWriter.Factory
-        topics.saveToCassandra(keyspace, "conjunctivetopics")
+        topics.saveToCassandra(KeyspaceName, Table.ConjunctiveTopics)
     }
 
     topics.unpersist(blocking = true)
   }
 
+  private[aggregators] def aggregate(events: RDD[Event]): RDD[ConjunctiveTopic] = {
+    val siteSettings = configurationManager.fetchSiteSettings(events.sparkContext)
+    val conjunctiveTopicsByEvent = CassandraConjunctiveTopics(events, siteSettings.defaultzoom).keyBy(_.eventid)
+
+    conjunctiveTopicsByEvent.deDupValuesByCassandraTable(KeyspaceName, Table.ConjunctiveTopics).values
+  }
 }
