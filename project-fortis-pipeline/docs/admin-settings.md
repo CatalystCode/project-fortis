@@ -8,6 +8,8 @@ Through the admin site, you will be able to configure amonst others:
 - Blacklist terms and whitelist terms in the "Watchlist" tab.
 - Data sources to watch like Twitter, Facebook, Bing, etc in the "Streams" tab.
 
+## Required settings
+
 After setting up a new Fortis site, at the very least you should configure the
 following to start monitoring events:
 
