@@ -32,6 +32,7 @@ ENV USER_FILES_BLOB_ACCOUNT_NAME=""
 ENV USER_FILES_BLOB_ACCOUNT_KEY=""
 ENV BACKUP_CONTAINER_NAME="backups"
 ENV BACKUP_DELETE_LOOKBACK="2 weeks ago"
+ENV BACKUP_INTERVAL="2h"
 
 # a one-node local cassandra is set up via docker-compose, if you wish to use a
 # larger cluster (e.g. hosted in Azure), just override this variable with the

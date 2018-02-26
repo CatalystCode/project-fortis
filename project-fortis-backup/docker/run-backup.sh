@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
 while :; do
-  sleep 60m
+  sleep "$BACKUP_INTERVAL"
   /app/backup-cassandra-keyspace.sh settings
 done

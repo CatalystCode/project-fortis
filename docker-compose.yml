@@ -75,6 +75,8 @@ services:
     environment:
       - FORTIS_CASSANDRA_HOST=cassandra
       - FORTIS_CASSANDRA_PORT=9042
+      - BACKUP_INTERVAL=10m
+      - BACKUP_DELETE_LOOKBACK=30 minutes ago
     env_file:
       - .env-secrets
 
