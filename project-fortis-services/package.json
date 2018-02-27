@@ -72,9 +72,7 @@
   "scripts": {
     "createsite": "node src/scripts/createsite.js",
     "addusers": "node src/scripts/addusers.js",
-    "ingestsetting": "node src/scripts/ingestsetting.js",
-    "depcheck": "depcheck",
-    "lint": "eslint --max-warnings=0 src *.js"
+    "ingestsetting": "node src/scripts/ingestsetting.js"
   },
   "generator-swaggerize": {
     "version": "3.1.0"

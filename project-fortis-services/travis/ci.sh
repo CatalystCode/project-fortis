@@ -10,11 +10,11 @@ if [ ! -d node_modules ]; then
   npm install
 fi
 
-if ! npm run lint; then
+if ! ./node_modules/.bin/eslint --max-warnings=0 src *.js; then
   err=1
 fi
 
-if npm run depcheck | grep -q '^Unused dependencies$'; then
+if ./node_modules/.bin/depcheck | grep -q '^Unused dependencies$'; then
   err=2
 fi
 

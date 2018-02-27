@@ -91,8 +91,6 @@
   "scripts": {
     "devserver": "react-scripts start",
     "build": "react-scripts build",
-    "eject": "react-scripts eject",
-    "depcheck": "depcheck",
-    "lint": "eslint src --max-warnings=0"
+    "eject": "react-scripts eject"
   }
 }
