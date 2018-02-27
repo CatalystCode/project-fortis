@@ -19,7 +19,7 @@ export const DashboardPage = createReactClass({
             conjunctivetopics, heatmapTileIds, timeSeriesGraphData, popularLocations, popularTerms,
             timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv, category,
             allCategories,
-            topSources, trustedSources, fullTermList, selectedplace } = this.getStateFromFlux();
+            topSources, trustedSources, fullTermList, selectedplace, dashboardIsLoadedFromShareLink } = this.getStateFromFlux();
 
     return { dataSource, maintopic, termFilters, bbox, enabledStreams,
              externalsourceid, datetimeSelection, fromDate, toDate, language,
@@ -27,7 +27,7 @@ export const DashboardPage = createReactClass({
              conjunctivetopics, timeSeriesGraphData, popularLocations, popularTerms,
              timeSeriesCsv, popularLocationsCsv, popularTermsCsv, topSourcesCsv,
              allCategories,
-             topSources, trustedSources, fullTermList, selectedplace };
+             topSources, trustedSources, fullTermList, selectedplace, dashboardIsLoadedFromShareLink };
   },
 
   render() {

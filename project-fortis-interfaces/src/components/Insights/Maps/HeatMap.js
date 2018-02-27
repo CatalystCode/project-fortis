@@ -16,15 +16,16 @@ export default class HeatMap extends React.Component {
 
     const bounds = this.getMapBounds(bbox);
     this.onViewportChanged = this.onViewportChanged.bind(this);
-    this.updateBounds = this.asyncInvokeDashboardRefresh.bind(this);
+    this.asyncInvokeDashboardRefresh = this.asyncInvokeDashboardRefresh.bind(this);
     this.changeMapBoundsWithTile = this.changeMapBoundsWithTile.bind(this);
-    const maxbounds = targetBbox.length && targetBbox.length === 4 ? [[targetBbox[0], targetBbox[1]], [targetBbox[2], targetBbox[3]]] : [];
+    const maxbounds = this.getMapBounds(targetBbox);
 
     this.state = {
       bounds: bounds,
       placeid: "",
       defaultZoom: parseFloat(defaultZoom || 6),
-      maxbounds: maxbounds
+      maxbounds: maxbounds,
+      sharedLinkMapRepositions: false
     };
   }
 
@@ -33,7 +34,6 @@ export default class HeatMap extends React.Component {
       this.cancelQueuedProcess();
       this.refreshTimerId = setTimeout(this.asyncInvokeDashboardRefresh(viewport), constants.MAP.DEBOUNCE);
     }
-
     this.ready = true;
   }
 
@@ -77,11 +77,15 @@ export default class HeatMap extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { placeid, defaultZoom } = this.state;
     const { targetBbox } = this.props;
-
-    if (hasChanged(this.props, nextProps) && nextProps.selectedplace.placeid && placeid !== nextProps.selectedplace.placeid) {
+    const { dashboardIsLoadedFromShareLink } = nextProps;
+    const didPropsChange = hasChanged(this.props, nextProps);
+    
+    if (didPropsChange && dashboardIsLoadedFromShareLink && !this.state.sharedLinkMapRepositions) {
+      this.refs.map.leafletElement.fitBounds(this.getMapBounds(nextProps.bbox));
+      this.setState({sharedLinkMapRepositions: true});
+    } else if (didPropsChange && nextProps.selectedplace.placeid && placeid !== nextProps.selectedplace.placeid) {
       this.moveMapToNewLocation(nextProps, defaultZoom);
-    }
-    else if (hasChanged(this.props, nextProps) && nextProps.bbox && isEqual(nextProps.bbox, targetBbox)) {
+    } else if (didPropsChange && nextProps.bbox && isEqual(nextProps.bbox, targetBbox)) {
       this.moveMapToBoundingBox(targetBbox);
     }
   }
@@ -93,7 +97,7 @@ export default class HeatMap extends React.Component {
   }
 
   getMapBounds(bbox) {
-    return bbox.length && bbox.length === 4 ? [[bbox[1], bbox[0]], [bbox[3], bbox[2]]] : [];
+    return bbox.length && bbox.length === 4 ? [[bbox[0], bbox[1]], [bbox[2], bbox[3]]] : [];
   }
 
   moveMapToBoundingBox(bbox) {
@@ -106,20 +110,12 @@ export default class HeatMap extends React.Component {
     const {latitudeNorth, latitudeSouth, longitudeWest, longitudeEast } = tileFromTileId(tileid)
     const bounds = [[latitudeNorth, longitudeWest], [latitudeSouth, longitudeEast]];
 
-    this.refs.map.leafletElement.fitBounds(bounds);
-  }
-
-  formatLeafletBounds(bbox) {
-    if (bbox.length === 4) {
-      return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]];
-    }
-
-    console.error('Bad bbox format');
+    this.refs.map.leafletElement.fitBounds(this.getMapBounds(bounds));
   }
 
   renderRectangle(bbox) {
     const bboxRectangleColor = "#0ff";
-    const bounds = [[bbox[0], bbox[1]], [bbox[2], bbox[3]]];
+    const bounds = this.getMapBounds(bbox);
 
     return <Rectangle
       bounds={bounds}

@@ -163,7 +163,7 @@ const _methods = {
     },
 
     reloadVisualizationState(fromDate, toDate, datetimeSelection, periodType, dataSource, maintopic, bbox,
-                             zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place, onFinished) {
+                             zoomLevel, conjunctivetopics, externalsourceid, includeCsv, place, onFinished, dashboardIsLoadedFromShareLink) {
         const self = this;
         const { category, popularTerms, enabledStreams } = this.flux.stores.DataStore.dataStore;
         onFinished = onFinished != null ? onFinished : doNothing;
@@ -180,7 +180,7 @@ const _methods = {
                 let mutatedFilters = { fromDate, toDate, name, placeid, placebbox, placecentroid, datetimeSelection, periodType, dataSource, maintopic, externalsourceid, zoomLevel, bbox };
                 mutatedFilters.selectedconjunctiveterms = conjunctivetopics;
 
-                self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData));
+                self.dispatch(constants.DASHBOARD.RELOAD_CHARTS, Object.assign({}, mutatedFilters, chartData, {dashboardIsLoadedFromShareLink}));
                 onFinished();
             } else {
                 handleError(err, null, 'processing tile visualization re-sync request');

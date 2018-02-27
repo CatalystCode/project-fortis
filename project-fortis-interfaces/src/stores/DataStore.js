@@ -62,7 +62,8 @@ export const DataStore = Fluxxor.createStore({
             bbox: [],
             zoomLevel: constants.HEATMAP_DEFAULT_ZOOM,
             maintopic: false,
-            language: constants.LANGUAGE_CODE_ENG
+            language: constants.LANGUAGE_CODE_ENG,
+            dashboardIsLoadedFromShareLink: false
         }
 
         this.bindActions(
@@ -189,6 +190,7 @@ export const DataStore = Fluxxor.createStore({
     handleReloadChartData(changedData) {
         this.syncChartDataToStore(changedData);
         this.syncFilterSelections(changedData);
+        this.dataStore.dashboardIsLoadedFromShareLink = changedData.dashboardIsLoadedFromShareLink;
         this.emit("change");
     },
 
