@@ -73,11 +73,10 @@ CREATE TABLE settings.streams (
 
 CREATE TABLE settings.trustedsources (
    externalsourceid text,
-   sourcetype text,
    pipelinekey text,
    rank int,
    displayname text,
    reportingcategory text,
    insertiontime timestamp,
-   PRIMARY KEY (pipelinekey, externalsourceid, sourcetype, rank)
+   PRIMARY KEY (pipelinekey, externalsourceid, rank)
 );

@@ -28,7 +28,7 @@ class TrustedSources extends React.Component {
   }
 
   getRowKey(row) {
-    return `${row.pipelinekey},${row.externalsourceid},${row.sourcetype},${row.rank}`;
+    return `${row.pipelinekey},${row.externalsourceid},${row.rank}`;
   }
 
   handleRemove(rows) {
@@ -39,7 +39,7 @@ class TrustedSources extends React.Component {
   }
 
   filterSourcesWithUnsetFields(sources) {
-    return sources.filter(source => source.pipelinekey.length > 0 || source.externalsourceid.length > 0 || source.sourcetype.length > 0 || source.rank.length > 0)
+    return sources.filter(source => source.pipelinekey.length > 0 || source.externalsourceid.length > 0 || source.rank.length > 0)
   }
 
   trustedSourcesToRemoveExist(sources) {
@@ -53,7 +53,6 @@ class TrustedSources extends React.Component {
       {editable: true, filterable: true, sortable: true, key: "externalsourceid", name: "External Source Id"},
       {editable: true, filterable: true, sortable: true, key: "reportingcategory", name: "Category"},
       {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
-      {editable: true, filterable: true, sortable: true, key: "sourcetype", name: "Source Type"},
       {editable: true, filterable: true, sortable: true, key: "rank", name: "Rank"},
     ];
 

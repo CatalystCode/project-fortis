@@ -205,7 +205,6 @@ function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
         query: `INSERT INTO settings.trustedsources (
           pipelinekey,
           externalsourceid,
-          sourcetype,
           rank,
           displayname,
           insertiontime,
@@ -214,7 +213,6 @@ function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
         params: [
           source.pipelinekey,
           source.externalsourceid,
-          source.sourcetype,
           source.rank,
           source.displayname,
           source.reportingcategory
@@ -243,8 +241,8 @@ function removeTrustedSources(args, res) { // eslint-disable-line no-unused-vars
     }
 
     const mutations = args.input.sources.map(source => ({
-      query: 'DELETE FROM settings.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND sourcetype = ? AND rank = ?',
-      params: [source.pipelinekey, source.externalsourceid, source.sourcetype, source.rank]
+      query: 'DELETE FROM settings.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND rank = ?',
+      params: [source.pipelinekey, source.externalsourceid, source.rank]
     }));
 
     cassandraConnector.executeBatchMutations(mutations)

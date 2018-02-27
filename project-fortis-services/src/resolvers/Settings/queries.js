@@ -112,9 +112,8 @@ function trustedSources(args, res) { // eslint-disable-line no-unused-vars
 
 function cassandraRowToSource(row) {
   return {
-    rowKey: row.pipelinekey + ',' + row.externalsourceid + ',' + row.sourcetype + ',' + row.rank,
+    rowKey: row.pipelinekey + ',' + row.externalsourceid + ',' + row.rank,
     externalsourceid: row.externalsourceid,
-    sourcetype: row.sourcetype,
     displayname: row.displayname || row.externalsourceid,
     pipelinekey: row.pipelinekey,
     rank: row.rank,

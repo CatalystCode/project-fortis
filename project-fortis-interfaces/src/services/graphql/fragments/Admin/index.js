@@ -74,7 +74,6 @@ export const trustedsources = `fragment TrustedSourcesView on SourceCollection {
     rowKey
     displayname
     externalsourceid
-    sourcetype
     pipelinekey
     rank
     reportingcategory

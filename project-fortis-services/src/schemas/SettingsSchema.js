@@ -125,7 +125,6 @@ module.exports = graphql.buildSchema(`
   input SourceInput {
     rowKey: String,
     externalsourceid: String!,
-    sourcetype: String!,
     displayname: String,
     pipelinekey: String!,
     rank: String!,
@@ -135,7 +134,6 @@ module.exports = graphql.buildSchema(`
   type Source {
     rowKey: String,
     externalsourceid: String!,
-    sourcetype: String,
     displayname: String,
     pipelinekey: String,
     rank: String,
