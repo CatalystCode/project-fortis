@@ -153,28 +153,26 @@ Manage trusted sources like `twitter`, `facebook`, etc.
 | Column Name         | Description   |
 | ------------------- | ------------- |
 | Pipeline Key        | Refer to `All Supported Trusted Sources` table below. |
+| Name                | Friendly name you assign for your trusted source to act as an alias for the external source id. In the `dashboard` this friendly name will be what is displayed, not the external source id. (external source id will only be displayed if `Name` is not defined) |
 | External Source Id  | Refer to `All Supported Trusted Sources` table below. |
 | Category            | The category specifies what set of `watchlist` keywords are monitored in the pipeline for a particular source type. Categories are originally defined in the `watchlist` tab. For example, if the category is `armed conflict` and the source type is `Facebook` for a row in the trusted sources table, then the pipeline will process any facebook events containing keywords in the `armed conflict` category. |
-| Name                | Friendly name you assign for your trusted source to act as an alias for the external source id. In the `dashboard` this friendly name will be what is displayed, not the external source id. (external source id will only be displayed if `Name` is not defined) |
-| Source Type         | Refer to `All Supported Trusted Sources` table below. | 
-| Rank                | An `Integer` value. The `rank` does not affect the way events are processed in the pipeline and does not affect the ui (though the rank feature may be added in the future), but it is still a required field. |  
 
 ### List of All Supported Trusted Sources
 
-A table of all supported `trusted sources` with their associated `pipeline keys` and descriptions of what to put as their `external source ids`. If you would like to add a new trusted source to Fortis you can look in `project-fortis-spark's` `/streamfactories` and `/analyzers` and view their implementations.
+A table of all supported `trusted sources` with their associated `pipeline keys` and descriptions of what to put as their `external source ids`. If you would like to add a new trusted source type to Fortis you can look in `project-fortis-spark's` `/streamfactories` and `/analyzers` and view their implementations.
 
-| Source Type            | Pipeline Key  | External Source Id |
-| ---------------------- | ------------- | ------------------ |
-| BingPage               | BingPage      | A bing page url `host` like `nytimes.com`. |
-| CustomEvent            | CustomEvent   | You as a user would define its structure. |
-| Facebook               | Facebook      | [Facebook Page Id](https://www.facebook.com/help/community/question/?id=378910098941520)   |
-| HTML                   | HTML          | A html page url `host` like `nytimes.com`.  |
-| Instagram              | Instagram     | An instagram `username`. |
-| Radio                  | Radio         | A radio station's `url`. |
-| Reddit                 | Reddit        | The author's `username` of the reddit post. |
-| RSS                    | RSS           | A RSS feed `url`. | 
-| TadaWeb                | TadaWeb       | Tadaweb name. |
-| Twitter                | Twitter       | [Twitter Id](http://mytwitterid.com/) |
+| Pipeline Key           | External Source Id |
+| ---------------------- | ------------------ |
+| Bing                   | A bing page url `host` like http://nytimes.com. |
+| CustomEvent            |  You as a user would define its structure. |
+| Facebook               |  [Facebook Page Id](https://www.facebook.com/help/community/question/?id=378910098941520)   |
+| HTML                   | A html page url `host` like http://nytimes.com.  |
+| Instagram              | Instagram `username`. |
+| Radio                  | Radio station `url`. |
+| Reddit                 | The author's `username` of the reddit post. |
+| RSS                    | A RSS feed `url` like https://reliefweb.int/headlines/rss.xml. |
+| TadaWeb                | Tadaweb source. |
+| Twitter                | Twitter `username` |
 
 ## Blacklisted Terms
 
