@@ -31,9 +31,6 @@ services:
       - cassandra:cassandra
       - featureservice:featureservice
     environment:
-      - FORTIS_FEATURE_SERVICE_HOST=http://featureservice
-      - FORTIS_CASSANDRA_HOST=cassandra
-      - FORTIS_CASSANDRA_PORT=9042
       - FORTIS_CASSANDRA_SEED_DATA_URL=${CASSANDRA_SEED_DATA_URL}
       - FORTIS_CASSANDRA_SITE_NAME=Fortis Dev
       - FORTIS_CASSANDRA_SITE_TYPE=none
@@ -58,10 +55,6 @@ services:
       - featureservice:featureservice
     depends_on:
       - project_fortis_services
-    environment:
-      - FORTIS_FEATURE_SERVICE_HOST=http://featureservice
-      - FORTIS_CASSANDRA_HOST=cassandra
-      - FORTIS_CASSANDRA_PORT=9042
     env_file:
       - .env-secrets
 
@@ -73,8 +66,6 @@ services:
     links:
       - cassandra:cassandra
     environment:
-      - FORTIS_CASSANDRA_HOST=cassandra
-      - FORTIS_CASSANDRA_PORT=9042
       - BACKUP_INTERVAL=10m
       - BACKUP_DELETE_LOOKBACK=30 minutes ago
     env_file:
