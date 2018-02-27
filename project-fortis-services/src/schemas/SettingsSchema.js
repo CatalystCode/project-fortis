@@ -127,8 +127,6 @@ module.exports = graphql.buildSchema(`
     externalsourceid: String!,
     displayname: String,
     pipelinekey: String!,
-    rank: String!,
-    reportingcategory: String
   }
 
   type Source {
@@ -136,8 +134,6 @@ module.exports = graphql.buildSchema(`
     externalsourceid: String!,
     displayname: String,
     pipelinekey: String,
-    rank: String,
-    reportingcategory: String
   }
 
   type Site {

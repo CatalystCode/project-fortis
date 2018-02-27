@@ -205,17 +205,13 @@ function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
         query: `INSERT INTO settings.trustedsources (
           pipelinekey,
           externalsourceid,
-          rank,
           displayname,
-          insertiontime,
-          reportingcategory
+          insertiontime
         ) VALUES (?,?,?,?,?,dateof(now()),?)`,
         params: [
           source.pipelinekey,
           source.externalsourceid,
-          source.rank,
           source.displayname,
-          source.reportingcategory
         ]
       });
     });
@@ -241,8 +237,8 @@ function removeTrustedSources(args, res) { // eslint-disable-line no-unused-vars
     }
 
     const mutations = args.input.sources.map(source => ({
-      query: 'DELETE FROM settings.trustedsources WHERE pipelinekey = ? AND externalsourceid = ? AND rank = ?',
-      params: [source.pipelinekey, source.externalsourceid, source.rank]
+      query: 'DELETE FROM settings.trustedsources WHERE pipelinekey = ? AND externalsourceid = ?',
+      params: [source.pipelinekey, source.externalsourceid]
     }));
 
     cassandraConnector.executeBatchMutations(mutations)

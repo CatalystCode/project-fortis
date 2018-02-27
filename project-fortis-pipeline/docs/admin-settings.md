@@ -155,7 +155,6 @@ Manage trusted sources like `twitter`, `facebook`, etc.
 | Pipeline Key        | Refer to `All Supported Trusted Sources` table below. |
 | Name                | Friendly name you assign for your trusted source to act as an alias for the external source id. In the `dashboard` this friendly name will be what is displayed, not the external source id. (external source id will only be displayed if `Name` is not defined) |
 | External Source Id  | Refer to `All Supported Trusted Sources` table below. |
-| Category            | The category specifies what set of `watchlist` keywords are monitored in the pipeline for a particular source type. Categories are originally defined in the `watchlist` tab. For example, if the category is `armed conflict` and the source type is `Facebook` for a row in the trusted sources table, then the pipeline will process any facebook events containing keywords in the `armed conflict` category. |
 
 ### List of All Supported Trusted Sources
 
