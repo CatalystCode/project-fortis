@@ -1,12 +1,14 @@
 package com.microsoft.partnercatalyst.fortis.spark.sources.streamfactories
 
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
-import com.microsoft.partnercatalyst.fortis.spark.dto.{Geofence, SiteSettings}
+import com.microsoft.partnercatalyst.fortis.spark.dto.SiteSettings
 import org.apache.spark.{SparkConf, SparkContext}
-import org.mockito.Mockito
-import org.mockito.ArgumentMatchers
+import org.mockito.{ArgumentMatchers, Mockito}
 import org.scalatest.{BeforeAndAfter, FlatSpec}
 import twitter4j.FilterQuery
+import twitter4j.conf.ConfigurationBuilder
+
+import scala.util.Properties.envOrElse
 
 class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
 
@@ -148,9 +150,26 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
   }
 
   it should "parse user ids" in {
-    assert(TwitterStreamFactory.parseUserIds(Map("foo" -> "bar")).isEmpty)
-    assert(TwitterStreamFactory.parseUserIds(Map("userIds" -> "123")).get sameElements Array(123L))
-    assert(TwitterStreamFactory.parseUserIds(Map("userIds" -> "1|2|3")).get sameElements Array(1L, 2L, 3L))
+    val twitterConsumerKey = envOrElse("TWITTER_CONSUMER_KEY", "")
+    val twitterConsumerSecret = envOrElse("TWITTER_CONSUMER_SECRET", "")
+    val twitterAccessToken = envOrElse("TWITTER_ACCESS_TOKEN", "")
+    val twitterAccessTokenSecret = envOrElse("TWITTER_ACCESS_TOKEN_SECRET", "")
+
+    if (twitterConsumerKey.isEmpty || twitterConsumerSecret.isEmpty || twitterAccessToken.isEmpty || twitterAccessTokenSecret.isEmpty) {
+      cancel("Twitter credentials not defined, skipping test")
+    }
+
+    val twitterConfig = new ConfigurationBuilder()
+      .setOAuthConsumerKey(twitterConsumerKey)
+      .setOAuthConsumerSecret(twitterConsumerSecret)
+      .setOAuthAccessToken(twitterAccessToken)
+      .setOAuthAccessTokenSecret(twitterAccessTokenSecret)
+      .build
+
+    assert(TwitterStreamFactory.parseUserIds(Map("foo" -> "bar"), twitterConfig).isEmpty)
+    assert(TwitterStreamFactory.parseUserIds(Map("userIds" -> "clemenswolff"), twitterConfig).get sameElements Array(2222239916L))
+    assert(TwitterStreamFactory.parseUserIds(Map("userIds" -> "codewithsteph|erikschlegel1"), twitterConfig).get sameElements Array(889224358119567365L, 142881621L))
+    assert(TwitterStreamFactory.parseUserIds(Map("userIds" -> "2222239916|codewithsteph|142881621"), twitterConfig).get sameElements Array(2222239916L, 142881621L, 889224358119567365L))
   }
 
   it should "parse locations" in {

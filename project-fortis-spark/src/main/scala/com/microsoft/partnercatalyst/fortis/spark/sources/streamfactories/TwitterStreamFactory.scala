@@ -10,10 +10,12 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.twitter.TwitterUtils
 import twitter4j.auth.OAuthAuthorization
-import twitter4j.conf.ConfigurationBuilder
-import twitter4j.{FilterQuery, Status}
+import twitter4j.conf.{Configuration, ConfigurationBuilder}
+import twitter4j.{FilterQuery, Status, TwitterFactory}
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.util.Try
 
 class TwitterStreamFactory(configurationManager: ConfigurationManager) extends StreamFactoryBase[Status] {
 
@@ -28,14 +30,18 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
 
     val params = connectorConfig.parameters
     val consumerKey = params.getAs[String]("consumerKey")
-    val auth = new OAuthAuthorization(
-      new ConfigurationBuilder()
-        .setOAuthConsumerKey(consumerKey)
-        .setOAuthConsumerSecret(params.getAs[String]("consumerSecret"))
-        .setOAuthAccessToken(params.getAs[String]("accessToken"))
-        .setOAuthAccessTokenSecret(params.getAs[String]("accessTokenSecret"))
-        .build()
-    )
+    val consumerSecret = params.getAs[String]("consumerSecret")
+    val accessToken = params.getAs[String]("accessToken")
+    val accessTokenSecret = params.getAs[String]("accessTokenSecret")
+
+    val twitterConfig = new ConfigurationBuilder()
+      .setOAuthConsumerKey(consumerKey)
+      .setOAuthConsumerSecret(consumerSecret)
+      .setOAuthAccessToken(accessToken)
+      .setOAuthAccessTokenSecret(accessTokenSecret)
+      .build
+
+    val auth = new OAuthAuthorization(twitterConfig)
 
     val query = new FilterQuery
 
@@ -53,7 +59,7 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
       return ssc.queueStream(new mutable.Queue[RDD[Status]])
     }
 
-    val usersAdded = addUsers(query, params)
+    val usersAdded = addUsers(query, params, twitterConfig)
     if (!usersAdded) {
       Log.logInfo(s"No users set for Twitter consumerKey $consumerKey")
     }
@@ -105,8 +111,8 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
     true
   }
 
-  private def addUsers(query: FilterQuery, params: Map[String, Any]): Boolean = {
-    parseUserIds(params) match {
+  private def addUsers(query: FilterQuery, params: Map[String, Any], twitterConfig: Configuration): Boolean = {
+    parseUserIds(params, twitterConfig) match {
       case Some(userIds) =>
         query.follow(userIds:_*)
         true
@@ -137,7 +143,23 @@ object TwitterStreamFactory {
     }
   }
 
-  def parseUserIds(params: Map[String, Any]): Option[Array[Long]] = parseList(params, "userIds").map(_.map(_.toLong))
+  def parseUserIds(params: Map[String, Any], twitterConfig: Configuration): Option[Array[Long]] = {
+    parseList(params, "userIds").map(users => {
+      val twitter = new TwitterFactory(twitterConfig).getInstance
+
+      val (ids, names) = users.partition(user => Try(user.toLong).isSuccess)
+
+      val idProfiles = ids.map(_.toLong)
+
+      val nameProfiles = names
+        .map(_.toLowerCase)
+        .grouped(100)
+        .flatMap(screenNames => twitter.users().lookupUsers(screenNames:_*).asScala)
+        .map(_.getId)
+
+      idProfiles ++ nameProfiles
+    })
+  }
 
   private def parseList(params: Map[String, Any], key: String): Option[Array[String]] = params.get(key).map(_.asInstanceOf[String].split('|'))
 }
