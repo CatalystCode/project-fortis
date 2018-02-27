@@ -6,9 +6,7 @@ pushd "$(dirname $0)/.."
 
 err=0
 
-if [ ! -d node_modules ]; then
-  npm install
-fi
+npm install
 
 if ! ./node_modules/.bin/eslint --max-warnings=0 src *.js; then
   err=1
