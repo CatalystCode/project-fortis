@@ -78,18 +78,30 @@ class Header extends React.Component {
     );
   }
 
-  renderLogoutLink() {
-    return (
-      <a onClick={this.props.logoutCallback}>
-        Logout {this.props.userName}
-      </a>
-    )
+  renderAuth() {
+    if (!this.props.userName && this.props.loginCallback) {
+      return (
+        <a onClick={this.props.loginCallback}>
+          Log in
+        </a>
+      );
+    }
+
+    if (this.props.userName && this.props.logoutCallback) {
+      return (
+        <a onClick={this.props.logoutCallback}>
+          Logout {this.props.userName}
+        </a>
+      );
+    }
+
+    return null;
   }
 
   renderRightNav() {
     return (
       <ul className="nav navbar-nav navbar-right">
-        { this.props.logoutCallback && <li>{ this.renderLogoutLink() }</li> }
+        <li>{ this.renderAuth() }</li>
       </ul>
     );
   }

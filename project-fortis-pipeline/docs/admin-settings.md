@@ -131,6 +131,9 @@ On this page, you can manage access to your Fortis site. There are currently two
 levels of access: `admin` and `user`. Users can only log into the site and view
 the dashboard. Admins can additionally chage the settings for the site.
 
+If you wish to enable anoymous access to Fortis, you can add the identity
+`anonymous@fortis` to your users list and give it a role such as `user`.
+
 The following list explains the settings managed on this site in more detail:
 
 - **Identity:** The canonical email address of the users who have access to the

@@ -1,6 +1,7 @@
 const Promise = require('promise');
 const passport = require('passport');
 const OIDCBearerStrategy = require('passport-azure-ad').BearerStrategy;
+const AnonymousStrategy = require('passport-anonymous').Strategy;
 const NodeCache = require('node-cache');
 const cassandraConnector = require('./clients/cassandra/CassandraConnector');
 const { getUserFromArgs } = require('./utils/request');
@@ -33,7 +34,8 @@ function initialize(app, route) {
   app.use(passport.initialize());
   app.use(passport.session());
   passport.use(bearerStrategy);
-  app.use(route, passport.authenticate('oauth-bearer', { session: false }));
+  passport.use(new AnonymousStrategy());
+  app.use(route, passport.authenticate(['oauth-bearer', 'anonymous'], { session: false }));
 }
 
 function checkIfUserHasRole(user, role) {

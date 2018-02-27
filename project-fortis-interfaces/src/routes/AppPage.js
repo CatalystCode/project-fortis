@@ -163,8 +163,24 @@ export const AppPage = createReactClass({
     return this.getFlux().store("DataStore").getState();
   },
 
+  didAuthFail() {
+    const { error } = this.state;
+
+    if (!error) {
+      return false;
+    }
+
+    return error.code === 401 || error.message.indexOf('Unknown user') !== -1;
+  },
+
+  isAuthAvailable() {
+    const { authInfo } = this.state;
+
+    return authInfo && authInfo.token;
+  },
+
   shouldRenderLogin() {
-    return this.adApplication && (!this.state.authInfo || !this.state.authInfo.user || !this.state.authInfo.token);
+    return this.adApplication && this.didAuthFail() && !this.isAuthAvailable();
   },
 
   shouldRenderUnknownCategory() {
@@ -178,7 +194,7 @@ export const AppPage = createReactClass({
       return false;
     }
 
-    if (this.state.error.code === 401 && this.state.authInfo && this.state.authInfo.token) {
+    if (this.didAuthFail() && this.isAuthAvailable()) {
       window.location.reload();
       return false;
     }
@@ -266,6 +282,7 @@ export const AppPage = createReactClass({
             title={this.state.title}
             logo={this.state.logo}
             logoutCallback={this.adApplication ? this.adLogout : null}
+            loginCallback={this.adApplication ? this.adLogin : null}
             userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}
           />
           <div id="main">
