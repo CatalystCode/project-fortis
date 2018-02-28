@@ -26,7 +26,7 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
     sc = new SparkContext(conf)
     factory = new TwitterStreamFactory(configurationManager)
     configurationManager = Mockito.mock(classOf[ConfigurationManager])
-    siteSettings = new SiteSettings(
+    siteSettings = SiteSettings(
       sitename = "Fortis",
       geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = Some("en"),
@@ -56,7 +56,7 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
     ))
     val query = new FilterQuery()
     val watchlistAppended = factory.appendWatchlist(query, sc, configurationManager)
-    assert(watchlistAppended == true)
+    assert(watchlistAppended)
     assert(query == new FilterQuery("hello", "hola", "monde", "mundo", "salut", "world"))
   }
 
@@ -70,15 +70,15 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
     factory.twitterMaxTermCount = 2
 
     val query0 = new FilterQuery()
-    assert(factory.appendWatchlist(query0, sc, configurationManager) == true)
+    assert(factory.appendWatchlist(query0, sc, configurationManager))
     assert(query0 == new FilterQuery("hello", "hola"))
 
     val query1 = new FilterQuery()
-    assert(factory.appendWatchlist(query1, sc, configurationManager) == true)
+    assert(factory.appendWatchlist(query1, sc, configurationManager))
     assert(query1 == new FilterQuery("monde", "mundo"))
 
     val query2 = new FilterQuery()
-    assert(factory.appendWatchlist(query2, sc, configurationManager) == true)
+    assert(factory.appendWatchlist(query2, sc, configurationManager))
     assert(query2 == new FilterQuery("salut", "world"))
   }
 
@@ -86,21 +86,21 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
     Mockito.when(configurationManager.fetchWatchlist(ArgumentMatchers.any())).thenReturn(Map[String, Seq[String]]())
     val query = new FilterQuery()
     val watchlistAppended = factory.appendWatchlist(query, sc, configurationManager)
-    assert(watchlistAppended == false)
+    assert(!watchlistAppended)
     assert(query == new FilterQuery())
   }
 
   it should "append to query when languages are present" in {
     val query = new FilterQuery()
     val languagesAdded = factory.addLanguages(query, sc, configurationManager)
-    assert(languagesAdded == true)
+    assert(languagesAdded)
     val expectedQuery = new FilterQuery()
     expectedQuery.language("en", "es", "fr")
     assert(query == expectedQuery)
   }
 
   it should "return true when languages are absent but defaultlanguage is present" in {
-    val noLanguageSiteSettings = new SiteSettings(
+    val noLanguageSiteSettings = SiteSettings(
       sitename = "Fortis",
       geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = Some("en"),
@@ -119,14 +119,14 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
 
     val query = new FilterQuery()
     val languagesAdded = factory.addLanguages(query, sc, configurationManager)
-    assert(languagesAdded == true)
+    assert(languagesAdded)
     val expectedQuery = new FilterQuery()
     expectedQuery.language("en")
     assert(query == expectedQuery)
   }
 
   it should "return false when both languages and defaultlanguage are absent" in {
-    val noLanguageSiteSettings = new SiteSettings(
+    val noLanguageSiteSettings = SiteSettings(
       sitename = "Fortis",
       geofence_json = "[1, 2, 3, 4]",
       defaultlanguage = None,
@@ -145,7 +145,7 @@ class TwitterStreamFactorySpec extends FlatSpec with BeforeAndAfter {
 
     val query = new FilterQuery()
     val languagesAdded = factory.addLanguages(query, sc, configurationManager)
-    assert(languagesAdded == false)
+    assert(!languagesAdded)
     assert(query == new FilterQuery())
   }
 
