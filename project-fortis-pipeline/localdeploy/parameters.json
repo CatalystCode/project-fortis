@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "namespaces_fortiseventhubs_name": {
-            "value": "fortisev"
+            "value": "fortiseh"
         },
         "namespaces_fortisservicebus_name": {
             "value": "fortissb"
