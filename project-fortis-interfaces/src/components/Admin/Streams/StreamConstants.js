@@ -1031,10 +1031,10 @@ const uiSchema = {
         "ui:description": <a href="https://docs.microsoft.com/en-us/azure/cognitive-services/speech/api-reference-rest/websocketprotocol#message-audio" target="_blank" rel="noopener noreferrer">More information on Audio Types</a>
       },
       cacheEditDistanceThreshold: {
-        "ui:placeholder": 0.0001
+        "ui:placeholder": "0.0001"
       },
       connectionTimeout: {
-        "ui:placeholder": 3000
+        "ui:placeholder": "3000"
       },
       consumerKey: {
         classNames: "settings secret"
@@ -1044,20 +1044,20 @@ const uiSchema = {
       },
       instagramLocation: {
         lat: {
-          "ui:placeholder": 42.37
+          "ui:placeholder": "42.37"
         },
         long: {
-          "ui:placeholder": -71.11
+          "ui:placeholder": "-71.11"
         }
       },
       maxDepth: {
-        "ui:placeholder": 1
+        "ui:placeholder": "1"
       },
       policyKey: {
         classNames: "settings secret"
       },
       pollingPeriod: {
-        "ui:placeholder": 3600
+        "ui:placeholder": "3600"
       },
       subscriptionKey: {
         "ui:description": <a href="https://docs.microsoft.com/en-us/azure/cognitive-services/speech/how-to/how-to-authentication?tabs=Powershell#use-a-subscription-key" target="_blank" rel="noopener noreferrer">Get a subscription key</a>
@@ -1066,11 +1066,11 @@ const uiSchema = {
         "ui:placeholder": "http://"
       },
       readTimeout: {
-        "ui:placeholder": 9000
+        "ui:placeholder": "9000"
       },
       searchLimit: {
         "ui:description": "The maximum number of items returned from a search",
-        "ui:placeholder": 25
+        "ui:placeholder": "25"
       },
       searchInstanceId: {
         classNames: "settings secret",
