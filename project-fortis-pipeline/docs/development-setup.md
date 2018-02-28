@@ -3,6 +3,14 @@
 [![Travis CI status](https://api.travis-ci.org/CatalystCode/project-fortis.svg?branch=master)](https://travis-ci.org/CatalystCode/project-fortis)
 [![Docker Pulls for project-fortis-services](https://img.shields.io/docker/pulls/cwolff/project_fortis_services.svg)](https://hub.docker.com/r/cwolff/project_fortis_services/)
 
+## Architecture overview
+
+<a href="https://user-images.githubusercontent.com/1086421/36808013-5f3388f6-1c92-11e8-80c8-8ac8a7844f2a.png">
+  <img title="Overview of the Fortis architecture"
+       height="400"
+       src="https://user-images.githubusercontent.com/1086421/36808013-5f3388f6-1c92-11e8-80c8-8ac8a7844f2a.png" />
+</a>
+
 ## One-time setup
 
 ### Getting the code
