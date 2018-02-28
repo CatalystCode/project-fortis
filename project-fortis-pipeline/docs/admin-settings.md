@@ -103,6 +103,9 @@ The following list explains the settings managed on this site in more detail:
 - **name_{language}:** Keyword translated into other languages, used to monitor
   multi-lingual areas.
 
+After changing the watchlist, you should click the restart pipeline button to
+propoagate the changes to the Fortis event ingestion.
+
 ### Adding Keywords with Excel then translating them to a supported language
 
 To add keywords quickly, you can copy keyword categories and keywords from
@@ -155,6 +158,9 @@ Manage trusted sources like `twitter`, `facebook`, etc.
 | Pipeline Key        | Refer to `All Supported Trusted Sources` table below. |
 | Name                | Friendly name you assign for your trusted source to act as an alias for the external source id. In the `dashboard` this friendly name will be what is displayed, not the external source id. (external source id will only be displayed if `Name` is not defined) |
 | External Source Id  | Refer to `All Supported Trusted Sources` table below. |
+
+After changing the trusted sources, you should click the restart pipeline button
+to propoagate the changes to the Fortis event ingestion.
 
 ### List of All Supported Trusted Sources
 
@@ -220,3 +226,6 @@ The following list explains the settings managed on this site in more detail:
 
 - **Edit:** Open the editor to modify the stream, for example to update API
   access credentials.
+
+After changing the streams, you should click the restart pipeline button to
+propoagate the changes to the Fortis event ingestion.
