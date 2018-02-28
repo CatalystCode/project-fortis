@@ -31,6 +31,11 @@ class StreamEditor extends React.Component {
     return getColumns(columnValues);
   }
 
+  handleSave = (streams) => {
+    this.prepareStreamsForSave(streams);
+    this.props.flux.actions.ADMIN.save_stream(streams);
+  }
+
   remove = streams => {
     this.prepareStreamsForSave(streams);
     this.props.flux.actions.ADMIN.remove_streams(streams);
