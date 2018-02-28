@@ -66,25 +66,27 @@ object StreamsChangeListener {
     }
 
     override def onMessageAsync(message: IMessage): CompletableFuture[Void] = {
-      Log.logInfo(s"Service Bus message received $message.")
+      val messageId = message.getMessageId
+
+      Log.logEvent("streamsChangeListener.messageHandler", Map("messageId" -> messageId, "step" -> "received"))
 
       if (message.getEnqueuedTimeUtc.isBefore(this.initializedAt)) {
-        Log.logInfo(s"Service Bus message ignored since it predates listener initialization.")
+        Log.logEvent("streamsChangeListener.messageHandler", Map("messageId" -> messageId, "step" -> "ignored-predates-initialization"))
         return CompletableFuture.completedFuture(null)
       }
 
       this.scheduledTask match {
         case Some(task) =>
-          Log.logInfo(s"Service Bus message for updated streams received; Re-scheduling streaming context stop for ${settings.sscShutdownDelayMillis} milliseconds from now.")
+          Log.logEvent("streamsChangeListener.messageHandler", Map("messageId" -> messageId, "step" -> "rescheduling-task"))
           task.cancel(false)
         case None =>
-          Log.logInfo(s"Service Bus message for updated streams received; Requesting streaming context stop in ${settings.sscShutdownDelayMillis} milliseconds.")
+          Log.logEvent("streamsChangeListener.messageHandler", Map("messageId" -> messageId, "step" -> "scheduling-task"))
       }
 
       this.currentContext match {
         case Some(context) =>
           this.scheduledTask = Some(this.scheduler.schedule(
-            new ContextStopRunnable(settings, context, scheduler),
+            new ContextStopRunnable(settings, context, scheduler, messageId),
             settings.sscShutdownDelayMillis,
             TimeUnit.MILLISECONDS
           ))
@@ -96,15 +98,18 @@ object StreamsChangeListener {
     }
   }
 
-  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ScheduledExecutorService) extends Runnable {
+  private[spark] class ContextStopRunnable(settings: FortisSettings, ssc: StreamingContext, scheduler: ScheduledExecutorService, messageId: String) extends Runnable {
     override def run(): Unit = {
+      Log.logEvent("streamsChangeListener.contextStopRunnable", Map("messageId" -> messageId, "step" -> "stop-initialized"))
+
       StreamsChangeListener.suggestedExitCode = 10
-      Log.logInfo(s"Requesting streaming context stop now.")
       val timeoutTask = scheduler.schedule(new TimeoutRunnable(), 30L, TimeUnit.SECONDS)
       try {
         ssc.stop(stopSparkContext = true, stopGracefully = false)
         timeoutTask.cancel(false)
-        Log.logInfo(s"Streaming context stop complete; Cleaning up...")
+
+        Log.logEvent("streamsChangeListener.contextStopRunnable", Map("messageId" -> messageId, "step" -> "stop-completed"))
+
         if (!settings.progressDir.isEmpty) {
           Path(settings.progressDir).deleteRecursively()
         }
