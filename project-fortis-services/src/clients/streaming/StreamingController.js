@@ -32,14 +32,18 @@ function notifyUpdate(queue, properties) {
   return sendQueueMessage(queue, serviceBusMessage);
 }
 
+let client;
+
 function sendQueueMessage(queue, serviceBusMessage) {
   return new Promise((resolve, reject) => {
-    let client;
-    try {
-      client = azure.createServiceBusService(fortisSbConnStr);
-    } catch (exception) {
-      return reject(exception);
+    if (!client) {
+      try {
+        client = azure.createServiceBusService(fortisSbConnStr);
+      } catch (exception) {
+        return reject(exception);
+      }
     }
+
     try {
       client.sendQueueMessage(queue, serviceBusMessage, (error) => {
         if (error) reject(error);
