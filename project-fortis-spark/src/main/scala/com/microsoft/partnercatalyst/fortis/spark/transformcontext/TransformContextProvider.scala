@@ -9,6 +9,7 @@ import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder
 import com.microsoft.partnercatalyst.fortis.spark.FortisSettings
 import com.microsoft.partnercatalyst.fortis.spark.dba.ConfigurationManager
 import com.microsoft.partnercatalyst.fortis.spark.logging.FortisTelemetry.{get => Log}
+import com.microsoft.partnercatalyst.fortis.spark.transformcontext.TransformContextMessages.{BlacklistChanged, ChangeRequired, SettingsChanged, WatchlistChanged}
 import org.apache.spark.SparkContext
 
 @SerialVersionUID(100L)
@@ -136,26 +137,28 @@ class TransformContextProvider(configManager: ConfigurationManager, featureServi
 
       // Read the service bus message and build delta using data store.
       val delta = Option(message.getProperties) match {
-        case Some(properties) => Option(properties.getOrDefault("dirty", null)) match {
+        case Some(properties) => Option(properties.getOrDefault(ChangeRequired, null)) match {
           case Some(value) => value match {
-            case "settings" =>
+            case SettingsChanged =>
               val siteSettings = configManager.fetchSiteSettings(sparkContext)
-              Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> "settings", "newSettings" -> siteSettings.toString))
+              Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> SettingsChanged, "newSettings" -> siteSettings.toString))
               Delta(transformContext, featureServiceClientUrlBase, cognitiveUrlBase, siteSettings = Some(siteSettings))
-            case "watchlist" =>
+
+            case WatchlistChanged =>
               val langToWatchlist = configManager.fetchWatchlist(sparkContext)
-              Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> "watchlist", "newWatchlist" -> langToWatchlist.map(kv => s"${kv._1}=[${kv._2.mkString(",")}]").mkString("|")))
+              Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> WatchlistChanged, "newWatchlist" -> langToWatchlist.map(kv => s"${kv._1}=[${kv._2.mkString(",")}]").mkString("|")))
               Delta(transformContext, featureServiceClientUrlBase, cognitiveUrlBase, langToWatchlist = Some(langToWatchlist))
-            case "blacklist" =>
+
+            case BlacklistChanged =>
               val blacklist = configManager.fetchBlacklist(sparkContext)
-              Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> "blacklist", "newBlacklist" -> s"[${blacklist.mkString(",")}]"))
+              Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> BlacklistChanged, "newBlacklist" -> s"[${blacklist.mkString(",")}]"))
               Delta(transformContext, featureServiceClientUrlBase, cognitiveUrlBase, blacklist = Some(blacklist))
 
             case unknown =>
               Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> "unknown-dirty"))
               Log.logError(s"Service Bus client received unexpected update request. Ignoring.: $unknown")
               Delta()
-            }
+          }
           case None =>
             Log.logEvent("transformcontext.messageHandler", Map("messageId" -> messageId, "step" -> "no-dirty"))
             Log.logError(s"Service Bus client received unexpected message. Ignoring.: ${message.toString}")
