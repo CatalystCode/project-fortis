@@ -18,7 +18,7 @@ const SETTINGS_TAB = 0;
 const WATCHLIST_TAB = 1;
 const USERS_TAB = 2;
 const CUSTOM_EVENTS_TAB = 3;
-const TRUSTED_SOURCES = 4;
+const TRUSTED_SOURCES_TAB = 4;
 const BLACKLIST_TAB = 5;
 const STREAM_TAB = 6;
 
@@ -69,7 +69,7 @@ class Admin extends React.Component {
 
     const shouldShowRestartPipelineButton =
       index === WATCHLIST_TAB ||
-      index === TRUSTED_SOURCES ||
+      index === TRUSTED_SOURCES_TAB ||
       index === STREAM_TAB;
 
     return (
@@ -124,7 +124,7 @@ class Admin extends React.Component {
                     <TabPanel>
                       <h2>Trusted Sources</h2>
                       <div className="adminTable">
-                        {settings && settings.properties && index === TRUSTED_SOURCES &&
+                        {settings && settings.properties && index === TRUSTED_SOURCES_TAB &&
                           <div>
                             <TrustedSources {...this.props}/>
                           </div>}
