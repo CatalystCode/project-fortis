@@ -36,9 +36,7 @@ const _methods = {
   restart_pipeline() {
     const self = this;
     AdminServices.restartPipeline((err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
-      if (graphqlResponse && !error) {
-        self.dispatch(constants.ADMIN.RESTART_PIPELINE, { response: graphqlResponse.restartPipeline });
-      } else {
+      if (error) {
         self.dispatch(constants.ADMIN.LOAD_FAIL, { error: error.message });
       }
     }));
