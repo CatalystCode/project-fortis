@@ -27,14 +27,8 @@ function insertTopics(siteType) {
         mutations = response;
         return cassandraConnector.executeBatchMutations(response);
       })
-      .then(() => {
-        streamingController.notifyWatchlistUpdate();
-      })
-      .then(() => {
-        resolve({
-          numTopicsInserted: mutations.length
-        });
-      })
+      .then(() => streamingController.notifyWatchlistUpdate())
+      .then(() => resolve({ numTopicsInserted: mutations.length }))
       .catch(reject);
   });
 }

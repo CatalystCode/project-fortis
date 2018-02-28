@@ -166,28 +166,24 @@ function editSite(args, res) { // eslint-disable-line no-unused-vars
           ]
         }]);
       })
-      .then(() => {
-        streamingController.notifySiteSettingsUpdate();
-      })
-      .then(() => {
-        resolve({
-          name: args.input.name,
-          properties: {
-            targetBbox: args.input.targetBbox,
-            defaultZoomLevel: args.input.defaultZoomLevel,
-            logo: args.input.logo,
-            title: args.input.title,
-            defaultLocation: args.input.defaultLocation,
-            supportedLanguages:args.input.supportedLanguages,
-            defaultLanguage: args.input.defaultLanguage,
-            cogSpeechSvcToken: args.input.cogSpeechSvcToken,
-            cogTextSvcToken: args.input.cogTextSvcToken,
-            cogVisionSvcToken: args.input.cogVisionSvcToken,
-            featureservicenamespace: args.input.featureservicenamespace,
-            translationSvcToken: args.input.translationSvcToken
-          }
-        });
-      })
+      .then(() => streamingController.notifySiteSettingsUpdate())
+      .then(() => resolve({
+        name: args.input.name,
+        properties: {
+          targetBbox: args.input.targetBbox,
+          defaultZoomLevel: args.input.defaultZoomLevel,
+          logo: args.input.logo,
+          title: args.input.title,
+          defaultLocation: args.input.defaultLocation,
+          supportedLanguages:args.input.supportedLanguages,
+          defaultLanguage: args.input.defaultLanguage,
+          cogSpeechSvcToken: args.input.cogSpeechSvcToken,
+          cogTextSvcToken: args.input.cogTextSvcToken,
+          cogVisionSvcToken: args.input.cogVisionSvcToken,
+          featureservicenamespace: args.input.featureservicenamespace,
+          translationSvcToken: args.input.translationSvcToken
+        }
+      }))
       .catch(reject);
   });
 }
@@ -267,14 +263,8 @@ function removeKeywords(args, res) { // eslint-disable-line no-unused-vars
     }));
 
     cassandraConnector.executeBatchMutations(mutations)
-      .then(() => {
-        streamingController.notifyWatchlistUpdate();
-      })
-      .then(_ => { // eslint-disable-line no-unused-vars
-        resolve({
-          edges: args.input.edges
-        });
-      })
+      .then(() => streamingController.notifyWatchlistUpdate())
+      .then(() => resolve({ edges: args.input.edges }))
       .catch(error => {
         trackException(error);
         reject(error);
@@ -314,14 +304,8 @@ function addKeywords(args, res) { // eslint-disable-line no-unused-vars
     });
 
     cassandraConnector.executeBatchMutations(mutations)
-      .then(() => {
-        streamingController.notifyWatchlistUpdate();
-      })
-      .then(_ => { // eslint-disable-line no-unused-vars
-        resolve({
-          edges: args.input.edges
-        });
-      })
+      .then(() => streamingController.notifyWatchlistUpdate())
+      .then(() => resolve({ edges: args.input.edges }))
       .catch(error => {
         trackException(error);
         reject(error);
@@ -460,9 +444,7 @@ function modifyBlacklist(args, res) { // eslint-disable-line no-unused-vars
     });
 
     cassandraConnector.executeBatchMutations(mutations)
-      .then(() => {
-        streamingController.notifyBlacklistUpdate();
-      })
+      .then(() => streamingController.notifyBlacklistUpdate())
       .then(() => resolve({ filters: filterRecords }))
       .catch(reject);
   });
@@ -486,14 +468,8 @@ function removeBlacklist(args, res) { // eslint-disable-line no-unused-vars
     }));
 
     cassandraConnector.executeQueries(queries)
-      .then(() => {
-        streamingController.notifyBlacklistUpdate();
-      })
-      .then(() => {
-        resolve({
-          filters: termFilters
-        });
-      })
+      .then(() => streamingController.notifyBlacklistUpdate())
+      .then(() => resolve({ filters: termFilters }))
       .catch(reject);
   });
 }
