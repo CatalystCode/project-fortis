@@ -5,10 +5,10 @@
 
 ## Architecture overview
 
-<a href="https://user-images.githubusercontent.com/1086421/36808013-5f3388f6-1c92-11e8-80c8-8ac8a7844f2a.png">
+<a href="https://user-images.githubusercontent.com/1086421/36808739-f25cd3ac-1c93-11e8-8f97-b59192deec03.png">
   <img title="Overview of the Fortis architecture"
        height="400"
-       src="https://user-images.githubusercontent.com/1086421/36808013-5f3388f6-1c92-11e8-80c8-8ac8a7844f2a.png" />
+       src="https://user-images.githubusercontent.com/1086421/36808739-f25cd3ac-1c93-11e8-8f97-b59192deec03.png" />
 </a>
 
 ## One-time setup
