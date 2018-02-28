@@ -36,7 +36,7 @@ class StreamEditor extends React.Component {
     this.props.flux.actions.ADMIN.save_stream(streams);
   }
 
-  remove = streams => {
+  handleRemove = (streams) => {
     this.prepareStreamsForSave(streams);
     this.props.flux.actions.ADMIN.remove_streams(streams);
   }
@@ -66,7 +66,7 @@ class StreamEditor extends React.Component {
                 columns={this.getStreamColumns()}
                 rows={this.props.streams}
                 handleSave={this.handleSave}
-                handleRemove={this.remove}
+                handleRemove={this.handleRemove}
               />
             </CardText>
           </Card>
