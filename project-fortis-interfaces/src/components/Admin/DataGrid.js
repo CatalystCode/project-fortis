@@ -8,8 +8,9 @@ import Fluxxor from 'fluxxor';
 import moment from 'moment';
 // eslint-disable-next-line
 import { guid, doNothing } from '../../utils/Utils.js';
+import { Toolbar, Data } from 'react-data-grid-addons';
+const { Selectors } = Data;
 
-const { Toolbar, Data: { Selectors } } = require('react-data-grid-addons');
 const STATE_ACTIONS = {
   SAVED: "saved",
   SAVING: "saving",

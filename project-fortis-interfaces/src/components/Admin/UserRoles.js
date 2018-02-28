@@ -4,7 +4,7 @@ import groupBy from 'lodash/groupBy';
 import differenceBy from 'lodash/differenceBy';
 import { DataGrid } from './DataGrid';
 import { getColumns } from './shared';
-const { Editors, Formatters } = require('react-data-grid-addons');
+import { Editors, Formatters } from 'react-data-grid-addons';
 const { DropDownEditor } = Editors;
 const { DropDownFormatter } = Formatters;
 
