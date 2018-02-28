@@ -1,11 +1,10 @@
 'use strict';
 
-const Promise = require('promise');
-const azure = require('azure-sb');
-const { trackDependency } = require('../appinsights/AppInsightsClient');
+const { trackEvent } = require('../appinsights/AppInsightsClient');
+const { sendQueueMessage } = require('./ServiceBusClient');
 
 const {
-  fortisSbConnStr, fortisSbCommandQueue, fortisSbConfigQueue
+  fortisSbCommandQueue, fortisSbConfigQueue
 } = require('../../../config').serviceBus;
 
 function restartPipeline() {
@@ -32,32 +31,9 @@ function notifyUpdate(queue, properties) {
   return sendQueueMessage(queue, serviceBusMessage);
 }
 
-let client;
-
-function sendQueueMessage(queue, serviceBusMessage) {
-  return new Promise((resolve, reject) => {
-    if (!client) {
-      try {
-        client = azure.createServiceBusService(fortisSbConnStr);
-      } catch (exception) {
-        return reject(exception);
-      }
-    }
-
-    try {
-      client.sendQueueMessage(queue, serviceBusMessage, (error) => {
-        if (error) reject(error);
-        else resolve(serviceBusMessage);
-      });
-    } catch (exception) {
-      reject(exception);
-    }
-  });
-}
-
 module.exports = {
-  restartPipeline: trackDependency(restartPipeline, 'ServiceBus', 'sendRestartPipeline'),
-  notifyWatchlistUpdate: trackDependency(notifyWatchlistUpdate, 'ServiceBus', 'sendWatchlistChanged'),
-  notifyBlacklistUpdate: trackDependency(notifyBlacklistUpdate, 'ServiceBus', 'sendBlacklistChanged'),
-  notifySiteSettingsUpdate: trackDependency(notifySiteSettingsUpdate, 'ServiceBus', 'sendSettingsChanged')
+  restartPipeline: trackEvent(restartPipeline, 'notifyRestartPipeline'),
+  notifyWatchlistUpdate: trackEvent(notifyWatchlistUpdate, 'notifyWatchlistChanged'),
+  notifyBlacklistUpdate: trackEvent(notifyBlacklistUpdate, 'notifyBlacklistChanged'),
+  notifySiteSettingsUpdate: trackEvent(notifySiteSettingsUpdate, 'notifySettingsChanged')
 };
