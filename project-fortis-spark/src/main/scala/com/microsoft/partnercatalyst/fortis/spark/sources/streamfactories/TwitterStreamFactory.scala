@@ -104,17 +104,22 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
     val maxTerms = twitterMaxTermCount
     val updatedWatchlistCurrentOffsetValue = watchlistCurrentOffsetValue + maxTerms
     val selectedTerms = terms.filter(_.getBytes("UTF-8").length < 60).take(maxTerms)
-    query.track(selectedTerms:_*)
 
-    sparkContext.setLocalProperty(watchlistCurrentOffsetKey, updatedWatchlistCurrentOffsetValue.toString)
-
-    true
+    if (selectedTerms.nonEmpty) {
+      query.track(selectedTerms:_*)
+      Log.logInfo(s"Twitter is tracking terms [${selectedTerms.mkString(",")}]")
+      sparkContext.setLocalProperty(watchlistCurrentOffsetKey, updatedWatchlistCurrentOffsetValue.toString)
+      true
+    } else {
+      false
+    }
   }
 
   private def addUsers(query: FilterQuery, params: Map[String, Any], twitterConfig: Configuration): Boolean = {
     parseUserIds(params, twitterConfig) match {
       case Some(userIds) =>
         query.follow(userIds:_*)
+        Log.logInfo(s"Twitter is tracking users [${userIds.mkString(",")}]")
         true
       case None =>
         false
@@ -122,13 +127,14 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
   }
 
   private[streamfactories] def addLanguages(query: FilterQuery, sparkContext: SparkContext, configurationManager: ConfigurationManager): Boolean = {
-    val allLanguages = configurationManager.fetchSiteSettings(sparkContext).getAllLanguages()
+    val allLanguages = configurationManager.fetchSiteSettings(sparkContext).getAllLanguages().toList
 
-    allLanguages.size match {
-      case 0 => false
-      case _ =>
-        query.language(allLanguages:_*)
-        true
+    if (allLanguages.nonEmpty) {
+      query.language(allLanguages:_*)
+      Log.logInfo(s"Twitter is tracking languages [${allLanguages.mkString(",")}]")
+      true
+    } else {
+      false
     }
   }
 
