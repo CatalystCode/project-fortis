@@ -64,6 +64,9 @@ class Admin extends React.Component {
   }
 
   render() {
+    const { index, showModal } = this.state;
+    const { settings, watchlist } = this.props;
+
     return (
       <div>
         <div className="container-fluid">
@@ -73,7 +76,7 @@ class Admin extends React.Component {
                   <div className="row adminContainer">
                   <Tabs
                     onSelect={this.handleTabChanged}
-                    selectedIndex={this.state.index}>
+                    selectedIndex={index}>
                     <TabList>
                       <Tab>Site Settings</Tab>
                       <Tab>Watchlist</Tab>
@@ -85,22 +88,22 @@ class Admin extends React.Component {
                     </TabList>
                     <TabPanel>
                       <h2>Settings</h2>
-                      { this.props.settings && this.props.settings.properties && this.state.index === SETTINGS_TAB &&
+                      { settings && settings.properties && index === SETTINGS_TAB &&
                         <AdminSettings {...this.props}
-                          index={this.state.index}
-                          siteSettings={this.props.settings}
+                          index={index}
+                          siteSettings={settings}
                         />}
                     </TabPanel>
                     <TabPanel>
                       <h2>Watchlist</h2>
                         <div className="adminTable">
-                          {this.props.settings && this.props.settings.properties && this.props.watchlist && this.state.index === WATCHLIST_TAB &&
+                          {settings && settings.properties && watchlist && index === WATCHLIST_TAB &&
                             <AdminWatchlist {...this.props}/>}
                         </div>
                     </TabPanel>
                     <TabPanel>
                       <h2>Users</h2>
-                      { this.props.settings && this.props.settings.properties && this.state.index === USERS_TAB &&
+                      { settings && settings.properties && index === USERS_TAB &&
                         <div className="adminTable">
                           <UserRoles {...this.props}/>
                         </div>
@@ -109,14 +112,14 @@ class Admin extends React.Component {
                     <TabPanel>
                       <h2>Event Import</h2>
                       <div className="adminTable">
-                        {this.props.settings && this.props.settings.properties && this.state.index === CUSTOM_EVENTS_TAB &&
+                        {settings && settings.properties && index === CUSTOM_EVENTS_TAB &&
                           <CustomEventsEditor {...this.props}/>}
                       </div>
                     </TabPanel>
                     <TabPanel>
                       <h2>Trusted Sources</h2>
                       <div className="adminTable">
-                        {this.props.settings && this.props.settings.properties && this.state.index === TRUSTED_SOURCES &&
+                        {settings && settings.properties && index === TRUSTED_SOURCES &&
                           <div>
                             <TrustedSources {...this.props}/>
                           </div>}
@@ -128,13 +131,13 @@ class Admin extends React.Component {
                         <span>Provide a comma delimited list of blacklist terms, i.e. hunger, flood, hurricane. If an event matches all the blacklist terms, then it will be discarded.</span>
                       </ReactTooltip>
                       <div className="adminTable">
-                        {this.props.settings && this.props.settings.properties && this.state.index === BLACKLIST_TAB &&
+                        {settings && settings.properties && index === BLACKLIST_TAB &&
                           <BlacklistEditor {...this.props}/>}
                       </div>
                     </TabPanel>
                     <TabPanel>
                       <div className="adminTable">
-                        {this.props.settings && this.props.settings.properties && this.state.index === STREAM_TAB &&
+                        {settings && settings.properties && index === STREAM_TAB &&
                           <StreamEditor {...this.props}/>}
                       </div>
                     </TabPanel>
@@ -147,7 +150,7 @@ class Admin extends React.Component {
             </div>
           </div>
         </div>
-        <Modal show={this.state.showModal} onHide={this.closeModal}>
+        <Modal show={showModal} onHide={this.closeModal}>
           <Modal.Header closeButton>
             <Modal.Title>Are you sure you want to restart the pipeline?</Modal.Title>
           </Modal.Header>
