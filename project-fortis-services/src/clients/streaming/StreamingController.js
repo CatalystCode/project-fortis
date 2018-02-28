@@ -9,11 +9,7 @@ const {
 } = require('../../../config').serviceBus;
 
 function restartPipeline() {
-  return notifyUpdate(fortisSbCommandQueue, { 'dirty': 'streams' });
-}
-
-function restartStreaming() {
-  return notifyUpdate(fortisSbCommandQueue, { 'dirty': 'streams' });
+  return notifyUpdate(fortisSbCommandQueue);
 }
 
 function notifyWatchlistUpdate() {
@@ -29,15 +25,11 @@ function notifySiteSettingsUpdate() {
 }
 
 function notifyUpdate(queue, properties) {
-  return new Promise((resolve, reject) => {
-    const serviceBusMessage = {
-      customProperties: properties
-    };
+  const serviceBusMessage = {};
 
-    sendQueueMessage(queue, serviceBusMessage)
-      .then(resolve(true))
-      .catch(reject(false));
-  });
+  if (properties) serviceBusMessage.customProperties = properties;
+
+  return sendQueueMessage(queue, serviceBusMessage);
 }
 
 function sendQueueMessage(queue, serviceBusMessage) {
@@ -60,9 +52,8 @@ function sendQueueMessage(queue, serviceBusMessage) {
 }
 
 module.exports = {
-  restartPipeline: trackDependency(restartPipeline, 'ServiceBus', 'send'),
-  restartStreaming: trackDependency(restartStreaming, 'ServiceBus', 'send'),
-  notifyWatchlistUpdate: trackDependency(notifyWatchlistUpdate, 'ServiceBus', 'send'),
-  notifyBlacklistUpdate: trackDependency(notifyBlacklistUpdate, 'ServiceBus', 'send'),
-  notifySiteSettingsUpdate: trackDependency(notifySiteSettingsUpdate, 'ServiceBus', 'send')
+  restartPipeline: trackDependency(restartPipeline, 'ServiceBus', 'sendRestartPipeline'),
+  notifyWatchlistUpdate: trackDependency(notifyWatchlistUpdate, 'ServiceBus', 'sendWatchlistChanged'),
+  notifyBlacklistUpdate: trackDependency(notifyBlacklistUpdate, 'ServiceBus', 'sendBlacklistChanged'),
+  notifySiteSettingsUpdate: trackDependency(notifySiteSettingsUpdate, 'ServiceBus', 'sendSettingsChanged')
 };

@@ -82,9 +82,7 @@ function createSite(args) {
           ]
         }]);
       })
-      .then(() => {
-        streamingController.restartStreaming();
-      })
+      .then(() => streamingController.restartPipeline())
       .then(() => cassandraConnector.executeQuery(siteQuery, siteQueryParams))
       .then(addedSite => {
         if (addedSite.length === 1) {

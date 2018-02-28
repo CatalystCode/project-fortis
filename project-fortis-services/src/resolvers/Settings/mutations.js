@@ -408,7 +408,7 @@ function modifyStreams(args, res) { // eslint-disable-line no-unused-vars
     }
 
     Promise.all(streams.map(modifyStream))
-      .then(() => streamingController.restartStreaming())
+      .then(() => streamingController.restartPipeline())
       .then(() => resolve({ streams }))
       .catch(error => {
         trackException(error);
