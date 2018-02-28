@@ -104,7 +104,7 @@ The following list explains the settings managed on this site in more detail:
   multi-lingual areas.
 
 After changing the watchlist, you should click the restart pipeline button to
-propoagate the changes to the Fortis event ingestion.
+propagate the changes to the Fortis event ingestion.
 
 ### Adding Keywords with Excel then translating them to a supported language
 
@@ -160,7 +160,7 @@ Manage trusted sources like `twitter`, `facebook`, etc.
 | External Source Id  | Refer to `All Supported Trusted Sources` table below. |
 
 After changing the trusted sources, you should click the restart pipeline button
-to propoagate the changes to the Fortis event ingestion.
+to propagate the changes to the Fortis event ingestion.
 
 ### List of All Supported Trusted Sources
 
@@ -228,4 +228,4 @@ The following list explains the settings managed on this site in more detail:
   access credentials.
 
 After changing the streams, you should click the restart pipeline button to
-propoagate the changes to the Fortis event ingestion.
+propagate the changes to the Fortis event ingestion.
