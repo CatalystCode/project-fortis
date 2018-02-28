@@ -67,6 +67,11 @@ class Admin extends React.Component {
     const { index, showModal } = this.state;
     const { settings, watchlist } = this.props;
 
+    const shouldShowRestartPipelineButton =
+      index === WATCHLIST_TAB ||
+      index === TRUSTED_SOURCES ||
+      index === STREAM_TAB;
+
     return (
       <div>
         <div className="container-fluid">
@@ -142,9 +147,10 @@ class Admin extends React.Component {
                       </div>
                     </TabPanel>
                   </Tabs>
+                  { shouldShowRestartPipelineButton ?
                   <div className="row adminContainer">
                     <Button className="pull-right" bsStyle="danger" onClick={this.openModal}>Restart Pipeline</Button>
-                  </div>
+                  </div> : null }
                 </div>
               </div>
             </div>
