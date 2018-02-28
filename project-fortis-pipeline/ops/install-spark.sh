@@ -32,10 +32,11 @@ readonly k8location="${28}"
 # setup
 cd charts || exit -2
 readonly spark_daemon_memory="1g"
+readonly spark_driver_memory="4g"
 readonly default_language="en"
 readonly checkpoint_directory="/opt/checkpoint"
 readonly spark_config_map_name="spark-master-conf"
-readonly spark_command="spark-submit --conf \"spark.executor.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --conf \"spark.driver.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --deploy-mode cluster --driver-memory 2g --executor-memory 18g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/fortis-${latest_version}.jar\""
+readonly spark_command="spark-submit --conf \"spark.executor.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --conf \"spark.driver.extraJavaOptions=-XX:+UseConcMarkSweepGC\" --deploy-mode cluster --driver-memory ${spark_driver_memory} --executor-memory 18g --supervise --master spark://spark-master:7077 --verbose --class com.microsoft.partnercatalyst.fortis.spark.ProjectFortis \"https://fortiscentral.blob.core.windows.net/jars/fortis-${latest_version}.jar\""
 
 readonly install_dir="$(mktemp -d /tmp/fortis-spark-XXXXXX)"
 readonly namespace_yaml="${install_dir}/namespace.yaml"
@@ -65,6 +66,7 @@ kubectl create configmap "${spark_config_map_name}" \
   --from-literal=APPLICATION_INSIGHTS_IKEY="${app_insights_id}" \
   --from-literal=APPINSIGHTS_INSTRUMENTATIONKEY="${app_insights_id}" \
   --from-literal=SPARK_DAEMON_MEMORY="${spark_daemon_memory}" \
+  --from-literal=SPARK_DRIVER_MEMORY="${spark_driver_memory}" \
   --from-literal=DEFAULT_LANGUAGE="${default_language}" \
   --from-literal=FORTIS_SERVICE_HOST="${graphql_service_host}" \
   --from-literal=FORTIS_CENTRAL_ASSETS_HOST="${fortis_central_directory}" \
