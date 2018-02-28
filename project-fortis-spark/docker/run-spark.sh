@@ -58,4 +58,7 @@ while ! wget -qO- "$FORTIS_FEATURE_SERVICE_HOST/features/name/paris" > /dev/null
 done
 log "...done, featureService is now available"
 
-spark-submit --driver-memory "${SPARK_DRIVER_MEMORY}" --class "${SPARK_MAINCLASS}" /app/job.jar
+while ! spark-submit --driver-memory "${SPARK_DRIVER_MEMORY}" --class "${SPARK_MAINCLASS}" /app/job.jar; do
+  log "Spark job finished, restarting."
+  sleep 3s
+done
