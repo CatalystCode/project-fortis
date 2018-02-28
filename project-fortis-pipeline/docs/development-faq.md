@@ -18,6 +18,12 @@ perform a clean (discarding table data etc.), use:
 docker-compose down
 ```
 
+## I'm developing locally and the Project Fortis Spark tests take too long?
+
+You can temporarily disable the tests in project-fortis-spark by adding the
+string `"set test in assembly := {}"` before the assembly command on the
+instruction in the Dockerfile that runs the sbt build for the spark project.
+
 ## I'm getting an error from Twitter about "too many connections"?
 
 If you're getting an error from project-fortis-spark that there are too many
