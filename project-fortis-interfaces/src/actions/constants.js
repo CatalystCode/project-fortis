@@ -49,8 +49,16 @@ const CHART_STYLE = {
 };
 
 const EVENT_SOURCE_ICON_MAP = {
-    "twitter": "fa fa-twitter",
-    "facebook": "fa fa-facebook-official"
+    "bing": "fa fa-searchengin",
+    "customEvent": "fa fa-calendar-alt",
+    "facebook": "fa fa-facebook-official",
+    "html": "fa fa-code",
+    "instagram": "fa fa-instagram",
+    "radio": "fa fa-music",
+    "reddit": "fa fa-reddit",
+    "rss": "fa fa-rss-square",
+    "tadaweb": "fa fa-chart-area",
+    "twitter": "fa fa-twitter"
 };
 
 const CATEGORY_KEY_MAPPING = {
