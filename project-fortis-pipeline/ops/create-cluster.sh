@@ -220,6 +220,17 @@ EOF
 chown "${user_name}:${user_name}" "${backup_upgrade_script}"
 chmod +x "${backup_upgrade_script}"
 
+while :; do
+  services_pod="$(kubectl get po --selector='io.kompose.service=project-fortis-services' -o jsonpath='{.items[0].metadata.name}')"
+
+  if kubectl exec "${services_pod}" -- /usr/bin/wget -qO- "${feature_service_host}/features/name/paris" > /dev/null; do
+    break
+  else
+    echo "featureService not yet available, waiting..."
+    sleep 1m
+  fi
+done
+
 echo "Finished. Now installing Spark helm chart."
 ./install-spark.sh \
   "${cassandra_ip}" \
