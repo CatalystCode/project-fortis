@@ -150,6 +150,8 @@ const _methods = {
     },
 
     save_stream(streams) {
+      if (!streams || streams.length === 0) return;
+
       AdminServices.saveStreams(streams, (err, response, body) => ResponseHandler(err, response, body, (error, graphqlResponse) => {
         if (graphqlResponse) {
           const streamsListed = this.flux.stores.AdminStore.dataStore.streams;
