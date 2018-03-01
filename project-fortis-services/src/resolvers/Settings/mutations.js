@@ -203,7 +203,7 @@ function addTrustedSources(args, res) { // eslint-disable-line no-unused-vars
           externalsourceid,
           displayname,
           insertiontime
-        ) VALUES (?,?,?,?,?,dateof(now()),?)`,
+        ) VALUES (?,?,?,dateof(now()))`,
         params: [
           source.pipelinekey,
           source.externalsourceid,

@@ -8,48 +8,38 @@ const { DropDownFormatter } = Formatters;
 const TRANSLATED_NAME = "translatedname";
 
 class TrustedSources extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.getEnabledStreamsForDropdown = this.getEnabledStreamsForDropdown.bind(this);
-    this.getTrustedSourcesColumns = this.getTrustedSourcesColumns.bind(this);
-    this.getTranslatableFields = this.getTranslatableFields.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-  }
-
   componentDidMount() {
     this.props.flux.actions.ADMIN.notifyDataGridTrustedSourcesLoaded();
   }
 
-  handleSave(rows) {
+  handleSave = rows => {
     rows.forEach(row => row.rowKey = this.getRowKey(row));
     this.props.flux.actions.ADMIN.save_trusted_sources(rows);
   }
 
-  getRowKey(row) {
+  getRowKey = row => {
     return `${row.pipelinekey},${row.externalsourceid}`;
   }
 
-  handleRemove(rows) {
+  handleRemove = rows => {
     const sourcesWithAllFieldsSet = this.filterSourcesWithUnsetFields(rows);
     if (this.trustedSourcesToRemoveExist(sourcesWithAllFieldsSet)) {
       this.props.flux.actions.ADMIN.remove_trusted_sources(sourcesWithAllFieldsSet);
     }
   }
 
-  filterSourcesWithUnsetFields(sources) {
+  filterSourcesWithUnsetFields = sources => {
     return sources.filter(source => source.pipelinekey.length > 0 || source.externalsourceid.length > 0)
   }
 
-  trustedSourcesToRemoveExist(sources) {
+  trustedSourcesToRemoveExist = sources => {
     return sources.length > 0;
   }
 
-  getTrustedSourcesColumns() {
-    const enabledStreams = this.getEnabledStreamsForDropdown();
+  getTrustedSourcesColumns = () => {
+    const streams = this.getStreamsForDropdown();
     const columnValues = [
-      {key: "pipelinekey", name: "Pipeline Key", editor: <DropDownEditor options={enabledStreams}/>, formatter: <DropDownFormatter options={enabledStreams} value='Facebook'/>},
+      {key: "pipelinekey", name: "Pipeline Key", editor: <DropDownEditor options={streams}/>, formatter: <DropDownFormatter options={streams} value='Facebook'/>},
       {editable: true, filterable: true, sortable: true, key: "externalsourceid", name: "External Source Id"},
       {editable: true, filterable: true, sortable: true, key: "displayname", name: "Name"},
     ];
@@ -57,7 +47,7 @@ class TrustedSources extends React.Component {
     return getColumns(columnValues);
   }
 
-  getEnabledStreamsForDropdown = () => {
+  getStreamsForDropdown = () => {
     let dropdownOptions = [];
     this.props.enabledStreams.forEach((value, key) => {
       dropdownOptions.push({
@@ -70,7 +60,7 @@ class TrustedSources extends React.Component {
     return dropdownOptions;
   }
 
-  getTranslatableFields() {
+  getTranslatableFields = () => {
     const defaultLanguage = this.getDefaultLanguage();
     const alternateLanguage = this.props.settings.properties.supportedLanguages.find(supportedLanguage => supportedLanguage !== defaultLanguage);
     return {
@@ -79,7 +69,7 @@ class TrustedSources extends React.Component {
     };
   }
 
-  getDefaultLanguage() {
+  getDefaultLanguage = () => {
     return this.props.settings.properties.defaultLanguage;
   }
 
