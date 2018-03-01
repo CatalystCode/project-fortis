@@ -223,7 +223,7 @@ chmod +x "${backup_upgrade_script}"
 while :; do
   services_pod="$(kubectl get po --selector='io.kompose.service=project-fortis-services' -o jsonpath='{.items[0].metadata.name}')"
 
-  if kubectl exec "${services_pod}" -- /usr/bin/wget -qO- "${feature_service_host}/features/name/paris" > /dev/null; do
+  if kubectl exec "${services_pod}" -- /usr/bin/wget -qO- "${feature_service_host}/features/name/paris" > /dev/null; then
     break
   else
     echo "featureService not yet available, waiting..."
