@@ -294,42 +294,6 @@ EOF
 chown "${user_name}:${user_name}" "${upgrade_script}"
 chmod +x "${upgrade_script}"
 
-echo "Finished. Verifying deployment."
-if [ "${endpoint_protection}" == "none" ]; then
-  ./verify-deployment.sh \
-    "${graphql_service_host}"
-else
-  # request a public ip in order to verify the cluster deployment
-  # we aren't testing the TLS ingress due to manual steps required to get
-  # that completely setup
-  kubectl expose deployment project-fortis-services \
-    --type "LoadBalancer" \
-    --name "project-fortis-services-verification-lb"
-  # wait for the verification endpoint to come up
-  while :; do
-    fortis_service_verification_ip="$(kubectl get svc project-fortis-services-verification-lb -o jsonpath='{..ip}')"
-    if [ -n "${fortis_service_verification_ip}" ]; then break; else echo "Waiting for project-fortis-services-verification IP"; sleep 5s; fi
-  done
-  echo "Got service IP: ${fortis_service_verification_ip}"
-  project_fortis_services_verification_endpoint="http://${fortis_service_verification_ip}"
-  echo "Endpoint: ${project_fortis_services_verification_endpoint}"
-  ./verify-deployment.sh \
-    "${project_fortis_services_verification_endpoint}"
-fi
-
-# shellcheck disable=SC2181
-if [ $? -ne 0 ]; then
-  echo "Deployment verification failed" >&2
-  exit 1
-fi
-
-if [ "${endpoint_protection}" != "none" ]; then
-  if ! kubectl delete service project-fortis-services-verification-lb; then
-    echo "Unable to delete verification endpoint" >& 2
-    exit 1
-  fi
-fi
-
 echo "Finished. Finally, creating tags containing URLs for resources so that the user can find them later."
 ./create-tags.sh \
   "${k8resource_group}" \
