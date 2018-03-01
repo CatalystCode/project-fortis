@@ -78,16 +78,16 @@ class TwitterStreamFactory(configurationManager: ConfigurationManager) extends S
       }
 
       if (!isOriginalTweet(status)) {
-        Log.logEvent("pipeline.filters.isRetweet", Map("isFiltered" -> "false"))
+        Log.logEvent("pipeline.filters.isRetweet", Map("passedFilter" -> "false"))
         false
       } else {
         if (trustedSourceScreenNames.isEmpty) {
           true
         } else {
           val screenName = status.getUser.getScreenName.toLowerCase
-          val isFiltered = trustedSourceScreenNames.contains(screenName)
-          Log.logEvent("pipeline.filters.isTrustedSource", Map("isFiltered" -> isFiltered.toString, "screenName" -> screenName))
-          isFiltered
+          val passedFilter = trustedSourceScreenNames.contains(screenName)
+          Log.logEvent("pipeline.filters.isTrustedSource", Map("passedFilter" -> passedFilter.toString, "screenName" -> screenName))
+          passedFilter
         }
       }
     })

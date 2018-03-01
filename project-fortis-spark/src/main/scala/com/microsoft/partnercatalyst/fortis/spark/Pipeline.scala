@@ -155,9 +155,9 @@ object Pipeline {
         event.copy(analysis = event.analysis.copy(summary = summary))
       }
 
-      def logFilter(isFiltered: Boolean, filterName: String) = {
-        Log.logEvent(s"pipeline.filters.$filterName", Map("isFiltered" -> isFiltered.toString))
-        isFiltered
+      def logFilter(passedFilter: Boolean, filterName: String) = {
+        Log.logEvent(s"pipeline.filters.$filterName", Map("passedFilter" -> passedFilter.toString))
+        passedFilter
       }
 
       // Configure analysis pipeline
