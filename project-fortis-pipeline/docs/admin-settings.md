@@ -172,7 +172,14 @@ Still needs to be implemented.
 
 ## Trusted Sources
 
-Manage trusted sources like `twitter`, `facebook`, etc.
+White-list trusted sources like Twitter accounts or RSS feeds. If you specify
+trusted sources, Fortis will only ingest events that come from the sources you
+trust for a particular data source instead of ingesting all the events.
+
+For example, if you add trusted sources for your Twitter pipeline, Fortis will
+only ingest tweets from those accounts that match the keywords you care about,
+instead of ingesting all the tweets for anyone in your geographic area for those
+keywords.
 
 | Column Name         | Description   |
 | ------------------- | ------------- |
