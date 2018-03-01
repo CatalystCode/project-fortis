@@ -68,9 +68,9 @@ class Admin extends React.Component {
     const { settings, watchlist } = this.props;
 
     const shouldShowRestartPipelineButton =
+      index === SETTINGS_TAB ||
       index === WATCHLIST_TAB ||
-      index === TRUSTED_SOURCES_TAB ||
-      index === STREAM_TAB;
+      index === BLACKLIST_TAB;
 
     return (
       <div>

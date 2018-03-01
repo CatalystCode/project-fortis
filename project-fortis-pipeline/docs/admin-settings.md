@@ -4,6 +4,7 @@ Fortis comes with a settings page with which you can edit site configurations
 and also provide details on how events should be monitored and processed.
 
 Through the settings page, you will be able to configure amonst others:
+
 - General settings about your deployment in the "Site Settings" tab
 - Blacklist terms and whitelist terms in the "Watchlist" tab.
 - Data sources to watch like Twitter, Facebook, Bing, etc in the "Streams" tab.
@@ -21,6 +22,18 @@ following to start monitoring events:
   that match any of the keywords you specify on this tab.
 - One or more data sources on the "Streams" tab; Fortis will only ingest events
   sourced from the data sources that you specify on this tab.
+
+## Restarting the Pipeline
+
+It is necessary to restart the pipeline to update Fortis event ingestion with your new admin settings. As some configurations may be updated more frequently than others, these will need a manual pipeline restart. To restart the pipeline manually, use the `restart pipeline button` on the corresponding tab. Configurations that are infrequently changed will have automatic pipeline restarts.
+
+| Configurations  | Pipeline Restart |
+| ----------------|------------------|
+| Site Settings   | Manual           |
+| Watchlist       | Manual           |
+| Trusted Sources | Automatic        |
+| Blacklist       | Manual           |
+| Streams         | Automatic        |
 
 ## Site Settings
 
@@ -78,6 +91,9 @@ The following list explains the settings managed on this site in more detail:
 
 - **Cognitive Text Services Token:** Neded for [sentiment analysis](https://azure.microsoft.com/en-us/services/cognitive-services/text-analytics/).
   This access key is set up automatically during the initial Fortis deployment.
+
+After changing the site settings, you should click the restart pipeline button to
+propagate the changes to the Fortis event ingestion.
 
 ## Watchlist
 
@@ -159,8 +175,7 @@ Manage trusted sources like `twitter`, `facebook`, etc.
 | Name                | Friendly name you assign for your trusted source to act as an alias for the external source id. In the `dashboard` this friendly name will be what is displayed, not the external source id. (external source id will only be displayed if `Name` is not defined) |
 | External Source Id  | Refer to `All Supported Trusted Sources` table below. |
 
-After changing the trusted sources, you should click the restart pipeline button
-to propagate the changes to the Fortis event ingestion.
+After changing the trusted sources, the pipeline will automatically be restarted.
 
 ### List of All Supported Trusted Sources
 
@@ -202,6 +217,9 @@ The following list explains the settings managed on this site in more detail:
   excluded. For example, you can use this to exclude all events from a
   particular city, town or region.
 
+After changing the blacklist, you should click the restart pipeline button to
+propagate the changes to the Fortis event ingestion.
+
 ## Streams
 
 On this page, you can manage the data sources to which your Fortis site listens.
@@ -227,5 +245,4 @@ The following list explains the settings managed on this site in more detail:
 - **Edit:** Open the editor to modify the stream, for example to update API
   access credentials.
 
-After changing the streams, you should click the restart pipeline button to
-propagate the changes to the Fortis event ingestion.
+After changing the streams, the pipeline will automatically be restarted.
