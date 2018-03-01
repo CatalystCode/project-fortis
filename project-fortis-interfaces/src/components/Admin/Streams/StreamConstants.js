@@ -580,6 +580,14 @@ const schema = {
                   title: 'HTML Parameters',
                   type: 'object',
                   properties: {
+                    feedUrls: {
+                      title: 'HTML Feed Urls',
+                      type: 'array',
+                      items: {
+                        type: 'string',
+                        format: 'uri',
+                      },
+                    },
                     maxDepth: {
                       title: 'Max Depth',
                       type: 'string',
@@ -595,7 +603,10 @@ const schema = {
                       type: 'string',
                       pattern: '\\d+'
                     }
-                  }
+                  },
+                  required: [
+                    'feedUrls'
+                  ]
                 }
               },
             },
@@ -1041,6 +1052,11 @@ const uiSchema = {
       },
       consumerSecret: {
         classNames: "settings secret"
+      },
+      feedUrls: {
+        items: {
+          "ui:placeholder": "http://"
+        }
       },
       instagramLocation: {
         lat: {
