@@ -47,9 +47,9 @@ class Header extends React.Component {
   renderLeftNav() {
     return (
       <ul className="nav navbar-nav navbar-left">
-        <li>{ this.renderDashboardLink() }</li>
-        <li>{ this.renderFactsLink() }</li>
-        <li>{ this.renderSettingsLink() }</li>
+        { this.renderDashboardLink() }
+        { this.renderFactsLink() }
+        { this.renderSettingsLink() }
       </ul>
     );
   }
@@ -58,7 +58,9 @@ class Header extends React.Component {
     const category = this.props.category;
 
     return (
-      <Link to={category ? `/dashboard/${category}` : '/dashboard'} activeClassName="current">Dashboard</Link>
+      <li>
+        <Link to={category ? `/dashboard/${category}` : '/dashboard'} activeClassName="current">Dashboard</Link>
+      </li>
     );
   }
 
@@ -66,15 +68,23 @@ class Header extends React.Component {
     const category = this.props.category;
 
     return (
-      <Link to={category ? `/facts/${category}` : '/facts'} activeClassName="current">Facts</Link>
+      <li>
+        <Link to={category ? `/facts/${category}` : '/facts'} activeClassName="current">Facts</Link>
+      </li>
     );
   }
 
   renderSettingsLink() {
-    const category = this.props.category;
+    const { category, accessLevels } = this.props;
+
+    if (!accessLevels || !accessLevels.has('admin')) {
+      return null;
+    }
 
     return (
-      <Link to={category ? `/settings/${category}` : '/settings'} activeClassName="current">Settings</Link>
+      <li>
+        <Link to={category ? `/settings/${category}` : '/settings'} activeClassName="current">Settings</Link>
+      </li>
     );
   }
 

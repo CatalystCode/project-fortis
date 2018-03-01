@@ -17,6 +17,7 @@ const { trackException, trackEvent } = require('../../clients/appinsights/AppIns
 const loggingClient = require('../../clients/appinsights/LoggingClient');
 const { uploadFile } = require('../../clients/storage/BlobStorageClient');
 const { requiresRole } = require('../../auth');
+const { getUserFromArgs } = require('../../utils/request');
 const { hideSecret, isSecretParam, cassandraRowToStream } = require('./shared');
 
 function users(args, res) { // eslint-disable-line no-unused-vars
@@ -57,12 +58,22 @@ function terms(args, res) { // eslint-disable-line no-unused-vars
 
 function sites(args, res) { // eslint-disable-line no-unused-vars
   return new Promise((resolve, reject) => {
-    getSiteDefinition()
+    const user = getUserFromArgs(args, res);
+    const roles = [];
+
+    cassandraConnector.executeQuery('SELECT role FROM settings.users WHERE identifier = ? ALLOW FILTERING', [user])
+      .then(rows => {
+        rows.forEach(row => roles.push(row.role));
+      })
+      .then(() => getSiteDefinition())
       .then(value => {
         hideSecret(value.site.properties, 'translationSvcToken');
         hideSecret(value.site.properties, 'cogSpeechSvcToken');
         hideSecret(value.site.properties, 'cogVisionSvcToken');
         hideSecret(value.site.properties, 'cogTextSvcToken');
+
+        value.accessLevels = roles;
+
         resolve(value);
       })
       .catch(reject);

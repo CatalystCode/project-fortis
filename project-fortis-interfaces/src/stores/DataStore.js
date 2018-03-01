@@ -60,6 +60,7 @@ export const DataStore = Fluxxor.createStore({
             initialLoadStepsCompleted: 0,
             initialLoadStepsTotal: 4,
             bbox: [],
+            accessLevels: new Set(),
             zoomLevel: constants.HEATMAP_DEFAULT_ZOOM,
             maintopic: false,
             language: constants.LANGUAGE_CODE_ENG,
@@ -113,10 +114,11 @@ export const DataStore = Fluxxor.createStore({
             return;
         }
 
-        const { terms, configuration, topics, dataSources, category, trustedSources, siteName } = graphqlResponse;
+        const { terms, configuration, topics, dataSources, category, trustedSources, siteName, accessLevels } = graphqlResponse;
         const { datetimeSelection, timespanType } = this.dataStore;
         const { defaultLanguage, logo, title, targetBbox, supportedLanguages, defaultZoomLevel } = configuration;
         const { fromDate, toDate } = convertDateValueToRange(datetimeSelection, timespanType);
+        this.dataStore.accessLevels = new Set(accessLevels);
         this.dataStore.siteName = siteName;
         this.dataStore.enabledStreams = dataSources;
         this.dataStore.dataSource = constants.DEFAULT_DATA_SOURCE;

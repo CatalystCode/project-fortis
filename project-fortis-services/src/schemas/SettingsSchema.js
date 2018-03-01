@@ -144,6 +144,7 @@ module.exports = graphql.buildSchema(`
   type SiteCollection {
     runTime: String,
     site: Site!,
+    accessLevels: [String]!
   }
 
   type StreamCollection {

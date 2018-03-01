@@ -71,9 +71,15 @@ export const AdminPage = createReactClass({
   },
 
   render() {
+    const { adminStoreState, dataStoreState } = this.state;
+
+    if (!dataStoreState || !dataStoreState.accessLevels || !dataStoreState.accessLevels.has('admin')) {
+      return null;
+    }
+
     return (
       <div>
-        { this.state.adminStoreState.settings.properties ?
+        { adminStoreState && adminStoreState.settings && adminStoreState.settings.properties ?
            <div>
               <Admin flux={this.props.flux} {...this.propertyLiterals()} />
             </div>

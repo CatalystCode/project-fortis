@@ -281,6 +281,7 @@ export const AppPage = createReactClass({
             category={this.props.params.category}
             title={this.state.title}
             logo={this.state.logo}
+            accessLevels={this.state.accessLevels}
             logoutCallback={this.adApplication ? this.adLogout : null}
             loginCallback={this.adApplication ? this.adLogin : null}
             userName={this.state.authInfo && this.state.authInfo.user && this.state.authInfo.user.name}

@@ -23,6 +23,7 @@ export const siteSettingsFragment = `fragment FortisSiteDefinitionView on SiteCo
         supportedLanguages
     }
   }
+  accessLevels
 }`;
 
 export const site = `fragment SiteView on SiteCollection {
