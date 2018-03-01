@@ -25,7 +25,12 @@ following to start monitoring events:
 
 ## Restarting the Pipeline
 
-It is necessary to restart the pipeline to update Fortis event ingestion with your new admin settings. As some configurations may be updated more frequently than others, these will need a manual pipeline restart. To restart the pipeline manually, use the `restart pipeline button` on the corresponding tab. Configurations that are infrequently changed will have automatic pipeline restarts.
+It is necessary to restart the pipeline to update Fortis event ingestion with
+your new admin settings. As some configurations may be updated more
+frequently than others, these will need a manual pipeline restart. To restart
+the pipeline manually, use the `restart pipeline button` on the corresponding
+tab. Configurations that are infrequently changed will have automatic
+pipeline restarts.
 
 | Configurations  | Pipeline Restart |
 | ----------------|------------------|
