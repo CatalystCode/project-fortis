@@ -23,6 +23,14 @@ following to start monitoring events:
 - One or more data sources on the "Streams" tab; Fortis will only ingest events
   sourced from the data sources that you specify on this tab.
 
+**Note:** Some stream types, mentioned below, `require` trusted
+  sources to be configured for event ingestion.
+
+### Streams which require configured Trusted Sources
+
+- Facebook
+- RSS
+
 ## Restarting the Pipeline
 
 It is necessary to restart the pipeline to update Fortis event ingestion with
