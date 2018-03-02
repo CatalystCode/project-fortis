@@ -43,6 +43,8 @@ single resource group whose name is stored under the
 
 ### Generating Mapbox access token
 
+Mapbox is a service that allows you to simply create beautiful maps and location services through APIs and SDKs. They have extensive documentation which you can find [here](https://www.mapbox.com/api-documentation/#maps).
+
 Next, you need to create a Mapbox access token. If you don't have one yet, you
 can create a new one for free by [signing up](https://www.mapbox.com/signup/).
 Once you have the token, append it to the `.env-secrets` file like so:

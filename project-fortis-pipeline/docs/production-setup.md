@@ -1,13 +1,22 @@
-# Fortis production setup
+# Fortis production 
 
 ## Prerequisites
 
 ### Azure subscription
 
-First and foremost, you'll need an Azure subscription. You can create one for
-free [here](https://azure.microsoft.com/en-us/free/).
+First and foremost, you'll need an Azure subscription. 
+
+Azure is a comprehensive set of cloud services that developers and IT professionals use to build, deploy, and manage applications through our global network of datacenters. Integrated tools, DevOps, and a marketplace support you in efficiently building anything from simple mobile apps to internet-scale solutions.
+
+A full list of products and services can be found [here](https://azure.microsoft.com/en-us/services/).
+
+And you can create an account for free [here](https://azure.microsoft.com/en-us/free/).
+
+For this project we're using these services: [Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/), [Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/), [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/services/postgresql/), [Service Bus](https://azure.microsoft.com/en-us/services/service-bus/), [Active Directory v2](https://azure.microsoft.com/en-us/services/active-directory/), [Container Service](https://azure.microsoft.com/en-us/services/container-service/) and [Event Hubs](https://azure.microsoft.com/en-us/services/event-hubs/).
 
 ### Secure your Fortis site with TLS
+
+TLS is the successcor to SSL. The TLS protocol aims primarily to provide privacy and data integrity between two communicating computer applications. You can find more information about it [here](https://en.wikipedia.org/wiki/Transport_Layer_Security)
 
 To enable TLS and secure your Fortis site, you have two choices:
 
