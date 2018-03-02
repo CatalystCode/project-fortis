@@ -88,7 +88,7 @@ function requiresRole(promiseFunc, requiredRole) {
 
       checkIfUserHasRoleCached(user, requiredRole)
         .then(hasRole => {
-          if (!hasRole) return reject(`Unknown user ${user} for role ${requiredRole}`);
+          if (!hasRole) return reject(`Unknown user ${user}`);
           return promiseFunc(...args)
             .then(resolve)
             .catch(reject);
