@@ -89,6 +89,7 @@ export const AppPage = createReactClass({
     const user = this.adApplication.getUser();
     localStorage.setItem(reactAppAdTokenStoreKey, token);
     this.getFlux().actions.DASHBOARD.handleAuth({ user, token });
+    window.location.reload();
   },
 
   adLogin() {
