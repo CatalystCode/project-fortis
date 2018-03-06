@@ -275,7 +275,7 @@ const defaultStreamMap = {
     pipelineKey: 'Facebook',
     pipelineLabel: 'Facebook',
     pipelineIcon: EVENT_SOURCE_ICON_MAP.facebook,
-    streamFactory: 'FacebookPost',
+    streamFactory: 'FacebookPage',
     enabled: true
   },
   HTML: {
