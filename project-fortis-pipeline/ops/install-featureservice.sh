@@ -7,8 +7,8 @@ readonly user_name="$4"
 
 readonly dbpassword="$(< /dev/urandom tr -dc '_A-Z-a-z-0-9' | head -c32)"
 readonly dbversion="1.0.1"
-readonly dbtier="Standard"
-readonly dbcompute="400"
+readonly dbsku="GP_Gen4_2"
+readonly dbsizemb="102400"
 
 # setup
 readonly install_dir="$(mktemp -d /tmp/fortis-featureservice-XXXXXX)"
@@ -22,8 +22,8 @@ az postgres server create \
   --admin-password="${dbpassword}" \
   --resource-group="${k8resource_group}" \
   --location="${k8location}" \
-  --compute-units="${dbcompute}" \
-  --performance-tier="${dbtier}"
+  --sku-name="${dbsku}" \
+  --storage-size="${dbsizemb}"
 
 az postgres server firewall-rule create \
   --server-name="${featuresdb_name}" \
