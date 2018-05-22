@@ -31,6 +31,7 @@ Fortis is a flexible project and can be configured for many situations, e.g.:
 
 ## Articles
 
+- [Runtime Configuration of Spark Streaming Jobs](https://www.microsoft.com/developerblog/2018/05/01/runtime-configuration-of-spark-streaming-jobs-via-azure-service-bus/)
 - [Spark Streaming Transformations: A Deep-dive](https://medium.com/@kevin_hartman/spark-streaming-transformations-a-deep-dive-b82787e53288)
 - [Permissively-Licensed Named Entity Recognition on the JVM](https://www.microsoft.com/developerblog/2017/11/20/opener-permissively-licensed-named-entity-recognition-on-the-jvm/)
 - [Building a Custom Spark Connector for Near Real-Time Speech-to-Text Transcription](https://www.microsoft.com/developerblog/2017/11/01/building-a-custom-spark-connector-for-near-real-time-speech-to-text-transcription/)
