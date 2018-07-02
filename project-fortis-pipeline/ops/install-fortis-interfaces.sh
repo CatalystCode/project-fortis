@@ -11,7 +11,7 @@ readonly latest_version="$8"
 
 # setup
 if ! (command -v jq >/dev/null); then sudo apt-get -qq install -y jq; fi
-if ! (command -v npm >/dev/null); then curl -sL 'https://deb.nodesource.com/setup_6.x' | sudo -E bash -; sudo apt-get -qq install -y nodejs; fi
+if ! (command -v npm >/dev/null); then curl -sL 'https://deb.nodesource.com/setup_8.x' | sudo -E bash -; sudo apt-get -qq install -y nodejs; fi
 
 readonly install_dir="$(mktemp -d /tmp/fortis-interfaces-XXXXXX)"
 pushd "${install_dir}"
