@@ -2,14 +2,6 @@ matrix:
   include:
 
     - language: bash
-      sudo: required
-      addons:
-        apt:
-          sources:
-            - debian-sid
-          packages:
-            - shellcheck
-            - docker-ce
       script:
         - project-fortis-backup/travis/ci.sh
       services:
@@ -35,12 +27,6 @@ matrix:
         NAME=project-fortis-interfaces
 
     - language: bash
-      addons:
-      apt:
-        sources:
-          - debian-sid
-        packages:
-          - shellcheck
       script:
         - project-fortis-pipeline/travis/ci.sh
       env:
@@ -57,12 +43,6 @@ matrix:
         project-fortis-services/travis/ci.sh
       services:
         - docker
-      addons:
-        apt:
-          sources:
-            - debian-sid
-          packages:
-            - docker-ce
       deploy:
         - provider: script
           script: project-fortis-services/travis/publish.sh
