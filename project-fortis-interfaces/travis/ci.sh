@@ -8,7 +8,7 @@ err=0
 
 npm install
 
-if ! ./node_modules/.bin/eslint --max-warnings=0 src *.js; then
+if ! ./node_modules/.bin/eslint src *.js; then
   err=1
 fi
 
