@@ -215,8 +215,8 @@ done
 
 install_azure_cli() {
   sudo apt-get -qq update && sudo apt-get -qq install -y libssl-dev libffi-dev python-dev
-  echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/azure-cli/ wheezy main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
-  sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
+  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" |sudo tee /etc/apt/sources.list.d/azure-cli.list
+  curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
   sudo apt-get -qq install -y apt-transport-https
   sudo apt-get -qq update && sudo apt-get -qq install -y azure-cli
 }
