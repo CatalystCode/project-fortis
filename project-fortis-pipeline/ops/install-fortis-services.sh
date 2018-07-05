@@ -157,7 +157,14 @@ if [ "${endpoint_protection}" == "none" ]; then
     --name "project-fortis-services-lb"
 elif [ "${endpoint_protection}" == "tls_provide_certificate" ]; then
   # setup nginx ingress controller
-  helm install stable/nginx-ingress --name nginx-ingress --namespace nginx-ingress --set controller.replicaCount=3
+  helm install --name nginx-ingress \
+    --namespace nginx-ingress \
+    --set controller.replicaCount=3 \
+    --set rbac.create=false \
+    --set rbac.createRole=false \
+    --set rbac.createClusterRole=false \
+    stable/nginx-ingress
+
   cat > "${ingress_yaml}" << EOF
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -199,7 +206,14 @@ else
     stable/kube-lego
 
   # setup nginx ingress controller
-  helm install stable/nginx-ingress --name nginx-ingress --namespace nginx-ingress --set controller.replicaCount=3
+  helm install --name nginx-ingress \
+    --namespace nginx-ingress \
+    --set controller.replicaCount=3 \
+    --set rbac.create=false \
+    --set rbac.createRole=false \
+    --set rbac.createClusterRole=false \
+    stable/nginx-ingress
+
   cat > "${ingress_yaml}" << EOF
 apiVersion: extensions/v1beta1
 kind: Ingress
