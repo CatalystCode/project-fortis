@@ -70,7 +70,7 @@ readonly cassandra_username="cassandra"
 readonly cassandra_password="cassandra"
 
 echo "Finished. Now setting up fortis graphql service in kubernetes."
-readonly tls_hostname="${storage_account_name}.${k8location}.cloudapp.azure.com"
+readonly tls_hostname="${storage_account_name}.$(echo "${k8location}" | tr '[:upper:]' '[:lower:]' | tr -d ' ').cloudapp.azure.com"
 ./install-fortis-services.sh \
   "${cassandra_ip}" \
   "${app_insights_id}" \
