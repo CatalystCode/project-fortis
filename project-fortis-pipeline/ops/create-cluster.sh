@@ -70,6 +70,7 @@ readonly cassandra_username="cassandra"
 readonly cassandra_password="cassandra"
 
 echo "Finished. Now setting up fortis graphql service in kubernetes."
+readonly tls_hostname="${storage_account_name}.${k8location}.cloudapp.azure.com"
 ./install-fortis-services.sh \
   "${cassandra_ip}" \
   "${app_insights_id}" \
@@ -99,16 +100,16 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${cassandra_port}" \
   "${cassandra_username}" \
   "${cassandra_password}" \
-  "${k8cassandra_node_count}"
+  "${k8cassandra_node_count}" \
+  "${tls_hostname}"
 
 while :; do
   fortis_service_ip="$(kubectl get svc/nginx-ingress-controller -o jsonpath='{..ip}')"
   if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
 done
 readonly ingressipid="$(az network public-ip list --resource-group "" --output tsv --query "[?ipAddress!=null]|[?contains(ipAddress, '${fortis_service_ip}')].[id]")"
-readonly tls_hostname="$(az network public-ip update --ids "${ingressipid}" --dns-name "${storage_account_name}" --output tsv --query dnsSettings.fqdn)"
+az network public-ip update --ids "${ingressipid}" --dns-name "${storage_account_name}" --output tsv --query dnsSettings.fqdn
 readonly graphql_service_host="https://${tls_hostname}"
-readonly mx_record_entry="@.${lets_encrypt_email#*@}"
 
 echo "Finished. Now setting up fortis graphql service upgrade script."
 readonly services_upgrade_script="/home/${user_name}/upgrade-fortis-services.sh"

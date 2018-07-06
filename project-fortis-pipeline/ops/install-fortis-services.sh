@@ -29,6 +29,7 @@ readonly cassandra_port="${26}"
 readonly cassandra_username="${27}"
 readonly cassandra_password="${28}"
 readonly k8cassandra_node_count="${29}"
+readonly tls_hostname="${30}"
 
 # setup
 readonly install_dir="$(mktemp -d /tmp/fortis-services-XXXXXX)"
