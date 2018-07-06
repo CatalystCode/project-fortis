@@ -23,24 +23,18 @@ readonly cogspeechsvctoken="${20}"
 readonly cogtextsvctoken="${21}"
 readonly translationsvctoken="${22}"
 readonly fortis_site_clone_url="${23}"
-readonly endpoint_protection="${24}"
-readonly tls_hostname="${25}"
-readonly tls_certificate_b64="${26}"
-readonly tls_key_b64="${27}"
-readonly lets_encrypt_email="${28}"
-readonly lets_encrypt_api_endpoint="${29}"
-readonly latest_version="${30}"
-readonly cassandra_port="${31}"
-readonly cassandra_username="${32}"
-readonly cassandra_password="${33}"
-readonly k8cassandra_node_count="${34}"
+readonly lets_encrypt_email="${24}"
+readonly latest_version="${25}"
+readonly cassandra_port="${26}"
+readonly cassandra_username="${27}"
+readonly cassandra_password="${28}"
+readonly k8cassandra_node_count="${29}"
 
 # setup
 readonly install_dir="$(mktemp -d /tmp/fortis-services-XXXXXX)"
 readonly deployment_yaml="${install_dir}/kubernetes-deployment.yaml"
 readonly service_yaml="${install_dir}/kubernetes-service.yaml"
 readonly ingress_yaml="${install_dir}/nginx-ingress.yaml"
-readonly ingress_secret_yaml="${install_dir}/nginx-ingress-secret.yaml"
 readonly replication_factor="$((k8cassandra_node_count/2+1))"
 
 # deploy the service to the kubernetes cluster
@@ -150,91 +144,40 @@ status:
 EOF
 kubectl create -f "${deployment_yaml}","${service_yaml}"
 
-if [ "${endpoint_protection}" == "none" ]; then
-  # request a public ip for the service
-  kubectl expose deployment project-fortis-services \
-    --type "LoadBalancer" \
-    --name "project-fortis-services-lb"
-elif [ "${endpoint_protection}" == "tls_provide_certificate" ]; then
-  # setup nginx ingress controller
-  helm install --name nginx-ingress \
-    --namespace nginx-ingress \
-    --set controller.replicaCount=3 \
-    --set rbac.create=false \
-    --set rbac.createRole=false \
-    --set rbac.createClusterRole=false \
-    stable/nginx-ingress
+# setup kube-lego
+helm install --name kube-lego \
+  --set config.LEGO_EMAIL="${lets_encrypt_email}" \
+  --set config.LEGO_URL="https://acme-v01.api.letsencrypt.org/directory" \
+  stable/kube-lego
 
-  cat > "${ingress_yaml}" << EOF
+# setup nginx ingress controller
+helm install --name nginx-ingress \
+  --set controller.replicaCount=3 \
+  --set rbac.create=false \
+  --set rbac.createRole=false \
+  --set rbac.createClusterRole=false \
+  stable/nginx-ingress
+
+cat > "${ingress_yaml}" << EOF
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  name: project-fortis-services-ingress
+annotations:
+  kubernetes.io/ingress.class: nginx
+  kubernetes.io/tls-acme: 'true'
+name: project-fortis-services-ingress
 spec:
-  rules:
-    - host: ${tls_hostname}
-      http:
-        paths:
-          - backend:
-              serviceName: project-fortis-services
-              servicePort: 80
-            path: /
-  tls:
-      - hosts:
-          - ${tls_hostname}
-        secretName: project-fortis-services-nginx-tls-secret
+rules:
+  - host: ${tls_hostname}
+    http:
+      paths:
+        - backend:
+            serviceName: project-fortis-services
+            servicePort: 80
+          path: /
+tls:
+  - hosts:
+      - ${tls_hostname}
+    secretName: project-fortis-services-nginx-tls-secret
 EOF
-  cat > "${ingress_secret_yaml}" << EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: project-fortis-services-nginx-tls-secret
-  namespace: default
-data:
-  tls.crt: ${tls_certificate_b64}
-  tls.key: ${tls_key_b64}
-type: kubernetes.io/tls
-EOF
-  kubectl create -f "${ingress_secret_yaml}","${ingress_yaml}"
-else
-  # setup kube-lego
-  helm install --name fortis-kube-lego \
-    --set config.LEGO_EMAIL="${lets_encrypt_email}" \
-    --set config.LEGO_URL="${lets_encrypt_api_endpoint}" \
-    stable/kube-lego
-
-  # setup nginx ingress controller
-  helm install --name nginx-ingress \
-    --namespace nginx-ingress \
-    --set controller.replicaCount=3 \
-    --set rbac.create=false \
-    --set rbac.createRole=false \
-    --set rbac.createClusterRole=false \
-    stable/nginx-ingress
-
-  cat > "${ingress_yaml}" << EOF
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    kubernetes.io/tls-acme: 'true'
-  name: project-fortis-services-ingress
-spec:
-  rules:
-    - host: ${tls_hostname}
-      http:
-        paths:
-          - backend:
-              serviceName: project-fortis-services
-              servicePort: 80
-            path: /
-  tls:
-    - hosts:
-        - ${tls_hostname}
-      secretName: project-fortis-services-nginx-tls-secret
-EOF
-    kubectl create -f "${ingress_yaml}"
-fi
+kubectl create -f "${ingress_yaml}"

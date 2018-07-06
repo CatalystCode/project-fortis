@@ -133,19 +133,9 @@
             },
             "type": "securestring"
         },
-        "endpointProtection": {
-            "type": "string",
-            "allowedValues": [
-                "none",
-                "tls_provide_certificate",
-                "tls_lets_encrypt"
-            ],
-            "metadata": {
-                "description": "Endpoint security."
-            }
-        },
         "activeDirectoryClientId": {
             "type": "string",
+            "minLength": 1,
             "defaultValue": "",
             "metadata": {
                 "description": "Client Id for the Active Directory application to use for this deployment"
@@ -153,7 +143,7 @@
         },
         "fortisAdmins": {
             "type": "string",
-            "defaultValue": "",
+            "minLength": 1,
             "metadata": {
                 "description": "Email addresses of accounts to which admin-access should be granted in Fortis (separated by commas)"
             }
@@ -165,38 +155,11 @@
                 "description": "Email addresses of accounts to which user-access should be granted in Fortis (separated by commas)"
             }
         },
-        "ingressHostname": {
-            "metadata": {
-                "description": "The hostname of the external ingress system."
-            },
-            "type": "string"
-        },
-        "tlsCertificate": {
-            "metadata": {
-                "description": "The certificate to use for TLS.  Must be base64 encoded."
-            },
-            "type": "string"
-        },
-        "tlsPrivateKey": {
-            "metadata": {
-                "description": "The private key for use with TLS.  Must be base64 encoded."
-            },
-            "type": "string"
-        },
         "letsEncryptEmail": {
             "metadata": {
                 "description": "Email address to register with Let's Encrypt."
             },
-            "type": "string"
-        },
-        "letsEncryptApiEndpoint": {
-            "metadata": {
-                "allowedValues": [
-                    "https://acme-staging.api.letsencrypt.org/directory",
-                    "https://acme-v01.api.letsencrypt.org/directory"
-                ],
-                "description": "Let's Encrypt registration endpoint."
-            },
+            "minLength": 1,
             "type": "string"
         }
     },
@@ -589,7 +552,7 @@
                     "fileUris": [
                         "[variables('fortisDeployScriptFileUri')]"
                     ],
-                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', variables('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -gc \"', variables('githubClonePath'), '\" -gr \"', parameters('githubProjectRelease'), '\" -avms \"', parameters('agentVMSize'), '\" -ep \"', parameters('endpointProtection'), '\" -ih \"', parameters('ingressHostname'), '\" -tc \"', parameters('tlsCertificate'), '\" -tk \"', parameters('tlsPrivateKey'), '\" -le \"', parameters('letsEncryptEmail'), '\" -lae \"', parameters('letsEncryptApiEndpoint'), '\"')]"
+                    "commandToExecute": "[concat('./fortis-deploy.sh', ' -fcu \"', parameters('fortisSiteCloneUrl'), '\" -ad \"', parameters('activeDirectoryClientId'), '\" -fa \"', parameters('fortisAdmins'), '\" -fu \"', parameters('fortisUsers'), '\" -lo \"', parameters('siteLocation'), '\" -ak \"', parameters('servicePrincipalAppKey'), '\" -si \"', subscription().subscriptionId, '\" -ti \"', subscription().tenantId, '\" -sn \"', parameters('siteName'), '\" -un \"', variables('adminUsername'), '\" -aii \"', reference(resourceId('Microsoft.Insights/components', variables('applicationInsightServiceName')), '2014-04-01').InstrumentationKey,'\" -rg \"', resourceGroup().name, '\" -mf \"', reference(resourceId('Microsoft.ContainerService/containerServices', variables('kubernetesName'))).masterProfile.fqdn, '\" -san \"', variables('storageAccountName'), '\" -sak \"', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2016-01-01').keys[0].value,'\" -sty \"', parameters('siteType'), '\" -ai \"', parameters('servicePrincipalAppId'), '\" -sw \"', parameters('sparkWorkers'), '\" -cn \"', parameters('cassandraNodes'), '\" -ec \"', listKeys(variables('eventhubResource'), variables('ehVersion')).primaryConnectionString, '\" -sb \"', listkeys(variables('sbAuthRuleResourceId'), variables('sbVersion')).primaryConnectionString, '\" -mat \"', parameters('mapboxAccessToken'), '\" -gc \"', variables('githubClonePath'), '\" -gr \"', parameters('githubProjectRelease'), '\" -avms \"', parameters('agentVMSize'), '\" -le \"', parameters('letsEncryptEmail'), '\"')]"
                 }
             }
         }

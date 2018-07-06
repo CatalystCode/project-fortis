@@ -47,9 +47,6 @@
         "servicePrincipalAppKey": {
             "value": "CHANGE ME"
         },
-        "endpointProtection": {
-            "value": "none"
-        },
         "activeDirectoryClientId": {
             "value": ""
         },
@@ -59,20 +56,8 @@
         "fortisUsers": {
             "value": ""
         },
-        "ingressHostname": {
-            "value": ""
-        },
-        "tlsCertificate": {
-            "value": ""
-        },
-        "tlsPrivateKey": {
-            "value": ""
-        },
         "letsEncryptEmail": {
             "value": ""
-        },
-        "letsEncryptApiEndpoint": {
-            "value": "https://acme-v01.api.letsencrypt.org/directory"
         }
     }
 }

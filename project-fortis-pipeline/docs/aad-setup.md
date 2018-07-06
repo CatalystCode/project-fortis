@@ -1,9 +1,5 @@
 # Azure Active Directory v2.0 login setup for Fortis
 
-## Prerequisites
-
-Setting up TLS is required in order to enable login.
-
 ## Pre-deployment steps
 
 ### Creating a new AAD application

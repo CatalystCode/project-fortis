@@ -14,26 +14,6 @@ And you can create an account for free [here](https://azure.microsoft.com/en-us/
 
 For this project we're using these services: [Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/), [Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/), [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/services/postgresql/), [Service Bus](https://azure.microsoft.com/en-us/services/service-bus/), [Active Directory v2](https://azure.microsoft.com/en-us/services/active-directory/), [Container Service](https://azure.microsoft.com/en-us/services/container-service/) and [Event Hubs](https://azure.microsoft.com/en-us/services/event-hubs/).
 
-### Secure your Fortis site with TLS
-
-TLS is the successcor to SSL. The TLS protocol aims primarily to provide privacy and data integrity between two communicating computer applications. You can find more information about it [here](https://en.wikipedia.org/wiki/Transport_Layer_Security)
-
-To enable TLS and secure your Fortis site, you have two choices:
-
-1. Provide your own TLS certificate and private key
-2. Generate a free certificate with LetsEncrypt
-
-#### Required Deployment Parameters for TLS
-
-* `Endpoint Protection` set to `tls_provide_certificate` or `tls_lets_encrypt`
-* [`Active Directory Client Id`](./aad-setup.md) from `Azure Active Directory v2.0`
-* `Ingress Hostname`
-* `TLS Certificate` if not using LetsEncrypt
-* `TLS Private Key` if not using LetsEncrypt
-* `Lets Encrypt Email` if using LetsEncrypt
-
-More details on TLS setup can be found [here](./tls-setup.md).
-
 ## Setting up a new Azure deployment
 
 Hit the deploy to Azure button below:
@@ -49,7 +29,7 @@ complete.
 
 ## Post Deployment
 
-If you set up TLS, remember to do the [TLS post deployment steps](https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/tls-setup.md#post-deployment-steps) and [AAD post deployment steps](https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/aad-setup.md#post-deployment-steps) before viewing your site. Then, click on the `Manage your resources`
+Remember to do the [AAD post deployment steps](https://github.com/CatalystCode/project-fortis/blob/master/project-fortis-pipeline/docs/aad-setup.md#post-deployment-steps) before viewing your site. Then, click on the `Manage your resources`
 (highlighted below).
 
 ![Screenshot of ARM template after successful deployment with highlight of management link to access the newly created resource group](https://user-images.githubusercontent.com/1086421/33331326-4437a7fe-d42f-11e7-8b4a-19b968b4705b.png)
@@ -64,7 +44,7 @@ loads, you can now finalize the setup of your Fortis deployment using the portal
 
 ![Screenshot showing the Fortis admin interface](https://user-images.githubusercontent.com/1086421/33331562-e9e589be-d42f-11e7-870c-6b758ec2141a.png)
 
-If you configured TLS and get `AADSTS70005: response_type 'id_token' is not enabled for the application`, make sure you completed all the post deployment steps properly.
+If you get `AADSTS70005: response_type 'id_token' is not enabled for the application`, make sure you completed all the post deployment steps properly.
 
 Once you've completed all the [admin settings](./admin-settings.md), your
 deployment is ready to be used.

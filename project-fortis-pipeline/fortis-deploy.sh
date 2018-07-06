@@ -40,12 +40,7 @@ Arguments
   --fortis_admins|-fa                [Optional] : Email addresses of fortis admins, comma separated
   --fortis_users|-fu                 [Optional] : Email addresses of fortis users, comma separated
   --fortis_site_clone_url|-fcu       [Optional] : URL to exported Fortis site to clone
-  --endpoint_protection|-ep          [Optional] : What version of endpoint protection to use
-  --ingress_hostname|-ih             [Optional] : Hostname for TLS ingress
-  --tls_certificate|-tc              [Optional] : Certificate (in base64) for TLS
-  --tls_key|-tk                      [Optional] : Private key (in base64) for TLS
   --lets_encrypt_email|-le           [Optional] : Email to register with Let's Encrypt
-  --lets_encrypt_api_endpoint|-lae   [Optional] : Let's Encrypt API endpoint
 EOF
 }
 
@@ -53,30 +48,6 @@ throw_if_empty() {
   local name="$1"
   local value="$2"
   if [ -z "${value}" ]; then echo "Parameter '${name}' cannot be empty." 1>&2; print_usage; exit -1; fi
-}
-
-throw_if_tls_certificate_info_not_complete() {
-  local hostname="$1"
-  local certificate="$2"
-  local key="$3"
-  if [ -n "$hostname" ] && [ -n "$certificate" ] && [ -n "$key" ]; then
-    return
-  fi
-  echo "endpoint_protection with value 'tls_provide_certificate' requires fields 'ingress_hostname', 'tls_certificate', 'tls_key' be fully filled out." 1>&2
-  print_usage
-  exit -1
-}
-
-throw_if_tls_lets_encrypt_info_not_complete() {
-  local hostname="$1"
-  local email="$2"
-  local endpoint="$3"
-  if [[ -n "${hostname}" ]] && [[ -n "${email}" ]] && [[ -n "${endpoint}" ]]; then
-    return
-  fi
-  echo "endpoint_protection with value 'tls_lets_encrypt' requires fields 'ingress_hostname', 'lets_encrypt_email', 'lets_encrypt_api_endpoint' be fully filled out." 1>&2
-  print_usage
-  exit -1
 }
 
 while [[ $# -gt 0 ]]; do
@@ -183,28 +154,8 @@ while [[ $# -gt 0 ]]; do
       fortis_site_clone_url="$1"
       shift
       ;;
-    --endpoint_protection|-ep)
-      endpoint_protection="$1"
-      shift
-      ;;
-    --ingress_hostname|-ih)
-      ingress_hostname="$1"
-      shift
-      ;;
-    --tls_certificate|-tc)
-      tls_certificate="$1"
-      shift
-      ;;
-    --tls_key|-tk)
-      tls_key="$1"
-      shift
-      ;;
     --lets_encrypt_email|-le)
       lets_encrypt_email="$1"
-      shift
-      ;;
-    --lets_encrypt_api_endpoint|-lae)
-      lets_encrypt_api_endpoint="$1"
       shift
       ;;
     *)
@@ -302,12 +253,6 @@ throw_if_empty --sb_conn_str "${sb_conn_str}"
 throw_if_empty --agent_vm_size "${agent_vm_size}"
 throw_if_empty --mapbox_access_token "${mapbox_access_token}"
 
-if [ "${endpoint_protection}" == "tls_provide_certificate" ]; then
-  throw_if_tls_certificate_info_not_complete "${ingress_hostname}" "${tls_certificate}" "${tls_key}"
-elif [ "${endpoint_protection}" == "tls_lets_encrypt" ]; then
-  throw_if_tls_lets_encrypt_info_not_complete "${ingress_hostname}" "${lets_encrypt_email}" "${lets_encrypt_api_endpoint}"
-fi
-
 readonly kube_config_dest_file="/home/${user_name}/.kube/config"
 
 echo "Logging into Azure"
@@ -384,12 +329,7 @@ echo "Finished. Setting up cluster"
   "${cogtextsvctoken}" \
   "${translationsvctoken}" \
   "${fortis_site_clone_url}" \
-  "${endpoint_protection}" \
-  "${ingress_hostname}" \
-  "${tls_certificate}" \
-  "${tls_key}" \
   "${lets_encrypt_email}" \
-  "${lets_encrypt_api_endpoint}" \
   "${user_name}"
 
 # shellcheck disable=SC2181

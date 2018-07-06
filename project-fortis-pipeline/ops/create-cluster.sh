@@ -22,19 +22,13 @@ readonly cogspeechsvctoken="${19}"
 readonly cogtextsvctoken="${20}"
 readonly translationsvctoken="${21}"
 readonly fortis_site_clone_url="${22}"
-readonly endpoint_protection="${23}"
-readonly tls_hostname="${24}"
-readonly tls_certificate_b64="${25}"
-readonly tls_key_b64="${26}"
-readonly lets_encrypt_email="${27}"
-readonly lets_encrypt_api_endpoint="${28}"
-readonly user_name="${29}"
+readonly lets_encrypt_email="${23}"
+readonly user_name="${24}"
 
-if [ -n "${aad_client}" ] || [ "${endpoint_protection}" != "none" ]; then readonly fortis_interface_protocol="https"; else readonly fortis_interface_protocol="http"; fi
 readonly fortis_central_directory="https://fortiscentral.blob.core.windows.net/"
 readonly fortis_interface_container="public"
 readonly fortis_backup_container="backups"
-readonly fortis_interface_host="${fortis_interface_protocol}://${storage_account_name}.blob.core.windows.net/${fortis_interface_container}"
+readonly fortis_interface_host="https://${storage_account_name}.blob.core.windows.net/${fortis_interface_container}"
 readonly eh_path="published-messages"
 readonly eh_consumer_group="\$Default"
 readonly sb_queue_config="configuration"
@@ -100,12 +94,7 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${cogtextsvctoken}" \
   "${translationsvctoken}" \
   "${fortis_site_clone_url}" \
-  "${endpoint_protection}" \
-  "${tls_hostname}" \
-  "${tls_certificate_b64}" \
-  "${tls_key_b64}" \
   "${lets_encrypt_email}" \
-  "${lets_encrypt_api_endpoint}" \
   "${latest_version}" \
   "${cassandra_port}" \
   "${cassandra_username}" \
@@ -113,21 +102,13 @@ echo "Finished. Now setting up fortis graphql service in kubernetes."
   "${k8cassandra_node_count}"
 
 while :; do
-  if [ "${endpoint_protection}" == "none" ]; then
-    fortis_service_ip="$(kubectl get svc project-fortis-services-lb -o jsonpath='{..ip}')"
-  else
-    fortis_service_ip="$(kubectl get svc/nginx-ingress-controller --namespace=nginx-ingress -o jsonpath='{..ip}')"
-  fi
+  fortis_service_ip="$(kubectl get svc/nginx-ingress-controller -o jsonpath='{..ip}')"
   if [ -n "${fortis_service_ip}" ]; then break; else echo "Waiting for project-fortis-services IP"; sleep 5s; fi
 done
-if [ "${endpoint_protection}" == "none" ]; then
-  readonly graphql_service_host="http://${fortis_service_ip}"
-else
-  readonly graphql_service_host="https://${tls_hostname}"
-  if [ "${endpoint_protection}" == "tls_lets_encrypt" ]; then
-    readonly mx_record_entry="@.${lets_encrypt_email#*@}"
-  fi
-fi
+readonly ingressipid="$(az network public-ip list --resource-group "" --output tsv --query "[?ipAddress!=null]|[?contains(ipAddress, '${fortis_service_ip}')].[id]")"
+readonly tls_hostname="$(az network public-ip update --ids "${ingressipid}" --dns-name "${storage_account_name}" --output tsv --query dnsSettings.fqdn)"
+readonly graphql_service_host="https://${tls_hostname}"
+readonly mx_record_entry="@.${lets_encrypt_email#*@}"
 
 echo "Finished. Now setting up fortis graphql service upgrade script."
 readonly services_upgrade_script="/home/${user_name}/upgrade-fortis-services.sh"
@@ -310,9 +291,6 @@ echo "Finished. Finally, creating tags containing URLs for resources so that the
   "${k8resource_group}" \
   "${fortis_interface_host}" \
   "${site_name}" \
-  "${graphql_service_host}" \
-  "${tls_hostname}" \
-  "${fortis_service_ip}" \
-  "${mx_record_entry}"
+  "${graphql_service_host}"
 
 echo "All done :)"
