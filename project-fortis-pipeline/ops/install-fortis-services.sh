@@ -163,22 +163,22 @@ cat > "${ingress_yaml}" << EOF
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-annotations:
-  kubernetes.io/ingress.class: nginx
-  kubernetes.io/tls-acme: 'true'
-name: project-fortis-services-ingress
+  name: project-fortis-services-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
 spec:
-rules:
+  rules:
   - host: ${tls_hostname}
     http:
       paths:
-        - backend:
-            serviceName: project-fortis-services
-            servicePort: 80
-          path: /
-tls:
-  - hosts:
+      - path: /
+        backend:
+          serviceName: project-fortis-services
+          servicePort: 80
+  tls:
+  - secretName: project-fortis-services-nginx-tls-secret
+    hosts:
       - ${tls_hostname}
-    secretName: project-fortis-services-nginx-tls-secret
 EOF
 kubectl create -f "${ingress_yaml}"
