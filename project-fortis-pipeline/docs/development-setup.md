@@ -29,10 +29,15 @@ script (e.g. via the [Windows Subsystem for Linux](https://docs.microsoft.com/en
 
 ```sh
 ./project-fortis-pipeline/localdeploy/setup-development-azure-resources.sh \
-  -i YOUR_SUBSCRIPTION_ID_HERE \
-  -l YOUR_CLOSEST_AZURE_LOCATION_HERE \
+  -i "YOUR_SUBSCRIPTION_ID_HERE" \
+  -l "YOUR_CLOSEST_AZURE_LOCATION_HERE" \
   -o .env-secrets
 ```
+
+Note that the script depends on the the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+and on [Python](https://www.python.org/) so please ensure to install these
+system dependencies before running the script. You can get a full list of
+all supported locations using `az account list-locations`.
 
 This script will deploy to Azure a number of services used by Fortis, such as
 ServiceBus, EventHubs, Cognitive Services, PostgreSQL, and so forth. The secrets
