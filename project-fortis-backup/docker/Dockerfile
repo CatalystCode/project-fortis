@@ -11,10 +11,9 @@ RUN apt-get update && \
     ln -s /opt/${CASSANDRA_ARTIFACT} ${CASSANDRA_HOME}
 
 RUN apt-get -qq update && \
-    apt-get -qq install -y libssl-dev libffi-dev python-dev curl && \
+    apt-get -qq install -y libssl-dev libffi-dev python-dev curl apt-transport-https && \
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ xenial main" | tee /etc/apt/sources.list.d/azure-cli.list && \
     curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    apt-get -qq install -y apt-transport-https && \
     apt-get -qq update && \
     apt-get -qq install -y azure-cli
 
