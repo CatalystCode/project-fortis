@@ -141,3 +141,16 @@ directory which you can use as a template.
 ## Why isn't my UI loading?
 
 If you see `An error occurred while loading the page: GraphQL call failed` when trying to load the Dashboard, your `docker-compose up` process is either not done running, or you might need to pull down fresh from your Master branch and rebuild.
+
+## Why are there no events showing up?
+
+If your site is set up correctly but there are still no events showing up on the dashboard, this is likely caused by the events being filtered out by the pipeline. You can investigate at which step of the pipeline the events are being dropped via [Application Insights](https://azure.microsoft.com/en-us/services/application-insights/).
+
+First, find the Application Insights resource in the Azure dashboard that was created by the Fortis deployment. The resource will be called `FortisAppInsight-YOUR_SITE_NAME`. Open the resource and access the Application Insights interactive querying environment. Create a query for the `customEvents` table in Application Insights. If an item was filtered out by a particular step in the Fortis pipeline, there will be an entry in the `customEvents` table named `pipeline.filters.STEP_NAME` with a custom property of `passedFilter: false`. The possible steps in the pipeline at which an event can be filtered out are:
+
+- `missingvalues`: the ingested event is missing required fields such as title or body
+- `blacklistterms`: the ingested event contains one or more entries of the blacklist table
+- `language`: it was not possible to infer the language of the ingested event
+- `keywords`: the ingested event does not contain at least one entry of the keywords table
+- `locations`: it was not possible to infer any locations in the geofence from the event
+- `blacklistentities`: the event contains at least one entry of the blacklist entities table
