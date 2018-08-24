@@ -977,7 +977,7 @@ const schema = {
                       type: 'boolean'
                     },
                     userIds: {
-                      title: 'Twitter User Ids',
+                      title: 'Twitter User Ids (without leading @ symbol)',
                       type: 'array',
                       items: {
                         type: 'string'
