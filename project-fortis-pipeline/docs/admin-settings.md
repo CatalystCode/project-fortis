@@ -121,6 +121,8 @@ to a particular category.
 Keywords can be single words such as `election` or phrases such as `election results`.
 Fortis will only monitor events that match any of the keywords verbatim.
 
+All keywords must be lowercase.
+
 The following list explains the settings managed on this site in more detail:
 
 - **Category:** Used to group keywords for separate display on the dashboard.
